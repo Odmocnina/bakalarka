@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <road>
+        <maxSpeed>50</maxSpeed>
+        <lanes>10</lanes>
+        <roadLength>1000</roadLength>
+        <type>cellular</type>
+        <drawCells>false</drawCells>
+    </road>
+
+    <models>
+        <carFollowingModel>
+            <name>rule184</name>
+            <id>nagelschreckenberg</id>
+        </carFollowingModel>
+        <laneChangingModel>
+            <name>Minimizing Overall Braking Induced by Lane changes (MOBIL)</name>
+            <id>mobil</id>
+        </laneChangingModel>
+    </models>
+
+    <generator>
+        <flowRate>0.7</flowRate>
+        <minLength>1</minLength>
+        <maxLength>5</maxLength>
+        <minMaxSpeed>1</minMaxSpeed>
+        <maxMaxSpeed>5</maxMaxSpeed>
+    </generator>
+</config>
