@@ -56,15 +56,15 @@ public class ContinuosRoad extends Road {
 
     @Override
     public void upadateRoad() {
-//        for (int lane = 0; lane < numberOfLanes; lane++) {
-//            if (generator.decideIfNewCar()) {
-//                CarParams newCar = generator.generateCar();
-//
-//                if (okToPutCar(newCar, lane)) {
-//                    placeCar(newCar, 0, lane);
-//                }
-//            }
-//        }
+        for (int lane = 0; lane < numberOfLanes; lane++) {
+            if (generator.decideIfNewCar()) {
+                CarParams newCar = generator.generateCar();
+
+                if (okToPutCar(newCar, lane)) {
+                    placeCar(newCar, 0, lane);
+                }
+            }
+        }
         for (int lane = this.numberOfLanes - 1; lane >= 0; lane--) {
             this.updateLane(lane);
         }
@@ -82,6 +82,8 @@ public class ContinuosRoad extends Road {
             double newSpeed = AppContext.CAR_FOLLOWING_MODEL.getNewSpeed(parameters);
             car.currentSpeed = newSpeed;
             car.xPosition += newSpeed;
+
+            checkIfCarStillRelevant(car, lane);
         }
     }
 
@@ -162,7 +164,33 @@ public class ContinuosRoad extends Road {
     private void placeCar(CarParams newCar, double position, int lane) {
         newCar.xPosition = position;
         newCar.lane = lane;
-        vehicles[lane].addFirst(newCar);
+        int place = findPlaceForCar(position, lane);
+        vehicles[lane].add(place, newCar);
+    }
+
+    private int findPlaceForCar(double x, int lane) {
+        if (vehicles[lane].isEmpty()) {
+            return 0;
+        }
+        for (int i = 0; i < vehicles[lane].size(); i++) {
+            if (vehicles[lane].get(i).xPosition > x) {
+                return i;
+            }
+        }
+        return vehicles[lane].size();
+    }
+
+    private boolean checkIfCarStillRelevant(CarParams car, int lane) {
+        if ((car.xPosition - car.length) > this.length) {
+            destroyCar(car, lane);
+            return false;
+        }
+
+        return true;
+    }
+
+    private void destroyCar(CarParams car, int lane) {
+        vehicles[lane].remove(car);
     }
 
 

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
+    <numberOfRoads>1</numberOfRoads>
+    <roadFile>roads/road1.xml</roadFile>
     <road>
         <maxSpeed>50</maxSpeed>
         <lanes>10</lanes>
@@ -20,10 +22,10 @@
 
     <generator>
         <flowRate>0.7</flowRate>
-        <minLength>1</minLength>
+        <minLength>3</minLength>
         <maxLength>5</maxLength>
-        <minMaxSpeed>1</minMaxSpeed>
-        <maxMaxSpeed>5</maxMaxSpeed>
+        <minMaxSpeed>50</minMaxSpeed>
+        <maxMaxSpeed>100</maxMaxSpeed>
     </generator>
 
 

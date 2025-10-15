@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<road>
+    <maxSpeed>50</maxSpeed>
+    <lanes>10</lanes>
+    <roadLength>200</roadLength>
+    <type>continous</type>
+</road>

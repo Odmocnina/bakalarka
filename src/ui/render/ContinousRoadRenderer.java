@@ -5,6 +5,7 @@ import core.model.Road;
 import core.utils.Constants;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.paint.Color;
 import java.util.LinkedList;
 
@@ -12,7 +13,10 @@ public class ContinousRoadRenderer implements IRoadRenderer {
     @Override
     public void draw(GraphicsContext gc, Road road, double width, double height) {
         int lanes = road.getNumberOfLanes();
-        if (lanes <= 0) return;
+
+        if (lanes <= 0) {
+            return;
+        }
 
         // size of road base units
         double roadLengthUnits = road.getLength();          // meters

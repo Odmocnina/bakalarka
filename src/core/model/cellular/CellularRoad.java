@@ -19,7 +19,6 @@ public class CellularRoad extends Road {
         super(length, numberOfLanes, speedLimit);
         createRoad();
         this.generator = AppContext.CAR_GENERATOR;
-        System.out.println("Cell size");
         super.type = Constants.CELLULAR;
     }
     private void createRoad() {
@@ -82,9 +81,17 @@ public class CellularRoad extends Road {
                         System.out.println("Error getting parameters for car at lane " + lane + ", position " + position);
                         continue;
                     }
+
                     double newSpeed = AppContext.CAR_FOLLOWING_MODEL.getNewSpeed(parameters);
-                    cells[lane][position].getCarParams().currentSpeed = (int) newSpeed;
-                    this.moveCar(cells[lane][position]);
+
+                    if (isCarAtEnd(cells[lane][position].getCarParams(), (int) newSpeed)) {
+                        if (checkIfCarStillRelevant(cells[lane][position].getCarParams(), (int) newSpeed)) {
+                            moveCarHead(cells[lane][position].getCarParams(), (int) newSpeed);
+                        }
+                    } else {
+                        cells[lane][position].getCarParams().currentSpeed = (int) newSpeed;
+                        this.moveCar(cells[lane][position]);
+                    }
                 }
             }
         }
@@ -317,5 +324,52 @@ public class CellularRoad extends Road {
                 System.out.println("Car length exceeds road boundaries when placing car");
             }
         }
+    }
+
+    private boolean checkIfCarStillRelevant(CarParams car, int newSpeed) {
+        if (car == null) {
+            return false;
+        }
+
+        if ((car.xPosition + newSpeed - car.length) >= this.length) {
+            removeCar(car.lane, (int) car.xPosition);
+            return false;
+        }
+        
+        return true;
+    }
+
+    private boolean isCarAtEnd(CarParams car, int newSpeed) {
+        if (car == null) {
+            return false;
+        }
+
+        return (car.xPosition + newSpeed) >= this.length;
+    }
+
+    private void moveCarHead(CarParams car, int newSpeed) {
+        if (car == null) {
+            return;
+        }
+
+        int oldX = (int) car.xPosition;
+        int howMuchOverflow = (int) (car.xPosition + newSpeed - this.length);
+
+        for (int i = 0; i < howMuchOverflow; i++) {
+            int posToClear = oldX - i;
+            if (posToClear >= 0 && posToClear < numberOfCells) {
+                cells[car.lane][posToClear].setOccupied(false);
+                cells[car.lane][posToClear].setHead(false);
+                cells[car.lane][posToClear].setCarParams(null);
+            }
+        }
+
+        int newX = oldX + newSpeed - howMuchOverflow;
+        car.length = car.length - howMuchOverflow;
+
+        cells[car.lane][newX].setOccupied(true);
+        cells[car.lane][newX].setHead(true);
+        cells[car.lane][newX].setCarParams(car);
+        this.moveCar(cells[car.lane][newX]);
     }
 }
