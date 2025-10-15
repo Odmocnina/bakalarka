@@ -19,6 +19,7 @@ public class Main {
         } else {
             configFile = args[0];
         }
+
         ICarFollowingModel carFollowingModel = ConfigLoader.loadCarFollowingModel(configFile);
         if (carFollowingModel == null) {
             System.out.println("Failed to load car following model, exiting.");
@@ -26,6 +27,7 @@ public class Main {
         } else {
             System.out.println("Loaded car following model: " + carFollowingModel.getID());
         }
+        AppContext.CAR_FOLLOWING_MODEL = carFollowingModel;
 
         CarGenerator carGenerator = ConfigLoader.loadCarGenerator(configFile);
         if (carGenerator == null) {
@@ -61,7 +63,6 @@ public class Main {
         }
         AppContext.RENDERER = renderer;
 
-        AppContext.CAR_FOLLOWING_MODEL = carFollowingModel;
         Window.main(args);
     }
 }

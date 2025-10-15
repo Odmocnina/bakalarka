@@ -4,6 +4,7 @@ import app.AppContext;
 import core.utils.Constants;
 import javafx.scene.paint.Color;
 
+import java.util.Queue;
 import java.util.Random;
 
 public class CarGenerator {
@@ -14,8 +15,8 @@ public class CarGenerator {
     private double minAcceleration;
     private double maxDeceleration;
     private double minDeceleration;
-    private double maxLength = 3.0;
-    private double minLength = 1.0;
+    private double maxLength;
+    private double minLength;
     private double maxDesiredTimeHeadway;
     private double minDesiredTimeHeadway;
     private String type;
@@ -103,6 +104,19 @@ public class CarGenerator {
         this.maxMaxSpeed = Math.round(this.maxMaxSpeed / cellSize);
         this.minLength = Math.ceil(this.minLength / cellSize);
         this.maxLength = Math.round(this.maxLength / cellSize);
+    }
+
+    public Queue<CarParams> generateCarsInToQueue(int minNumberOfCars, int maxNumberOfCars) {
+        Queue<CarParams> queue = new java.util.LinkedList<>();
+        Random rand = new Random();
+        int numberOfCars = rand.nextInt(maxNumberOfCars - minNumberOfCars + 1) + minNumberOfCars;
+
+        while (queue.size() < numberOfCars) {
+            CarParams car = generateCar();
+            queue.add(car);
+        }
+
+        return queue;
     }
 
 

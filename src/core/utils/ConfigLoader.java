@@ -53,7 +53,7 @@ public class ConfigLoader {
                 System.out.println("Road length must be greater than 0, exiting");
                 return null;
             }
-            String type = road.getElementsByTagName("type").item(0).getTextContent();
+            String type = AppContext.CAR_FOLLOWING_MODEL.getType();
             System.out.println("Loading road from config: lanes=" + numberOfLanes + ", maxSpeed=" + getMaxSpeed +
                     ", roadLength=" + roadLength + ", type=" + type);
 
@@ -152,9 +152,10 @@ public class ConfigLoader {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
             doc.getDocumentElement().normalize();
+
             Element generator = (Element) doc.getElementsByTagName("generator").item(0);
             Element flowRate = (Element) generator.getElementsByTagName("flowRate").item(0);
-            Element minLength = (Element) generator.getElementsByTagName("minLenght").item(0);
+            Element minLength = (Element) generator.getElementsByTagName("minLength").item(0);
             Element maxLenght = (Element) generator.getElementsByTagName("maxLength").item(0);
             Element maxSpeed = (Element) generator.getElementsByTagName("maxMaxSpeed").item(0);
             Element minSpeed = (Element) generator.getElementsByTagName("minMaxSpeed").item(0);

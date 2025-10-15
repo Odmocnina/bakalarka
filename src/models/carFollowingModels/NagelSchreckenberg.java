@@ -24,18 +24,14 @@ public class NagelSchreckenberg implements ICarFollowingModel {
         int distanceInCells = (int) Math.round(distance); // convert distance to number of cells
         // Step 1: Acceleration
         if (currentSpeed < maxSpeed) {
-            System.out.println("Accelerating");
             currentSpeed++;
         }
         // Step 2: Slowing down
         if (distanceInCells <= currentSpeed) {
-            System.out.println("Slowing down");
             currentSpeed = distanceInCells - 1;
-            System.out.println("New Speed after slowing down: " + currentSpeed);
         }
         // Step 3: Randomization
         if (currentSpeed > 0 && Math.random() < this.slowDownChance) { // 30% chance to slow down
-            System.out.println("Random slowing down");
             currentSpeed--;
         }
         System.out.println("Final Speed: " + Math.max(0, currentSpeed));

@@ -17,4 +17,12 @@ public class CarParams {
     public double conftableDeceleration = Constants.PARAMETER_UNDEFINED;
     public Color color = null;
 
+    public String toString() {
+        return "CarParams[currentSpeed=" + currentSpeed + ", maxSpeed=" + maxSpeed + ", xPosition=" + xPosition +
+                ", lane=" + lane + ", length=" + length + ", maxAcceleration=" + maxAcceleration +
+                ", minGapToNextCar=" + minGapToNextCar + ", maxConfortableDeceleration=" + maxConfortableDeceleration +
+                ", desiredTimeHeadway=" + desiredTimeHeadway + ", conftableDeceleration=" + conftableDeceleration +
+                ", color=" + color + "]";
+    }
+
 }

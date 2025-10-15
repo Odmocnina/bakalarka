@@ -3,9 +3,9 @@
     <road>
         <maxSpeed>50</maxSpeed>
         <lanes>10</lanes>
-        <roadLength>1000</roadLength>
+        <roadLength>500</roadLength>
         <type>cellular</type>
-        <drawCells>false</drawCells>
+        <drawCells>true</drawCells>
     </road>
 
     <models>

@@ -88,6 +88,9 @@ public class CellularRoad extends Road {
                         if (checkIfCarStillRelevant(cells[lane][position].getCarParams(), (int) newSpeed)) {
                             moveCarHead(cells[lane][position].getCarParams(), (int) newSpeed);
                         }
+                        //removeCar(lane, position); //easier and probably better solution, if car touches the end
+                                                   //delete it whole but im a retard and keep trying to make that only
+                                                   //part that is outside will delete, viz voodo at top, fucking thing
                     } else {
                         cells[lane][position].getCarParams().currentSpeed = (int) newSpeed;
                         this.moveCar(cells[lane][position]);
@@ -148,7 +151,7 @@ public class CellularRoad extends Road {
                     int nextCarPos = getNextOcuppiedCell(lane, position, Direction.STRAIGHT);
                     if (nextCarPos == Constants.NO_CAR_IN_FRONT) {
                         parameters.put(Constants.DISTANCE_TO_NEXT_CAR_REQUEST,
-                                (double) (cells[lane].length - position));
+                                Double.MAX_VALUE);
                     } else {
                         parameters.put(Constants.DISTANCE_TO_NEXT_CAR_REQUEST,
                                 (double) (nextCarPos - position - 1));
@@ -158,7 +161,7 @@ public class CellularRoad extends Road {
                     nextCarPos = getNextOcuppiedCell(lane, position, Direction.LEFT);
                     if (nextCarPos == Constants.NO_CAR_IN_FRONT) {
                         parameters.put(Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST,
-                                (double) (cells[lane].length - position));
+                                Double.MAX_VALUE);
                     } else if (nextCarPos == Constants.NO_LANE_THERE) {
                         parameters.put(Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST,
                                 Constants.PARAMETER_UNDEFINED);
@@ -171,7 +174,7 @@ public class CellularRoad extends Road {
                     nextCarPos = getNextOcuppiedCell(lane, position, Direction.RIGHT);
                     if (nextCarPos == Constants.NO_CAR_IN_FRONT) {
                         parameters.put(Constants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST,
-                                (double) (cells[lane].length - position));
+                                Double.MAX_VALUE);
                     } else if (nextCarPos == Constants.NO_LANE_THERE) {
                         parameters.put(Constants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST,
                                 Constants.PARAMETER_UNDEFINED);
@@ -331,7 +334,7 @@ public class CellularRoad extends Road {
             return false;
         }
 
-        if ((car.xPosition + newSpeed - car.length) >= this.length) {
+        if ((car.xPosition + newSpeed - car.length + 1) >= this.numberOfCells) { // fuck zero base indexing
             removeCar(car.lane, (int) car.xPosition);
             return false;
         }
@@ -344,7 +347,7 @@ public class CellularRoad extends Road {
             return false;
         }
 
-        return (car.xPosition + newSpeed) >= this.length;
+        return (car.xPosition + newSpeed) >= this.numberOfCells;
     }
 
     private void moveCarHead(CarParams car, int newSpeed) {
@@ -353,23 +356,29 @@ public class CellularRoad extends Road {
         }
 
         int oldX = (int) car.xPosition;
-        int howMuchOverflow = (int) (car.xPosition + newSpeed - this.length);
+        int howMuchOverflow = (int) (car.xPosition + newSpeed - this.numberOfCells + 1);
 
         for (int i = 0; i < howMuchOverflow; i++) {
             int posToClear = oldX - i;
-            if (posToClear >= 0 && posToClear < numberOfCells) {
+            if (posToClear >= 0 && posToClear < this.numberOfCells) {
                 cells[car.lane][posToClear].setOccupied(false);
                 cells[car.lane][posToClear].setHead(false);
                 cells[car.lane][posToClear].setCarParams(null);
             }
         }
 
-        int newX = oldX + newSpeed - howMuchOverflow;
+        int newHeadX = oldX - howMuchOverflow;
         car.length = car.length - howMuchOverflow;
 
-        cells[car.lane][newX].setOccupied(true);
-        cells[car.lane][newX].setHead(true);
-        cells[car.lane][newX].setCarParams(car);
-        this.moveCar(cells[car.lane][newX]);
+        cells[car.lane][newHeadX].setOccupied(true);
+        cells[car.lane][newHeadX].setHead(true);
+        cells[car.lane][newHeadX].setCarParams(car);
+        car.currentSpeed = newSpeed;
+        car.xPosition = newHeadX;
+
+        System.out.println("Old head position: " + oldX);
+        System.out.println("Car at lane " + car.lane + " reached the end of the road and is partially removed.");
+        System.out.println("New head position: " + newHeadX + ", New length: " + car.length + ", Current speed: " + car.currentSpeed);
+        this.moveCar(cells[car.lane][newHeadX]);
     }
 }
