@@ -7,7 +7,7 @@ import ui.render.IRoadRenderer;
 
 public final class AppContext {
     private AppContext() {}
-    public static Road ROAD;
+    public static Road[] ROADS;
     public static IRoadRenderer RENDERER;
     public static ICarFollowingModel CAR_FOLLOWING_MODEL;
     public static double cellSize = -1;

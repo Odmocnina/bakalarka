@@ -11,6 +11,7 @@ import ui.render.ContinousRoadRenderer;
 import ui.render.IRoadRenderer;
 
 public class Main {
+
     public static void main(String[] args) {
         String configFile;
         if (args.length == 0) {
@@ -38,30 +39,39 @@ public class Main {
         }
         AppContext.CAR_GENERATOR = carGenerator;
 
-        Road road = ConfigLoader.loadRoad(configFile);
-        if (road == null) {
+        if (carGenerator.checkIfAllParametresAreLoaded(carFollowingModel.requestParameters())) {
+            System.out.println("Car generator parameters are valid for the selected car following model.");
+        } else {
+            System.out.println("Car generator parameters are NOT valid for the selected car following model, exiting.");
+            return;
+        }
+
+        Road[] roads = ConfigLoader.loadRoads(configFile);
+
+        if (roads == null) {
             System.out.println("Failed to load road configuration, exiting.");
             return;
         } else {
-            System.out.println("Loaded road: " + road.toString());
+            System.out.println("Loaded road: " + roads[0].toString());
         }
-        if (!road.getType().equals(carFollowingModel.getType())) {
+        if (!roads[0].getType().equals(carFollowingModel.getType())) {
             System.out.println("Types of car following model and road do not match, exiting.");
             return;
         }
-        AppContext.CAR_GENERATOR.setType(road.getType());
-        AppContext.ROAD = road;
+        AppContext.CAR_GENERATOR.setType(roads[0].getType());
+        AppContext.ROADS = roads;
 
         IRoadRenderer renderer;
-        if (road.getType().equals(Constants.CELLULAR)) {
+        if (roads[0].getType().equals(Constants.CELLULAR)) {
             renderer = new CellularRoadRenderer();
-        } else if (road.getType().equals(Constants.CONTINOUS)) {
+        } else if (roads[0].getType().equals(Constants.CONTINOUS)) {
             renderer = new ContinousRoadRenderer();
         } else {
-            System.out.println("Unknown road type: " + road.getType());
+            System.out.println("Unknown road type: " + roads[0].getType());
             return;
         }
         AppContext.RENDERER = renderer;
+
 
         Window.main(args);
     }

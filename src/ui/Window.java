@@ -1,108 +1,193 @@
 package ui;
 
 import app.AppContext;
+import core.engine.Engine;
 import core.model.Road;
-import core.model.cellular.CellularRoad;
+import core.model.cellular.Cell;
 import core.utils.Constants;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import ui.render.IRoadRenderer;
 
 public class Window extends Application {
 
+    // gap between roads
+    private static final double GAP_Y = 16.0;
+
+    // scale for continous roads
+    private static final double PX_PER_M = 4.0;
+
+    private Engine engine;
+
     @Override
     public void start(Stage primaryStage) {
-        Road road = AppContext.ROAD;
+        Road[] roads = AppContext.ROADS;                    // očekává pole silnic
         IRoadRenderer renderer = AppContext.RENDERER;
 
-        // 1) Vytvoříme Canvas s "reálnými" rozměry silnice
+        // cavas for drawing
         Canvas canvas = new Canvas();
-        resizeCanvasToRoad(canvas, road); // <<< NOVÁ POMOCNÁ FUNKCE níže
 
-        // 2) Kreslící funkce (žádné centrování, renderery si všimnou, že width/height == reálná velikost)
-        Runnable paint = () -> {
-            GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-            gc.setLineDashes(null);
-            renderer.draw(gc, road, canvas.getWidth(), canvas.getHeight());
-        };
+        // dividing cavas for all roads
+        layoutAndResizeCanvas(canvas, roads);
 
-        // 3) ScrollPane místo StackPane/bindingů
+        // painter for all roads
+        Runnable paintAll = () -> paintAllRoads(canvas, roads, renderer);
+
+        // scroller
         ScrollPane scroller = new ScrollPane(canvas);
         scroller.setFitToWidth(false);
         scroller.setFitToHeight(false);
-        scroller.setPannable(true);      // drag myší
+        scroller.setPannable(true);
         scroller.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scroller.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        // 4) Tlačítko nahoře (ponecháno)
-        Button button = new Button("Překreslit");
-        button.setOnAction(e -> this.nextSimulationStep(paint, canvas, road, scroller));
+        // --- definice jednoho simulačního kroku (co se má stát každé „tik“) ---
+        Runnable tick = () -> {
+            for (Road r : roads) if (r != null) r.upadateRoad();
+            // Pokud se rozměry za běhu můžou měnit, nech:
+            // layoutAndResizeCanvas(canvas, roads);
+            paintAll.run();
+        };
+
+        // --- Engine s intervalem 1 s ---
+        engine = new Engine(tick, Duration.seconds(1));
+
+        // --- Ovládání ---
+        ToggleButton playPause = new ToggleButton("Start");
+        playPause.setOnAction(e -> {
+            if (playPause.isSelected()) {
+                playPause.setText("Stop");
+                engine.start();
+            } else {
+                playPause.setText("Start");
+                engine.stop();
+            }
+        });
+
+        // control for manual stepping
+        Button button = new Button("Překreslit / další krok");
+        button.setOnAction(e -> {
+            // update all roads
+            for (Road r : roads) {
+                if (r != null) {
+                    r.upadateRoad(); // update road to next step
+                }
+            }
+            // if road sizes changed, relayout canvas, shouldnt happpen
+            layoutAndResizeCanvas(canvas, roads);
+            paintAll.run();
+        });
+
+        HBox top = new HBox(8, button, playPause);
+
+        // control for automatic stepping
+        Button autoButton = new Button("Automatický režim start/stop");
+        //autoButton
 
         BorderPane root = new BorderPane();
-        root.setTop(button);
+        root.setTop(top);
         root.setCenter(scroller);
 
         Scene scene = new Scene(root, Constants.CANVAS_WIDTH, Constants.CANVAS_HEIGHT + 40);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Silnice");
-        primaryStage.setMinWidth(200);
-        primaryStage.setMinHeight(150);
+        primaryStage.setTitle("Více silnic pod sebou");
+        primaryStage.setMinWidth(300);
+        primaryStage.setMinHeight(200);
         primaryStage.show();
 
-        // po zobrazení skoč na horní levý roh
         scroller.setHvalue(0);
         scroller.setVvalue(0);
 
-        paint.run();
+        paintAll.run();
     }
 
-    private void nextSimulationStep(Runnable paint, Canvas canvas, Road road, ScrollPane scroller) {
-        AppContext.ROAD.upadateRoad();
-        // pokud by se někdy změnily rozměry silnice (počet pruhů / délka), přepočti canvas
-        resizeCanvasToRoad(canvas, road);
-        // držet nahoře (volitelné)
-        // scroller.setVvalue(0);
-        paint.run();
+
+    private void paintAllRoads(Canvas canvas, Road[] roads, IRoadRenderer renderer) {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.setLineDashes(null);
+
+        double yOffset = 0.0;
+
+        for (Road road : roads) {
+            if (road == null) {
+                continue;
+            }
+
+            // getting road size for road
+            Size s = getRoadPixelSize(road);
+
+            // draw offset for road
+            gc.save();
+            gc.translate(0, yOffset);
+            renderer.draw(gc, road, s.w, s.h); //rederer get its own size
+            gc.restore();
+
+            yOffset += s.h + GAP_Y;
+        }
     }
 
-    /**
-     * Nastaví velikost canvasu podle typu silnice tak, aby renderery
-     * počítaly scale=1 a offset=(0,0) → kreslení nahoře vlevo bez centrování.
-     */
-    private void resizeCanvasToRoad(Canvas canvas, Road road) {
+    private void layoutAndResizeCanvas(Canvas canvas, Road[] roads) {
+        double maxW = 0.0;
+        double sumH = 0.0;
+
+        for (Road road : roads) {
+            if (road == null) continue;
+            Size s = getRoadPixelSize(road);
+            maxW = Math.max(maxW, s.w);
+            sumH += s.h + GAP_Y;
+        }
+
+        if (sumH > 0) {
+            sumH -= GAP_Y;
+        }
+
+        if (maxW <= 0) {
+            maxW = Constants.CANVAS_WIDTH;
+        }
+        if (sumH <= 0) {
+            sumH = Constants.CANVAS_HEIGHT;
+        }
+
+        canvas.setWidth(maxW);
+        canvas.setHeight(sumH);
+    }
+
+    private Size getRoadPixelSize(Road road) {
         if (Constants.CELLULAR.equals(road.getType())) {
-            // Cellular: vycházej z "base cell" v rendereru (cellSize = AppContext.cellSize + 0.5, scale=1)
+            // same logic as in CellularRoadRenderer
             Object content = road.getContent();
-            if (content instanceof core.model.cellular.Cell[][] cells && cells.length > 0) {
+            if (content instanceof Cell[][] cells && cells.length > 0 && cells[0].length > 0) {
                 int lanes = cells.length;
                 int cols  = cells[0].length;
-                double baseCell = (AppContext.cellSize + 0.5); // stejné jako v CellularRoadRenderer
-                canvas.setWidth(cols  * baseCell);
-                canvas.setHeight(lanes * baseCell);
+                double baseCell = (AppContext.cellSize + 0.5);
+                return new Size(cols * baseCell, lanes * baseCell);
             }
         } else if (Constants.CONTINOUS.equals(road.getType())) {
-            // Continous: zvolíme fixní pixely na metr, aby to nebylo malinké
-            double PX_PER_M = 4.0; // klidně dej do Constants, když chceš
+            // scale
             int lanes = road.getNumberOfLanes();
-            double roadLengthUnits = road.getLength();          // metry
-            double laneHeightUnits = Constants.LANE_WIDTH;      // metry na pruh
+            double roadLenM = road.getLength();
+            double laneH_M  = Constants.LANE_WIDTH;
+            return new Size(roadLenM * PX_PER_M, lanes * laneH_M * PX_PER_M);
+        }
+        // fallback
+        return new Size(Constants.CANVAS_WIDTH, Constants.CANVAS_HEIGHT);
+    }
 
-            canvas.setWidth(roadLengthUnits * PX_PER_M);
-            canvas.setHeight(lanes * laneHeightUnits * PX_PER_M);
-        } else {
-            // fallback
-            canvas.setWidth(Constants.CANVAS_WIDTH);
-            canvas.setHeight(Constants.CANVAS_HEIGHT);
+    private static class Size {
+        final double w, h;
+        Size(double w, double h) {
+            this.w = w;
+            this.h = h;
         }
     }
 

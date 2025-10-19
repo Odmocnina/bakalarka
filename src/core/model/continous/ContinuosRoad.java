@@ -38,7 +38,6 @@ public class ContinuosRoad extends Road {
             minGapToNextCar = 2.0;
             maxConfortableDeceleration = 4.5;
             desiredTimeHeadway = 1.5;
-            conftableDeceleration = 4.5;
         }});
         vehicles[0].add(new CarParams() {{
             currentSpeed = 0;
@@ -50,7 +49,6 @@ public class ContinuosRoad extends Road {
             minGapToNextCar = 2.0;
             maxConfortableDeceleration = 4.5;
             desiredTimeHeadway = 1.5;
-            conftableDeceleration = 4.5;
         }});
     }
 
@@ -114,7 +112,7 @@ public class ContinuosRoad extends Road {
                     break;
                 case Constants.DECELERATION_COMFORT_REQUEST:
                     parameters.put(Constants.DECELERATION_COMFORT_REQUEST,
-                            vehicles[lane].get(position).conftableDeceleration);
+                            vehicles[lane].get(position).maxConfortableDeceleration);
                     break;
                 case Constants.DESIRED_TIME_HEADWAY_REQUEST:
                     parameters.put(Constants.DESIRED_TIME_HEADWAY_REQUEST,

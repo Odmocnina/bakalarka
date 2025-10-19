@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <road>
-        <maxSpeed>50</maxSpeed>
-        <lanes>10</lanes>
-        <roadLength>500</roadLength>
-        <type>cellular</type>
-        <drawCells>true</drawCells>
-    </road>
+    <numberOfRoads>10</numberOfRoads>
+    <roadFile>config/roads/road2.xml</roadFile>
 
     <models>
         <carFollowingModel>
@@ -21,9 +16,12 @@
 
     <generator>
         <flowRate>0.7</flowRate>
-        <minLength>1</minLength>
-        <maxLength>5</maxLength>
-        <minMaxSpeed>1</minMaxSpeed>
-        <maxMaxSpeed>5</maxMaxSpeed>
+        <minLength>2</minLength>
+        <maxLength>2</maxLength>
+        <minMaxSpeed>15</minMaxSpeed>
+        <maxMaxSpeed>25</maxMaxSpeed>
+        <minMaxAcceleration>2</minMaxAcceleration>
+        <maxMaxAcceleration>2</maxMaxAcceleration>
+
     </generator>
 </config>

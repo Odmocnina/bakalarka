@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <numberOfRoads>1</numberOfRoads>
-    <roadFile>roads/road1.xml</roadFile>
-    <road>
-        <maxSpeed>50</maxSpeed>
-        <lanes>10</lanes>
-        <roadLength>200</roadLength>
-        <type>continous</type>
-    </road>
+    <numberOfRoads>3</numberOfRoads>
+    <roadFile>config/roads/road1.xml</roadFile>
 
     <models>
         <carFollowingModel>
@@ -27,6 +21,11 @@
         <minMaxSpeed>50</minMaxSpeed>
         <maxMaxSpeed>100</maxMaxSpeed>
     </generator>
+
+    <gui>
+        <showGui>true</showGui>
+        <drawCells>false</drawCells>
+    </gui>
 
 
 </config>

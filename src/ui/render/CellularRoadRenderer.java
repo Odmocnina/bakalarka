@@ -11,7 +11,8 @@ import javafx.scene.paint.Color;
 public class CellularRoadRenderer implements IRoadRenderer {
     @Override
     public void draw(GraphicsContext gc, Road road, double width, double height) {
-        Object roadContent = AppContext.ROAD.getContent();
+        Object roadContent = road.getContent();
+
         if (roadContent == null || !(roadContent instanceof Cell[][])) {
             return;
         }

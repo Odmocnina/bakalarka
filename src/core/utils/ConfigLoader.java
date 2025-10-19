@@ -11,11 +11,72 @@ import models.carFollowingModels.NagelSchreckenberg;
 import models.carFollowingModels.Rule184;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
+import java.io.IOException;
 
 public class ConfigLoader {
+
+    public static Road[] loadRoads(String filePath) {
+        Road[] roads;
+        File xmlFile;
+        try {
+            xmlFile = new File(filePath);
+        } catch (NullPointerException e) {
+            System.out.println("Config file not found, loading default config");
+            xmlFile = new File(Constants.CONFIG_FILE);
+            if (!xmlFile.exists()) {
+                System.out.println("Default config file not found, exiting");
+                return null;
+            }
+        }
+
+        try {
+            int numberOfRoads = 0;
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(xmlFile);
+            Element numberOfRoadsElement = (Element) doc.getElementsByTagName("numberOfRoads").item(0);
+            numberOfRoads = Integer.parseInt(numberOfRoadsElement.getTextContent());
+
+            if (numberOfRoads <= 0) {
+                System.out.println("Number of roads must be greater than 0, exiting");
+                return null;
+            }
+
+            String roadFile = doc.getElementsByTagName("roadFile").item(0).getTextContent();
+
+            if (roadFile == null || roadFile.isEmpty()) {
+                System.out.println("Road file path is empty, exiting");
+                return null;
+            }
+
+            if (!new File(roadFile).exists()) {
+                System.out.println("Road file does not exist: " + roadFile + ", exiting");
+                return null;
+            }
+
+            roads = new Road[numberOfRoads];
+            for (int i = 0; i < numberOfRoads; i++) {
+                Road road = loadRoad(roadFile);
+                if (road == null) {
+                    System.out.println("Failed to load road from file: " + roadFile + ", exiting");
+                    return null;
+                }
+                roads[i] = road;
+            }
+
+            return roads;
+        } catch (Exception e) {
+            System.out.println("Error loading config file: " + e.getMessage());
+        }
+
+        return null;
+    }
 
     public static Road loadRoad(String filePath) {
         Road roadFormConfig;

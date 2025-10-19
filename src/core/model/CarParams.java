@@ -14,14 +14,13 @@ public class CarParams {
     public double minGapToNextCar = Constants.PARAMETER_UNDEFINED;
     public double maxConfortableDeceleration = Constants.PARAMETER_UNDEFINED;
     public double desiredTimeHeadway = Constants.PARAMETER_UNDEFINED;
-    public double conftableDeceleration = Constants.PARAMETER_UNDEFINED;
     public Color color = null;
 
     public String toString() {
         return "CarParams[currentSpeed=" + currentSpeed + ", maxSpeed=" + maxSpeed + ", xPosition=" + xPosition +
                 ", lane=" + lane + ", length=" + length + ", maxAcceleration=" + maxAcceleration +
                 ", minGapToNextCar=" + minGapToNextCar + ", maxConfortableDeceleration=" + maxConfortableDeceleration +
-                ", desiredTimeHeadway=" + desiredTimeHeadway + ", conftableDeceleration=" + conftableDeceleration +
+                ", desiredTimeHeadway=" + desiredTimeHeadway +
                 ", color=" + color + "]";
     }
 

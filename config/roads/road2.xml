@@ -2,5 +2,7 @@
 <road>
     <maxSpeed>50</maxSpeed>
     <lanes>10</lanes>
-    <roadLength>200</roadLength>
+    <roadLength>2000</roadLength>
+    <type>cellular</type>
+    <drawCells>true</drawCells>
 </road>
