@@ -5,10 +5,12 @@ import core.model.*;
 import core.model.cellular.CellularRoad;
 import core.model.continous.ContinuosRoad;
 import models.ICarFollowingModel;
+import models.ILaneChangingModel;
 import models.carFollowingModels.IDM;
 import models.carFollowingModels.NagelSchreckenberg;
 
 import models.carFollowingModels.Rule184;
+import models.laneChangingModels.Rickert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -185,6 +187,47 @@ public class ConfigLoader {
                     return null;
                 }
                 AppContext.cellSize = cellSize;
+            }
+
+            return modelFromConfig;
+        } catch (Exception e) {
+            System.out.println("Error loading config file: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    public static ILaneChangingModel loadLaneChangingModel(String filePath) {
+        ILaneChangingModel modelFromConfig;
+        // Logic to load and return the appropriate car-following model based on modelId
+        // Logic to read the configuration file for road parameters
+        File xmlFile;
+        try {
+            xmlFile = new File(filePath);
+        } catch (NullPointerException e) {
+            System.out.println("Config file not found, loading default config");
+            xmlFile = new File(Constants.CONFIG_FILE);
+            if (!xmlFile.exists()) {
+                System.out.println("Default config file not found, exiting");
+                return null;
+            }
+        }
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(xmlFile);
+            doc.getDocumentElement().normalize();
+            Element models = (Element) doc.getElementsByTagName("models").item(0);
+            Element model = (Element) models.getElementsByTagName("laneChangingModel").item(0);
+            String id = model.getElementsByTagName("id").item(0).getTextContent();
+            id = id.toLowerCase().trim();
+
+            //TODO add refexion for dynamic loading of models
+            if (id.equals("rickert")) {
+                modelFromConfig = new Rickert();
+            } else {
+                System.out.println("Unknown lane changing model id in config file: " + id + ", exiting");
+                return null;
             }
 
             return modelFromConfig;

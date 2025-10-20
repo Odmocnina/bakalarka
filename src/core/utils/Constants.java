@@ -24,6 +24,12 @@ public class Constants {
             Color.PURPLE, Color.PINK, Color.BROWN, Color.CYAN, Color.MAGENTA
     };
 
+    // output file types
+    public static final String CSV_TYPE = "csv";
+    public static final String CONSOLE_TYPE = "console";
+    public static final String TXT_TYPE = "txt";
+
+
     // request string used when model is requesting parameters of road
     public static final String MAX_SPEED_REQUEST = "maxSpeed";
     public static final String CURRENT_SPEED_REQUEST = "currentSpeed";

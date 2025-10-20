@@ -17,7 +17,11 @@ public class Rickert implements ILaneChangingModel {
     public String requestParameters() {
         return Constants.DISTANCE_TO_NEXT_CAR_REQUEST + Constants.REQUEST_SEPARATOR +
                 Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.CURRENT_SPEED_REQUEST + Constants.REQUEST_SEPARATOR;
+                Constants.CURRENT_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
+                Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST + Constants.REQUEST_SEPARATOR +
+                Constants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST + Constants.REQUEST_SEPARATOR +
+                Constants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST + Constants.REQUEST_SEPARATOR +
+                Constants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST;
     }
 
     public Direction changeLaneIfDesired(HashMap<String, Double> parameters) {

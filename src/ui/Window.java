@@ -30,7 +30,7 @@ public class Window extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        Road[] roads = AppContext.ROADS;                    // očekává pole silnic
+        Road[] roads = AppContext.ROADS;                    // expects a array of roads
         IRoadRenderer renderer = AppContext.RENDERER;
 
         // cavas for drawing
@@ -50,18 +50,21 @@ public class Window extends Application {
         scroller.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scroller.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        // --- definice jednoho simulačního kroku (co se má stát každé „tik“) ---
+        // one tick of simulation
         Runnable tick = () -> {
-            for (Road r : roads) if (r != null) r.upadateRoad();
-            // Pokud se rozměry za běhu můžou měnit, nech:
-            // layoutAndResizeCanvas(canvas, roads);
+            for (Road r : roads) {
+                if (r != null) {
+                    r.upadateRoad();
+                }
+            }
             paintAll.run();
         };
 
-        // --- Engine s intervalem 1 s ---
+        // engine with 1 second interval
         engine = new Engine(tick, Duration.seconds(1));
+        //engine = AppContext.ENGINE;
 
-        // --- Ovládání ---
+        // start/stop toggle button
         ToggleButton playPause = new ToggleButton("Start");
         playPause.setOnAction(e -> {
             if (playPause.isSelected()) {
@@ -88,10 +91,6 @@ public class Window extends Application {
         });
 
         HBox top = new HBox(8, button, playPause);
-
-        // control for automatic stepping
-        Button autoButton = new Button("Automatický režim start/stop");
-        //autoButton
 
         BorderPane root = new BorderPane();
         root.setTop(top);
@@ -141,7 +140,9 @@ public class Window extends Application {
         double sumH = 0.0;
 
         for (Road road : roads) {
-            if (road == null) continue;
+            if (road == null) {
+                continue;
+            }
             Size s = getRoadPixelSize(road);
             maxW = Math.max(maxW, s.w);
             sumH += s.h + GAP_Y;

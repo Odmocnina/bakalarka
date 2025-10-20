@@ -15,6 +15,7 @@ public class CarParams {
     public double maxConfortableDeceleration = Constants.PARAMETER_UNDEFINED;
     public double desiredTimeHeadway = Constants.PARAMETER_UNDEFINED;
     public Color color = null;
+    public boolean isProcessed = false;
 
     public String toString() {
         return "CarParams[currentSpeed=" + currentSpeed + ", maxSpeed=" + maxSpeed + ", xPosition=" + xPosition +

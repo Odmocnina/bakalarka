@@ -31,7 +31,7 @@ public class CellularRoad extends Road {
         }
 
         // first test of occupied cells, DELETE LATER
-        /*cells[0][0].setOccupied(true);
+        cells[0][0].setOccupied(true);
         CarParams carParams = new CarParams();
         carParams.currentSpeed = 0;
         carParams.maxSpeed = 5;
@@ -52,13 +52,14 @@ public class CellularRoad extends Road {
         carParams.length = 2;
         carParams.color = Constants.CAR_COLORS[0];
         cells[0][3].setCarParams(carParams);
-        cells[0][3].setHead(true);*/
+        cells[0][3].setHead(true);
 
     }
 
     @Override
     public void upadateRoad() {
         // Attempt to add a new car at the beginning of each lane
+        if (false)
         for (int lane = 0; lane < numberOfLanes; lane++) {
             if (generator.decideIfNewCar()) {
                 CarParams newCar = generator.generateCar();
@@ -76,6 +77,10 @@ public class CellularRoad extends Road {
         for (int position = this.numberOfCells - 1; position >= 0; position--) {
             for (int lane = numberOfLanes - 1; lane >= 0; lane--) {
                 if (cells[lane][position].isOccupied() && cells[lane][position].isHead()) {
+                    Cell cell = cells[lane][position];
+
+                    this.attemptLaneChange(cells[lane][position]);
+
                     String requestParameters = AppContext.CAR_FOLLOWING_MODEL.requestParameters();
                     HashMap<String, Double> parameters = getParameters(lane, position, requestParameters);
                     if (parameters == null) {
@@ -140,15 +145,17 @@ public class CellularRoad extends Road {
             return null;
         }
         for (String param : params) {
-            switch (param) {
-                case Constants.MAX_SPEED_REQUEST:
+            switch (param) { // getting parameters for model
+                case Constants.MAX_SPEED_REQUEST: // max speed of vehicle
                     parameters.put(Constants.MAX_SPEED_REQUEST, (double) cells[lane][position].getCarParams().maxSpeed);
                     break;
-                case Constants.CURRENT_SPEED_REQUEST:
+
+                case Constants.CURRENT_SPEED_REQUEST:   // current speed of vehicle
                     parameters.put(Constants.CURRENT_SPEED_REQUEST,
                             (double) cells[lane][position].getCarParams().currentSpeed);
                     break;
-                case Constants.DISTANCE_TO_NEXT_CAR_REQUEST:
+
+                case Constants.DISTANCE_TO_NEXT_CAR_REQUEST:   // distance to next car in the same lane
                     int nextCarPos = getNextOcuppiedCell(lane, position, Direction.STRAIGHT);
                     if (nextCarPos == Constants.NO_CAR_IN_FRONT) {
                         parameters.put(Constants.DISTANCE_TO_NEXT_CAR_REQUEST,
@@ -158,7 +165,8 @@ public class CellularRoad extends Road {
                                 (double) (nextCarPos - position - 1));
                     }
                     break;
-                case Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST:
+
+                case Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST:   // distance to next car in the left lane
                     nextCarPos = getNextOcuppiedCell(lane, position, Direction.LEFT);
                     if (nextCarPos == Constants.NO_CAR_IN_FRONT) {
                         parameters.put(Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST,
@@ -171,7 +179,8 @@ public class CellularRoad extends Road {
                                 (double) (nextCarPos - position - 1));
                     }
                     break;
-                case Constants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST:
+
+                case Constants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST:    // distance to next car in the right lane
                     nextCarPos = getNextOcuppiedCell(lane, position, Direction.RIGHT);
                     if (nextCarPos == Constants.NO_CAR_IN_FRONT) {
                         parameters.put(Constants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST,
@@ -184,7 +193,8 @@ public class CellularRoad extends Road {
                                 (double) (nextCarPos - position - 1));
                     }
                     break;
-                case Constants.DISTANCE_TO_PREVIOUS_CAR_REQUEST:
+
+                case Constants.DISTANCE_TO_PREVIOUS_CAR_REQUEST: // distance to previous car in the same lane
                     int prevCarPos = getPreviousOccupiedCell(lane, position, Direction.STRAIGHT);
                     if (prevCarPos == Constants.NO_CAR_IN_FRONT) {
                         parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_REQUEST,
@@ -194,7 +204,8 @@ public class CellularRoad extends Road {
                                 (double) (position - prevCarPos - 1));
                     }
                     break;
-                case Constants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST:
+
+                case Constants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST:  // distance to previous car in the left lane
                     prevCarPos = getPreviousOccupiedCell(lane, position, Direction.LEFT);
                     if (prevCarPos == Constants.NO_CAR_IN_FRONT) {
                         parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST,
@@ -207,7 +218,8 @@ public class CellularRoad extends Road {
                                 (double) (position - prevCarPos - 1));
                     }
                     break;
-                case Constants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST:
+
+                case Constants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST: // distance to previous car in the right lane
                     prevCarPos = getPreviousOccupiedCell(lane, position, Direction.RIGHT);
                     if (prevCarPos == Constants.NO_CAR_IN_FRONT) {
                         parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST,
@@ -220,6 +232,7 @@ public class CellularRoad extends Road {
                                 (double) (position - prevCarPos - 1));
                     }
                     break;
+
                 default:
                     System.out.println("Unknown parameter requested: " + param);
             }
@@ -381,5 +394,52 @@ public class CellularRoad extends Road {
         System.out.println("Car at lane " + car.lane + " reached the end of the road and is partially removed.");
         System.out.println("New head position: " + newHeadX + ", New length: " + car.length + ", Current speed: " + car.currentSpeed);
         this.moveCar(cells[car.lane][newHeadX]);
+    }
+
+    private boolean attemptLaneChange(Cell cell) {
+        String requestParameters = AppContext.LANE_CHANGING_MODEL.requestParameters();
+        HashMap<String, Double> parameters = getParameters(cell.getCarParams().lane,
+                (int) cell.getCarParams().xPosition, requestParameters);
+        if (parameters == null) {
+            System.out.println("Error getting parameters for lane change for car at lane " +
+                    cell.getCarParams().lane + ", position " + (int) cell.getCarParams().xPosition);
+            return false;
+        }
+
+        Direction desiredDirection = AppContext.LANE_CHANGING_MODEL.changeLaneIfDesired(parameters);
+
+        if (desiredDirection == Direction.LEFT) {
+            int currentLane = cell.getCarParams().lane;
+            if (currentLane > 0) {
+                int targetLane = currentLane - 1;
+
+                CarParams carParams = cell.getCarParams();
+                carParams.lane = targetLane;
+
+                cells[targetLane][(int) cell.getCarParams().xPosition].setOccupied(true);
+                cells[targetLane][(int) cell.getCarParams().xPosition].setHead(true);
+                cells[targetLane][(int) cell.getCarParams().xPosition].setCarParams(carParams);
+                this.removeCar(currentLane, (int) cell.getCarParams().xPosition);
+
+                return true;
+            }
+        } else if (desiredDirection == Direction.RIGHT) {
+            int currentLane = cell.getCarParams().lane;
+            if (currentLane < numberOfLanes - 1) {
+                int targetLane = currentLane + 1;
+
+                CarParams carParams = cell.getCarParams();
+                carParams.lane = targetLane;
+
+                cells[targetLane][(int) cell.getCarParams().xPosition].setOccupied(true);
+                cells[targetLane][(int) cell.getCarParams().xPosition].setHead(true);
+                cells[targetLane][(int) cell.getCarParams().xPosition].setCarParams(carParams);
+                this.removeCar(currentLane, (int) cell.getCarParams().xPosition);
+
+                return true;
+            }
+        }
+
+        return false;
     }
 }

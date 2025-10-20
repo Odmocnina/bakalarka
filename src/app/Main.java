@@ -5,6 +5,7 @@ import core.model.Road;
 import core.utils.ConfigLoader;
 import core.utils.Constants;
 import models.ICarFollowingModel;
+import models.ILaneChangingModel;
 import ui.Window;
 import ui.render.CellularRoadRenderer;
 import ui.render.ContinousRoadRenderer;
@@ -29,6 +30,15 @@ public class Main {
             System.out.println("Loaded car following model: " + carFollowingModel.getID());
         }
         AppContext.CAR_FOLLOWING_MODEL = carFollowingModel;
+
+        ILaneChangingModel laneChangingModel = ConfigLoader.loadLaneChangingModel(configFile);
+        if (laneChangingModel == null) {
+            System.out.println("Failed to load lane changing model, exiting.");
+            return;
+        } else {
+            System.out.println("Loaded lane changing model: " + laneChangingModel.getID());
+        }
+        AppContext.LANE_CHANGING_MODEL = laneChangingModel;
 
         CarGenerator carGenerator = ConfigLoader.loadCarGenerator(configFile);
         if (carGenerator == null) {
