@@ -31,35 +31,32 @@ public class CellularRoad extends Road {
         }
 
         // first test of occupied cells, DELETE LATER
-        cells[0][0].setOccupied(true);
+        cells[0][5].setOccupied(true);
         CarParams carParams = new CarParams();
         carParams.currentSpeed = 0;
-        carParams.maxSpeed = 5;
-        carParams.xPosition = 0;
+        carParams.maxSpeed = 3;
+        carParams.xPosition = 5;
         carParams.lane = 0;
         carParams.length = 1;
         carParams.color = Constants.CAR_COLORS[0];
-        cells[0][0].setCarParams(carParams);
-        cells[0][0].setHead(true);
+        cells[0][5].setCarParams(carParams);
+        cells[0][5].setHead(true);
 
-        cells[0][3].setOccupied(true);
-        cells[0][2].setOccupied(true);
+        cells[0][0].setOccupied(true);
+        cells[0][1].setOccupied(true);
         carParams = new CarParams();
         carParams.currentSpeed = 0;
-        carParams.maxSpeed = 3;
-        carParams.xPosition = 3;
+        carParams.maxSpeed = 5;
+        carParams.xPosition = 1;
         carParams.lane = 0;
         carParams.length = 2;
         carParams.color = Constants.CAR_COLORS[0];
-        cells[0][3].setCarParams(carParams);
-        cells[0][3].setHead(true);
+        cells[0][1].setCarParams(carParams);
+        cells[0][1].setHead(true);
 
     }
 
-    @Override
-    public void upadateRoad() {
-        // Attempt to add a new car at the beginning of each lane
-        if (false)
+    private void tryToAddCar() {
         for (int lane = 0; lane < numberOfLanes; lane++) {
             if (generator.decideIfNewCar()) {
                 CarParams newCar = generator.generateCar();
@@ -74,13 +71,24 @@ public class CellularRoad extends Road {
                 }
             }
         }
+    }
+
+    @Override
+    public void upadateRoad() {
+        // Attempt to add a new car at the beginning of each lane
+        if (false)
+        this.tryToAddCar();
+
         for (int position = this.numberOfCells - 1; position >= 0; position--) {
             for (int lane = numberOfLanes - 1; lane >= 0; lane--) {
                 if (cells[lane][position].isOccupied() && cells[lane][position].isHead()) {
                     Cell cell = cells[lane][position];
 
-                    this.attemptLaneChange(cells[lane][position]);
+                    boolean changedLine = this.attemptLaneChange(cells[lane][position]);
 
+                    if (changedLine) {
+                        continue; // skip speed update if lane was changed
+                    }
                     String requestParameters = AppContext.CAR_FOLLOWING_MODEL.requestParameters();
                     HashMap<String, Double> parameters = getParameters(lane, position, requestParameters);
                     if (parameters == null) {
@@ -95,8 +103,8 @@ public class CellularRoad extends Road {
                             moveCarHead(cells[lane][position].getCarParams(), (int) newSpeed);
                         }
                         //removeCar(lane, position); //easier and probably better solution, if car touches the end
-                                                   //delete it whole but im a retard and keep trying to make that only
-                                                   //part that is outside will delete, viz voodo at top, fucking thing
+                        //delete it whole but im a retard and keep trying to make that only
+                        //part that is outside will delete, viz voodo at top, fucking thing
                     } else {
                         cells[lane][position].getCarParams().currentSpeed = (int) newSpeed;
                         this.moveCar(cells[lane][position]);
@@ -352,7 +360,7 @@ public class CellularRoad extends Road {
             removeCar(car.lane, (int) car.xPosition);
             return false;
         }
-        
+
         return true;
     }
 
@@ -431,9 +439,10 @@ public class CellularRoad extends Road {
                 CarParams carParams = cell.getCarParams();
                 carParams.lane = targetLane;
 
-                cells[targetLane][(int) cell.getCarParams().xPosition].setOccupied(true);
-                cells[targetLane][(int) cell.getCarParams().xPosition].setHead(true);
-                cells[targetLane][(int) cell.getCarParams().xPosition].setCarParams(carParams);
+                placeCar(carParams, (int) cell.getCarParams().xPosition, targetLane);
+//                cells[targetLane][(int) cell.getCarParams().xPosition].setOccupied(true);
+//                cells[targetLane][(int) cell.getCarParams().xPosition].setHead(true);
+//                cells[targetLane][(int) cell.getCarParams().xPosition].setCarParams(carParams);
                 this.removeCar(currentLane, (int) cell.getCarParams().xPosition);
 
                 return true;

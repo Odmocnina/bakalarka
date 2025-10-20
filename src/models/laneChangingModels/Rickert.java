@@ -61,6 +61,12 @@ public class Rickert implements ILaneChangingModel {
 
         int weight2 = currentSpeed - newLaneForwardGap;
         int weight3 = maxSpeed - newLanePreviousGap;
+        if (weight2 < 0) {
+            weight2 = 0;
+        }
+        if (weight3 < 0) {
+            weight3 = 0;
+        }
 
         return weight1 > weight2 && weight1 > weight3;
     }
