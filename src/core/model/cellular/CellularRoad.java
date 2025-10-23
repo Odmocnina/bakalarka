@@ -8,6 +8,8 @@ import core.model.Road;
 import core.utils.Constants;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 public class CellularRoad extends Road {
     private Cell[][] cells; // 2D array representing lanes and positions
@@ -73,22 +75,69 @@ public class CellularRoad extends Road {
         }
     }
 
-    @Override
-    public void upadateRoad() {
-        // Attempt to add a new car at the beginning of each lane
-        if (false)
-        this.tryToAddCar();
+    private class LaneChangeResult {
+        public Direction direction;
+        public CarParams carParams;
+
+        public LaneChangeResult(Direction direction, CarParams carParams) {
+            this.direction = direction;
+            this.carParams = carParams;
+        }
+    }
+
+    private LinkedList<LaneChangeResult> findLaneChanges() {
+        LinkedList<LaneChangeResult> changedCars = new LinkedList<>();
 
         for (int position = this.numberOfCells - 1; position >= 0; position--) {
             for (int lane = numberOfLanes - 1; lane >= 0; lane--) {
                 if (cells[lane][position].isOccupied() && cells[lane][position].isHead()) {
-                    Cell cell = cells[lane][position];
-
-                    boolean changedLine = this.attemptLaneChange(cells[lane][position]);
-
-                    if (changedLine) {
-                        continue; // skip speed update if lane was changed
+                    Direction laneChangeResult = attemptLaneChange(cells[lane][position]);
+                    if (laneChangeResult != Direction.STRAIGHT) {
+                        LaneChangeResult lcr = new LaneChangeResult(laneChangeResult, cells[lane][position].getCarParams());
+                        changedCars.add(lcr);
                     }
+                }
+            }
+        }
+
+        return changedCars;
+    }
+
+    private void processLaneChanges(LinkedList<LaneChangeResult> changedCars) {
+        for (LaneChangeResult lcr : changedCars) {
+            Direction direction = lcr.direction;
+            CarParams carParams = lcr.carParams;
+            if (direction == Direction.LEFT) {
+                int currentLane = carParams.lane;
+                if (currentLane > 0) {
+                    int targetLane = currentLane - 1;
+                    carParams.lane = targetLane;
+                    this.placeCar(carParams, (int) carParams.xPosition, targetLane);
+                    this.removeCar(currentLane, (int) carParams.xPosition);
+                }
+            } else if (direction == Direction.RIGHT) {
+                int currentLane = carParams.lane;
+                if (currentLane < numberOfLanes - 1) {
+                    int targetLane = currentLane + 1;
+                    carParams.lane = targetLane;
+                    this.placeCar(carParams, (int) carParams.xPosition, targetLane);
+                    this.removeCar(currentLane, (int) carParams.xPosition);
+                }
+            }
+        }
+    }
+
+    private void laneChangeStep() {
+        LinkedList<LaneChangeResult> changedCars = findLaneChanges();
+        processLaneChanges(changedCars);
+    }
+
+    private void forwardStep() {
+        for (int position = this.numberOfCells - 1; position >= 0; position--) {
+            for (int lane = numberOfLanes - 1; lane >= 0; lane--) {
+                if (cells[lane][position].isOccupied() && cells[lane][position].isHead()) {
+                    //Cell cell = cells[lane][position];
+
                     String requestParameters = AppContext.CAR_FOLLOWING_MODEL.requestParameters();
                     HashMap<String, Double> parameters = getParameters(lane, position, requestParameters);
                     if (parameters == null) {
@@ -109,6 +158,28 @@ public class CellularRoad extends Road {
                         cells[lane][position].getCarParams().currentSpeed = (int) newSpeed;
                         this.moveCar(cells[lane][position]);
                     }
+                }
+            }
+        }
+    }
+
+
+    @Override
+    public void upadateRoad() {
+        // Attempt to add a new car at the beginning of each lane
+        if (true)
+        this.tryToAddCar();
+
+        laneChangeStep();
+        forwardStep();
+    }
+
+    private void resetIsProcessed() {
+        for (int position = this.numberOfCells - 1; position >= 0; position--) {
+            for (int lane = numberOfLanes - 1; lane >= 0; lane--) {
+                if (cells[lane][position].isOccupied() && cells[lane][position].isHead()
+                        && cells[lane][position].getCarParams().isProcessed) {
+                    cells[lane][position].getCarParams().isProcessed = false;
                 }
             }
         }
@@ -404,14 +475,14 @@ public class CellularRoad extends Road {
         this.moveCar(cells[car.lane][newHeadX]);
     }
 
-    private boolean attemptLaneChange(Cell cell) {
+    private Direction attemptLaneChange(Cell cell) {
         String requestParameters = AppContext.LANE_CHANGING_MODEL.requestParameters();
         HashMap<String, Double> parameters = getParameters(cell.getCarParams().lane,
                 (int) cell.getCarParams().xPosition, requestParameters);
         if (parameters == null) {
             System.out.println("Error getting parameters for lane change for car at lane " +
                     cell.getCarParams().lane + ", position " + (int) cell.getCarParams().xPosition);
-            return false;
+            return null;
         }
 
         Direction desiredDirection = AppContext.LANE_CHANGING_MODEL.changeLaneIfDesired(parameters);
@@ -419,36 +490,15 @@ public class CellularRoad extends Road {
         if (desiredDirection == Direction.LEFT) {
             int currentLane = cell.getCarParams().lane;
             if (currentLane > 0) {
-                int targetLane = currentLane - 1;
-
-                CarParams carParams = cell.getCarParams();
-                carParams.lane = targetLane;
-
-                cells[targetLane][(int) cell.getCarParams().xPosition].setOccupied(true);
-                cells[targetLane][(int) cell.getCarParams().xPosition].setHead(true);
-                cells[targetLane][(int) cell.getCarParams().xPosition].setCarParams(carParams);
-                this.removeCar(currentLane, (int) cell.getCarParams().xPosition);
-
-                return true;
+                return Direction.LEFT;
             }
         } else if (desiredDirection == Direction.RIGHT) {
             int currentLane = cell.getCarParams().lane;
             if (currentLane < numberOfLanes - 1) {
-                int targetLane = currentLane + 1;
-
-                CarParams carParams = cell.getCarParams();
-                carParams.lane = targetLane;
-
-                placeCar(carParams, (int) cell.getCarParams().xPosition, targetLane);
-//                cells[targetLane][(int) cell.getCarParams().xPosition].setOccupied(true);
-//                cells[targetLane][(int) cell.getCarParams().xPosition].setHead(true);
-//                cells[targetLane][(int) cell.getCarParams().xPosition].setCarParams(carParams);
-                this.removeCar(currentLane, (int) cell.getCarParams().xPosition);
-
-                return true;
+                return Direction.RIGHT;
             }
         }
 
-        return false;
+        return Direction.STRAIGHT;
     }
 }

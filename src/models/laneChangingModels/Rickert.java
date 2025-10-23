@@ -27,7 +27,7 @@ public class Rickert implements ILaneChangingModel {
     public Direction changeLaneIfDesired(HashMap<String, Double> parameters) {
         int distanceToNextCar = parameters.get(Constants.DISTANCE_TO_NEXT_CAR_REQUEST).intValue();
         int maxSpeed = parameters.get(Constants.MAX_SPEED_REQUEST).intValue();
-        int currentSpeed = parameters.get(Constants.CURRENT_SPEED_REQUEST).intValue();
+        int currentSpeed = parameters.get(Constants.CURRENT_SPEED_REQUEST).intValue() + 1;
         int forwardGap = parameters.get(Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST).intValue();
         int previousGap = parameters.get(Constants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST).intValue();
 
