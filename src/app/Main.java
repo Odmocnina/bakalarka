@@ -2,8 +2,10 @@ package app;
 
 import core.model.CarGenerator;
 import core.model.Road;
+import core.sim.Simulation;
 import core.utils.ConfigLoader;
 import core.utils.Constants;
+import core.utils.ResultsRecorder;
 import models.ICarFollowingModel;
 import models.ILaneChangingModel;
 import ui.Window;
@@ -21,6 +23,8 @@ public class Main {
         } else {
             configFile = args[0];
         }
+
+        ConfigLoader.giveConfigFile(configFile);
 
         ICarFollowingModel carFollowingModel = ConfigLoader.loadCarFollowingModel(configFile);
         if (carFollowingModel == null) {
@@ -81,6 +85,10 @@ public class Main {
             return;
         }
         AppContext.RENDERER = renderer;
+
+        ResultsRecorder.getResultsRecorder().initialize(roads.length);
+        Simulation sim = new Simulation(roads);
+        AppContext.SIMULATION = sim;
 
 
         Window.main(args);

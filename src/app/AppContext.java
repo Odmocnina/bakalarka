@@ -3,6 +3,7 @@ package app;
 import core.engine.Engine;
 import core.model.CarGenerator;
 import core.model.Road;
+import core.sim.Simulation;
 import models.ICarFollowingModel;
 import models.ILaneChangingModel;
 import ui.render.IRoadRenderer;
@@ -17,4 +18,5 @@ public final class AppContext {
     public static boolean drawCells = false;
     public static CarGenerator CAR_GENERATOR;
     public static Engine ENGINE;
+    public static Simulation SIMULATION;
 }

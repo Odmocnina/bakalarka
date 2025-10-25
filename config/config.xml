@@ -17,15 +17,15 @@
     <generator>
         <flowRate>0.7</flowRate>
         <minLength>3</minLength>
-        <maxLength>5</maxLength>
+        <maxLength>15</maxLength>
         <minMaxSpeed>50</minMaxSpeed>
         <maxMaxSpeed>100</maxMaxSpeed>
     </generator>
 
-    <gui>
+    <runDetails>
         <showGui>true</showGui>
         <drawCells>false</drawCells>
-    </gui>
+    </runDetails>
 
 
 </config>

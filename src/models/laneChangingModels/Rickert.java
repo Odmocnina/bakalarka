@@ -8,12 +8,28 @@ import java.util.HashMap;
 
 import static core.model.Direction.*;
 
+/****************************************************
+ * Rickert lane changing model class for deciding lane changes
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ *****************************************************/
 public class Rickert implements ILaneChangingModel {
 
+    /**
+     * gives the unique ID of the rickert model
+     *
+     * @return the unique ID of the rickert model
+     **/
     public String getID() {
         return "rickert";
     }
 
+    /*
+     * gives the list of parameters that the rickert model needs to make a decision
+     *
+     * @return the list of parameters that the rickert model needs to make a decision
+     **/
     public String requestParameters() {
         return Constants.DISTANCE_TO_NEXT_CAR_REQUEST + Constants.REQUEST_SEPARATOR +
                 Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
@@ -24,6 +40,13 @@ public class Rickert implements ILaneChangingModel {
                 Constants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST;
     }
 
+    /**
+     * decides whether to change lane or not based on the rickert model
+     *
+     * @param parameters the parameters needed to make a decision in hasmap form, where key is the parameter name and
+     *                   value is the parameter value in double
+     * @return the direction to change lane or go straight
+     **/
     public Direction changeLaneIfDesired(HashMap<String, Double> parameters) {
         int distanceToNextCar = parameters.get(Constants.DISTANCE_TO_NEXT_CAR_REQUEST).intValue();
         int maxSpeed = parameters.get(Constants.MAX_SPEED_REQUEST).intValue();
@@ -46,6 +69,17 @@ public class Rickert implements ILaneChangingModel {
         return STRAIGHT;
     }
 
+    /**
+     * makes the decision to change lane or not based on the rickert model, returns true if the decision is to change
+     * lane, false otherwise
+     *
+     * @param distanceToNextCar the distance to the next car in the current lane
+     * @param maxSpeed the maximum speed of the car
+     * @param currentSpeed the current speed of the car
+     * @param newLaneForwardGap the gap to the next car in the new lane
+     * @param newLanePreviousGap the gap to the previous car in the new lane
+     * @return true if the decision is to change lane, false otherwise
+     **/
     private boolean makeDecision(int distanceToNextCar, int maxSpeed, int currentSpeed, int newLaneForwardGap,
                                  int newLanePreviousGap) {
 

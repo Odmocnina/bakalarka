@@ -5,6 +5,7 @@ import core.model.CarGenerator;
 import core.model.CarParams;
 import core.model.Road;
 import core.utils.Constants;
+import core.utils.ResultsRecorder;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -93,31 +94,39 @@ public class ContinuosRoad extends Road {
                 case Constants.CURRENT_SPEED_REQUEST:
                     parameters.put(Constants.CURRENT_SPEED_REQUEST, vehicles[lane].get(position).currentSpeed);
                     break;
+
                 case Constants.MAX_SPEED_REQUEST:
                     parameters.put(Constants.MAX_SPEED_REQUEST, vehicles[lane].get(position).maxSpeed);
                     break;
+
                 case Constants.DISTANCE_TO_NEXT_CAR_REQUEST:
                     parameters.put(Constants.DISTANCE_TO_NEXT_CAR_REQUEST, getDistanceToNextCar(lane, position));
                     break;
+
                 case Constants.SPEED_DIFFERENCE_TO_NEXT_CAR_REQUEST:
                     parameters.put(Constants.SPEED_DIFFERENCE_TO_NEXT_CAR_REQUEST,
                             getSpeedDifferenceToNextCar(lane, position));
                     break;
+
                 case Constants.MAX_ACCELERATION_REQUEST:
                     parameters.put(Constants.MAX_ACCELERATION_REQUEST, vehicles[lane].get(position).maxAcceleration);
                     break;
+
                 case Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST:
                     parameters.put(Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST,
                             vehicles[lane].get(position).minGapToNextCar);
                     break;
+
                 case Constants.DECELERATION_COMFORT_REQUEST:
                     parameters.put(Constants.DECELERATION_COMFORT_REQUEST,
                             vehicles[lane].get(position).maxConfortableDeceleration);
                     break;
+
                 case Constants.DESIRED_TIME_HEADWAY_REQUEST:
                     parameters.put(Constants.DESIRED_TIME_HEADWAY_REQUEST,
                             vehicles[lane].get(position).desiredTimeHeadway);
                     break;
+
                 default:
                     System.out.println("Unknown parameter requested: " + param);
                     return null;
@@ -180,15 +189,16 @@ public class ContinuosRoad extends Road {
 
     private boolean checkIfCarStillRelevant(CarParams car, int lane) {
         if ((car.xPosition - car.length) > this.length) {
-            destroyCar(car, lane);
+            removeCar(car, lane);
             return false;
         }
 
         return true;
     }
 
-    private void destroyCar(CarParams car, int lane) {
+    private void removeCar(CarParams car, int lane) {
         vehicles[lane].remove(car);
+        ResultsRecorder.getResultsRecorder().recordCarPassed(lane);
     }
 
 

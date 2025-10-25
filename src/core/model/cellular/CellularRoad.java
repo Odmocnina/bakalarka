@@ -6,6 +6,7 @@ import core.model.Direction;
 import core.model.CarGenerator;
 import core.model.Road;
 import core.utils.Constants;
+import core.utils.ResultsRecorder;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -392,6 +393,8 @@ public class CellularRoad extends Road {
                 cells[lane][posToClear].setCarParams(null);
             }
         }
+
+        ResultsRecorder.getResultsRecorder().recordCarPassed(lane);
     }
 
     @Override

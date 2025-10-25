@@ -1,195 +1,127 @@
 package ui;
 
 import app.AppContext;
-import core.engine.Engine;
+import core.engine.CoreEngine;
 import core.model.Road;
-import core.model.cellular.Cell;
-import core.utils.Constants;
+import ui.render.IRoadRenderer;
+import core.sim.Simulation;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import ui.render.IRoadRenderer;
 
 public class Window extends Application {
 
-    // gap between roads
-    private static final double GAP_Y = 16.0;
-
-    // scale for continous roads
-    private static final double PX_PER_M = 4.0;
-
-    private Engine engine;
+    private Simulation simulation;
+    private CoreEngine engine;
+    private IRoadRenderer renderer;
 
     @Override
     public void start(Stage primaryStage) {
-        Road[] roads = AppContext.ROADS;                    // expects a array of roads
-        IRoadRenderer renderer = AppContext.RENDERER;
+        // get rederer and simulation from AppContext
+        this.simulation = AppContext.SIMULATION;
+        this.renderer = AppContext.RENDERER;
 
         // cavas for drawing
-        Canvas canvas = new Canvas();
+        Canvas canvas = new Canvas(2000, 800);
+        ScrollPane scrollPane = new ScrollPane(canvas);
+        scrollPane.setPannable(true);
+        scrollPane.setFitToWidth(false);
+        scrollPane.setFitToHeight(false);
 
-        // dividing cavas for all roads
-        layoutAndResizeCanvas(canvas, roads);
+        // panel with controls
+        Button btnStart = new Button("Start");
+        Button btnStop = new Button("Stop");
+        Button btnStep = new Button("Další krok");
+        Label statusLabel = new Label("Stav: zastaveno");
 
-        // painter for all roads
-        Runnable paintAll = () -> paintAllRoads(canvas, roads, renderer);
+        HBox controls = new HBox(10, btnStart, btnStop, btnStep, statusLabel);
+        controls.setPadding(new Insets(10));
 
-        // scroller
-        ScrollPane scroller = new ScrollPane(canvas);
-        scroller.setFitToWidth(false);
-        scroller.setFitToHeight(false);
-        scroller.setPannable(true);
-        scroller.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scroller.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-
-        // one tick of simulation
-        Runnable tick = () -> {
-            for (Road r : roads) {
-                if (r != null) {
-                    r.upadateRoad();
-                }
-            }
-            paintAll.run();
-        };
-
-        // engine with 1 second interval
-        engine = new Engine(tick, Duration.seconds(1));
-        //engine = AppContext.ENGINE;
-
-        // start/stop toggle button
-        ToggleButton playPause = new ToggleButton("Start");
-        playPause.setOnAction(e -> {
-            if (playPause.isSelected()) {
-                playPause.setText("Stop");
-                engine.start();
-            } else {
-                playPause.setText("Start");
-                engine.stop();
-            }
-        });
-
-        // control for manual stepping
-        Button button = new Button("Překreslit / další krok");
-        button.setOnAction(e -> {
-            // update all roads
-            for (Road r : roads) {
-                if (r != null) {
-                    r.upadateRoad(); // update road to next step
-                }
-            }
-            // if road sizes changed, relayout canvas, shouldnt happpen
-            layoutAndResizeCanvas(canvas, roads);
-            paintAll.run();
-        });
-
-        HBox top = new HBox(8, button, playPause);
-
+        // main layout of gui
         BorderPane root = new BorderPane();
-        root.setTop(top);
-        root.setCenter(scroller);
+        root.setCenter(scrollPane);
+        root.setBottom(controls);
 
-        Scene scene = new Scene(root, Constants.CANVAS_WIDTH, Constants.CANVAS_HEIGHT + 40);
+        Scene scene = new Scene(root, 1200, 700, Color.LIGHTGRAY);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Více silnic pod sebou");
-        primaryStage.setMinWidth(300);
-        primaryStage.setMinHeight(200);
+        primaryStage.setTitle("Simulátor dopravy");
         primaryStage.show();
 
-        scroller.setHvalue(0);
-        scroller.setVvalue(0);
+        // part that repaints all roads
+        Runnable paintAll = () -> {
+            GraphicsContext gc = canvas.getGraphicsContext2D();
+            gc.setFill(Color.LIGHTGRAY);
+            gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight()); // clear canvas
 
+            Road[] roads = simulation.getRoads();
+            if (roads == null) {
+                return;
+            }
+
+            double totalHeight = canvas.getHeight();
+            double roadHeight = totalHeight / Math.max(roads.length, 1);
+
+            for (int i = 0; i < roads.length; i++) {
+                Road road = roads[i];
+                if (road == null) { // if this happens, something is seriously fucked up
+                    continue;
+                }
+                double yOffset = i * roadHeight;
+                gc.save();
+                gc.translate(0, yOffset);
+                renderer.draw(gc, road, canvas.getWidth(), roadHeight); // draw road
+                gc.restore();
+            }
+        };
+
+        // tick of engine - one simulation step and repaint
+        Runnable tick = () -> {
+            simulation.step();
+            Platform.runLater(paintAll);
+        };
+
+        // engine initialization
+        engine = new CoreEngine(tick, 1000); // krok každých 500 ms
+
+        // starting engine when start button is pressed, simulation runs
+        btnStart.setOnAction(e -> {
+            engine.start();
+            statusLabel.setText("Stav: běží");
+        });
+
+        // stopping engine when stop button is pressed, simulation stops
+        btnStop.setOnAction(e -> {
+            engine.stop();
+            statusLabel.setText("Stav: zastaveno");
+        });
+
+        // one simulation step when step button is pressed, manual step
+        btnStep.setOnAction(e -> {
+            simulation.step();
+            paintAll.run();
+            statusLabel.setText("Stav: krok proveden");
+        });
+
+        // first paint
         paintAll.run();
     }
 
-
-    private void paintAllRoads(Canvas canvas, Road[] roads, IRoadRenderer renderer) {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        gc.setLineDashes(null);
-
-        double yOffset = 0.0;
-
-        for (Road road : roads) {
-            if (road == null) {
-                continue;
-            }
-
-            // getting road size for road
-            Size s = getRoadPixelSize(road);
-
-            // draw offset for road
-            gc.save();
-            gc.translate(0, yOffset);
-            renderer.draw(gc, road, s.w, s.h); //rederer get its own size
-            gc.restore();
-
-            yOffset += s.h + GAP_Y;
+    @Override
+    public void stop() {
+        if (engine != null && engine.isRunning()) {
+            engine.stop();
         }
-    }
-
-    private void layoutAndResizeCanvas(Canvas canvas, Road[] roads) {
-        double maxW = 0.0;
-        double sumH = 0.0;
-
-        for (Road road : roads) {
-            if (road == null) {
-                continue;
-            }
-            Size s = getRoadPixelSize(road);
-            maxW = Math.max(maxW, s.w);
-            sumH += s.h + GAP_Y;
-        }
-
-        if (sumH > 0) {
-            sumH -= GAP_Y;
-        }
-
-        if (maxW <= 0) {
-            maxW = Constants.CANVAS_WIDTH;
-        }
-        if (sumH <= 0) {
-            sumH = Constants.CANVAS_HEIGHT;
-        }
-
-        canvas.setWidth(maxW);
-        canvas.setHeight(sumH);
-    }
-
-    private Size getRoadPixelSize(Road road) {
-        if (Constants.CELLULAR.equals(road.getType())) {
-            // same logic as in CellularRoadRenderer
-            Object content = road.getContent();
-            if (content instanceof Cell[][] cells && cells.length > 0 && cells[0].length > 0) {
-                int lanes = cells.length;
-                int cols  = cells[0].length;
-                double baseCell = (AppContext.cellSize + 0.5);
-                return new Size(cols * baseCell, lanes * baseCell);
-            }
-        } else if (Constants.CONTINOUS.equals(road.getType())) {
-            // scale
-            int lanes = road.getNumberOfLanes();
-            double roadLenM = road.getLength();
-            double laneH_M  = Constants.LANE_WIDTH;
-            return new Size(roadLenM * PX_PER_M, lanes * laneH_M * PX_PER_M);
-        }
-        // fallback
-        return new Size(Constants.CANVAS_WIDTH, Constants.CANVAS_HEIGHT);
-    }
-
-    private static class Size {
-        final double w, h;
-        Size(double w, double h) {
-            this.w = w;
-            this.h = h;
-        }
+        Platform.exit();
     }
 
     public static void main(String[] args) {

@@ -20,28 +20,35 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class ConfigLoader {
 
-    public static Road[] loadRoads(String filePath) {
-        Road[] roads;
-        File xmlFile;
+    private static File configFile;
+
+    public static boolean giveConfigFile(String filePath) {
         try {
-            xmlFile = new File(filePath);
+            configFile = new File(filePath);
         } catch (NullPointerException e) {
             System.out.println("Config file not found, loading default config");
-            xmlFile = new File(Constants.CONFIG_FILE);
-            if (!xmlFile.exists()) {
+            configFile = new File(Constants.CONFIG_FILE);
+            if (!configFile.exists()) {
                 System.out.println("Default config file not found, exiting");
-                return null;
+                return false;
             }
         }
+
+        return true;
+    }
+
+    public static Road[] loadRoads(String filePath) {
+        Road[] roads;
 
         try {
             int numberOfRoads = 0;
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(xmlFile);
+            Document doc = dBuilder.parse(configFile);
             Element numberOfRoadsElement = (Element) doc.getElementsByTagName("numberOfRoads").item(0);
             numberOfRoads = Integer.parseInt(numberOfRoadsElement.getTextContent());
 
@@ -145,22 +152,10 @@ public class ConfigLoader {
     public static ICarFollowingModel loadCarFollowingModel(String filePath) {
         ICarFollowingModel modelFromConfig;
         // Logic to load and return the appropriate car-following model based on modelId
-        // Logic to read the configuration file for road parameters
-        File xmlFile;
-        try {
-            xmlFile = new File(filePath);
-        } catch (NullPointerException e) {
-            System.out.println("Config file not found, loading default config");
-            xmlFile = new File(Constants.CONFIG_FILE);
-            if (!xmlFile.exists()) {
-                System.out.println("Default config file not found, exiting");
-                return null;
-            }
-        }
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(xmlFile);
+            Document doc = dBuilder.parse(configFile);
             doc.getDocumentElement().normalize();
             Element models = (Element) doc.getElementsByTagName("models").item(0);
             Element model = (Element) models.getElementsByTagName("carFollowingModel").item(0);
@@ -199,23 +194,10 @@ public class ConfigLoader {
 
     public static ILaneChangingModel loadLaneChangingModel(String filePath) {
         ILaneChangingModel modelFromConfig;
-        // Logic to load and return the appropriate car-following model based on modelId
-        // Logic to read the configuration file for road parameters
-        File xmlFile;
-        try {
-            xmlFile = new File(filePath);
-        } catch (NullPointerException e) {
-            System.out.println("Config file not found, loading default config");
-            xmlFile = new File(Constants.CONFIG_FILE);
-            if (!xmlFile.exists()) {
-                System.out.println("Default config file not found, exiting");
-                return null;
-            }
-        }
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(xmlFile);
+            Document doc = dBuilder.parse(configFile);
             doc.getDocumentElement().normalize();
             Element models = (Element) doc.getElementsByTagName("models").item(0);
             Element model = (Element) models.getElementsByTagName("laneChangingModel").item(0);
@@ -242,19 +224,9 @@ public class ConfigLoader {
         File xmlFile;
         CarGenerator loadedGenerator = null;
         try {
-            xmlFile = new File(filePath);
-        } catch (NullPointerException e) {
-            System.out.println("Config file not found, loading default config");
-            xmlFile = new File(Constants.CONFIG_FILE);
-            if (!xmlFile.exists()) {
-                System.out.println("Default config file not found, exiting");
-                return null;
-            }
-        }
-        try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(xmlFile);
+            Document doc = dBuilder.parse(configFile);
             doc.getDocumentElement().normalize();
 
             Element generator = (Element) doc.getElementsByTagName("generator").item(0);
@@ -301,6 +273,70 @@ public class ConfigLoader {
             }
 
             return loadedGenerator;
+        } catch (Exception e) {
+            System.out.println("Error loading config file: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    public static HashMap<String, String> loadRunDetails(String filePath) {
+        File xmlFile;
+        HashMap<String, String> runDetails = new HashMap<>();
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(configFile);
+            doc.getDocumentElement().normalize();
+
+            Element runDetailsElement = (Element) doc.getElementsByTagName("runDetails").item(0);
+            Element duration = (Element) runDetailsElement.getElementsByTagName("duration").item(0);
+            Element timeStep = (Element) runDetailsElement.getElementsByTagName("timeStep").item(0);
+            Element showGui = (Element) runDetailsElement.getElementsByTagName("showGui").item(0);
+            Element outputFile = (Element) runDetailsElement.getElementsByTagName("outputFile").item(0);
+            Element drawCells = (Element) runDetailsElement.getElementsByTagName("drawCells").item(0);
+            Element writeResults = (Element) runDetailsElement.getElementsByTagName("writeResults").item(0);
+
+            if (duration != null) {
+                runDetails.put("duration", duration.getTextContent());
+            } else {
+                System.out.println("Missing duration in run details, exiting");
+                return null;
+            }
+
+            if (timeStep != null) {
+                runDetails.put("timeStep", timeStep.getTextContent());
+            } else {
+                System.out.println("Missing timeStep in run details, exiting");
+                return null;
+            }
+
+            if (showGui != null) {
+                runDetails.put("showGui", showGui.getTextContent());
+            } else {
+                runDetails.put("showGui", "false");
+            }
+
+            if (writeResults != null) {
+                runDetails.put("writeResults", writeResults.getTextContent());
+                if (writeResults.getTextContent().equals("true")) {
+                    if (outputFile != null) {
+                        runDetails.put("outputFile", outputFile.getTextContent());
+                    } else {
+                        runDetails.put("outputFile", "simulation_output.txt");
+                    }
+                }
+            } else {
+                runDetails.put("writeResults", "false");
+            }
+
+            if (drawCells != null) {
+                runDetails.put("drawCells", drawCells.getTextContent());
+            } else {
+                runDetails.put("drawCells", "false");
+            }
+
+            return runDetails;
         } catch (Exception e) {
             System.out.println("Error loading config file: " + e.getMessage());
         }

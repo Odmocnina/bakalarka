@@ -59,4 +59,11 @@ public class Constants {
     public static final double DEFAULT_MIN_MIN_GAP_TO_NEXT_CAR = 2.0; // m
     public static final double DEFAULT_MAX_MIN_GAP_TO_NEXT_CAR = 5.0; // m
 
+    // constants for config loading
+    public static final String GENERATOR_TAG = "generator";
+    public static final String RUN_DETAILS_TAG = "runDetails";
+    public static final String MODELS_TAG = "models";
+
+    public static final String CAR_FOLLOWING_MODEL_TAG = "carFollowingModel";
+
 }
