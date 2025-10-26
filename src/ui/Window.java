@@ -3,6 +3,7 @@ package ui;
 import app.AppContext;
 import core.engine.CoreEngine;
 import core.model.Road;
+import core.utils.ResultsRecorder;
 import ui.render.IRoadRenderer;
 import core.sim.Simulation;
 import javafx.application.Application;
@@ -43,8 +44,9 @@ public class Window extends Application {
         Button btnStop = new Button("Stop");
         Button btnStep = new Button("Další krok");
         Label statusLabel = new Label("Stav: zastaveno");
+        Button exportBtn = new Button("Exportovat výsledky");
 
-        HBox controls = new HBox(10, btnStart, btnStop, btnStep, statusLabel);
+        HBox controls = new HBox(10, btnStart, exportBtn, btnStop, btnStep, statusLabel);
         controls.setPadding(new Insets(10));
 
         // main layout of gui
@@ -91,7 +93,7 @@ public class Window extends Application {
         };
 
         // engine initialization
-        engine = new CoreEngine(tick, 1000); // krok každých 500 ms
+        engine = new CoreEngine(tick, 1000); // 1000 ms per step
 
         // starting engine when start button is pressed, simulation runs
         btnStart.setOnAction(e -> {
@@ -110,6 +112,11 @@ public class Window extends Application {
             simulation.step();
             paintAll.run();
             statusLabel.setText("Stav: krok proveden");
+        });
+
+        // export results when export button is pressed
+        exportBtn.setOnAction(e -> {
+            ResultsRecorder.getResultsRecorder().writeResults();
         });
 
         // first paint

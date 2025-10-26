@@ -17,12 +17,9 @@ public class CellularRoad extends Road {
 
     private int numberOfCells;
     private int cellSize; // size of each cell in meters
-    private CarGenerator generator;
-    public CellularRoad(double length, int numberOfLanes, double speedLimit) {
-        super(length, numberOfLanes, speedLimit);
+    public CellularRoad(double length, int numberOfLanes, double speedLimit, CarGenerator generator) {
+        super(length, numberOfLanes, speedLimit, Constants.CELLULAR, generator);
         createRoad();
-        this.generator = AppContext.CAR_GENERATOR;
-        super.type = Constants.CELLULAR;
     }
     private void createRoad() {
         this.numberOfCells = (int) Math.ceil(length / AppContext.cellSize); // to-do load cell size from config
@@ -61,8 +58,8 @@ public class CellularRoad extends Road {
 
     private void tryToAddCar() {
         for (int lane = 0; lane < numberOfLanes; lane++) {
-            if (generator.decideIfNewCar()) {
-                CarParams newCar = generator.generateCar();
+            if (super.generator.decideIfNewCar()) {
+                CarParams newCar = super.generator.generateCar();
                 for (int i = 0; i <= newCar.length; i++) {
                     if (i >= numberOfCells || cells[lane][i].isOccupied()) {
                         newCar = null;
@@ -130,7 +127,7 @@ public class CellularRoad extends Road {
 
     private void laneChangeStep() {
         LinkedList<LaneChangeResult> changedCars = findLaneChanges();
-        processLaneChanges(changedCars);
+        this.processLaneChanges(changedCars);
     }
 
     private void forwardStep() {
@@ -171,8 +168,8 @@ public class CellularRoad extends Road {
         if (true)
         this.tryToAddCar();
 
-        laneChangeStep();
-        forwardStep();
+        this.laneChangeStep();
+        this.forwardStep();
     }
 
     private void resetIsProcessed() {

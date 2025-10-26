@@ -12,14 +12,11 @@ import java.util.LinkedList;
 
 public class ContinuosRoad extends Road {
 
-    LinkedList<CarParams> vehicles[];
-    private CarGenerator generator;
+    LinkedList<CarParams>[] vehicles;
 
-    public ContinuosRoad(double length, int numberOfLanes, double speedLimit) {
-        super(length, numberOfLanes, speedLimit);
+    public ContinuosRoad(double length, int numberOfLanes, double speedLimit, CarGenerator generator) {
+        super(length, numberOfLanes, speedLimit, Constants.CONTINOUS, generator);
         createRoad();
-        this.generator = AppContext.CAR_GENERATOR;
-        this.type = Constants.CONTINOUS;
     }
 
     private void createRoad() {

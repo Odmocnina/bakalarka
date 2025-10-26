@@ -13,6 +13,8 @@ public class ResultsWriter {
         }
     }
 
+    //public void writeNum
+
     public void writeResults(String data) {
         if (type.equals(Constants.CSV_TYPE)) {
 

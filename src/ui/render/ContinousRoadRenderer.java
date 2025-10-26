@@ -46,7 +46,7 @@ public class ContinousRoadRenderer implements IRoadRenderer {
         // pattern for dashed lines
         gc.setLineDashes(5 * scale);
 
-        Color carColor = Color.RED;
+        Color carColor;
 
         for (int i = 0; i < lanes; i++) {
             double y = offsetY + i * laneHpx;

@@ -17,7 +17,7 @@
     <generator>
         <flowRate>0.7</flowRate>
         <minLength>3</minLength>
-        <maxLength>15</maxLength>
+        <maxLength>7</maxLength>
         <minMaxSpeed>50</minMaxSpeed>
         <maxMaxSpeed>100</maxMaxSpeed>
     </generator>

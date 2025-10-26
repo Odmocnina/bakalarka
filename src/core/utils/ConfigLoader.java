@@ -133,9 +133,9 @@ public class ConfigLoader {
             }
 
             if (type.equals(Constants.CELLULAR)) {
-                roadFormConfig = new CellularRoad(roadLength, numberOfLanes, getMaxSpeed);
+                roadFormConfig = new CellularRoad(roadLength, numberOfLanes, getMaxSpeed, AppContext.CAR_GENERATOR);
             } else if (type.equals(Constants.CONTINOUS)) {
-                roadFormConfig = new ContinuosRoad(roadLength, numberOfLanes, getMaxSpeed);
+                roadFormConfig = new ContinuosRoad(roadLength, numberOfLanes, getMaxSpeed, AppContext.CAR_GENERATOR);
             } else {
                 System.out.println("Unknown road type in config file: " + type + ", exiting");
                 return null;
@@ -342,6 +342,10 @@ public class ConfigLoader {
         }
 
         return null;
+    }
+
+    public void closeConfigFile() {
+
     }
 
 }

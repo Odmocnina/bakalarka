@@ -10,10 +10,12 @@ public abstract class Road {
     protected String type;
     protected CarGenerator generator;
 
-    public Road(double length, int numberOfLanes, double speedLimit) {
+    public Road(double length, int numberOfLanes, double speedLimit, String type, CarGenerator generator) {
         this.length = length;
         this.numberOfLanes = numberOfLanes;
         this.speedLimit = speedLimit;
+        this.type = type;
+        this.generator = generator;
     }
 
     public double getLength() {
