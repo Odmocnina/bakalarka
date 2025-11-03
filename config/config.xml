@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <numberOfRoads>20</numberOfRoads>
+    <roadFile>config/roads/road1.xml</roadFile>
+
+    <models>
+        <carFollowingModel>
+            <name>idm</name>
+            <id>idm</id>
+        </carFollowingModel>
+        <laneChangingModel>
+            <name>Minimizing Overall Braking Induced by Lane changes (MOBIL)</name>
+            <id>rickert</id>
+        </laneChangingModel>
+    </models>
+
+    <generator>
+        <flowRate>0.1</flowRate>
+        <minLength>3</minLength>
+        <maxLength>7</maxLength>
+        <minMaxSpeed>50</minMaxSpeed>
+        <maxMaxSpeed>100</maxMaxSpeed>
+    </generator>
+
+    <runDetails>
+        <showGui>true</showGui>
+        <drawCells>false</drawCells>
+        <timeStep>1</timeStep>
+        <duration>3600</duration>
+        <outputFile>output/simulationContOutput.txt</outputFile>
+    </runDetails>
+
+
+</config>

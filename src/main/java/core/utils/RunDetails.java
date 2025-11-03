@@ -1,0 +1,20 @@
+package core.utils;
+
+public class RunDetails {
+
+    public int duration;
+
+    public double timeStep;
+
+    public boolean showGui;
+
+    public String outputFile;
+
+    public boolean drawCells;
+
+    public boolean writingResults() {
+        return this.outputFile != null && !this.outputFile.isEmpty();
+    }
+
+
+}
