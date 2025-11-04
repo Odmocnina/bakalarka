@@ -28,7 +28,8 @@ public abstract class Road {
     }
 
     public String toString() {
-        return "Road[length=" + length + ", numberOfLanes=" + numberOfLanes + ", speedLimit=" + speedLimit + "]";
+        return "Road[length=" + length + ", numberOfLanes=" + numberOfLanes + ", speedLimit=" + speedLimit +
+                ", type=" + type + "]";
     }
 
     public String getType() {

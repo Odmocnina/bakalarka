@@ -155,9 +155,6 @@ public class CellularRoad extends Road {
                         if (checkIfCarStillRelevant(cells[lane][position].getCarParams(), (int) newSpeed)) {
                             moveCarHead(cells[lane][position].getCarParams(), (int) newSpeed);
                         } else {
-//                            if (AppContext.RUN_DETAILS.writingResults()) {
-//                                ResultsRecorder.getResultsRecorder().recordCarPassed();
-//                            }
                             carsPassed++;
                         }
                         //removeCar(lane, position); //easier and probably better solution, if car touches the end
@@ -228,10 +225,103 @@ public class CellularRoad extends Road {
         }
     }
 
+    private void getRoadDependedParameters(HashMap<String, Double> parameters, String param, CarParams car) {
+        int lane = car.lane;
+        int position = (int) car.xPosition;
+
+        switch (param) { // getting parameters for model
+
+            case Constants.CURRENT_SPEED_REQUEST:   // current speed of vehicle
+                parameters.put(Constants.CURRENT_SPEED_REQUEST, car.getParameter(Constants.CURRENT_SPEED_REQUEST));
+                break;
+
+            case Constants.DISTANCE_TO_NEXT_CAR_REQUEST:   // distance to next car in the same lane
+                int nextCarPos = getNextOcuppiedCell(lane, position, Direction.STRAIGHT);
+                if (nextCarPos == Constants.NO_CAR_IN_FRONT) {
+                    parameters.put(Constants.DISTANCE_TO_NEXT_CAR_REQUEST,
+                            Double.MAX_VALUE);
+                } else {
+                    parameters.put(Constants.DISTANCE_TO_NEXT_CAR_REQUEST,
+                            (double) (nextCarPos - position - 1));
+                }
+                break;
+
+            case Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST:   // distance to next car in the left lane
+                nextCarPos = getNextOcuppiedCell(lane, position, Direction.LEFT);
+                if (nextCarPos == Constants.NO_CAR_IN_FRONT) {
+                    parameters.put(Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST,
+                            Double.MAX_VALUE);
+                } else if (nextCarPos == Constants.NO_LANE_THERE) {
+                    parameters.put(Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST,
+                            Constants.PARAMETER_UNDEFINED);
+                } else {
+                    parameters.put(Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST,
+                            (double) (nextCarPos - position - 1));
+                }
+                break;
+
+            case Constants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST:    // distance to next car in the right lane
+                nextCarPos = getNextOcuppiedCell(lane, position, Direction.RIGHT);
+                if (nextCarPos == Constants.NO_CAR_IN_FRONT) {
+                    parameters.put(Constants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST,
+                            Double.MAX_VALUE);
+                } else if (nextCarPos == Constants.NO_LANE_THERE) {
+                    parameters.put(Constants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST,
+                            Constants.PARAMETER_UNDEFINED);
+                } else {
+                    parameters.put(Constants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST,
+                            (double) (nextCarPos - position - 1));
+                }
+                break;
+
+            case Constants.DISTANCE_TO_PREVIOUS_CAR_REQUEST: // distance to previous car in the same lane
+                int prevCarPos = getPreviousOccupiedCell(lane, position, Direction.STRAIGHT);
+                if (prevCarPos == Constants.NO_CAR_IN_FRONT) {
+                    parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_REQUEST,
+                            (double) (position + 1));
+                } else {
+                    parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_REQUEST,
+                            (double) (position - prevCarPos - 1));
+                }
+                break;
+
+            case Constants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST:  // distance to previous car in the left lane
+                prevCarPos = getPreviousOccupiedCell(lane, position, Direction.LEFT);
+                if (prevCarPos == Constants.NO_CAR_IN_FRONT) {
+                    parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST,
+                            (double) (position + 1));
+                } else if (prevCarPos == Constants.NO_LANE_THERE) {
+                    parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST,
+                            (double) Constants.NO_LANE_THERE);
+                } else {
+                    parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST,
+                            (double) (position - prevCarPos - 1));
+                }
+                break;
+
+            case Constants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST: // distance to previous car in the right lane
+                prevCarPos = getPreviousOccupiedCell(lane, position, Direction.RIGHT);
+                if (prevCarPos == Constants.NO_CAR_IN_FRONT) {
+                    parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST,
+                            (double) (position + 1));
+                } else if (prevCarPos == Constants.NO_LANE_THERE) {
+                    parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST,
+                            (double) Constants.NO_LANE_THERE);
+                } else {
+                    parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST,
+                            (double) (position - prevCarPos - 1));
+                }
+                break;
+
+            default:
+                logger.debug("Unknown parameter requested: " + param);
+        }
+    }
+
     private HashMap<String, Double> getParameters(int lane, int position, String requestedParameters) {
         HashMap<String, Double> parameters = new HashMap<>();
         String[] params = requestedParameters.split(Constants.REQUEST_SEPARATOR);
-        if (params.length <= 0) {
+        if (params.length == 0) {
             logger.debug("No parameters requested");
             return null;
         }
@@ -243,98 +333,7 @@ public class CellularRoad extends Road {
                 int i = 0;
                 parameters.put(param, car.getParameter(param));
             } else {
-                switch (param) { // getting parameters for model
-                    case Constants.MAX_SPEED_REQUEST: // max speed of vehicle
-                        parameters.put(Constants.MAX_SPEED_REQUEST, (double) cells[lane][position].getCarParams().
-                                getParameter(Constants.MAX_SPEED_REQUEST));
-                        break;
-
-                    case Constants.CURRENT_SPEED_REQUEST:   // current speed of vehicle
-                        parameters.put(Constants.CURRENT_SPEED_REQUEST,
-                                (double) car.getParameter(Constants.CURRENT_SPEED_REQUEST));
-                        break;
-
-                    case Constants.DISTANCE_TO_NEXT_CAR_REQUEST:   // distance to next car in the same lane
-                        int nextCarPos = getNextOcuppiedCell(lane, position, Direction.STRAIGHT);
-                        if (nextCarPos == Constants.NO_CAR_IN_FRONT) {
-                            parameters.put(Constants.DISTANCE_TO_NEXT_CAR_REQUEST,
-                                    Double.MAX_VALUE);
-                        } else {
-                            parameters.put(Constants.DISTANCE_TO_NEXT_CAR_REQUEST,
-                                    (double) (nextCarPos - position - 1));
-                        }
-                        break;
-
-                    case Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST:   // distance to next car in the left lane
-                        nextCarPos = getNextOcuppiedCell(lane, position, Direction.LEFT);
-                        if (nextCarPos == Constants.NO_CAR_IN_FRONT) {
-                            parameters.put(Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST,
-                                    Double.MAX_VALUE);
-                        } else if (nextCarPos == Constants.NO_LANE_THERE) {
-                            parameters.put(Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST,
-                                    Constants.PARAMETER_UNDEFINED);
-                        } else {
-                            parameters.put(Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST,
-                                    (double) (nextCarPos - position - 1));
-                        }
-                        break;
-
-                    case Constants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST:    // distance to next car in the right lane
-                        nextCarPos = getNextOcuppiedCell(lane, position, Direction.RIGHT);
-                        if (nextCarPos == Constants.NO_CAR_IN_FRONT) {
-                            parameters.put(Constants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST,
-                                    Double.MAX_VALUE);
-                        } else if (nextCarPos == Constants.NO_LANE_THERE) {
-                            parameters.put(Constants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST,
-                                    Constants.PARAMETER_UNDEFINED);
-                        } else {
-                            parameters.put(Constants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST,
-                                    (double) (nextCarPos - position - 1));
-                        }
-                        break;
-
-                    case Constants.DISTANCE_TO_PREVIOUS_CAR_REQUEST: // distance to previous car in the same lane
-                        int prevCarPos = getPreviousOccupiedCell(lane, position, Direction.STRAIGHT);
-                        if (prevCarPos == Constants.NO_CAR_IN_FRONT) {
-                            parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_REQUEST,
-                                    (double) (position + 1));
-                        } else {
-                            parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_REQUEST,
-                                    (double) (position - prevCarPos - 1));
-                        }
-                        break;
-
-                    case Constants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST:  // distance to previous car in the left lane
-                        prevCarPos = getPreviousOccupiedCell(lane, position, Direction.LEFT);
-                        if (prevCarPos == Constants.NO_CAR_IN_FRONT) {
-                            parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST,
-                                    (double) (position + 1));
-                        } else if (prevCarPos == Constants.NO_LANE_THERE) {
-                            parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST,
-                                    (double) Constants.NO_LANE_THERE);
-                        } else {
-                            parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST,
-                                    (double) (position - prevCarPos - 1));
-                        }
-                        break;
-
-                    case Constants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST: // distance to previous car in the right lane
-                        prevCarPos = getPreviousOccupiedCell(lane, position, Direction.RIGHT);
-                        if (prevCarPos == Constants.NO_CAR_IN_FRONT) {
-                            parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST,
-                                    (double) (position + 1));
-                        } else if (prevCarPos == Constants.NO_LANE_THERE) {
-                            parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST,
-                                    (double) Constants.NO_LANE_THERE);
-                        } else {
-                            parameters.put(Constants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST,
-                                    (double) (position - prevCarPos - 1));
-                        }
-                        break;
-
-                    default:
-                        logger.debug("Unknown parameter requested: " + param);
-                }
+                this.getRoadDependedParameters(parameters, param, car);
             }
         }
         return parameters;

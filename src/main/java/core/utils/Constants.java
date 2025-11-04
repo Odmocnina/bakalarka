@@ -46,6 +46,8 @@ public class Constants {
     public static final String DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST = "distanceToPreviousCarLeft";
     public static final String DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST = "distanceToPreviousCarRight";
     public static final String LENGTH_REQUEST = "length";
+    public static final String DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST = "distanceDifferenceSensitivity";
+    public static final String SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST = "speedDifferenceSensitivity";
 
     // stock values for car generation
     public static final double DEFAULT_MIN_LENGTH = 3.0;

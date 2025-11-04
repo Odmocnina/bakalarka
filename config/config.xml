@@ -5,11 +5,9 @@
 
     <models>
         <carFollowingModel>
-            <name>idm</name>
-            <id>idm</id>
+            <id>helly</id>
         </carFollowingModel>
         <laneChangingModel>
-            <name>Minimizing Overall Braking Induced by Lane changes (MOBIL)</name>
             <id>rickert</id>
         </laneChangingModel>
     </models>
@@ -41,6 +39,14 @@
                 <minValue>1</minValue>
                 <maxValue>3</maxValue>
             </desiredTimeHeadway>
+            <speedDifferenceSensitivity>
+                <minValue>0.5</minValue>
+                <maxValue>1.5</maxValue>
+            </speedDifferenceSensitivity>
+            <distanceDifferenceSensitivity>
+                <minValue>0.5</minValue>
+                <maxValue>1.5</maxValue>
+            </distanceDifferenceSensitivity>
         </carParams>
     </generator>
 
@@ -48,7 +54,7 @@
         <showGui>true</showGui>
         <drawCells>false</drawCells>
         <timeStep>1</timeStep>
-        <duration>3600</duration>
+        <duration>60</duration>
         <outputFile>output/simulationContOutput.txt</outputFile>
     </runDetails>
 

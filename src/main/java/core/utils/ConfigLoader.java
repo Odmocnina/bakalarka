@@ -163,6 +163,10 @@ public class ConfigLoader {
                 modelFromConfig = new IDM();
             } else if (id.equals("rule184")) {
                 modelFromConfig = new Rule184();
+            } else if (id.equals("ovm")) {
+                modelFromConfig = new OVM();
+            } else if (id.equals("helly")) {
+                modelFromConfig = new Helly();
             } else {
                 logger.fatal("Unknown car-following model id in config file: " + id + ", exiting");
                 return null;
