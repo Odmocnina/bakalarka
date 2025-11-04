@@ -168,7 +168,7 @@ public class ContinuosRoad extends Road {
 
     private double getSpeedDifferenceToNextCar(int lane, int position) {
         if (position >= vehicles[lane].size() - 1) {
-            return Double.MAX_VALUE; // No car in front
+            return 0.0; // No car in front
         }
         return Math.abs(vehicles[lane].get(position).getParameter(Constants.CURRENT_SPEED_REQUEST) -
                 vehicles[lane].get(position + 1).getParameter(Constants.CURRENT_SPEED_REQUEST));
