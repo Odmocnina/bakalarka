@@ -16,6 +16,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class ConfigLoader {
 
@@ -222,18 +224,8 @@ public class ConfigLoader {
 
             Element generator = (Element) doc.getElementsByTagName("generator").item(0);
             Element flowRate = (Element) generator.getElementsByTagName("flowRate").item(0);
-            Element minLength = (Element) generator.getElementsByTagName("minLength").item(0);
-            Element maxLenght = (Element) generator.getElementsByTagName("maxLength").item(0);
-            Element maxSpeed = (Element) generator.getElementsByTagName("maxMaxSpeed").item(0);
-            Element minSpeed = (Element) generator.getElementsByTagName("minMaxSpeed").item(0);
-            Element minAcceleration = (Element) generator.getElementsByTagName("minAcceleration").item(0);
-            Element maxAcceleration = (Element) generator.getElementsByTagName("maxAcceleration").item(0);
-            Element minDeceleration = (Element) generator.getElementsByTagName("minDeceleration").item(0);
-            Element maxDeceleration = (Element) generator.getElementsByTagName("maxDeceleration").item(0);
-            Element minDesiredTimeHeadway = (Element) generator.getElementsByTagName("minDesiredTimeHeadway").item(0);
-            Element maxDesiredTimeHeadway = (Element) generator.getElementsByTagName("maxDesiredTimeHeadway").item(0);
-            Element minMinGapToNextCar = (Element) generator.getElementsByTagName("minMinGapToNextCar").item(0);
-            Element maxMinGapToNextCar = (Element) generator.getElementsByTagName("maxMinGapToNextCar").item(0);
+
+            Element carParams = (Element) generator.getElementsByTagName("carParams").item(0);
 
 
             if (flowRate == null) {
@@ -249,82 +241,21 @@ public class ConfigLoader {
 
             loadedGenerator = new CarGenerator(flow);
 
-            if (minLength != null && maxLenght != null) {
-                double minL = Double.parseDouble(minLength.getTextContent());
-                double maxL = Double.parseDouble(maxLenght.getTextContent());
-                if (minL <= 0 || maxL <= 0 || minL > maxL) {
-                    logger.fatal("Invalid length parameters in config file, exiting");
-                    return null;
-                }
-                loadedGenerator.setMinLength(minL);
-                loadedGenerator.setMaxLength(maxL);
-            } else {
-                logger.warn("Missing length parameters in config file, using default values");
-            }
+            if (carParams != null) {
+                NodeList children = carParams.getChildNodes();
+                for (int i = 0; i < children.getLength(); i++) {
+                    Node param = children.item(i);
+                    String paramName = param.getNodeName();
 
-            if (minSpeed != null && maxSpeed != null) {
-                double minS = Double.parseDouble(minSpeed.getTextContent());
-                double maxS = Double.parseDouble(maxSpeed.getTextContent());
-                if (minS <= 0 || maxS <= 0 || minS > maxS) {
-                    logger.fatal("Invalid speed parameters in config file, exiting");
-                    return null;
+                    if (param.getNodeType() == Node.ELEMENT_NODE) {
+                        Element paramElement = (Element) param;
+                        double minValue = Double.parseDouble(paramElement.getElementsByTagName("minValue").
+                                item(0).getTextContent());
+                        double maxValue = Double.parseDouble(paramElement.getElementsByTagName("maxValue").
+                                item(0).getTextContent());
+                        loadedGenerator.addParameter(paramName, minValue, maxValue);
+                    }
                 }
-                loadedGenerator.setMinMaxSpeed(minS);
-                loadedGenerator.setMaxMaxSpeed(maxS);
-            } else {
-                logger.warn("Missing speed parameters in config file, using default values");
-            }
-
-            if (minAcceleration != null && maxAcceleration != null) {
-                double minA = Double.parseDouble(minAcceleration.getTextContent());
-                double maxA = Double.parseDouble(maxAcceleration.getTextContent());
-                if (minA <= 0 || maxA <= 0 || minA > maxA) {
-                    logger.fatal("Invalid acceleration parameters in config file, exiting");
-                    return null;
-                }
-                loadedGenerator.setMinAcceleration(minA);
-                loadedGenerator.setMaxAcceleration(maxA);
-            } else {
-                logger.warn("Missing acceleration parameters in config file, using default values");
-            }
-
-            if (minDeceleration != null && maxDeceleration != null) {
-                double minD = Double.parseDouble(minDeceleration.getTextContent());
-                double maxD = Double.parseDouble(maxDeceleration.getTextContent());
-                if (minD <= 0 || maxD <= 0 || minD > maxD) {
-                    logger.fatal("Invalid deceleration parameters in config file, exiting");
-                    return null;
-                }
-                loadedGenerator.setMinDeceleration(minD);
-                loadedGenerator.setMaxDeceleration(maxD);
-            } else {
-                logger.warn("Missing deceleration parameters in config file, using default values");
-            }
-
-            if (minDesiredTimeHeadway != null && maxDesiredTimeHeadway != null) {
-                double minT = Double.parseDouble(minDesiredTimeHeadway.getTextContent());
-                double maxT = Double.parseDouble(maxDesiredTimeHeadway.getTextContent());
-                if (minT <= 0 || maxT <= 0 || minT > maxT) {
-                    logger.fatal("Invalid desired time headway parameters in config file, exiting");
-                    return null;
-                }
-                loadedGenerator.setMinDesiredTimeHeadway(minT);
-                loadedGenerator.setMaxDesiredTimeHeadway(maxT);
-            } else {
-                logger.warn("Missing desired time headway parameters in config file, using default values");
-            }
-
-            if (minMinGapToNextCar != null && maxMinGapToNextCar != null) {
-                double minG = Double.parseDouble(minMinGapToNextCar.getTextContent());
-                double maxG = Double.parseDouble(maxMinGapToNextCar.getTextContent());
-                if (minG <= 0 || maxG <= 0 || minG > maxG) {
-                    logger.fatal("Invalid minimum gap to next car parameters in config file, exiting");
-                    return null;
-                }
-                loadedGenerator.setMinMinGapToNextCar(minG);
-                loadedGenerator.setMaxMinGapToNextCar(maxG);
-            } else {
-                logger.warn("Missing minimum gap to next car parameters in config file, using default values");
             }
 
             return loadedGenerator;

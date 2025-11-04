@@ -56,6 +56,11 @@ public class NagelSchreckenberg implements ICarFollowingModel {
                 Constants.DISTANCE_TO_NEXT_CAR_REQUEST;
     }
 
+    public String getParametersForGeneration() {
+        return Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR
+                + Constants.LENGTH_REQUEST + Constants.REQUEST_SEPARATOR;
+    }
+
     @Override
     public String getName() {
         return "Nagel-Schreckenberg Model";

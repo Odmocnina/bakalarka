@@ -16,19 +16,39 @@
 
     <generator>
         <flowRate>0.1</flowRate>
-        <minLength>2</minLength>
-        <maxLength>25</maxLength>
-        <minMaxSpeed>15</minMaxSpeed>
-        <maxMaxSpeed>25</maxMaxSpeed>
-        <minMaxAcceleration>2</minMaxAcceleration>
-        <maxMaxAcceleration>2</maxMaxAcceleration>
+        <carParams>
+            <maxSpeed>
+                <minValue>15</minValue>
+                <maxValue>25</maxValue>
+            </maxSpeed>
+            <length>
+                <minValue>2</minValue>
+                <maxValue>25</maxValue>
+            </length>
+            <maxAcceleration>
+                <minValue>2</minValue>
+                <maxValue>2</maxValue>
+            </maxAcceleration>
+            <minimumGapToNextCar>
+                <minValue>2</minValue>
+                <maxValue>5</maxValue>
+            </minimumGapToNextCar>
+            <decelerationComfort>
+                <minValue>2</minValue>
+                <maxValue>5</maxValue>
+            </decelerationComfort>
+            <desiredTimeHeadway>
+                <minValue>1</minValue>
+                <maxValue>3</maxValue>
+            </desiredTimeHeadway>
+        </carParams>
     </generator>
 
     <runDetails>
         <showGui>true</showGui>
         <drawCells>false</drawCells>
         <timeStep>1</timeStep>
-        <duration>3600</duration>
+        <duration>60</duration>
         <outputFile>output/simulationCellOutput.txt</outputFile>
     </runDetails>
 </config>

@@ -8,6 +8,8 @@ import core.utils.Constants;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+
+import core.utils.StringEditor;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -28,29 +30,29 @@ public class ContinuosRoad extends Road {
             this.vehicles[lane] = new LinkedList<>();
         }
 
-        // For testing purposes, add some cars to the road, DELETE LATER
-        vehicles[0].add(new CarParams() {{
-            currentSpeed = 0;
-            maxSpeed = 33.33; // 120 km/h
-            xPosition = 0;
-            lane = 0;
-            length = 4.5;
-            maxAcceleration = 2.0;
-            minGapToNextCar = 2.0;
-            maxConfortableDeceleration = 4.5;
-            desiredTimeHeadway = 1.5;
-        }});
-        vehicles[0].add(new CarParams() {{
-            currentSpeed = 0;
-            maxSpeed = 10; // 120 km/h
-            xPosition = 50;
-            lane = 0;
-            length = 4.5;
-            maxAcceleration = 2.0;
-            minGapToNextCar = 2.0;
-            maxConfortableDeceleration = 4.5;
-            desiredTimeHeadway = 1.5;
-        }});
+        CarParams carParams = new CarParams();
+        carParams.setParameter(Constants.CURRENT_SPEED_REQUEST, 0);
+        carParams.setParameter(Constants.MAX_SPEED_REQUEST, 33.33);
+        carParams.xPosition = 20;
+        carParams.lane = 0;
+        carParams.setParameter(Constants.LENGTH_REQUEST, 4.5);
+        carParams.setParameter(Constants.MAX_ACCELERATION_REQUEST, 2.0);
+        carParams.setParameter(Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 2.0);
+        carParams.setParameter(Constants.DECELERATION_COMFORT_REQUEST, 4.5);
+        carParams.setParameter(Constants.DESIRED_TIME_HEADWAY_REQUEST, 1.5);
+        vehicles[0].add(carParams);
+
+        CarParams carParams2 = new CarParams();
+        carParams2.setParameter(Constants.CURRENT_SPEED_REQUEST, 0);
+        carParams2.setParameter(Constants.MAX_SPEED_REQUEST, 10.0);
+        carParams2.xPosition = 50;
+        carParams2.lane = 0;
+        carParams2.setParameter(Constants.LENGTH_REQUEST, 4.5);
+        carParams2.setParameter(Constants.MAX_ACCELERATION_REQUEST, 2.0);
+        carParams2.setParameter(Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 2.0);
+        carParams2.setParameter(Constants.DECELERATION_COMFORT_REQUEST, 4.5);
+        carParams2.setParameter(Constants.DESIRED_TIME_HEADWAY_REQUEST, 1.5);
+        vehicles[0].add(carParams2);
     }
 
     public void tryToAddCar() {
@@ -96,7 +98,7 @@ public class ContinuosRoad extends Road {
                 continue;
             }
             double newSpeed = AppContext.CAR_FOLLOWING_MODEL.getNewSpeed(parameters);
-            car.currentSpeed = newSpeed;
+            car.setParameter(Constants.CURRENT_SPEED_REQUEST, newSpeed);
             car.xPosition += newSpeed;
 
             if (!checkIfCarStillRelevant(car, lane)) {
@@ -110,47 +112,60 @@ public class ContinuosRoad extends Road {
     private HashMap<String, Double> getParameters(int lane, int position, String requestParameters) {
         HashMap<String, Double> parameters = new HashMap<>();
         String[] params = requestParameters.split(Constants.REQUEST_SEPARATOR);
+        if (params.length <= 0) {
+            logger.debug("No parameters requested");
+            return null;
+        }
+        String[] carGeneratedParams = this.generator.getCarGenerationParameters();
+
+        CarParams car = vehicles[lane].get(position);
         for (String param : params) {
-            switch (param) {
-                case Constants.CURRENT_SPEED_REQUEST:
-                    parameters.put(Constants.CURRENT_SPEED_REQUEST, vehicles[lane].get(position).currentSpeed);
-                    break;
+            if (StringEditor.isInArray(carGeneratedParams, param)) {
+                int i = 0;
+                parameters.put(param, car.getParameter(param));
+            } else {
+                switch (param) {
+                    case Constants.CURRENT_SPEED_REQUEST:
+                        parameters.put(Constants.CURRENT_SPEED_REQUEST, car.getParameter(Constants.CURRENT_SPEED_REQUEST));
+                        break;
 
-                case Constants.MAX_SPEED_REQUEST:
-                    parameters.put(Constants.MAX_SPEED_REQUEST, vehicles[lane].get(position).maxSpeed);
-                    break;
+                    case Constants.MAX_SPEED_REQUEST:
+                        parameters.put(Constants.MAX_SPEED_REQUEST, car.getParameter(Constants.MAX_SPEED_REQUEST));
+                        break;
 
-                case Constants.DISTANCE_TO_NEXT_CAR_REQUEST:
-                    parameters.put(Constants.DISTANCE_TO_NEXT_CAR_REQUEST, getDistanceToNextCar(lane, position));
-                    break;
+                    case Constants.DISTANCE_TO_NEXT_CAR_REQUEST:
+                        parameters.put(Constants.DISTANCE_TO_NEXT_CAR_REQUEST, getDistanceToNextCar(lane, position));
+                        break;
 
-                case Constants.SPEED_DIFFERENCE_TO_NEXT_CAR_REQUEST:
-                    parameters.put(Constants.SPEED_DIFFERENCE_TO_NEXT_CAR_REQUEST,
-                            getSpeedDifferenceToNextCar(lane, position));
-                    break;
+                    case Constants.SPEED_DIFFERENCE_TO_NEXT_CAR_REQUEST:
+                        parameters.put(Constants.SPEED_DIFFERENCE_TO_NEXT_CAR_REQUEST,
+                                getSpeedDifferenceToNextCar(lane, position));
+                        break;
 
-                case Constants.MAX_ACCELERATION_REQUEST:
-                    parameters.put(Constants.MAX_ACCELERATION_REQUEST, vehicles[lane].get(position).maxAcceleration);
-                    break;
+                    case Constants.MAX_ACCELERATION_REQUEST:
+                        parameters.put(Constants.MAX_ACCELERATION_REQUEST,
+                                car.getParameter(Constants.MAX_ACCELERATION_REQUEST));
+                        break;
 
-                case Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST:
-                    parameters.put(Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST,
-                            vehicles[lane].get(position).minGapToNextCar);
-                    break;
+                    case Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST:
+                        parameters.put(Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST,
+                                car.getParameter(Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST));
+                        break;
 
-                case Constants.DECELERATION_COMFORT_REQUEST:
-                    parameters.put(Constants.DECELERATION_COMFORT_REQUEST,
-                            vehicles[lane].get(position).maxConfortableDeceleration);
-                    break;
+                    case Constants.DECELERATION_COMFORT_REQUEST:
+                        parameters.put(Constants.DECELERATION_COMFORT_REQUEST,
+                                car.getParameter(Constants.DECELERATION_COMFORT_REQUEST));
+                        break;
 
-                case Constants.DESIRED_TIME_HEADWAY_REQUEST:
-                    parameters.put(Constants.DESIRED_TIME_HEADWAY_REQUEST,
-                            vehicles[lane].get(position).desiredTimeHeadway);
-                    break;
+                    case Constants.DESIRED_TIME_HEADWAY_REQUEST:
+                        parameters.put(Constants.DESIRED_TIME_HEADWAY_REQUEST,
+                                car.getParameter(Constants.DESIRED_TIME_HEADWAY_REQUEST));
+                        break;
 
-                default:
-                    logger.debug("Unknown parameter requested: " + param);
-                    return null;
+                    default:
+                        logger.debug("Unknown parameter requested: " + param);
+                        return null;
+                }
             }
         }
         return parameters;
@@ -162,7 +177,7 @@ public class ContinuosRoad extends Road {
         }
         double distance = 0.0;
         distance = vehicles[lane].get(position + 1).xPosition - vehicles[lane].get(position).xPosition
-                - vehicles[lane].get(position).length;
+                - vehicles[lane].get(position).getParameter(Constants.LENGTH_REQUEST);
         return distance;
     }
 
@@ -170,7 +185,8 @@ public class ContinuosRoad extends Road {
         if (position >= vehicles[lane].size() - 1) {
             return 0.0; // No car in front
         }
-        return Math.abs(vehicles[lane].get(position).currentSpeed - vehicles[lane].get(position + 1).currentSpeed);
+        return Math.abs(vehicles[lane].get(position).getParameter(Constants.CURRENT_SPEED_REQUEST) -
+                vehicles[lane].get(position + 1).getParameter(Constants.CURRENT_SPEED_REQUEST));
     }
 
     @Override
@@ -183,9 +199,12 @@ public class ContinuosRoad extends Road {
             return true;
         }
         CarParams firstCar = vehicles[lane].getFirst();
-        if (newCar.length + newCar.minGapToNextCar <= firstCar.xPosition) {
+        double space = newCar.getParameter(Constants.LENGTH_REQUEST) +
+                newCar.getParameter(Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST);
+        if (space <= firstCar.xPosition) {
             return true;
         }
+
         return false;
     }
 
@@ -209,7 +228,7 @@ public class ContinuosRoad extends Road {
     }
 
     private boolean checkIfCarStillRelevant(CarParams car, int lane) {
-        if ((car.xPosition - car.length) > this.length) {
+        if ((car.xPosition - car.getParameter(Constants.LENGTH_REQUEST)) > this.length) {
             removeCar(car, lane);
             return false;
         }

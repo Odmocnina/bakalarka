@@ -65,7 +65,7 @@ public class ContinousRoadRenderer implements IRoadRenderer {
                 for (CarParams car : vehicles[i]) {
                     // x place of car
                     double carX = offsetX + car.xPosition * widthMultiplayer;
-                    double carW = car.length * widthMultiplayer;
+                    double carW = car.getParameter(Constants.LENGTH_REQUEST) * widthMultiplayer;
 
                     // y palce of car
                     double carY = y + laneHpx * carUpLiftFactor;

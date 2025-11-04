@@ -43,6 +43,10 @@ public class Rule184 implements ICarFollowingModel {
         return Constants.DISTANCE_TO_NEXT_CAR_REQUEST;
     }
 
+    public String getParametersForGeneration() {
+        return Constants.LENGTH_REQUEST;
+    }
+
     @Override
     public String getName() {
         return "Rule 184";

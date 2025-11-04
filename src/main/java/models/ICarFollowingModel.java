@@ -13,6 +13,7 @@ public interface ICarFollowingModel {
     public double getCellSize();
 
     public String requestParameters();
+    public String getParametersForGeneration();
     public String getName();
 
 }

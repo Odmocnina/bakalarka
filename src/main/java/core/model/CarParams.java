@@ -4,29 +4,32 @@ import core.utils.Constants;
 
 import javafx.scene.paint.Color;
 
+import java.util.HashMap;
+
 public class CarParams {
 
-    public double currentSpeed = Constants.PARAMETER_UNDEFINED;
-    public double maxSpeed = Constants.PARAMETER_UNDEFINED;
     public double xPosition = Constants.PARAMETER_UNDEFINED;
     public int lane = (int) Constants.PARAMETER_UNDEFINED;
-    public double length = Constants.PARAMETER_UNDEFINED;
-    public double maxAcceleration = Constants.PARAMETER_UNDEFINED;
-    public double minGapToNextCar = Constants.PARAMETER_UNDEFINED;
-    public double maxConfortableDeceleration = Constants.PARAMETER_UNDEFINED;
-    public double desiredTimeHeadway = Constants.PARAMETER_UNDEFINED;
-    public double reactionCoefficient = Constants.PARAMETER_UNDEFINED;
-    public double politenessFactor = Constants.PARAMETER_UNDEFINED;
+    private HashMap<String, Double> parameters = new HashMap<>();
     public int id = (int) Constants.PARAMETER_UNDEFINED;
     public Color color = null;
     public boolean isProcessed = false;
 
+    public void setParameter(String key, double value) {
+        parameters.put(key, value);
+    }
+
+    public double getParameter(String key) {
+        return parameters.getOrDefault(key, Constants.PARAMETER_UNDEFINED);
+    }
+
     public String toString() {
-        return "CarParams[id= " + id + ", currentSpeed=" + currentSpeed + ", maxSpeed=" + maxSpeed + ", xPosition=" + xPosition +
-                ", lane=" + lane + ", length=" + length + ", maxAcceleration=" + maxAcceleration +
-                ", minGapToNextCar=" + minGapToNextCar + ", maxConfortableDeceleration=" + maxConfortableDeceleration +
-                ", desiredTimeHeadway=" + desiredTimeHeadway +
-                ", color=" + color + "]";
+        String paramsString = "CarParams{id=" + id + ", lane=" + lane + ", xPosition=" + xPosition + ", parameters={";
+        for (String key : parameters.keySet()) {
+            paramsString += key + "=" + parameters.get(key) + ", ";
+        }
+
+        return paramsString + "}}";
     }
 
 }

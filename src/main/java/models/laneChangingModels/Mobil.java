@@ -18,6 +18,11 @@ public class Mobil implements ILaneChangingModel {
     }
 
     @Override
+    public String getParametersForGeneration() {
+        return "";
+    }
+
+    @Override
     public Direction changeLaneIfDesired(HashMap<String, Double> parameters) {
 
 

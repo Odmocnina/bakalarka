@@ -8,6 +8,7 @@ public interface ILaneChangingModel {
 
     public String getID();
     public String requestParameters();
+    public String getParametersForGeneration();
     public Direction changeLaneIfDesired(HashMap<String, Double> parameters);
     public String getName();
 

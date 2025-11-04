@@ -16,10 +16,32 @@
 
     <generator>
         <flowRate>0.1</flowRate>
-        <minLength>3</minLength>
-        <maxLength>7</maxLength>
-        <minMaxSpeed>50</minMaxSpeed>
-        <maxMaxSpeed>100</maxMaxSpeed>
+        <carParams>
+            <maxSpeed>
+                <minValue>50</minValue>
+                <maxValue>100</maxValue>
+            </maxSpeed>
+            <length>
+                <minValue>3</minValue>
+                <maxValue>7</maxValue>
+            </length>
+            <maxAcceleration>
+                <minValue>2</minValue>
+                <maxValue>2</maxValue>
+            </maxAcceleration>
+            <minimumGapToNextCar>
+                <minValue>2</minValue>
+                <maxValue>5</maxValue>
+            </minimumGapToNextCar>
+            <decelerationComfort>
+                <minValue>2</minValue>
+                <maxValue>5</maxValue>
+            </decelerationComfort>
+            <desiredTimeHeadway>
+                <minValue>1</minValue>
+                <maxValue>3</maxValue>
+            </desiredTimeHeadway>
+        </carParams>
     </generator>
 
     <runDetails>

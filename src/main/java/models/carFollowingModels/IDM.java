@@ -73,6 +73,16 @@ public class IDM implements ICarFollowingModel {
                 Constants.DESIRED_TIME_HEADWAY_REQUEST;
     }
 
+    @Override
+    public String getParametersForGeneration() {
+        return Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
+               Constants.MAX_ACCELERATION_REQUEST + Constants.REQUEST_SEPARATOR +
+               Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST + Constants.REQUEST_SEPARATOR +
+               Constants.DECELERATION_COMFORT_REQUEST + Constants.REQUEST_SEPARATOR +
+               Constants.DESIRED_TIME_HEADWAY_REQUEST + Constants.REQUEST_SEPARATOR
+                + Constants.LENGTH_REQUEST;
+    }
+
     public double getCellSize() {
         return -1.0;
     }

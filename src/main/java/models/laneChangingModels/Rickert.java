@@ -39,6 +39,10 @@ public class Rickert implements ILaneChangingModel {
                 Constants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST;
     }
 
+    public String getParametersForGeneration() {
+        return Constants.MAX_SPEED_REQUEST;
+    }
+
     /**
      * decides whether to change lane or not based on the rickert model
      *

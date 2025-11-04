@@ -3,10 +3,7 @@ package app;
 import core.model.CarGenerator;
 import core.model.Road;
 import core.sim.Simulation;
-import core.utils.ConfigLoader;
-import core.utils.Constants;
-import core.utils.ResultsRecorder;
-import core.utils.RunDetails;
+import core.utils.*;
 import models.ICarFollowingModel;
 import models.ILaneChangingModel;
 import ui.Window;
@@ -82,10 +79,14 @@ public class Main {
             logger.info("Loaded car generator: " + carGenerator.toString());
         }
 
+        String requestedParams = StringEditor.mergeRequestParameters(carFollowingModel.getParametersForGeneration(),
+                laneChangingModel.getParametersForGeneration());
+        carGenerator.setCarGenerationParameters(requestedParams);
+
         // check if car generator has all parameters needed for the selected car following model, for example person
         // loads car following model which need max speed, the model needs those parameters to work
         // so generator gives needs to gerenerate cars with max speed parameter, otherwise model wont work properly, lol
-        if (carGenerator.checkIfAllParametresAreLoaded(carFollowingModel.requestParameters())) {
+        if (carGenerator.checkIfAllParametresAreLoaded()) {
             logger.info("Car generator parameters are valid for the selected car following model.");
         } else { // missing some parameters, exit
             logger.fatal("Car generator parameters are NOT valid for the selected car following model, exiting.");

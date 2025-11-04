@@ -21,6 +21,11 @@ public class FVDM implements ICarFollowingModel {
     }
 
     @Override
+    public String getParametersForGeneration() {
+        return "";
+    }
+
+    @Override
     public String getID() {
         return "ovm";
     }
