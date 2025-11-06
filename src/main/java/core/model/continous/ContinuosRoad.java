@@ -73,7 +73,7 @@ public class ContinuosRoad extends Road {
 
         int carsPassed = this.forwardStep();
 
-        if (false)
+        if (true)
             this.tryToAddCar();
 
         return carsPassed;

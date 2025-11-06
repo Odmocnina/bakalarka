@@ -35,7 +35,7 @@ public class IDMN implements ICarFollowingModel {
         double currentSpeedNextCar = parameters.get(Constants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST);
         double speedDifferenceToTheNextCar;
         if (currentSpeedNextCar != Constants.NO_CAR_THERE) {
-            speedDifferenceToTheNextCar = currentSpeed - currentSpeedNextCar;
+            speedDifferenceToTheNextCar = Math.abs(currentSpeed - currentSpeedNextCar);
         } else {
             speedDifferenceToTheNextCar = 0.0;
         }
