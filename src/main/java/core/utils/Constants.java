@@ -23,6 +23,7 @@ public class Constants {
             Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.ORANGE,
             Color.PURPLE, Color.PINK, Color.BROWN, Color.CYAN, Color.MAGENTA
     };
+    public static final String GENERATOR_QUEUE = "queue";
 
     // output file types
     public static final String CSV_TYPE = "csv";

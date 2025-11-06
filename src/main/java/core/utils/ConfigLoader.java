@@ -232,6 +232,7 @@ public class ConfigLoader {
             Element flowRate = (Element) generator.getElementsByTagName("flowRate").item(0);
 
             Element carParams = (Element) generator.getElementsByTagName("carParams").item(0);
+            Element queue = (Element) generator.getElementsByTagName("queue").item(0);
 
 
             if (flowRate == null) {
@@ -246,6 +247,27 @@ public class ConfigLoader {
             }
 
             loadedGenerator = new CarGenerator(flow);
+
+            if (queue != null) {
+                Element useQueue = (Element) queue.getElementsByTagName("use").item(0);
+
+                if (useQueue != null && Boolean.parseBoolean(useQueue.getTextContent())) {
+                    try {
+                        int min = Integer.parseInt(queue.getElementsByTagName("minValue").item(0).getTextContent());
+                        int max = Integer.parseInt(queue.getElementsByTagName("maxValue").item(0).getTextContent());
+
+                        if (min < 0 || max < 0 || min > max) {
+                            logger.error("Invalid queue parameters in config file, it will be ignored.");
+                        } else {
+                            loadedGenerator.addParameter(Constants.GENERATOR_QUEUE, (double) min, (double) max);
+                        }
+                    } catch (Exception e) {
+                        logger.error("Error parsing queue parameters in config file, it will be ignored.");
+                    }
+
+                }
+
+            }
 
             if (carParams != null) {
                 NodeList children = carParams.getChildNodes();

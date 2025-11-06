@@ -69,19 +69,41 @@ public class CellularRoad extends Road {
 
     }
 
+    private boolean isOkToPutCar(CarParams car, int lane) {
+        for (int i = 0; i <= car.getParameter(Constants.LENGTH_REQUEST) + 1; i++) {
+            if (i >= numberOfCells || cells[lane][i].isOccupied()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void addFromQueue(int lane) {
+        CarParams cp = super.carQueuesPerLane[lane].peek();
+
+        if (cp != null && this.isOkToPutCar(cp, lane)) {
+            placeCar(cp, (int) (cp.getParameter(Constants.LENGTH_REQUEST) - 1), lane);
+            super.carQueuesPerLane[lane].poll();
+        }
+    }
+
+    private void addFromGenerator(int lane) {
+        if (super.generator.decideIfNewCar()) {
+            CarParams newCar = super.generator.generateCar();
+
+            if (this.isOkToPutCar(newCar, lane)) {
+                placeCar(newCar, (int) (newCar.getParameter(Constants.LENGTH_REQUEST) - 1), lane);
+            }
+        }
+    }
+
     private void tryToAddCar() {
         for (int lane = 0; lane < numberOfLanes; lane++) {
-            if (super.generator.decideIfNewCar()) {
-                CarParams newCar = super.generator.generateCar();
-                for (int i = 0; i <= newCar.getParameter(Constants.LENGTH_REQUEST) + 1; i++) {
-                    if (i >= numberOfCells || cells[lane][i].isOccupied()) {
-                        newCar = null;
-                        break;
-                    }
-                }
-                if (newCar != null) {
-                    placeCar(newCar, (int) newCar.getParameter(Constants.LENGTH_REQUEST), lane);
-                }
+            if (super.generator.generatingToQueue()) {
+                this.addFromQueue(lane);
+            } else {
+                this.addFromGenerator(lane);
             }
         }
     }

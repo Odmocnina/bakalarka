@@ -115,6 +115,13 @@ public class Main {
         carGenerator.setType(roads[0].getType());
         for (Road road : roads) {
             road.setCarGenerator(carGenerator);
+
+            if (carGenerator.generatingToQueue()) {
+                logger.info("Car generator is generating cars to queue.");
+                road.initializeCarQueues();
+            } else {
+                logger.info("Car generator is generating cars directly on road.");
+            }
         }
 
         IRoadRenderer renderer; // renderer for drawing roads in gui, depends on road type, because different road types

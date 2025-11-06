@@ -4,12 +4,23 @@ import java.util.Queue;
 
 public abstract class Road {
 
+    /** length of road **/
     protected double length;
+
+    /** number of lanes on road **/
     protected int numberOfLanes;
+
+    /** speed limit on road **/
     protected double speedLimit;
+
+    /** type of road, cellular, continuous... **/
     protected String type;
+
+    /** car generator assigned to this road **/
     protected CarGenerator generator;
-    protected Queue<CarParams>[] carQueuesPerLane;
+
+    /** queues of cars per lane **/
+    protected Queue<CarParams>[] carQueuesPerLane = null;
 
     public Road(double length, int numberOfLanes, double speedLimit, String type) {
         this.length = length;
@@ -49,10 +60,10 @@ public abstract class Road {
         this.generator = generator;
     }
 
-    private void initializeCarQueues() {
+    public void initializeCarQueues() {
         carQueuesPerLane = new Queue[numberOfLanes];
         for (int i = 0; i < numberOfLanes; i++) {
-            //carQueuesPerLane[i] = generator.generateCarsInToQueue()
+            this.carQueuesPerLane[i] = this.generator.generateCarsInToQueue();
         }
     }
 

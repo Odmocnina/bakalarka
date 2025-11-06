@@ -17,8 +17,8 @@
     <generator>
         <queue>
             <use>true</use>
-            <maxSize>50</maxSize>
-            <minSize>20</minSize>
+            <minValue>1</minValue>
+            <maxValue>2</maxValue>
         </queue>
         <flowRate>0.7</flowRate>
         <carParams>

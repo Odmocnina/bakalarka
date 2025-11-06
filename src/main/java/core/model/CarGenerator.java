@@ -172,10 +172,13 @@ public class CarGenerator {
         }
     }
 
-    public Queue<CarParams> generateCarsInToQueue(int minNumberOfCars, int maxNumberOfCars) {
+    public Queue<CarParams> generateCarsInToQueue() {
         Queue<CarParams> queue = new java.util.LinkedList<>();
         Random rand = new Random();
-        int numberOfCars = rand.nextInt(maxNumberOfCars - minNumberOfCars + 1) + minNumberOfCars;
+        Parameter p = parameters.get(Constants.GENERATOR_QUEUE);
+        int minNumberOfCars = (int) p.minValue;
+        int range = (int) p.range;
+        int numberOfCars = rand.nextInt(range + 1) + minNumberOfCars;
 
         while (queue.size() < numberOfCars) {
             CarParams car = generateCar();
@@ -246,6 +249,11 @@ public class CarGenerator {
         private boolean checkIfValid() {
             return minValue <= maxValue && range >= 0;
         }
+    }
+
+    public boolean generatingToQueue() {
+        Parameter p = parameters.get(Constants.GENERATOR_QUEUE);
+        return p != null;
     }
 
 
