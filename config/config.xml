@@ -5,7 +5,7 @@
 
     <models>
         <carFollowingModel>
-            <id>idm</id>
+            <id>helly</id>
         </carFollowingModel>
         <laneChangingModel>
             <id>rickert</id>
@@ -13,7 +13,7 @@
     </models>
 
     <generator>
-        <flowRate>0.1</flowRate>
+        <flowRate>0.7</flowRate>
         <carParams>
             <maxSpeed>
                 <minValue>50</minValue>
@@ -21,7 +21,7 @@
             </maxSpeed>
             <length>
                 <minValue>3</minValue>
-                <maxValue>7</maxValue>
+                <maxValue>3</maxValue>
             </length>
             <maxAcceleration>
                 <minValue>2</minValue>
@@ -54,7 +54,7 @@
         <showGui>true</showGui>
         <drawCells>false</drawCells>
         <timeStep>1</timeStep>
-        <duration>60</duration>
+        <duration>600</duration>
         <outputFile>output/simulationContOutput.txt</outputFile>
     </runDetails>
 

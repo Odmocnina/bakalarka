@@ -73,7 +73,7 @@ public class CellularRoad extends Road {
         for (int lane = 0; lane < numberOfLanes; lane++) {
             if (super.generator.decideIfNewCar()) {
                 CarParams newCar = super.generator.generateCar();
-                for (int i = 0; i <= newCar.getParameter(Constants.LENGTH_REQUEST); i++) {
+                for (int i = 0; i <= newCar.getParameter(Constants.LENGTH_REQUEST) + 1; i++) {
                     if (i >= numberOfCells || cells[lane][i].isOccupied()) {
                         newCar = null;
                         break;
@@ -175,11 +175,12 @@ public class CellularRoad extends Road {
     @Override
     public int updateRoad() {
         // Attempt to add a new car at the beginning of each lane
-        if (true)
-        this.tryToAddCar();
 
         this.laneChangeStep();
         int carsPassed = this.forwardStep();
+
+        if (true)
+            this.tryToAddCar();
         return carsPassed;
     }
 

@@ -274,7 +274,7 @@ public class Window extends Application {
 
     @Override
     public void stop() {
-        if (engine != null && engine.isRunning()) {
+        if (engine != null && engine.getRunning()) {
             engine.stop();
         }
         Platform.exit();

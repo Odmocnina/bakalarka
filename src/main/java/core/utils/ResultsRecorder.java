@@ -12,6 +12,7 @@ public class ResultsRecorder {
     private static ResultsRecorder instance = null;
     private int[] carsPassedPerRoad;
     private BigInteger timeStart;
+    private BigInteger timeEnd;
     private String fileName;
 
     private ResultsRecorder() {
@@ -48,11 +49,15 @@ public class ResultsRecorder {
         timeStart = BigInteger.valueOf(System.nanoTime());
     }
 
+    public void stopTimer() {
+        timeEnd = BigInteger.valueOf(System.nanoTime());
+    }
+
     public BigInteger getElapsedTimeNs() {
         if (timeStart == null) {
             return BigInteger.ZERO;
         }
-        return BigInteger.valueOf(System.nanoTime()).subtract(timeStart);
+        return timeEnd.subtract(timeStart);
     }
 
     public void writeResults() {
@@ -65,6 +70,10 @@ public class ResultsRecorder {
                 File file = new File(fileName);
                 FileWriter fw = new FileWriter(file);
                 BufferedWriter bw = new BufferedWriter(fw);
+                bw.write("=== Simulation Time Results ===\n");
+                BigInteger elapsedTime = getElapsedTimeNs();
+                int timeMillis = elapsedTime.divide(BigInteger.valueOf(1_000_000)).intValue();
+                bw.write("Total Simulation Time: " + timeMillis + " ms\n\n");
                 bw.write("=== Cars Passed Results ===\n");
                 for (int i = 0; i < carsPassedPerRoad.length; i++) {
                     bw.write("Road " + i + ": " + carsPassedPerRoad[i] + " cars passed.\n");

@@ -1,5 +1,7 @@
 package core.model;
 
+import java.util.Queue;
+
 public abstract class Road {
 
     protected double length;
@@ -7,6 +9,7 @@ public abstract class Road {
     protected double speedLimit;
     protected String type;
     protected CarGenerator generator;
+    protected Queue<CarParams>[] carQueuesPerLane;
 
     public Road(double length, int numberOfLanes, double speedLimit, String type) {
         this.length = length;
@@ -44,6 +47,13 @@ public abstract class Road {
 
     public void setCarGenerator(CarGenerator generator) {
         this.generator = generator;
+    }
+
+    private void initializeCarQueues() {
+        carQueuesPerLane = new Queue[numberOfLanes];
+        for (int i = 0; i < numberOfLanes; i++) {
+            //carQueuesPerLane[i] = generator.generateCarsInToQueue()
+        }
     }
 
 }

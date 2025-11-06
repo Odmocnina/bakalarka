@@ -167,6 +167,8 @@ public class ConfigLoader {
                 modelFromConfig = new OVM();
             } else if (id.equals("helly")) {
                 modelFromConfig = new Helly();
+            } else if (id.equals("headleading")) {
+                modelFromConfig = new HeadLeading();
             } else {
                 logger.fatal("Unknown car-following model id in config file: " + id + ", exiting");
                 return null;

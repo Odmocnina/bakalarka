@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <numberOfRoads>50</numberOfRoads>
+    <numberOfRoads>20</numberOfRoads>
     <roadFile>config/roads/road2.xml</roadFile>
 
     <models>
         <carFollowingModel>
             <name>rule184</name>
-            <id>nagelschreckenberg</id>
+            <id>headleading</id>
         </carFollowingModel>
         <laneChangingModel>
             <name>Minimizing Overall Braking Induced by Lane changes (MOBIL)</name>
@@ -15,15 +15,20 @@
     </models>
 
     <generator>
-        <flowRate>0.1</flowRate>
+        <queue>
+            <use>true</use>
+            <maxSize>50</maxSize>
+            <minSize>20</minSize>
+        </queue>
+        <flowRate>0.7</flowRate>
         <carParams>
             <maxSpeed>
-                <minValue>15</minValue>
-                <maxValue>25</maxValue>
+                <minValue>50</minValue>
+                <maxValue>100</maxValue>
             </maxSpeed>
             <length>
-                <minValue>2</minValue>
-                <maxValue>25</maxValue>
+                <minValue>1</minValue>
+                <maxValue>8</maxValue>
             </length>
             <maxAcceleration>
                 <minValue>2</minValue>
@@ -41,6 +46,14 @@
                 <minValue>1</minValue>
                 <maxValue>3</maxValue>
             </desiredTimeHeadway>
+            <speedDifferenceSensitivity>
+                <minValue>0.5</minValue>
+                <maxValue>1.5</maxValue>
+            </speedDifferenceSensitivity>
+            <distanceDifferenceSensitivity>
+                <minValue>0.5</minValue>
+                <maxValue>1.5</maxValue>
+            </distanceDifferenceSensitivity>
         </carParams>
     </generator>
 
@@ -48,7 +61,7 @@
         <showGui>true</showGui>
         <drawCells>false</drawCells>
         <timeStep>1</timeStep>
-        <duration>60</duration>
+        <duration>120</duration>
         <outputFile>output/simulationCellOutput.txt</outputFile>
     </runDetails>
 </config>

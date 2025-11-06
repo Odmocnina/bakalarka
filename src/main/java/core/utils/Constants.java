@@ -48,6 +48,12 @@ public class Constants {
     public static final String LENGTH_REQUEST = "length";
     public static final String DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST = "distanceDifferenceSensitivity";
     public static final String SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST = "speedDifferenceSensitivity";
+    public static final String CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST = "currentSpeed_straight_forward";
+    public static final String CURRENT_SPEED_STRAIGHT_BACKWARDS_REQUEST = "currentSpeed_backward_forward";
+    public static final String CURRENT_SPEED_LEFT_FORWARD_REQUEST = "currentSpeed_left_forward";
+    public static final String CURRENT_SPEED_LEFT_BACKWARD_REQUEST = "currentSpeed_left_backward";
+    public static final String CURRENT_SPEED_RIGHT_FORWARD_REQUEST = "currentSpeed_right_forward";
+    public static final String CURRENT_SPEED_RIGHT_BACKWARD_REQUEST = "currentSpeed_right_backward";
 
     // stock values for car generation
     public static final double DEFAULT_MIN_LENGTH = 3.0;

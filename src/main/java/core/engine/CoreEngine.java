@@ -4,8 +4,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CoreEngine {
-    private final Runnable tick;
-    private final AtomicBoolean running = new AtomicBoolean(false);
+    private final Runnable TICK;
+    private final AtomicBoolean RUNNING = new AtomicBoolean(false);
     private ScheduledExecutorService exec;
     private long periodMs;
 
@@ -16,12 +16,12 @@ public class CoreEngine {
         if (periodMs <= 0) {
             throw new IllegalArgumentException("periodMs must be > 0");
         }
-        this.tick = tick;
+        this.TICK = tick;
         this.periodMs = periodMs;
     }
 
     public synchronized void start() {
-        if (running.get()) {
+        if (RUNNING.get()) {
             return;
         }
 
@@ -30,8 +30,8 @@ public class CoreEngine {
             t.setDaemon(true);
             return t;
         });
-        exec.scheduleAtFixedRate(tick, 0, periodMs, TimeUnit.MILLISECONDS);
-        running.set(true);
+        exec.scheduleAtFixedRate(TICK, 0, periodMs, TimeUnit.MILLISECONDS);
+        RUNNING.set(true);
     }
 
     public synchronized void stop() {
@@ -39,17 +39,20 @@ public class CoreEngine {
             exec.shutdownNow();
             exec = null;
         }
-        running.set(false);
+        RUNNING.set(false);
     }
 
-    public boolean isRunning() {
-        return running.get();
+    public boolean getRunning() {
+        return RUNNING.get();
     }
 
     public synchronized void setPeriodMs(long newPeriod) {
         if (newPeriod <= 0) return;
         this.periodMs = newPeriod;
-        if (isRunning()) { stop(); start(); }
+        if (getRunning()) {
+            stop();
+            start();
+        }
     }
 
     public long getPeriodMs() {

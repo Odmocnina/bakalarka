@@ -1,9 +1,7 @@
 package core.model.continous;
 
 import app.AppContext;
-import core.model.CarGenerator;
-import core.model.CarParams;
-import core.model.Road;
+import core.model.*;
 import core.utils.Constants;
 
 import java.util.HashMap;
@@ -30,7 +28,7 @@ public class ContinuosRoad extends Road {
             this.vehicles[lane] = new LinkedList<>();
         }
 
-        CarParams carParams = new CarParams();
+        /*CarParams carParams = new CarParams();
         carParams.setParameter(Constants.CURRENT_SPEED_REQUEST, 0);
         carParams.setParameter(Constants.MAX_SPEED_REQUEST, 33.33);
         carParams.xPosition = 20;
@@ -54,7 +52,7 @@ public class ContinuosRoad extends Road {
         carParams2.setParameter(Constants.DECELERATION_COMFORT_REQUEST, 4.5);
         carParams2.setParameter(Constants.DESIRED_TIME_HEADWAY_REQUEST, 1.5);
         carParams2.setParameter(Constants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
-        vehicles[0].add(carParams2);
+        vehicles[0].add(carParams2);*/
     }
 
     public void tryToAddCar() {
@@ -72,10 +70,11 @@ public class ContinuosRoad extends Road {
 
     @Override
     public int updateRoad() {
-        if (true)
-        this.tryToAddCar();
 
         int carsPassed = this.forwardStep();
+
+        if (true)
+            this.tryToAddCar();
 
         return carsPassed;
     }
@@ -101,6 +100,11 @@ public class ContinuosRoad extends Road {
                 continue;
             }
             double newSpeed = AppContext.CAR_FOLLOWING_MODEL.getNewSpeed(parameters);
+
+            if (newSpeed > super.speedLimit) {
+                newSpeed = super.speedLimit;
+            }
+
             car.setParameter(Constants.CURRENT_SPEED_REQUEST, newSpeed);
             car.xPosition += newSpeed;
 
@@ -130,9 +134,77 @@ public class ContinuosRoad extends Road {
                         getSpeedDifferenceToNextCar(lane, position));
                 break;
 
+            case Constants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST:
+                CarParams forwardCar = getCarInProximity(Direction.STRAIGHT, Orientation.FORWARD, car);
+                if (forwardCar != null) {
+                    parameters.put(Constants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST,
+                            forwardCar.getParameter(Constants.CURRENT_SPEED_REQUEST));
+                } else {
+                    parameters.put(Constants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST, super.speedLimit);
+                }
+                break;
+
             default:
                 logger.debug("Unknown parameter requested: " + param);
         }
+    }
+
+    private CarParams getCarInProximityLane(Orientation orientation, CarParams car, LinkedList<CarParams> lane) {
+        if (orientation == Orientation.FORWARD) {
+            for (int i = 0; i < lane.size(); i++) {
+                CarParams otherCar = lane.get(i);
+                if (otherCar.xPosition > car.xPosition) {
+                    return otherCar;
+                }
+            }
+        } else if (orientation == Orientation.BACKWARD) {
+            for (int i = lane.size() - 1; i >= 0; i--) {
+                CarParams otherCar = lane.get(i);
+                if (otherCar.xPosition < car.xPosition) {
+                    return otherCar;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private CarParams getCarInProximity(Direction direction, Orientation orientation, CarParams car) {
+        int lane = car.lane;
+        int position = vehicles[lane].indexOf(car);
+
+        if (direction == Direction.STRAIGHT) {
+            if (orientation == Orientation.FORWARD) {
+                if (position < vehicles[lane].size() - 1) {
+                    return vehicles[lane].get(position + 1);
+                } else {
+                    return null;
+                }
+            } else {
+                if (position > 0) {
+                    return vehicles[lane].get(position - 1);
+                } else {
+                    return null;
+                }
+            }
+        } else if (direction == Direction.LEFT) {
+            if (lane == 0) {
+                return null;
+            }
+            LinkedList<CarParams> laneForScan = vehicles[lane - 1];
+            return this.getCarInProximityLane(orientation, car, laneForScan);
+        } else if (direction == Direction.RIGHT) {
+            if (lane == numberOfLanes - 1) {
+                return null;
+            }
+
+            LinkedList<CarParams> laneForScan = vehicles[lane + 1];
+            return this.getCarInProximityLane(orientation, car, laneForScan);
+        }
+
+        return null;
+
+
     }
 
     private HashMap<String, Double> getParameters(int lane, int position, String requestParameters) {
@@ -186,6 +258,7 @@ public class ContinuosRoad extends Road {
         CarParams firstCar = vehicles[lane].getFirst();
         double space = newCar.getParameter(Constants.LENGTH_REQUEST) +
                 newCar.getParameter(Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST);
+
         if (space <= firstCar.xPosition) {
             return true;
         }
