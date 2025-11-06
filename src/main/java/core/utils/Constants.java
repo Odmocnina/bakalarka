@@ -14,7 +14,7 @@ public class Constants {
     public static final int LINE_SEPARATOR_WIDTH = 2;
     public static final int CELL_SEPARATOR_WIDTH = 1;
     public static final Color CELL_SEPARATOR_COLOR = Color.BLACK;
-    public static final String REQUEST_SEPARATOR = ";";
+
     public static final int NO_CAR_IN_FRONT = -1;
     public static final double PARAMETER_UNDEFINED = -1.0;
     public static final double LANE_WIDTH = 3.5; // in meters
@@ -24,6 +24,7 @@ public class Constants {
             Color.PURPLE, Color.PINK, Color.BROWN, Color.CYAN, Color.MAGENTA
     };
     public static final String GENERATOR_QUEUE = "queue";
+    public static final double NO_CAR_THERE = -10000.0;
 
     // output file types
     public static final String CSV_TYPE = "csv";
@@ -33,6 +34,9 @@ public class Constants {
 
 
     // request string used when model is requesting parameters of road
+    public static final String REQUEST_SEPARATOR = ";";
+    public static final String SUBREQUEST_SEPARATOR = "_";
+    public static final String X_POSITION_REQUEST = "xPosition";
     public static final String MAX_SPEED_REQUEST = "maxSpeed";
     public static final String CURRENT_SPEED_REQUEST = "currentSpeed";
     public static final String DISTANCE_TO_NEXT_CAR_REQUEST = "distanceToNextCar";
@@ -49,12 +53,24 @@ public class Constants {
     public static final String LENGTH_REQUEST = "length";
     public static final String DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST = "distanceDifferenceSensitivity";
     public static final String SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST = "speedDifferenceSensitivity";
-    public static final String CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST = "currentSpeed_straight_forward";
-    public static final String CURRENT_SPEED_STRAIGHT_BACKWARDS_REQUEST = "currentSpeed_backward_forward";
-    public static final String CURRENT_SPEED_LEFT_FORWARD_REQUEST = "currentSpeed_left_forward";
-    public static final String CURRENT_SPEED_LEFT_BACKWARD_REQUEST = "currentSpeed_left_backward";
-    public static final String CURRENT_SPEED_RIGHT_FORWARD_REQUEST = "currentSpeed_right_forward";
-    public static final String CURRENT_SPEED_RIGHT_BACKWARD_REQUEST = "currentSpeed_right_backward";
+    public static final String CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST = "currentSpeed_STRAIGHT_FORWARD";
+    public static final String CURRENT_SPEED_STRAIGHT_BACKWARDS_REQUEST = "currentSpeed_STRAIGHT_BACKWARDS";
+    public static final String CURRENT_SPEED_LEFT_FORWARD_REQUEST = "currentSpeed_LEFT_FORWARD";
+    public static final String CURRENT_SPEED_LEFT_BACKWARD_REQUEST = "currentSpeed_LEFT_BACKWARD";
+    public static final String CURRENT_SPEED_RIGHT_FORWARD_REQUEST = "currentSpeed_RIGHT_FORWARD";
+    public static final String CURRENT_SPEED_RIGHT_BACKWARD_REQUEST = "currentSpeed_RIGHT_BACKWARD";
+    public static final String LENGTH_STRAIGHT_FORWARD_REQUEST = "length_STRAIGHT_FORWARD";
+    public static final String LENGTH_STRAIGHT_BACKWARDS_REQUEST = "length_STRAIGHT_BACKWARDS";
+    public static final String LENGTH_LEFT_FORWARD_REQUEST = "length_LEFT_FORWARD";
+    public static final String LENGTH_LEFT_BACKWARD_REQUEST = "length_LEFT_BACKWARD";
+    public static final String LENGTH_RIGHT_FORWARD_REQUEST = "length_RIGHT_FORWARD";
+    public static final String LENGTH_RIGHT_BACKWARD_REQUEST = "length_RIGHT_BACKWARD";
+    public static final String X_POSITION_STRAIGHT_FORWARD_REQUEST = "xPosition_STRAIGHT_FORWARD";
+    public static final String X_POSITION_STRAIGHT_BACKWARDS_REQUEST = "xPosition_STRAIGHT_BACKWARDS";
+    public static final String X_POSITION_LEFT_FORWARD_REQUEST = "xPosition_LEFT_FORWARD";
+    public static final String X_POSITION_LEFT_BACKWARD_REQUEST = "xPosition_LEFT_BACKWARD";
+    public static final String X_POSITION_RIGHT_FORWARD_REQUEST = "xPosition_RIGHT_FORWARD";
+    public static final String X_POSITION_RIGHT_BACKWARD_REQUEST = "xPosition_RIGHT_BACKWARD";
 
     // stock values for car generation
     public static final double DEFAULT_MIN_LENGTH = 3.0;

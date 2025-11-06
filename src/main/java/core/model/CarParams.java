@@ -13,13 +13,19 @@ public class CarParams {
     private HashMap<String, Double> parameters = new HashMap<>();
     public int id = (int) Constants.PARAMETER_UNDEFINED;
     public Color color = null;
-    public boolean isProcessed = false;
 
     public void setParameter(String key, double value) {
         parameters.put(key, value);
     }
 
     public double getParameter(String key) {
+        if (key.equals(Constants.X_POSITION_REQUEST)) {
+            return xPosition;
+        } else if (key.equals("lane")) {
+            return lane;
+        } else if (key.equals("id")) {
+            return id;
+        }
         return parameters.getOrDefault(key, Constants.PARAMETER_UNDEFINED);
     }
 

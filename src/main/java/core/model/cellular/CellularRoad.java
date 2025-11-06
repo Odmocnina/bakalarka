@@ -3,14 +3,12 @@ package core.model.cellular;
 import app.AppContext;
 import core.model.CarParams;
 import core.model.Direction;
-import core.model.CarGenerator;
 import core.model.Road;
 import core.utils.Constants;
+import core.utils.StringEditor;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-
-import core.utils.StringEditor;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -204,17 +202,6 @@ public class CellularRoad extends Road {
         if (true)
             this.tryToAddCar();
         return carsPassed;
-    }
-
-    private void resetIsProcessed() {
-        for (int position = this.numberOfCells - 1; position >= 0; position--) {
-            for (int lane = numberOfLanes - 1; lane >= 0; lane--) {
-                if (cells[lane][position].isOccupied() && cells[lane][position].isHead()
-                        && cells[lane][position].getCarParams().isProcessed) {
-                    cells[lane][position].getCarParams().isProcessed = false;
-                }
-            }
-        }
     }
 
     private void moveCar(Cell cell) {

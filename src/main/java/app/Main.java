@@ -76,7 +76,7 @@ public class Main {
             logger.fatal("Failed to load car generator, exiting.");
             return;
         } else {
-            logger.info("Loaded car generator: " + carGenerator.toString());
+            logger.info("Loaded car generator: " + carGenerator);
         }
 
         String requestedParams = StringEditor.mergeRequestParameters(carFollowingModel.getParametersForGeneration(),
@@ -85,7 +85,7 @@ public class Main {
 
         // check if car generator has all parameters needed for the selected car following model, for example person
         // loads car following model which need max speed, the model needs those parameters to work
-        // so generator gives needs to gerenerate cars with max speed parameter, otherwise model wont work properly, lol
+        // so generator gives needs to generate cars with max speed parameter, otherwise model won't work properly, lol
         if (carGenerator.checkIfAllParametresAreLoaded()) {
             logger.info("Car generator parameters are valid for the selected car following model.");
         } else { // missing some parameters, exit

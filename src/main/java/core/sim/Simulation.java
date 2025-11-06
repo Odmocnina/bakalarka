@@ -46,6 +46,9 @@ public class Simulation {
     public void runSimulation(double time, double timeStep) {
         int timeSteps = (int) Math.ceil(time);
         for (int i = 0; i < timeSteps; i++) {
+            if (i == 5) {
+                int debug = 1;
+            }
             step();
         }
 

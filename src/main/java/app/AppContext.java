@@ -1,7 +1,5 @@
 package app;
 
-import core.model.CarGenerator;
-import core.model.Road;
 import core.sim.Simulation;
 import core.utils.Constants;
 import core.utils.RunDetails;

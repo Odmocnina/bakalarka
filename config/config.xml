@@ -5,7 +5,7 @@
 
     <models>
         <carFollowingModel>
-            <id>helly</id>
+            <id>idmn</id>
         </carFollowingModel>
         <laneChangingModel>
             <id>rickert</id>
@@ -51,10 +51,10 @@
     </generator>
 
     <runDetails>
-        <showGui>true</showGui>
+        <showGui>false</showGui>
         <drawCells>false</drawCells>
         <timeStep>1</timeStep>
-        <duration>600</duration>
+        <duration>60</duration>
         <outputFile>output/simulationContOutput.txt</outputFile>
     </runDetails>
 

@@ -161,6 +161,8 @@ public class ConfigLoader {
                 modelFromConfig = new NagelSchreckenberg();
             } else if (id.equals("idm")) {
                 modelFromConfig = new IDM();
+            } else if (id.equals("idmn")) {
+                modelFromConfig = new IDMN();
             } else if (id.equals("rule184")) {
                 modelFromConfig = new Rule184();
             } else if (id.equals("ovm")) {
