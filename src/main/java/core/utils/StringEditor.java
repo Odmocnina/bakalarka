@@ -19,7 +19,7 @@ public class StringEditor {
         String[] requestParams1 = params1.split(Constants.REQUEST_SEPARATOR);
         String[] requestParams2 = params2.split(Constants.REQUEST_SEPARATOR);
 
-        Set<String> mergedSet = new LinkedHashSet<>(); // to maintain order and uniqueness, it throuw away duplicates
+        Set<String> mergedSet = new LinkedHashSet<>(); // to maintain order and uniqueness, it throws away duplicates
 
         for (String p : requestParams1) {
             p = p.trim();

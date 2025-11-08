@@ -78,7 +78,7 @@ public class ContinousRoadRenderer implements IRoadRenderer {
                     }
 
                     gc.setFill(carColor);
-                    gc.fillRect(carX, carY, carW, carH);
+                    gc.fillRect(carX - carW, carY, carW, carH);
                 }
             }
 

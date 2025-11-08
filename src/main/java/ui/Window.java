@@ -147,7 +147,7 @@ public class Window extends Application {
         };
 
         // engine initialization
-        engine = new CoreEngine(tick, 1000); // 1000 ms per step
+        engine = new CoreEngine(tick, 10); // 1000 ms per step
 
         // starting engine when start button is pressed, simulation runs
         btnStart.setOnAction(e -> {

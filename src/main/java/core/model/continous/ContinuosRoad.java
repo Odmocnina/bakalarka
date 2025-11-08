@@ -28,11 +28,12 @@ public class ContinuosRoad extends Road {
             this.vehicles[lane] = new LinkedList<>();
         }
 
-        CarParams carParams = new CarParams();
+        /*CarParams carParams = new CarParams();
         carParams.setParameter(Constants.CURRENT_SPEED_REQUEST, 0);
-        carParams.setParameter(Constants.MAX_SPEED_REQUEST, 33.33);
+        carParams.setParameter(Constants.MAX_SPEED_REQUEST, 40.33);
         carParams.xPosition = 20;
         carParams.lane = 0;
+        carParams.id = 1;
         carParams.setParameter(Constants.LENGTH_REQUEST, 4.5);
         carParams.setParameter(Constants.MAX_ACCELERATION_REQUEST, 2.0);
         carParams.setParameter(Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 2.0);
@@ -41,18 +42,19 @@ public class ContinuosRoad extends Road {
         carParams.setParameter(Constants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
         vehicles[0].add(carParams);
 
-        CarParams carParams2 = new CarParams();
+        /*CarParams carParams2 = new CarParams();
         carParams2.setParameter(Constants.CURRENT_SPEED_REQUEST, 0);
         carParams2.setParameter(Constants.MAX_SPEED_REQUEST, 10.0);
         carParams2.xPosition = 50;
         carParams2.lane = 0;
+        carParams2.id = 2;
         carParams2.setParameter(Constants.LENGTH_REQUEST, 4.5);
         carParams2.setParameter(Constants.MAX_ACCELERATION_REQUEST, 2.0);
         carParams2.setParameter(Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 2.0);
         carParams2.setParameter(Constants.DECELERATION_COMFORT_REQUEST, 4.5);
         carParams2.setParameter(Constants.DESIRED_TIME_HEADWAY_REQUEST, 1.5);
         carParams2.setParameter(Constants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
-        vehicles[0].add(carParams2);
+        vehicles[0].add(carParams2);*/
     }
 
     public void tryToAddCar() {
@@ -62,7 +64,18 @@ public class ContinuosRoad extends Road {
 
                 if (okToPutCar(newCar, lane)) {
                     placeCar(newCar, 0, lane);
-                    logger.debug("New car placed at lane " + lane + " position 0, carParams: " + newCar.toString());
+                    logger.debug("New car placed at lane " + lane + " position 0, carParams: " + newCar);
+                }
+            }
+        }
+    }
+
+    private void throwOutWierdCars() {
+        for (int lane = 0; lane < numberOfLanes; lane++) {
+            LinkedList<CarParams> laneCars = vehicles[lane];
+            for (CarParams car : laneCars) { //for each car
+                if (car.xPosition == Double.NaN) {
+                    removeCar(car, lane);
                 }
             }
         }
@@ -70,7 +83,7 @@ public class ContinuosRoad extends Road {
 
     @Override
     public int updateRoad() {
-
+        //this.throwOutWierdCars();
         int carsPassed = this.forwardStep();
 
         if (true)
@@ -105,12 +118,17 @@ public class ContinuosRoad extends Road {
                 newSpeed = super.speedLimit;
             }
 
+            if (newSpeed < 0) {
+                newSpeed = 0;
+            }
+
             car.setParameter(Constants.CURRENT_SPEED_REQUEST, newSpeed);
             car.xPosition += newSpeed;
 
             logger.debug("Car at lane " + lane + " updated to new speed " + newSpeed + " " +
                     "and new position " + car.xPosition);
 
+            logger.debug("car x:" + car.xPosition + ", length: " + car.getParameter(Constants.LENGTH_REQUEST));
             if (!checkIfCarStillRelevant(car, lane)) {
                 carsPassed++;
             }
@@ -275,13 +293,16 @@ public class ContinuosRoad extends Road {
         if (vehicles[lane].isEmpty()) {
             return true;
         }
+        double gap = 10;
         CarParams firstCar = vehicles[lane].getFirst();
         double space = newCar.getParameter(Constants.LENGTH_REQUEST) +
                 newCar.getParameter(Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST);
-
+        space += newCar.getParameter(Constants.LENGTH_REQUEST);
         if (space <= firstCar.xPosition) {
             return true;
         }
+
+        logger.debug("Generation bloked by car at position " + firstCar.xPosition);
 
         return false;
     }
@@ -290,6 +311,7 @@ public class ContinuosRoad extends Road {
         newCar.xPosition = position;
         newCar.lane = lane;
         int place = findPlaceForCar(position, lane);
+
         vehicles[lane].add(place, newCar);
     }
 
@@ -302,13 +324,21 @@ public class ContinuosRoad extends Road {
                 return i;
             }
         }
-        return vehicles[lane].size();
+        return vehicles[lane].size() - 1;
     }
 
     private boolean checkIfCarStillRelevant(CarParams car, int lane) {
-        if ((car.xPosition - car.getParameter(Constants.LENGTH_REQUEST)) > this.length) {
-            removeCar(car, lane);
+        logger.debug("car x:" + car.xPosition + ", length: " + car.getParameter(Constants.LENGTH_REQUEST));
+        if ((car.xPosition - car.getParameter(Constants.LENGTH_REQUEST)) > super.length) {
+            logger.debug("Removing car at lane " + lane + " position " + car.xPosition);
+            this.removeCar(car, lane);
             return false;
+        } else if (car.xPosition > super.length) {
+            double length = car.getParameter(Constants.LENGTH_REQUEST);
+            double x = car.xPosition;
+            double overflow = x - super.length;
+            car.setParameter(Constants.LENGTH_REQUEST, length - overflow);
+            car.xPosition = super.length;
         }
 
         return true;

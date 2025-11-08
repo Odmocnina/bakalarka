@@ -79,12 +79,11 @@ public class CarGenerator {
         return car;
     }
 
-    private CarParams generateCarContinuous() {
+    private CarParams
+    generateCarContinuous() {
         CarParams car = new CarParams();
 
         for (String key : carGenerationParameters) {
-            // TODO: dynamic adding of parameters to car params, will be nessesery to change CarParams class, so that it
-            // can hold dynamic set of parameters, via hashmap or similar structure
             double value = getParameterValueContinuous(key);
             car.setParameter(key, value);
         }

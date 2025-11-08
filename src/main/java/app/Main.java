@@ -36,6 +36,8 @@ public class Main {
         String configFile;
         if (args.length == 0) { // use default config file if none provided
             logger.warn("No config file provided, using default: " + Constants.CONFIG_FILE);
+            MyLogger.log("No config file provided, using default: " + Constants.CONFIG_FILE,
+                    Constants.WARN_FOR_LOGGING);
             configFile = Constants.CONFIG_FILE;
         } else {
             configFile = args[0];

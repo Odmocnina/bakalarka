@@ -21,7 +21,7 @@
             </maxSpeed>
             <length>
                 <minValue>3</minValue>
-                <maxValue>3</maxValue>
+                <maxValue>10</maxValue>
             </length>
             <maxAcceleration>
                 <minValue>2</minValue>

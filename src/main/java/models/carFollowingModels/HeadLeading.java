@@ -23,10 +23,7 @@ public class HeadLeading implements ICarFollowingModel {
         double distance = parameters.get(Constants.DISTANCE_TO_NEXT_CAR_REQUEST).intValue();
         int distanceInCells = (int) Math.round(distance); // convert distance to number of cells
 
-        boolean starting = false;
-        if (currentSpeed == 0) {
-            starting = true;
-        }
+        boolean starting = (currentSpeed == 0);
 
         // Step 1: Acceleration
         if (currentSpeed < maxSpeed) {
@@ -50,7 +47,7 @@ public class HeadLeading implements ICarFollowingModel {
 
     @Override
     public String getID() {
-        return "headleading";
+        return "head-leading";
     }
 
     @Override

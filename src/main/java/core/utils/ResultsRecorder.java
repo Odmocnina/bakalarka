@@ -81,7 +81,7 @@ public class ResultsRecorder {
                 bw.close();
                 fw.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error writing results to file: " + e.getMessage());
             }
         } else {
             logger.warn("Output file name is not set. Cannot write results.");

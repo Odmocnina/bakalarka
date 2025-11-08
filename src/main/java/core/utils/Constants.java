@@ -25,12 +25,20 @@ public class Constants {
     };
     public static final String GENERATOR_QUEUE = "queue";
     public static final double NO_CAR_THERE = -10000.0;
+    public static final String WARN_FOR_LOGGING = "warn";
+    public static final String DEBUG_FOR_LOGGING = "debug";
+    public static final String FATAL_FOR_LOGGING = "fatal";
+    public static final String ERROR_FOR_LOGGING = "error";
+    public static final String INFO_FOR_LOGGING = "info";
 
-    // output file types
-    public static final String CSV_TYPE = "csv";
-    public static final String CONSOLE_TYPE = "console";
-    public static final String TXT_TYPE = "txt";
-    public static final double LANE_WIDTH_METERS = 8.0;
+    // directions
+    public static final String STRAIGHT = "STRAIGHT";
+    public static final String LEFT = "LEFT";
+    public static final String RIGHT = "RIGHT";
+
+    // orientations
+    public static final String FORWARD = "FORWARD";
+    public static final String BACKWARD = "BACKWARD";
 
 
     // request string used when model is requesting parameters of road
@@ -53,24 +61,42 @@ public class Constants {
     public static final String LENGTH_REQUEST = "length";
     public static final String DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST = "distanceDifferenceSensitivity";
     public static final String SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST = "speedDifferenceSensitivity";
-    public static final String CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST = "currentSpeed_STRAIGHT_FORWARD";
-    public static final String CURRENT_SPEED_STRAIGHT_BACKWARDS_REQUEST = "currentSpeed_STRAIGHT_BACKWARDS";
-    public static final String CURRENT_SPEED_LEFT_FORWARD_REQUEST = "currentSpeed_LEFT_FORWARD";
-    public static final String CURRENT_SPEED_LEFT_BACKWARD_REQUEST = "currentSpeed_LEFT_BACKWARD";
-    public static final String CURRENT_SPEED_RIGHT_FORWARD_REQUEST = "currentSpeed_RIGHT_FORWARD";
-    public static final String CURRENT_SPEED_RIGHT_BACKWARD_REQUEST = "currentSpeed_RIGHT_BACKWARD";
-    public static final String LENGTH_STRAIGHT_FORWARD_REQUEST = "length_STRAIGHT_FORWARD";
-    public static final String LENGTH_STRAIGHT_BACKWARDS_REQUEST = "length_STRAIGHT_BACKWARDS";
-    public static final String LENGTH_LEFT_FORWARD_REQUEST = "length_LEFT_FORWARD";
-    public static final String LENGTH_LEFT_BACKWARD_REQUEST = "length_LEFT_BACKWARD";
-    public static final String LENGTH_RIGHT_FORWARD_REQUEST = "length_RIGHT_FORWARD";
-    public static final String LENGTH_RIGHT_BACKWARD_REQUEST = "length_RIGHT_BACKWARD";
-    public static final String X_POSITION_STRAIGHT_FORWARD_REQUEST = "xPosition_STRAIGHT_FORWARD";
-    public static final String X_POSITION_STRAIGHT_BACKWARDS_REQUEST = "xPosition_STRAIGHT_BACKWARDS";
-    public static final String X_POSITION_LEFT_FORWARD_REQUEST = "xPosition_LEFT_FORWARD";
-    public static final String X_POSITION_LEFT_BACKWARD_REQUEST = "xPosition_LEFT_BACKWARD";
-    public static final String X_POSITION_RIGHT_FORWARD_REQUEST = "xPosition_RIGHT_FORWARD";
-    public static final String X_POSITION_RIGHT_BACKWARD_REQUEST = "xPosition_RIGHT_BACKWARD";
+    public static final String CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST = CURRENT_SPEED_REQUEST + SUBREQUEST_SEPARATOR
+            + STRAIGHT + SUBREQUEST_SEPARATOR + FORWARD;
+    public static final String CURRENT_SPEED_STRAIGHT_BACKWARDS_REQUEST = CURRENT_SPEED_REQUEST + SUBREQUEST_SEPARATOR
+            + STRAIGHT + SUBREQUEST_SEPARATOR + BACKWARD;
+    public static final String CURRENT_SPEED_LEFT_FORWARD_REQUEST = CURRENT_SPEED_REQUEST + SUBREQUEST_SEPARATOR
+            + LEFT + SUBREQUEST_SEPARATOR + FORWARD;
+    public static final String CURRENT_SPEED_LEFT_BACKWARD_REQUEST = CURRENT_SPEED_REQUEST + SUBREQUEST_SEPARATOR
+            + LEFT + SUBREQUEST_SEPARATOR + BACKWARD;
+    public static final String CURRENT_SPEED_RIGHT_FORWARD_REQUEST = CURRENT_SPEED_REQUEST + SUBREQUEST_SEPARATOR
+            + RIGHT + SUBREQUEST_SEPARATOR + FORWARD;
+    public static final String CURRENT_SPEED_RIGHT_BACKWARD_REQUEST = CURRENT_SPEED_REQUEST + SUBREQUEST_SEPARATOR
+            + RIGHT + SUBREQUEST_SEPARATOR + BACKWARD;
+    public static final String LENGTH_STRAIGHT_FORWARD_REQUEST = LENGTH_REQUEST + SUBREQUEST_SEPARATOR + STRAIGHT
+            + SUBREQUEST_SEPARATOR + FORWARD;
+    public static final String LENGTH_STRAIGHT_BACKWARDS_REQUEST = LENGTH_REQUEST + SUBREQUEST_SEPARATOR + STRAIGHT
+            + SUBREQUEST_SEPARATOR + BACKWARD;
+    public static final String LENGTH_LEFT_FORWARD_REQUEST = LENGTH_REQUEST + SUBREQUEST_SEPARATOR + LEFT
+            + SUBREQUEST_SEPARATOR + FORWARD;
+    public static final String LENGTH_LEFT_BACKWARD_REQUEST = LENGTH_REQUEST + SUBREQUEST_SEPARATOR + LEFT
+            + SUBREQUEST_SEPARATOR + BACKWARD;
+    public static final String LENGTH_RIGHT_FORWARD_REQUEST = LENGTH_REQUEST + SUBREQUEST_SEPARATOR + RIGHT
+            + SUBREQUEST_SEPARATOR + FORWARD;
+    public static final String LENGTH_RIGHT_BACKWARD_REQUEST = LENGTH_REQUEST + SUBREQUEST_SEPARATOR + RIGHT
+            + SUBREQUEST_SEPARATOR + BACKWARD;
+    public static final String X_POSITION_STRAIGHT_FORWARD_REQUEST = X_POSITION_REQUEST + SUBREQUEST_SEPARATOR
+            + STRAIGHT + SUBREQUEST_SEPARATOR + FORWARD;
+    public static final String X_POSITION_STRAIGHT_BACKWARDS_REQUEST = X_POSITION_REQUEST + SUBREQUEST_SEPARATOR
+            + STRAIGHT + SUBREQUEST_SEPARATOR + BACKWARD;
+    public static final String X_POSITION_LEFT_FORWARD_REQUEST = X_POSITION_REQUEST + SUBREQUEST_SEPARATOR
+            + LEFT + SUBREQUEST_SEPARATOR + FORWARD;
+    public static final String X_POSITION_LEFT_BACKWARD_REQUEST = X_POSITION_REQUEST + SUBREQUEST_SEPARATOR
+            + LEFT + SUBREQUEST_SEPARATOR + BACKWARD;
+    public static final String X_POSITION_RIGHT_FORWARD_REQUEST = X_POSITION_REQUEST + SUBREQUEST_SEPARATOR
+            + RIGHT + SUBREQUEST_SEPARATOR + FORWARD;
+    public static final String X_POSITION_RIGHT_BACKWARD_REQUEST = X_POSITION_REQUEST + SUBREQUEST_SEPARATOR
+            + RIGHT + SUBREQUEST_SEPARATOR + BACKWARD;
 
     // stock values for car generation
     public static final double DEFAULT_MIN_LENGTH = 3.0;
