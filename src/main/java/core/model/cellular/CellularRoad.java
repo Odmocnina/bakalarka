@@ -1,10 +1,12 @@
 package core.model.cellular;
 
 import app.AppContext;
+import app.Main;
 import core.model.CarParams;
 import core.model.Direction;
 import core.model.Road;
 import core.utils.Constants;
+import core.utils.MyLogger;
 import core.utils.StringEditor;
 
 import java.util.HashMap;
@@ -13,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class CellularRoad extends Road {
-    private static final Logger logger = LogManager.getLogger(CellularRoad.class);
     private Cell[][] cells; // 2D array representing lanes and positions
 
     private int numberOfCells;
@@ -165,7 +166,8 @@ public class CellularRoad extends Road {
                     String requestParameters = AppContext.CAR_FOLLOWING_MODEL.requestParameters();
                     HashMap<String, Double> parameters = getParameters(lane, position, requestParameters);
                     if (parameters == null) {
-                        logger.debug("Error getting parameters for car at lane " + lane + ", position " + position);
+                        MyLogger.log("Error getting parameters for car at lane " + lane + ", position "
+                                        + position, Constants.ERROR_FOR_LOGGING);
                         continue;
                     }
 
@@ -206,7 +208,7 @@ public class CellularRoad extends Road {
 
     private void moveCar(Cell cell) {
         if (cell == null || !cell.isOccupied() || !cell.isHead()) {
-            logger.debug("Cannot move car: cell is null, unoccupied, or not head");
+            MyLogger.log("Cannot move car: cell is null, unoccupied, or not head", Constants.DEBUG_FOR_LOGGING);
             return;
         }
         cell.setOccupied(false);
@@ -214,8 +216,8 @@ public class CellularRoad extends Road {
         CarParams carParams = cell.getCarParams();
         int oldX = (int) carParams.xPosition;
         int currentSpeed = (int) carParams.getParameter(Constants.CURRENT_SPEED_REQUEST);
-        logger.debug("Moving car from position " + oldX + " to " + (oldX + currentSpeed) +
-                " with speed " + currentSpeed);
+        MyLogger.log("Moving car from position " + oldX + " to " + (oldX + currentSpeed) +
+                " with speed " + currentSpeed, Constants.DEBUG_FOR_LOGGING);
         Cell newCellOfHead = cells[carParams.lane][(int) (carParams.xPosition + currentSpeed)];
         carParams.xPosition = carParams.xPosition + currentSpeed;
         newCellOfHead.setOccupied(true);
@@ -324,7 +326,7 @@ public class CellularRoad extends Road {
                 break;
 
             default:
-                logger.debug("Unknown parameter requested: " + param);
+                MyLogger.log("Unknown parameter requested: " + param, Constants.DEBUG_FOR_LOGGING);
         }
     }
 
@@ -332,7 +334,7 @@ public class CellularRoad extends Road {
         HashMap<String, Double> parameters = new HashMap<>();
         String[] params = requestedParameters.split(Constants.REQUEST_SEPARATOR);
         if (params.length == 0) {
-            logger.debug("No parameters requested");
+            MyLogger.log("No parameters requested", Constants.DEBUG_FOR_LOGGING);
             return null;
         }
         String[] carGeneratedParams = this.generator.getCarGenerationParameters();
@@ -406,11 +408,11 @@ public class CellularRoad extends Road {
 
     private void removeCar(int lane, int position) {
         if (lane < 0 || lane >= numberOfLanes || position < 0 || position >= numberOfCells) {
-            logger.debug("Invalid lane or position to remove car");
+            MyLogger.log("Invalid lane or position to remove car", Constants.DEBUG_FOR_LOGGING);
             return;
         }
         if (!cells[lane][position].isOccupied() || !cells[lane][position].isHead()) {
-            logger.debug("No car head at the specified position to remove");
+            MyLogger.log("No car head at the specified position to remove", Constants.DEBUG_FOR_LOGGING);
             return;
         }
         CarParams carParams = cells[lane][position].getCarParams();
@@ -431,7 +433,7 @@ public class CellularRoad extends Road {
 
     private void placeCar(CarParams car, int x, int lane) {
         if (lane < 0 || lane >= numberOfLanes || x < 0 || x >= numberOfCells) {
-            logger.debug("Invalid lane or position to place car");
+            MyLogger.log("Invalid lane or position to place car", Constants.DEBUG_FOR_LOGGING);
             return;
         }
         for (int i = 0; i < car.getParameter(Constants.LENGTH_REQUEST); i++) {
@@ -447,7 +449,8 @@ public class CellularRoad extends Road {
                     cells[lane][posToOccupy].setHead(false);
                 }
             } else {
-                logger.debug("Car length exceeds road boundaries or is negative during placing car");
+                MyLogger.log("Car length exceeds road boundaries or is negative during placing car",
+                        Constants.DEBUG_FOR_LOGGING);
             }
         }
     }
@@ -499,10 +502,12 @@ public class CellularRoad extends Road {
         car.setParameter(Constants.CURRENT_SPEED_REQUEST, newSpeed);
         car.xPosition = newHeadX;
 
-        logger.debug("Old head position: " + oldX);
-        logger.debug("Car at lane " + car.lane + " reached the end of the road and is partially removed.");
-        logger.debug("New head position: " + newHeadX + ", New length: " + car.getParameter(Constants.LENGTH_REQUEST)
-                + ", Current speed: " + car.getParameter(Constants.CURRENT_SPEED_REQUEST));
+        MyLogger.log("Old head position: " + oldX, Constants.DEBUG_FOR_LOGGING);
+        MyLogger.log("Car at lane " + car.lane + " reached the end of the road and is partially removed.",
+                Constants.DEBUG_FOR_LOGGING);
+        MyLogger.log("New head position: " + newHeadX + ", New length: " +
+                car.getParameter(Constants.LENGTH_REQUEST) + ", Current speed: " +
+                car.getParameter(Constants.CURRENT_SPEED_REQUEST), Constants.DEBUG_FOR_LOGGING);
         this.moveCar(cells[car.lane][newHeadX]);
     }
 
@@ -511,8 +516,9 @@ public class CellularRoad extends Road {
         HashMap<String, Double> parameters = getParameters(cell.getCarParams().lane,
                 (int) cell.getCarParams().xPosition, requestParameters);
         if (parameters == null) {
-            logger.debug("Error getting parameters for lane change for car at lane " +
-                    cell.getCarParams().lane + ", position " + (int) cell.getCarParams().xPosition);
+            MyLogger.log("Error getting parameters for lane change for car at lane " +
+                    cell.getCarParams().lane + ", position " + (int) cell.getCarParams().xPosition,
+                    Constants.ERROR_FOR_LOGGING);
             return null;
         }
 

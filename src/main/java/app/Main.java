@@ -8,11 +8,8 @@ import models.ICarFollowingModel;
 import models.ILaneChangingModel;
 import ui.Window;
 import ui.render.CellularRoadRenderer;
-import ui.render.ContinousRoadRenderer;
+import ui.render.ContinuousRoadRenderer;
 import ui.render.IRoadRenderer;
-
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 
 /*****************************
@@ -23,9 +20,6 @@ import org.apache.logging.log4j.LogManager;
  *********************************/
 public class Main {
 
-    /** logger for logging process of program in main class **/
-    private static final Logger logger = LogManager.getLogger(Main.class);
-
     /*
      * main function of application, loads configuration and starts gui if gui is supposed to be used, returns nothing
      *
@@ -35,50 +29,54 @@ public class Main {
     public static void main(String[] args) {
         String configFile;
         if (args.length == 0) { // use default config file if none provided
-            logger.warn("No config file provided, using default: " + Constants.CONFIG_FILE);
-            MyLogger.log("No config file provided, using default: " + Constants.CONFIG_FILE,
+            MyLogger.logBeforeLoading("No config file provided, using default: " + Constants.CONFIG_FILE,
                     Constants.WARN_FOR_LOGGING);
             configFile = Constants.CONFIG_FILE;
         } else {
+            MyLogger.logBeforeLoading("Config file provided: " + args[0], Constants.INFO_FOR_LOGGING);
             configFile = args[0];
         }
 
         if (ConfigLoader.giveConfigFile(configFile)) { // wierd thing that I thought of, config file was opened multiple
                                                 // times when loading config info so now its opened only once and class
                                                 // remembers it
-            logger.info("Config file opened successfully: " + configFile);
+            MyLogger.logBeforeLoading("Config file opened successfully: " + configFile, Constants.INFO_FOR_LOGGING);
         } else {
-            logger.fatal("Failed to open config file: " + configFile + ", exiting.");
+            MyLogger.logBeforeLoading("Failed to open config file: " + configFile + ", exiting.",
+                    Constants.FATAL_FOR_LOGGING);
             return;
         }
 
         // load car following model
         ICarFollowingModel carFollowingModel = ConfigLoader.loadCarFollowingModel();
         if (carFollowingModel == null) {
-            logger.fatal("Failed to load car following model, exiting.");
+            MyLogger.logBeforeLoading("Failed to load car following model, exiting."
+                    , Constants.FATAL_FOR_LOGGING);
             return;
         } else {
-            logger.info("Loaded car following model: " + carFollowingModel.getID());
+            MyLogger.logBeforeLoading("Loaded car following model: " + carFollowingModel.getID(),
+                    Constants.INFO_FOR_LOGGING);
         }
         AppContext.CAR_FOLLOWING_MODEL = carFollowingModel; // store model in app context for later use
 
         // load lane changing model
         ILaneChangingModel laneChangingModel = ConfigLoader.loadLaneChangingModel();
         if (laneChangingModel == null) {
-            logger.fatal("Failed to load lane changing model, exiting.");
+            MyLogger.logBeforeLoading("Failed to load lane changing model, exiting.", Constants.FATAL_FOR_LOGGING);
             return;
         } else {
-            logger.info("Loaded lane changing model: " + laneChangingModel.getID());
+            MyLogger.logBeforeLoading("Loaded lane changing model: " + laneChangingModel.getID(),
+                    Constants.INFO_FOR_LOGGING);
         }
         AppContext.LANE_CHANGING_MODEL = laneChangingModel; // store model in app context for later use
 
         // load car generator, thing that decides when cars are generated and what params do they have
         CarGenerator carGenerator = ConfigLoader.loadCarGenerator();
         if (carGenerator == null) {
-            logger.fatal("Failed to load car generator, exiting.");
+            MyLogger.logBeforeLoading("Failed to load car generator, exiting.", Constants.FATAL_FOR_LOGGING);
             return;
         } else {
-            logger.info("Loaded car generator: " + carGenerator);
+            MyLogger.logBeforeLoading("Loaded car generator: " + carGenerator, Constants.INFO_FOR_LOGGING);
         }
 
         String requestedParams = StringEditor.mergeRequestParameters(carFollowingModel.getParametersForGeneration(),
@@ -89,9 +87,11 @@ public class Main {
         // loads car following model which need max speed, the model needs those parameters to work
         // so generator gives needs to generate cars with max speed parameter, otherwise model won't work properly, lol
         if (carGenerator.checkIfAllParametresAreLoaded()) {
-            logger.info("Car generator parameters are valid for the selected car following model.");
+            MyLogger.logBeforeLoading("Car generator parameters are valid for the selected car following model.",
+                    Constants.INFO_FOR_LOGGING);
         } else { // missing some parameters, exit
-            logger.fatal("Car generator parameters are NOT valid for the selected car following model, exiting.");
+            MyLogger.logBeforeLoading("Car generator parameters are NOT valid for the selected " +
+                            "car following model, exiting.", Constants.FATAL_FOR_LOGGING);
             return;
         }
 
@@ -99,18 +99,22 @@ public class Main {
         Road[] roads = ConfigLoader.loadRoads();
 
         if (roads == null) {
-            logger.fatal("Failed to load road configuration, exiting.");
+            MyLogger.logBeforeLoading("Failed to load road configuration, exiting."
+                    , Constants.FATAL_FOR_LOGGING);
             return;
         } else {
-            logger.info("Loaded road: " + roads[0].toString() + ", number of roads: " + roads.length);
+            MyLogger.logBeforeLoading("Loaded road: " + roads[0].toString() + ", number of roads: "
+                            + roads.length, Constants.INFO_FOR_LOGGING);
         }
 
         // check if type of road matches type of car following model
         if (!roads[0].getType().equals(carFollowingModel.getType())) {
-            logger.fatal("Types of car following model and road do not match, exiting.");
+            MyLogger.logBeforeLoading("Types of car following model and road do not match: model type=" +
+                    carFollowingModel.getType() + ", road type=" + roads[0].getType(), Constants.FATAL_FOR_LOGGING);
             return;
         } else {
-            logger.info("Types of car following model and road match: " + roads[0].getType());
+            MyLogger.logBeforeLoading("Types of car following model and road match: " + roads[0].getType(),
+                    Constants.INFO_FOR_LOGGING);
         }
 
         // set type of road for generator and store roads in road instance
@@ -119,10 +123,12 @@ public class Main {
             road.setCarGenerator(carGenerator);
 
             if (carGenerator.generatingToQueue()) {
-                logger.info("Car generator is generating cars to queue.");
+                MyLogger.logBeforeLoading("Car generator is generating cars to queue."
+                        , Constants.INFO_FOR_LOGGING);
                 road.initializeCarQueues();
             } else {
-                logger.info("Car generator is generating cars directly on road.");
+                MyLogger.logBeforeLoading("Car generator is generating cars directly on road."
+                        , Constants.INFO_FOR_LOGGING);
             }
         }
 
@@ -131,21 +137,21 @@ public class Main {
         if (roads[0].getType().equals(Constants.CELLULAR)) {
             renderer = new CellularRoadRenderer();
         } else if (roads[0].getType().equals(Constants.CONTINOUS)) {
-            renderer = new ContinousRoadRenderer();
+            renderer = new ContinuousRoadRenderer();
         } else {
-            logger.fatal("Unknown road type: " + roads[0].getType() + ", exiting.");
+            MyLogger.logBeforeLoading("Unknown road type: " + roads[0].getType(), Constants.FATAL_FOR_LOGGING);
             return;
         }
         AppContext.RENDERER = renderer;
 
         RunDetails runDetails = ConfigLoader.loadRunDetails(); // loading run details (show gui, duration...)
         if (runDetails == null) {
-            logger.fatal("Failed to load run details, exiting.");
+            MyLogger.logBeforeLoading("Failed to load run details, exiting.", Constants.FATAL_FOR_LOGGING);
             return;
         } else {
-            logger.info("Loaded run details: duration=" + runDetails.duration + ", timeStep=" + runDetails.timeStep +
-                    ", showGui=" + runDetails.showGui + ", outputFile=" + runDetails.outputFile +
-                    ", drawCells=" + runDetails.drawCells);
+            MyLogger.logBeforeLoading("Loaded run details: duration=" + runDetails.duration + ", timeStep=" +
+                    runDetails.timeStep + ", showGui=" + runDetails.showGui + ", outputFile=" + runDetails.outputFile +
+                    ", drawCells=" + runDetails.drawCells, Constants.INFO_FOR_LOGGING);
         }
         AppContext.RUN_DETAILS = runDetails;
 
@@ -157,12 +163,12 @@ public class Main {
 
 
         if (runDetails.showGui) {
-            logger.info("GUI enabled, starting GUI.");
+            MyLogger.logBeforeLoading("GUI enabled, starting GUI.", Constants.INFO_FOR_LOGGING);
             Window.main(args); // start gui
         } else { // if no gui, run simulation in console mode
-            logger.info("GUI disabled, running simulation in console mode.");
+            MyLogger.logBeforeLoading("Starting simulation in console mode.", Constants.INFO_FOR_LOGGING);
             sim.runSimulation(runDetails.duration, runDetails.timeStep);
-            logger.info("Simulation finished, exiting.");
+            MyLogger.logBeforeLoading("Simulation finished, exiting.", Constants.INFO_FOR_LOGGING);
             if (runDetails.writingResults()) {
                 ResultsRecorder.getResultsRecorder().writeResults();
             }

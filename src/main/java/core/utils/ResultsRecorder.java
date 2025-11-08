@@ -8,7 +8,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ResultsRecorder {
-    private static final Logger logger = LogManager.getLogger(ResultsRecorder.class);
     private static ResultsRecorder instance = null;
     private int[] carsPassedPerRoad;
     private BigInteger timeStart;
@@ -81,10 +80,10 @@ public class ResultsRecorder {
                 bw.close();
                 fw.close();
             } catch (Exception e) {
-                logger.error("Error writing results to file: " + e.getMessage());
+                MyLogger.log("Error writing results to file: " + e.getMessage(), Constants.ERROR_FOR_LOGGING);
             }
         } else {
-            logger.warn("Output file name is not set. Cannot write results.");
+            MyLogger.log("Output file name is not set. Cannot write results.", Constants.WARN_FOR_LOGGING);
         }
     }
 

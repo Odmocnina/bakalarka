@@ -8,7 +8,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import java.util.LinkedList;
 
-public class ContinousRoadRenderer implements IRoadRenderer {
+public class ContinuousRoadRenderer implements IRoadRenderer {
     @Override
     public void draw(GraphicsContext gc, Road road, double width, double height, double laneWidth) {
         int lanes = road.getNumberOfLanes();
@@ -35,7 +35,7 @@ public class ContinousRoadRenderer implements IRoadRenderer {
         double offsetX = 0;
         double offsetY = (height - roadHeightPx) / 2.0;
 
-        double seperatingLinesWidth = 5.0;
+        double separatingLinesWidth = 5.0;
         double carSmallingFactor = 0.8;
         double carUpLiftFactor = 0.1;
         // width multiplayer so that it looks better
@@ -49,7 +49,7 @@ public class ContinousRoadRenderer implements IRoadRenderer {
         LinkedList<CarParams>[] vehicles = (LinkedList<CarParams>[]) roadContent;
 
         // pattern for dashed lines
-        gc.setLineDashes(seperatingLinesWidth);
+        gc.setLineDashes(separatingLinesWidth);
 
         Color carColor;
 
@@ -67,7 +67,7 @@ public class ContinousRoadRenderer implements IRoadRenderer {
                     double carX = offsetX + car.xPosition * widthMultiplayer;
                     double carW = car.getParameter(Constants.LENGTH_REQUEST) * widthMultiplayer;
 
-                    // y palce of car
+                    // y place of car
                     double carY = y + laneHpx * carUpLiftFactor;
                     double carH = laneHpx * carSmallingFactor;
 
@@ -82,7 +82,7 @@ public class ContinousRoadRenderer implements IRoadRenderer {
                 }
             }
 
-            // seperating line between lanes
+            // separating line between lanes
             if (i != lanes - 1) {
                 gc.setStroke(Constants.LINE_SEPERATOR_COLOR);
                 gc.strokeLine(offsetX, y + laneHpx, offsetX + roadWidthPx * widthMultiplayer, y + laneHpx);

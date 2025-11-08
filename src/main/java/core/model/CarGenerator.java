@@ -3,6 +3,7 @@ package core.model;
 import app.AppContext;
 import core.utils.Constants;
 
+import core.utils.MyLogger;
 import javafx.scene.paint.Color;
 
 import java.util.HashMap;
@@ -12,7 +13,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class CarGenerator {
-    private static final Logger logger = LogManager.getLogger(CarGenerator.class);
     private HashMap<String, Parameter> parameters = new HashMap<>();
     private String[] carGenerationParameters;
     private String type;
@@ -72,7 +72,7 @@ public class CarGenerator {
         } else if (this.type.equals(Constants.CONTINOUS)) {
             car = generateCarContinuous();
         } else {
-            logger.warn("Unknown car generator type: " + this.type);
+            MyLogger.log("Unknown car generator type: " + this.type, Constants.WARN_FOR_LOGGING);
         }
 
         this.id++;
@@ -120,7 +120,7 @@ public class CarGenerator {
                 return param.minValue + (rand.nextDouble() * param.range);
             }
         } else {
-            logger.warn("Parameter " + key + " not found in generator parameters.");
+            MyLogger.log("Parameter " + key + " not found in generator parameters.", Constants.WARN_FOR_LOGGING);
             return Double.NaN;
         }
     }
@@ -134,7 +134,8 @@ public class CarGenerator {
                 return (int) (param.minValue + rand.nextInt((int) param.range));
             }
         } else {
-            logger.warn("Parameter " + key + " not found in generator parameters.");
+            MyLogger.log("Parameter " + key + " not found in generator parameters."
+                    , Constants.WARN_FOR_LOGGING);
             return (int) Constants.PARAMETER_UNDEFINED;
         }
     }
@@ -191,7 +192,8 @@ public class CarGenerator {
         String[] requiredParams = this.carGenerationParameters;
 
         if (requiredParams.length == 0) {
-            logger.fatal("CarGenerator: No parameters requested by the car following model.");
+            MyLogger.log("CarGenerator: No parameters requested by the car following model."
+                    , Constants.FATAL_FOR_LOGGING);
             return false;
         }
 
@@ -199,13 +201,14 @@ public class CarGenerator {
             Parameter p = parameters.get(param);
 
             if (p == null) {
-                logger.fatal("CarGenerator: Parameter " + param + " not set in car generator.");
+                MyLogger.log("CarGenerator: Parameter " + param + " not set in car generator."
+                        , Constants.FATAL_FOR_LOGGING);
                 return false;
             }
 
             if (!p.checkIfValid()) {
-                logger.fatal("CarGenerator: Parameter " + param + " has invalid range: min=" + p.minValue +
-                        ", max=" + p.maxValue);
+                MyLogger.log("CarGenerator: Parameter " + param + " has invalid range: min=" + p.minValue +
+                        ", max=" + p.maxValue, Constants.FATAL_FOR_LOGGING);
                 return false;
             }
 

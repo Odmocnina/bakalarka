@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <numberOfRoads>20</numberOfRoads>
+    <numberOfRoads>50</numberOfRoads>
     <roadFile>config/roads/road1.xml</roadFile>
 
     <models>
@@ -55,6 +55,14 @@
         <drawCells>false</drawCells>
         <timeStep>1</timeStep>
         <duration>60</duration>
+        <logging>
+            <log>true</log>
+            <info>true</info>
+            <warn>true</warn>
+            <debug>true</debug>
+            <error>true</error>
+            <fatal>true</fatal>
+        </logging>
         <outputFile>output/simulationContOutput.txt</outputFile>
     </runDetails>
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <numberOfRoads>20</numberOfRoads>
+    <numberOfRoads>10</numberOfRoads>
     <roadFile>config/roads/road2.xml</roadFile>
 
     <models>
@@ -16,7 +16,7 @@
 
     <generator>
         <queue>
-            <use>true</use>
+            <use>false</use>
             <minValue>1</minValue>
             <maxValue>2</maxValue>
         </queue>

@@ -5,6 +5,8 @@ import core.engine.CoreEngine;
 import core.model.Road;
 import core.model.cellular.Cell;
 import core.model.cellular.CellularRoad;
+import core.utils.Constants;
+import core.utils.MyLogger;
 import core.utils.ResultsRecorder;
 import ui.render.IRoadRenderer;
 import core.sim.Simulation;
@@ -28,7 +30,6 @@ import java.util.LinkedList;
 
 public class Window extends Application {
 
-    private static final Logger logger = LogManager.getLogger(Window.class);
     private Simulation simulation;
     private CoreEngine engine;
     private IRoadRenderer renderer;
@@ -46,7 +47,7 @@ public class Window extends Application {
         this.simulation = AppContext.SIMULATION;
         this.renderer = AppContext.RENDERER;
 
-        // cavas for drawing
+        // canvas for drawing
         Canvas canvas = new Canvas(2000, 800);
         ScrollPane scrollPane = new ScrollPane(canvas);
         scrollPane.setPannable(true);
@@ -78,7 +79,7 @@ public class Window extends Application {
             GraphicsContext gc = canvas.getGraphicsContext2D();
             Road[] roads = simulation.getRoads();
             if (roads == null || roads.length == 0) {
-                logger.error("Error while getting loads to render");
+                MyLogger.log("Error while getting roads to render", Constants.ERROR_FOR_LOGGING);
                 return;
             }
 
@@ -147,7 +148,7 @@ public class Window extends Application {
         };
 
         // engine initialization
-        engine = new CoreEngine(tick, 10); // 1000 ms per step
+        engine = new CoreEngine(tick, 100); // 1000 ms per step
 
         // starting engine when start button is pressed, simulation runs
         btnStart.setOnAction(e -> {

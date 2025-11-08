@@ -5,7 +5,7 @@ import core.model.Road;
 import javafx.scene.canvas.GraphicsContext;
 
 /***********************************
- * Interface for road rederers for gui
+ * Interface for road renderers for gui
  *
  * @author Michael Hladky
  * @version 1.0
@@ -21,6 +21,6 @@ public interface IRoadRenderer {
      * @param height    the height of the drawing area
      * @param laneWidth the width of a single lane
      */
-    public void draw(GraphicsContext gc, Road road, double width, double height, double laneWidth);
+    void draw(GraphicsContext gc, Road road, double width, double height, double laneWidth);
 
 }

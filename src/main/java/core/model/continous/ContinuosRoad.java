@@ -1,12 +1,15 @@
 package core.model.continous;
 
 import app.AppContext;
+import app.Main;
 import core.model.*;
 import core.utils.Constants;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
+import core.utils.MyLogger;
 import core.utils.StringEditor;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -14,8 +17,6 @@ import org.apache.logging.log4j.LogManager;
 public class ContinuosRoad extends Road {
 
     LinkedList<CarParams>[] vehicles;
-
-    private static final Logger logger = LogManager.getLogger(ContinuosRoad.class);
 
     public ContinuosRoad(double length, int numberOfLanes, double speedLimit) {
         super(length, numberOfLanes, speedLimit, Constants.CONTINOUS);
@@ -64,7 +65,8 @@ public class ContinuosRoad extends Road {
 
                 if (okToPutCar(newCar, lane)) {
                     placeCar(newCar, 0, lane);
-                    logger.debug("New car placed at lane " + lane + " position 0, carParams: " + newCar);
+                    MyLogger.log("New car placed at lane " + lane + " position 0, carParams: " + newCar,
+                            Constants.DEBUG_FOR_LOGGING);
                 }
             }
         }
@@ -95,7 +97,8 @@ public class ContinuosRoad extends Road {
     private int forwardStep() {
         int carsPassed = 0;
         for (int lane = this.numberOfLanes - 1; lane >= 0; lane--) {
-            logger.debug("Updating lane " + lane + " with " + this.vehicles[lane].size() + " vehicles.");
+            MyLogger.log("Updating lane " + lane + " with " + this.vehicles[lane].size() + " vehicles.",
+                    Constants.DEBUG_FOR_LOGGING);
             carsPassed = carsPassed + this.updateLane(lane);
         }
 
@@ -104,12 +107,72 @@ public class ContinuosRoad extends Road {
 
     private int updateLane(int lane) {
         int carsPassed = 0;
+
+        // nothing to update if lane is empty
+        if (this.vehicles[lane] == null || this.vehicles[lane].isEmpty()) {
+            return 0;
+        }
+
+        // safe iteration and removal using ListIterator
+        final ListIterator<CarParams> it = this.vehicles[lane].listIterator();
+        while (it.hasNext()) {
+            CarParams car = it.next();
+
+            // defensive check against broken car states
+            if (car == null || Double.isNaN(car.xPosition) ||
+                    Double.isNaN(car.getParameter(Constants.CURRENT_SPEED_REQUEST))) {
+                it.remove();
+                continue;
+            }
+
+            String requestParameters = AppContext.CAR_FOLLOWING_MODEL.requestParameters();
+            HashMap<String, Double> parameters = getParameters(lane, this.vehicles[lane].indexOf(car),
+                    requestParameters);
+            if (parameters == null) {
+                MyLogger.log("Error getting parameters for car at lane " + lane + ", position " +
+                        this.vehicles[lane].indexOf(car), Constants.ERROR_FOR_LOGGING);
+                continue;
+            }
+            double newSpeed = AppContext.CAR_FOLLOWING_MODEL.getNewSpeed(parameters);
+
+            if (newSpeed > super.speedLimit) {
+                newSpeed = super.speedLimit;
+            }
+
+            if (Double.isNaN(newSpeed) || newSpeed < 0.0) {
+                newSpeed = 0.0;
+            }
+
+            car.setParameter(Constants.CURRENT_SPEED_REQUEST, newSpeed);
+            car.xPosition += newSpeed;
+
+            MyLogger.log("Car at lane " + lane + " updated to new speed " + newSpeed + " " +
+                    "and new position " + car.xPosition, Constants.DEBUG_FOR_LOGGING);
+
+            MyLogger.log("car x:" + car.xPosition + ", length: " + car.getParameter(Constants.LENGTH_REQUEST),
+                    Constants.DEBUG_FOR_LOGGING);
+            if (!checkIfCarStillRelevant(car, lane)) {
+                it.remove();
+                carsPassed++;
+            }
+
+        }
+
+        // after movement, keep the lane sorted by xPosition (ascending)
+        // this ensures that "car ahead" logic remains consistent
+        //this.vehicles[lane].sort(Comparator.comparingDouble(c -> c.xPosition));
+
+        return carsPassed;
+    }
+
+    private int updateLaneO(int lane) {
+        int carsPassed = 0;
         for (CarParams car : this.vehicles[lane]) {
             String requestParameters = AppContext.CAR_FOLLOWING_MODEL.requestParameters();
             HashMap<String, Double> parameters = getParameters(lane, this.vehicles[lane].indexOf(car), requestParameters);
             if (parameters == null) {
-                logger.debug("Error getting parameters for car at lane " + lane + ", position " +
-                        this.vehicles[lane].indexOf(car));
+                MyLogger.log("Error getting parameters for car at lane " + lane + ", position " +
+                        this.vehicles[lane].indexOf(car), Constants.ERROR_FOR_LOGGING);
                 continue;
             }
             double newSpeed = AppContext.CAR_FOLLOWING_MODEL.getNewSpeed(parameters);
@@ -125,10 +188,11 @@ public class ContinuosRoad extends Road {
             car.setParameter(Constants.CURRENT_SPEED_REQUEST, newSpeed);
             car.xPosition += newSpeed;
 
-            logger.debug("Car at lane " + lane + " updated to new speed " + newSpeed + " " +
-                    "and new position " + car.xPosition);
+            MyLogger.log("Car at lane " + lane + " updated to new speed " + newSpeed + " " +
+                    "and new position " + car.xPosition, Constants.DEBUG_FOR_LOGGING);
 
-            logger.debug("car x:" + car.xPosition + ", length: " + car.getParameter(Constants.LENGTH_REQUEST));
+            MyLogger.log("car x:" + car.xPosition + ", length: " + car.getParameter(Constants.LENGTH_REQUEST),
+                    Constants.DEBUG_FOR_LOGGING);
             if (!checkIfCarStillRelevant(car, lane)) {
                 carsPassed++;
             }
@@ -181,7 +245,7 @@ public class ContinuosRoad extends Road {
                 break;
 
             default:
-                logger.debug("Unknown parameter requested: " + param);
+                MyLogger.log("Unknown parameter requested: " + param, Constants.DEBUG_FOR_LOGGING);
         }
     }
 
@@ -247,7 +311,7 @@ public class ContinuosRoad extends Road {
         HashMap<String, Double> parameters = new HashMap<>();
         String[] params = requestParameters.split(Constants.REQUEST_SEPARATOR);
         if (params.length == 0) {
-            logger.debug("No parameters requested");
+            MyLogger.log("No parameters requested", Constants.DEBUG_FOR_LOGGING);
             return null;
         }
         String[] carGeneratedParams = this.generator.getCarGenerationParameters();
@@ -302,7 +366,8 @@ public class ContinuosRoad extends Road {
             return true;
         }
 
-        logger.debug("Generation bloked by car at position " + firstCar.xPosition);
+        MyLogger.log("Generation blocked by car at position " + firstCar.xPosition,
+                Constants.DEBUG_FOR_LOGGING);
 
         return false;
     }
@@ -328,10 +393,10 @@ public class ContinuosRoad extends Road {
     }
 
     private boolean checkIfCarStillRelevant(CarParams car, int lane) {
-        logger.debug("car x:" + car.xPosition + ", length: " + car.getParameter(Constants.LENGTH_REQUEST));
         if ((car.xPosition - car.getParameter(Constants.LENGTH_REQUEST)) > super.length) {
-            logger.debug("Removing car at lane " + lane + " position " + car.xPosition);
-            this.removeCar(car, lane);
+            MyLogger.log("Car passed the end of the road and is being removed, carParams: " + car,
+                    Constants.DEBUG_FOR_LOGGING);
+            //this.removeCar(car, lane);
             return false;
         } else if (car.xPosition > super.length) {
             double length = car.getParameter(Constants.LENGTH_REQUEST);
