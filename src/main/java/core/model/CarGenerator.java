@@ -21,7 +21,7 @@ public class CarGenerator {
     /** parameters need for car generation, which cars need for models (for example model needs, politeness factor ->
      politeness factor will be in here, and it will be generated, if it is not necessary it will not be here and won't
      be generated **/
-    private final HashMap<String, Parameter> parameters = new HashMap<>();
+    private HashMap<String, Parameter> parameters = new HashMap<>();
 
     /** parameters requested by car following model, needed for generation **/
     private String[] carGenerationParameters;
@@ -39,13 +39,13 @@ public class CarGenerator {
     private double timeToNext = Double.NaN;
 
     /** random number generator **/
-    private final Random rng = new Random();
+    private final Random RNG = new Random();
 
     /** allow multiple cars to be generated per tick **/
     private boolean allowMultiplePerTick = false;
 
     /** available car colors **/
-    private final Color[] colors = Constants.CAR_COLORS;
+    private final Color[] COLORS = Constants.CAR_COLORS;
 
     /**
      * constructor for car generator
@@ -67,7 +67,7 @@ public class CarGenerator {
             return false;
         }
         double p = 1.0 - Math.exp(-lambdaPerSec);
-        return rng.nextDouble() < p;
+        return RNG.nextDouble() < p;
     }
 
     /**
@@ -78,7 +78,7 @@ public class CarGenerator {
             timeToNext = Double.POSITIVE_INFINITY;
         } else {
             // T = -ln(U)/λ, U ~ U(0,1]
-            double u = 1.0 - rng.nextDouble();
+            double u = 1.0 - RNG.nextDouble();
             timeToNext = -Math.log(u) / lambdaPerSec;
         }
     }
@@ -146,7 +146,7 @@ public class CarGenerator {
             car.setParameter(key, value);
         }
 
-        car.color = colors[(int) (Math.random() * colors.length)];
+        car.color = COLORS[(int) (Math.random() * COLORS.length)];
         car.id = this.id;
 
         return car;
@@ -165,7 +165,7 @@ public class CarGenerator {
             car.setParameter(key, value);
         }
 
-        car.color = colors[(int) (Math.random() * colors.length)];
+        car.color = COLORS[(int) (Math.random() * COLORS.length)];
         car.id = this.id;
 
         return car;

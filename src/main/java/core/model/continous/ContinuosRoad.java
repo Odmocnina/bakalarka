@@ -171,7 +171,7 @@ public class ContinuosRoad extends Road {
 
             MyLogger.log("car x:" + car.xPosition + ", length: " + car.getParameter(Constants.LENGTH_REQUEST),
                     Constants.DEBUG_FOR_LOGGING);
-            if (!checkIfCarStillRelevant(car, lane)) {
+            if (!checkIfCarStillRelevant(car)) {
                 it.remove();
                 carsPassed++;
             }
@@ -184,46 +184,6 @@ public class ContinuosRoad extends Road {
 
         return carsPassed;
     }
-
-    /*private int updateLaneO(int lane) {
-        int carsPassed = 0;
-        for (CarParams car : this.vehicles[lane]) {
-            String requestParameters = AppContext.CAR_FOLLOWING_MODEL.requestParameters();
-            HashMap<String, Double> parameters = getParameters(lane, this.vehicles[lane].indexOf(car), requestParameters);
-            if (parameters == null) {
-                MyLogger.log("Error getting parameters for car at lane " + lane + ", position " +
-                        this.vehicles[lane].indexOf(car), Constants.ERROR_FOR_LOGGING);
-                continue;
-            }
-            double newSpeed = AppContext.CAR_FOLLOWING_MODEL.getNewSpeed(parameters);
-
-            if (newSpeed > car.getParameter(Constants.MAX_SPEED_REQUEST)) {
-                newSpeed = car.getParameter(Constants.MAX_SPEED_REQUEST);
-            }
-
-            if (newSpeed > super.speedLimit) {
-                newSpeed = super.speedLimit;
-            }
-
-            if (newSpeed < 0) {
-                newSpeed = 0;
-            }
-
-            car.setParameter(Constants.CURRENT_SPEED_REQUEST, newSpeed);
-            car.xPosition += newSpeed;
-
-            MyLogger.log("Car at lane " + lane + " updated to new speed " + newSpeed + " " +
-                    "and new position " + car.xPosition, Constants.DEBUG_FOR_LOGGING);
-
-            MyLogger.log("car x:" + car.xPosition + ", length: " + car.getParameter(Constants.LENGTH_REQUEST),
-                    Constants.DEBUG_FOR_LOGGING);
-            if (!checkIfCarStillRelevant(car, lane)) {
-                carsPassed++;
-            }
-        }
-
-        return carsPassed;
-    }*/
 
     /**
      * gets parameter about different car in proximity of car for witch are we using model
@@ -246,38 +206,6 @@ public class ContinuosRoad extends Road {
             parameters.put(param, Constants.NO_CAR_THERE);
         }
     }
-
-    /*private void getRoadDependedParameters(HashMap<String, Double> parameters, String param, int lane, int position) {
-        CarParams car = vehicles[lane].get(position);
-
-        switch (param) {
-            case Constants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST:
-                CarParams forwardCar = getCarInProximity(Direction.STRAIGHT, Orientation.FORWARD, car);
-                if (forwardCar != null) {
-                    parameters.put(Constants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST,
-                            forwardCar.getParameter(Constants.CURRENT_SPEED_REQUEST));
-                } else {
-                    parameters.put(Constants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST, super.speedLimit);
-                }
-                break;
-
-            case Constants.CURRENT_SPEED_REQUEST:
-                parameters.put(Constants.CURRENT_SPEED_REQUEST, car.getParameter(Constants.CURRENT_SPEED_REQUEST));
-                break;
-
-            case Constants.DISTANCE_TO_NEXT_CAR_REQUEST:
-                parameters.put(Constants.DISTANCE_TO_NEXT_CAR_REQUEST, getDistanceToNextCar(lane, position));
-                break;
-
-            case Constants.SPEED_DIFFERENCE_TO_NEXT_CAR_REQUEST:
-                parameters.put(Constants.SPEED_DIFFERENCE_TO_NEXT_CAR_REQUEST,
-                        getSpeedDifferenceToNextCar(lane, position));
-                break;
-
-            default:
-                MyLogger.log("Unknown parameter requested: " + param, Constants.DEBUG_FOR_LOGGING);
-        }
-    }*/
 
     /**
      * function to get car in proximity lane in given orientation, can give for example same lane (car ahead/back of the
@@ -387,24 +315,6 @@ public class ContinuosRoad extends Road {
         return parameters;
     }
 
-    /*private double getDistanceToNextCar(int lane, int position) {
-        if (position >= vehicles[lane].size() - 1) {
-            return Double.MAX_VALUE; // No car in front
-        }
-        double distance = 0.0;
-        distance = vehicles[lane].get(position + 1).xPosition - vehicles[lane].get(position).xPosition
-                - vehicles[lane].get(position).getParameter(Constants.LENGTH_REQUEST);
-        return distance;
-    }
-
-    private double getSpeedDifferenceToNextCar(int lane, int position) {
-        if (position >= vehicles[lane].size() - 1) {
-            return 0.0; // No car in front
-        }
-        return Math.abs(vehicles[lane].get(position).getParameter(Constants.CURRENT_SPEED_REQUEST) -
-                vehicles[lane].get(position + 1).getParameter(Constants.CURRENT_SPEED_REQUEST));
-    }*/
-
     /**
      * getter for content of the road, in this case array of linked lists of cars, overriding abstract method in Road
      *
@@ -480,10 +390,9 @@ public class ContinuosRoad extends Road {
      * method to check if car is still relevant (has not passed the end of the road)
      *
      * @param car car to check
-     * @param lane lane in which the car is
      * @return true if car is still relevant, false otherwise
      **/
-    private boolean checkIfCarStillRelevant(CarParams car, int lane) {
+    private boolean checkIfCarStillRelevant(CarParams car) {
         if ((car.xPosition - car.getParameter(Constants.LENGTH_REQUEST)) > super.length) {
             MyLogger.log("Car passed the end of the road and is being removed, carParams: " + car,
                     Constants.DEBUG_FOR_LOGGING);
@@ -498,10 +407,6 @@ public class ContinuosRoad extends Road {
 
         return true;
     }
-
-    /*private void removeCar(CarParams car, int lane) {
-        vehicles[lane].remove(car);
-    }*/
 
     /**
      * method to get number of cars currently on the road

@@ -61,20 +61,20 @@ public class Window extends Application {
         scrollPane.setFitToWidth(false);
         scrollPane.setFitToHeight(false);
 
-        final String startButtonText = "Start";
-        final String stopButtonText = "Stop";
-        final String stepButtonText = "Next step";
-        final String exportButtonText = "Export results";
-        final String statusRunningText = "State: running";
-        final String statusStoppedText = "State: stopped";
-        final String windowText = "Traffic simulator";
+        final String START_BUTTON_TEXT = "Start";
+        final String STOP_BUTTON_TEXT = "Stop";
+        final String NEXT_STEP_BUTTON_TEXT = "Next step";
+        final String EXPORT_BUTTON_TEXT = "Export results";
+        final String STATUS_RUNNING_BUTTON_TEXT = "State: running";
+        final String STATUS_STOPPED_BUTTON_TEXT = "State: stopped";
+        final String WINDOW_TEXT = "Traffic simulator";
 
         // panel with controls
-        Button btnStart = new Button(startButtonText);
-        Button btnStop = new Button(stopButtonText);
-        Button btnStep = new Button(stepButtonText);
-        Label statusLabel = new Label(statusStoppedText);
-        Button exportBtn = new Button(exportButtonText);
+        Button btnStart = new Button(START_BUTTON_TEXT);
+        Button btnStop = new Button(STOP_BUTTON_TEXT);
+        Button btnStep = new Button(NEXT_STEP_BUTTON_TEXT);
+        Label statusLabel = new Label(STATUS_STOPPED_BUTTON_TEXT);
+        Button exportBtn = new Button(EXPORT_BUTTON_TEXT);
 
         HBox controls = new HBox(10, btnStart, exportBtn, btnStop, btnStep, statusLabel);
         controls.setPadding(new Insets(10));
@@ -86,7 +86,7 @@ public class Window extends Application {
 
         Scene scene = new Scene(root, 1200, 700, Color.LIGHTGRAY);
         primaryStage.setScene(scene);
-        primaryStage.setTitle(windowText);
+        primaryStage.setTitle(WINDOW_TEXT);
         primaryStage.show();
 
         // part that repaints all roads
@@ -125,13 +125,13 @@ public class Window extends Application {
         // starting engine when start button is pressed, simulation runs
         btnStart.setOnAction(e -> {
             engine.start();
-            statusLabel.setText(statusRunningText);
+            statusLabel.setText(STATUS_RUNNING_BUTTON_TEXT);
         });
 
         // stopping engine when stop button is pressed, simulation stops
         btnStop.setOnAction(e -> {
             engine.stop();
-            statusLabel.setText(statusStoppedText);
+            statusLabel.setText(STATUS_STOPPED_BUTTON_TEXT);
         });
 
         // one simulation step when step button is pressed, manual step

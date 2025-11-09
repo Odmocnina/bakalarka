@@ -66,6 +66,15 @@ public class Simulation {
     }
 
     /**
+     * Getter for the current step count of the simulation
+     *
+     * @return current step count
+     **/
+    public int getStepCount() {
+        return stepCount;
+    }
+
+    /**
      * Runs the simulation for a specified amount of time
      *
      * @param time duration to run the simulation

@@ -25,24 +25,24 @@ public class MyLogger {
      * @param level The log4j level at which to log the message (INFO, DEBUG, ERROR, WARN, FATAL).
      **/
     public static void log(String message, String level) {
-        final int generalIndex = 0;
-        final int infoIndex = 1;
-        final int warnIndex = 2;
-        final int errorIndex = 3;
-        final int fatalIndex = 4;
-        final int debugIndex = 5;
+        final int GENERAL_INDEX = 0;
+        final int INFO_INDEX = 1;
+        final int WARN_INDEX = 2;
+        final int ERROR_INDEX = 3;
+        final int FATAL_INDEX = 4;
+        final int DEBUG_INDEX = 5;
         boolean[] logSettings = AppContext.RUN_DETAILS.log;
 
-        if ((logSettings[generalIndex])) {
-            if (level.equalsIgnoreCase(Constants.INFO_FOR_LOGGING) && logSettings[infoIndex]) {
+        if ((logSettings[GENERAL_INDEX])) {
+            if (level.equalsIgnoreCase(Constants.INFO_FOR_LOGGING) && logSettings[INFO_INDEX]) {
                 logger.info(message);
-            } else if (level.equalsIgnoreCase(Constants.DEBUG_FOR_LOGGING) && logSettings[debugIndex]) {
+            } else if (level.equalsIgnoreCase(Constants.DEBUG_FOR_LOGGING) && logSettings[DEBUG_INDEX]) {
                 logger.debug(message);
-            } else if (level.equalsIgnoreCase(Constants.ERROR_FOR_LOGGING) && logSettings[errorIndex]) {
+            } else if (level.equalsIgnoreCase(Constants.ERROR_FOR_LOGGING) && logSettings[ERROR_INDEX]) {
                 logger.error(message);
-            } else if (level.equalsIgnoreCase(Constants.WARN_FOR_LOGGING) && logSettings[warnIndex]) {
+            } else if (level.equalsIgnoreCase(Constants.WARN_FOR_LOGGING) && logSettings[WARN_INDEX]) {
                 logger.warn(message);
-            } else if (level.equalsIgnoreCase(Constants.FATAL_FOR_LOGGING) && logSettings[fatalIndex]) {
+            } else if (level.equalsIgnoreCase(Constants.FATAL_FOR_LOGGING) && logSettings[FATAL_INDEX]) {
                 logger.fatal(message);
             }
         }

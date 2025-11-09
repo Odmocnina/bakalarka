@@ -21,7 +21,7 @@ public class CarParams {
     public int lane = (int) Constants.PARAMETER_UNDEFINED;
 
     /** other parameters of the car stored in a HashMap **/
-    private final HashMap<String, Double> parameters = new HashMap<>();
+    private HashMap<String, Double> parameters = new HashMap<>();
 
     /** unique id of the car **/
     public int id = (int) Constants.PARAMETER_UNDEFINED;

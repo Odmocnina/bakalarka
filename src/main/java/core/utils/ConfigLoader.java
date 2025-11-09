@@ -463,19 +463,19 @@ public class ConfigLoader {
      * @param logElements XML Element containing logging settings
      **/
     private static void loadLoggingFromConfig(RunDetails detailsFromConfig, Element logElements) {
-        final String generalLogging = "log";
-        final String infoLogging = "info";
-        final String warnLogging = "warn";
-        final String errorLogging = "error";
-        final String fatalLogging = "fatal";
-        final String debugLogging = "debug";
+        final String GENERAL_LOGGING = "log";
+        final String INFO_LOGGING = "info";
+        final String WARN_LOGGING = "warn";
+        final String ERROR_LOGGING = "error";
+        final String FATAL_LOGGING = "fatal";
+        final String DEBUG_LOGGING = "debug";
 
-        final int generalIndex = 0;
-        final int infoIndex = 1;
-        final int warnIndex = 2;
-        final int errorIndex = 3;
-        final int fatalIndex = 4;
-        final int debugIndex = 5;
+        final int GENERAL_INDEX = 0;
+        final int INFO_INDEX = 1;
+        final int WARN_INDEX = 2;
+        final int ERROR_INDEX = 3;
+        final int FATAL_INDEX = 4;
+        final int DEBUG_INDEX = 5;
 
         if (logElements != null) {
             NodeList logChildren = logElements.getChildNodes();
@@ -487,23 +487,23 @@ public class ConfigLoader {
                     boolean logValue = Boolean.parseBoolean(logElement.getTextContent());
 
                     switch (logType) {
-                        case generalLogging:
-                            detailsFromConfig.log[generalIndex] = logValue;
+                        case GENERAL_LOGGING:
+                            detailsFromConfig.log[GENERAL_INDEX] = logValue;
                             break;
-                        case infoLogging:
-                            detailsFromConfig.log[infoIndex] = logValue;
+                        case INFO_LOGGING:
+                            detailsFromConfig.log[INFO_INDEX] = logValue;
                             break;
-                        case warnLogging:
-                            detailsFromConfig.log[warnIndex] = logValue;
+                        case WARN_LOGGING:
+                            detailsFromConfig.log[WARN_INDEX] = logValue;
                             break;
-                        case errorLogging:
-                            detailsFromConfig.log[errorIndex] = logValue;
+                        case ERROR_LOGGING:
+                            detailsFromConfig.log[ERROR_INDEX] = logValue;
                             break;
-                        case fatalLogging:
-                            detailsFromConfig.log[fatalIndex] = logValue;
+                        case FATAL_LOGGING:
+                            detailsFromConfig.log[FATAL_INDEX] = logValue;
                             break;
-                        case debugLogging:
-                            detailsFromConfig.log[debugIndex] = logValue;
+                        case DEBUG_LOGGING:
+                            detailsFromConfig.log[DEBUG_INDEX] = logValue;
                             break;
                         default:
                             MyLogger.logBeforeLoading("Unknown log type in run details: " + logType

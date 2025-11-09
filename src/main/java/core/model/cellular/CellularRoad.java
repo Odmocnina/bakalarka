@@ -26,7 +26,7 @@ public class CellularRoad extends Road {
     private int numberOfCells;
 
     /** size of each cell in meters, used to translate length given in config to length in cells **/
-    private final double cellSize;
+    private double cellSize;
 
     /**
      * Constructor for CellularRoad, creates the road and initializes cells, and other parameters, like cell size
