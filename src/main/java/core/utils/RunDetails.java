@@ -14,6 +14,8 @@ public class RunDetails {
 
     public boolean[] log = new boolean[] { true, true, true, true, true, true };
 
+    public int timeBetweenSteps;
+
     public boolean writingResults() {
         return this.outputFile != null && !this.outputFile.isEmpty();
     }

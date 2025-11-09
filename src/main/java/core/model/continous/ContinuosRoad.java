@@ -1,28 +1,41 @@
 package core.model.continous;
 
 import app.AppContext;
-import app.Main;
 import core.model.*;
 import core.utils.Constants;
+import core.utils.MyLogger;
+import core.utils.StringEditor;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import core.utils.MyLogger;
-import core.utils.StringEditor;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
+/*****************************
+ * class representing continuous road
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ****************************/
 public class ContinuosRoad extends Road {
 
+    /** each linked list in array is one lane, CarParams in linked list are cars, so this represents entire road **/
     LinkedList<CarParams>[] vehicles;
 
+    /**
+     * constructor for continuous road
+     *
+     * @param length length of the road
+     * @param numberOfLanes number of lanes on the road
+     * @param speedLimit speed limit on the road
+     **/
     public ContinuosRoad(double length, int numberOfLanes, double speedLimit) {
         super(length, numberOfLanes, speedLimit, Constants.CONTINOUS);
         createRoad();
     }
 
+    /**
+     * method to create road structure, initialize lanes (linked lists)
+     **/
     private void createRoad() {
         this.vehicles = new LinkedList[numberOfLanes];
         for (int lane = 0; lane < numberOfLanes; lane++) {
@@ -58,6 +71,9 @@ public class ContinuosRoad extends Road {
         vehicles[0].add(carParams2);*/
     }
 
+    /**
+     * method to try to add new car at the beginning of each lane
+     **/
     public void tryToAddCar() {
         for (int lane = 0; lane < numberOfLanes; lane++) {
             if (super.generator.decideIfNewCar()) {
@@ -72,20 +88,13 @@ public class ContinuosRoad extends Road {
         }
     }
 
-    private void throwOutWierdCars() {
-        for (int lane = 0; lane < numberOfLanes; lane++) {
-            LinkedList<CarParams> laneCars = vehicles[lane];
-            for (CarParams car : laneCars) { //for each car
-                if (car.xPosition == Double.NaN) {
-                    removeCar(car, lane);
-                }
-            }
-        }
-    }
-
+    /**
+     * method to update the road, move cars forward according to car following model
+     *
+     * @return number of cars that passed the end of the road
+     **/
     @Override
     public int updateRoad() {
-        //this.throwOutWierdCars();
         int carsPassed = this.forwardStep();
 
         if (true)
@@ -94,6 +103,11 @@ public class ContinuosRoad extends Road {
         return carsPassed;
     }
 
+    /**
+     * method to move cars forward according to car following model
+     *
+     * @return number of cars that passed the end of the road
+     **/
     private int forwardStep() {
         int carsPassed = 0;
         for (int lane = this.numberOfLanes - 1; lane >= 0; lane--) {
@@ -105,6 +119,12 @@ public class ContinuosRoad extends Road {
         return carsPassed;
     }
 
+    /**
+     * method to update a single lane, move cars forward according to car following model
+     *
+     * @param lane lane to update
+     * @return number of cars that passed the end of the road in this lane
+     **/
     private int updateLane(int lane) {
         int carsPassed = 0;
 
@@ -201,6 +221,13 @@ public class ContinuosRoad extends Road {
         return carsPassed;
     }
 
+    /**
+     * gets parameter about different car in proximity of car for witch are we using model
+     *
+     * @param parameters hashmap to put parameter into
+     * @param param parameter to get
+     * @param car car for which we are getting parameter about different car
+     **/
     private void getParametersAboutDifferentCar(HashMap<String, Double> parameters, String param, CarParams car) {
         String[] paramSeparate = param.split(Constants.SUBREQUEST_SEPARATOR);
         String wantedParam = paramSeparate[0];
@@ -216,7 +243,7 @@ public class ContinuosRoad extends Road {
         }
     }
 
-    private void getRoadDependedParameters(HashMap<String, Double> parameters, String param, int lane, int position) {
+    /*private void getRoadDependedParameters(HashMap<String, Double> parameters, String param, int lane, int position) {
         CarParams car = vehicles[lane].get(position);
 
         switch (param) {
@@ -236,7 +263,6 @@ public class ContinuosRoad extends Road {
 
             case Constants.DISTANCE_TO_NEXT_CAR_REQUEST:
                 parameters.put(Constants.DISTANCE_TO_NEXT_CAR_REQUEST, getDistanceToNextCar(lane, position));
-                int i = 0;
                 break;
 
             case Constants.SPEED_DIFFERENCE_TO_NEXT_CAR_REQUEST:
@@ -247,8 +273,18 @@ public class ContinuosRoad extends Road {
             default:
                 MyLogger.log("Unknown parameter requested: " + param, Constants.DEBUG_FOR_LOGGING);
         }
-    }
+    }*/
 
+    /**
+     * function to get car in proximity lane in given orientation, can give for example same lane (car ahead/back of the
+     * inspected car), or different lane (car ahead/back of the inspected car in left/right lane), which lane is decided
+     * by the lane parameter, which is linked list of cars in that lane
+     *
+     * @param orientation orientation to look for car in (FORWARD or BACKWARD)
+     * @param car car for which we are looking for other car in proximity lane
+     * @param lane lane in which to look for car
+     * @return car in proximity lane in given orientation, null if no car found (free space)
+     **/
     private CarParams getCarInProximityLane(Orientation orientation, CarParams car, LinkedList<CarParams> lane) {
         if (orientation == Orientation.FORWARD) {
             for (int i = 0; i < lane.size(); i++) {
@@ -269,6 +305,18 @@ public class ContinuosRoad extends Road {
         return null;
     }
 
+    /**
+     * function to get car in proximity in given direction and orientation, for example car ahead in same lane is
+     * STRAIGHT FORWARD, car behind in left lane is LEFT BACKWARD, car ahead in right lane is RIGHT FORWARD, etc., car
+     * then is used when its parameters are wanted for model, like its speed, position, etc.
+     *
+     * @param direction direction (lane) to look for car in (STRAIGHT, LEFT, RIGHT)
+     * @param orientation orientation to look for car in (FORWARD or BACKWARD)
+     * @param car car for which we are looking for other car in proximity
+     * @return car in proximity in given direction and orientation, null if no car found (free space) also technically
+     *         will return null if no lane is there in given direction, so thread carefully, should be handled properly
+     *         by caller method
+     **/
     private CarParams getCarInProximity(Direction direction, Orientation orientation, CarParams car) {
         int lane = car.lane;
         int position = this.vehicles[lane].indexOf(car);
@@ -303,10 +351,17 @@ public class ContinuosRoad extends Road {
         }
 
         return null;
-
-
     }
 
+    /**
+     * method to get all parameters needed for car following / lane-changing model for given car on given position in
+     * given lane
+     *
+     * @param lane lane of the car
+     * @param position position of the car in the lane (index in linked list)
+     * @param requestParameters string with all requested parameters separated by request separator
+     * @return hashmap with all requested parameters and their values
+     **/
     private HashMap<String, Double> getParameters(int lane, int position, String requestParameters) {
         HashMap<String, Double> parameters = new HashMap<>();
         String[] params = requestParameters.split(Constants.REQUEST_SEPARATOR);
@@ -319,18 +374,16 @@ public class ContinuosRoad extends Road {
         CarParams car = vehicles[lane].get(position);
         for (String param : params) {
             if (StringEditor.isInArray(carGeneratedParams, param) || param.equals(Constants.X_POSITION_REQUEST) ||
-                    param.equals(Constants.CURRENT_SPEED_REQUEST)) {
-                int i = 0;
+                    param.equals(Constants.CURRENT_SPEED_REQUEST)) { // get directly from car we are inspecting
                 parameters.put(param, car.getParameter(param));
-            } else {
-                //this.getRoadDependedParameters(parameters, param, lane, position);
+            } else {   // get parameter from different car in proximity
                 this.getParametersAboutDifferentCar(parameters, param, car);
             }
         }
         return parameters;
     }
 
-    private double getDistanceToNextCar(int lane, int position) {
+    /*private double getDistanceToNextCar(int lane, int position) {
         if (position >= vehicles[lane].size() - 1) {
             return Double.MAX_VALUE; // No car in front
         }
@@ -346,23 +399,35 @@ public class ContinuosRoad extends Road {
         }
         return Math.abs(vehicles[lane].get(position).getParameter(Constants.CURRENT_SPEED_REQUEST) -
                 vehicles[lane].get(position + 1).getParameter(Constants.CURRENT_SPEED_REQUEST));
-    }
+    }*/
 
+    /**
+     * getter for content of the road, in this case array of linked lists of cars, overriding abstract method in Road
+     *
+     * @return array of linked lists of cars representing the road
+     **/
     @Override
     public Object getContent() {
         return vehicles;
     }
 
+    /**
+     * method to check if it is ok to put new car at the beginning of given lane
+     *
+     * @param newCar new car to put
+     * @param lane lane to put the car in
+     * @return true if it is ok to put the car, false otherwise
+     **/
     private boolean okToPutCar(CarParams newCar, int lane) {
         if (vehicles[lane].isEmpty()) {
             return true;
         }
-        double gap = 10;
+        double gap = newCar.getParameter(Constants.LENGTH_REQUEST);
         CarParams firstCar = vehicles[lane].getFirst();
         double space = newCar.getParameter(Constants.LENGTH_REQUEST) +
                 newCar.getParameter(Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST);
-        space += newCar.getParameter(Constants.LENGTH_REQUEST);
-        if (space <= firstCar.xPosition) {
+        space += gap; // add length of the new car as well for better spacing
+        if (space <= firstCar.xPosition) { // space needed is smaller than
             return true;
         }
 
@@ -372,6 +437,13 @@ public class ContinuosRoad extends Road {
         return false;
     }
 
+    /**
+     * method to place new car at given position in given lane
+     *
+     * @param newCar new car to place
+     * @param position position to place the car at
+     * @param lane lane to place the car in
+     **/
     private void placeCar(CarParams newCar, double position, int lane) {
         newCar.xPosition = position;
         newCar.lane = lane;
@@ -380,6 +452,13 @@ public class ContinuosRoad extends Road {
         vehicles[lane].add(place, newCar);
     }
 
+    /**
+     * method to find the correct place for new car in given lane, so that the lane remains sorted by xPosition
+     *
+     * @param x x position of the new car
+     * @param lane lane to find the place in
+     * @return index in linked list of the place to put the new car at
+     **/
     private int findPlaceForCar(double x, int lane) {
         if (vehicles[lane].isEmpty()) {
             return 0;
@@ -392,11 +471,17 @@ public class ContinuosRoad extends Road {
         return vehicles[lane].size() - 1;
     }
 
+    /**
+     * method to check if car is still relevant (has not passed the end of the road)
+     *
+     * @param car car to check
+     * @param lane lane in which the car is
+     * @return true if car is still relevant, false otherwise
+     **/
     private boolean checkIfCarStillRelevant(CarParams car, int lane) {
         if ((car.xPosition - car.getParameter(Constants.LENGTH_REQUEST)) > super.length) {
             MyLogger.log("Car passed the end of the road and is being removed, carParams: " + car,
                     Constants.DEBUG_FOR_LOGGING);
-            //this.removeCar(car, lane);
             return false;
         } else if (car.xPosition > super.length) {
             double length = car.getParameter(Constants.LENGTH_REQUEST);
@@ -409,10 +494,15 @@ public class ContinuosRoad extends Road {
         return true;
     }
 
-    private void removeCar(CarParams car, int lane) {
+    /*private void removeCar(CarParams car, int lane) {
         vehicles[lane].remove(car);
-    }
+    }*/
 
+    /**
+     * method to get number of cars currently on the road
+     *
+     * @return number of cars on the road
+     **/
     @Override
     public int getNumberOfCarsOnRoad() {
         int totalCars = 0;

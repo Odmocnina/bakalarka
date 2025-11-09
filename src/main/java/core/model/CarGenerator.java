@@ -1,6 +1,7 @@
 package core.model;
 
 import app.AppContext;
+import core.model.cellular.CellularRoad;
 import core.utils.Constants;
 
 import core.utils.MyLogger;
@@ -146,10 +147,12 @@ public class CarGenerator {
     }
 
 
-    public void setType(String type) {
+    public void setType(Road road) {
+        String type = road.getType();
         this.type = type;
         if (type.equals(Constants.CELLULAR)) {
-            translateParametersToCellular(AppContext.cellSize);
+            double cellSize = ((CellularRoad) road).getCellSize();
+            translateParametersToCellular(cellSize);
         }
     }
 

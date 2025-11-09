@@ -17,15 +17,6 @@ public class ContinuousRoadRenderer implements IRoadRenderer {
             return;
         }
 
-        // size of road base units
-        double roadLengthUnits = road.getLength();          // meters
-        double laneHeightUnits = Constants.LANE_WIDTH;      // height of one lane in meters
-
-        // scaling stuff
-        double xScale = width  / roadLengthUnits;
-        double yScale = height / (lanes * laneHeightUnits);
-        double scale = Math.min(xScale, yScale);
-
         // get size of road for drawing
         double laneHpx = laneWidth;
         double roadWidthPx = road.getLength();

@@ -64,6 +64,7 @@
             <fatal>true</fatal>
         </logging>
         <outputFile>output/simulationContOutput.txt</outputFile>
+        <timeBetweenSteps>10</timeBetweenSteps>
     </runDetails>
 
 

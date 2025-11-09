@@ -62,6 +62,15 @@
         <drawCells>false</drawCells>
         <timeStep>1</timeStep>
         <duration>120</duration>
+        <logging>
+            <log>true</log>
+            <info>true</info>
+            <warn>true</warn>
+            <debug>false</debug>
+            <error>true</error>
+            <fatal>true</fatal>
+        </logging>
         <outputFile>output/simulationCellOutput.txt</outputFile>
+        <timeBetweenSteps>100</timeBetweenSteps>
     </runDetails>
 </config>

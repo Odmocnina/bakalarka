@@ -135,7 +135,8 @@ public class ConfigLoader {
 
 
             if (type.equals(Constants.CELLULAR)) {
-                roadFormConfig = new CellularRoad(roadLength, numberOfLanes, getMaxSpeed);
+                double cellSize = AppContext.CAR_FOLLOWING_MODEL.getCellSize();
+                roadFormConfig = new CellularRoad(roadLength, numberOfLanes, getMaxSpeed, cellSize);
             } else if (type.equals(Constants.CONTINOUS)) {
                 roadFormConfig = new ContinuosRoad(roadLength, numberOfLanes, getMaxSpeed);
             } else {
@@ -166,7 +167,7 @@ public class ConfigLoader {
             String id = model.getElementsByTagName("id").item(0).getTextContent();
             id = id.toLowerCase().trim();
 
-            //TODO add refexion for dynamic loading of models
+            //TODO add reflexion for dynamic loading of models
             if (id.equals("nagelschreckenberg")) {
                 modelFromConfig = new NagelSchreckenberg();
             } else if (id.equals("idm")) {
@@ -187,7 +188,7 @@ public class ConfigLoader {
                 return null;
             }
 
-            String typeOfModel = modelFromConfig.getType();
+
             if (modelFromConfig.getType().equals(Constants.CELLULAR)) {
                 double cellSize = modelFromConfig.getCellSize();
                 if (cellSize <= 0) {
@@ -195,7 +196,7 @@ public class ConfigLoader {
                             , Constants.FATAL_FOR_LOGGING);
                     return null;
                 }
-                AppContext.cellSize = cellSize;
+                //AppContext.cellSize = cellSize;
             }
 
             return modelFromConfig;
@@ -219,7 +220,7 @@ public class ConfigLoader {
             String id = model.getElementsByTagName("id").item(0).getTextContent();
             id = id.toLowerCase().trim();
 
-            //TODO add refexion for dynamic loading of models
+            //TODO add reflexion for dynamic loading of models
             if (id.equals("rickert")) {
                 modelFromConfig = new Rickert();
             } else {
@@ -331,6 +332,8 @@ public class ConfigLoader {
             Element outputFile = (Element) runDetailsElement.getElementsByTagName("outputFile").item(0);
             Element drawCells = (Element) runDetailsElement.getElementsByTagName("drawCells").item(0);
             Element logElements = (Element) runDetailsElement.getElementsByTagName("logging").item(0);
+            Element timeBetweenSteps = (Element) runDetailsElement.getElementsByTagName("timeBetweenSteps")
+                    .item(0);
             //Element writeResults = (Element) runDetailsElement.getElementsByTagName("writeResults").item(0);
 
             if (duration != null) {
@@ -386,6 +389,21 @@ public class ConfigLoader {
                 MyLogger.logBeforeLoading("Duration is undefined and GUI is disabled, simulation cannot run" +
                                 ", exiting", Constants.FATAL_FOR_LOGGING);
                 return null;
+            }
+
+            if (detailsFromConfig.showGui) {
+                if (timeBetweenSteps != null) {
+                    detailsFromConfig.timeBetweenSteps = Integer.parseInt(timeBetweenSteps.getTextContent());
+                    if (detailsFromConfig.timeBetweenSteps < 0) {
+                        MyLogger.logBeforeLoading("Time between steps must be non-negative, exiting"
+                                , Constants.FATAL_FOR_LOGGING);
+                        return null;
+                    }
+                } else {
+                    MyLogger.logBeforeLoading("Missing timeBetweenSteps in run details, setting to 1 second"
+                            , Constants.WARN_FOR_LOGGING);
+                    detailsFromConfig.timeBetweenSteps = 1000;
+                }
             }
 
             final String generalLogging = "log";

@@ -1,7 +1,6 @@
 package app;
 
 import core.sim.Simulation;
-import core.utils.Constants;
 import core.utils.RunDetails;
 import models.ICarFollowingModel;
 import models.ILaneChangingModel;
@@ -28,10 +27,6 @@ public final class AppContext {
 
     /** lane changing model used in simulation **/
     public static ILaneChangingModel LANE_CHANGING_MODEL;
-
-    /** size of cell in cellular automaton road, -1 if not using cellular automaton **/
-    public static double cellSize = Constants.PARAMETER_UNDEFINED; // i dont like this shit, but have no idea how to do
-                                                                   // it better without fucking the entire thing up
 
     /** simulation, for stepping **/
     public static Simulation SIMULATION;

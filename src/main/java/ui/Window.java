@@ -24,8 +24,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+
 import java.util.LinkedList;
 
 public class Window extends Application {
@@ -33,17 +32,10 @@ public class Window extends Application {
     private Simulation simulation;
     private CoreEngine engine;
     private IRoadRenderer renderer;
-    private String startButtonText = "Start";
-    private String stopButtonText = "Stop";
-    private String stepButtonText = "Next step";
-    private String exportButtonText = "Export results";
-    private String statusRunningText = "State: running";
-    private String statusStoppedText = "State: stopped";
-    private String windowText = "Traffic simulator";
 
     @Override
     public void start(Stage primaryStage) {
-        // get rederer and simulation from AppContext
+        // get renderer and simulation from AppContext
         this.simulation = AppContext.SIMULATION;
         this.renderer = AppContext.RENDERER;
 
@@ -54,12 +46,20 @@ public class Window extends Application {
         scrollPane.setFitToWidth(false);
         scrollPane.setFitToHeight(false);
 
+        final String startButtonText = "Start";
+        final String stopButtonText = "Stop";
+        final String stepButtonText = "Next step";
+        final String exportButtonText = "Export results";
+        final String statusRunningText = "State: running";
+        final String statusStoppedText = "State: stopped";
+        final String windowText = "Traffic simulator";
+
         // panel with controls
-        Button btnStart = new Button(this.startButtonText);
-        Button btnStop = new Button(this.stopButtonText);
-        Button btnStep = new Button(this.stepButtonText);
-        Label statusLabel = new Label(this.statusStoppedText);
-        Button exportBtn = new Button(this.exportButtonText);
+        Button btnStart = new Button(startButtonText);
+        Button btnStop = new Button(stopButtonText);
+        Button btnStep = new Button(stepButtonText);
+        Label statusLabel = new Label(statusStoppedText);
+        Button exportBtn = new Button(exportButtonText);
 
         HBox controls = new HBox(10, btnStart, exportBtn, btnStop, btnStep, statusLabel);
         controls.setPadding(new Insets(10));
@@ -71,7 +71,7 @@ public class Window extends Application {
 
         Scene scene = new Scene(root, 1200, 700, Color.LIGHTGRAY);
         primaryStage.setScene(scene);
-        primaryStage.setTitle(this.windowText);
+        primaryStage.setTitle(windowText);
         primaryStage.show();
 
         // part that repaints all roads
@@ -83,56 +83,13 @@ public class Window extends Application {
                 return;
             }
 
-            final double GAP = 20.0;           // mezera mezi silnicemi
+            final double GAP = 20.0;           // gap between roads when drawing
             Object content = roads[0].getContent();
             if (content instanceof Cell[][]) {
                 this.handleCellular(roads, canvas, gc, GAP);
             } else if (content instanceof LinkedList[]) {
-                this.handleContinous(roads, canvas, gc, GAP);
+                this.handleContinuous(roads, canvas, gc, GAP);
             }
-//            final double CELL_PIXEL_SIZE = 8.0; // pevná výška pruhu
-//
-//            double neededHeight = GAP;
-//            double neededWidth  = 0;
-//
-//            for (Road r : roads) {
-//                Object content = r.getContent();
-//                int lanes = 1;
-//                int cols = 1;
-//
-//                if (content instanceof Cell[][] cells) {
-//                    if (cells.length > 0 && cells[0].length > 0) {
-//                        lanes = cells.length;
-//                        cols = cells[0].length;
-//                    }
-//                } else if (content instanceof LinkedList[]) {
-//                    if (r.getNumberOfLanes() > 0) {
-//                        lanes = r.getNumberOfLanes();
-//                    }
-//                }
-//
-//                neededHeight += lanes * CELL_PIXEL_SIZE + GAP;
-//                neededWidth   = Math.max(neededWidth, cols * CELL_PIXEL_SIZE);
-//            }
-//
-//            canvas.setWidth(Math.max(neededWidth, canvas.getWidth()));
-//            canvas.setHeight(neededHeight);
-//
-//            gc.setFill(Color.LIGHTGRAY);
-//            gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-//
-//            double y = GAP;
-//            for (Road road : roads) {
-//                int lanes = (road.getContent() instanceof Cell[][] c) ? c.length : road.getNumberOfLanes();
-//                double roadHeight = lanes * CELL_PIXEL_SIZE;
-//
-//                gc.save();
-//                gc.translate(0, y);
-//                renderer.draw(gc, road, canvas.getWidth(), roadHeight);
-//                gc.restore();
-//
-//                y += roadHeight + GAP;
-//            }
 
             String infoString = "Forward model used: " + AppContext.CAR_FOLLOWING_MODEL.getName() +
                     ", lane changing model used: " + AppContext.LANE_CHANGING_MODEL.getName();
@@ -148,18 +105,18 @@ public class Window extends Application {
         };
 
         // engine initialization
-        engine = new CoreEngine(tick, 100); // 1000 ms per step
+        engine = new CoreEngine(tick, AppContext.RUN_DETAILS.timeBetweenSteps); // 1000 ms per step
 
         // starting engine when start button is pressed, simulation runs
         btnStart.setOnAction(e -> {
             engine.start();
-            statusLabel.setText(this.statusRunningText);
+            statusLabel.setText(statusRunningText);
         });
 
         // stopping engine when stop button is pressed, simulation stops
         btnStop.setOnAction(e -> {
             engine.stop();
-            statusLabel.setText(this.statusStoppedText);
+            statusLabel.setText(statusStoppedText);
         });
 
         // one simulation step when step button is pressed, manual step
@@ -226,7 +183,7 @@ public class Window extends Application {
         }
     }
 
-    private void handleContinous(Road[] roads, Canvas canvas, GraphicsContext gc, final double GAP) {
+    private void handleContinuous(Road[] roads, Canvas canvas, GraphicsContext gc, final double GAP) {
         final double LANE_WIDTH = 8.0; // size of lane
 
         double neededHeight = GAP;
