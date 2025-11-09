@@ -46,7 +46,7 @@ public class Rickert implements ILaneChangingModel {
     /**
      * decides whether to change lane or not based on the rickert model
      *
-     * @param parameters the parameters needed to make a decision in hasmap form, where key is the parameter name and
+     * @param parameters the parameters needed to make a decision in hashmap form, where key is the parameter name and
      *                   value is the parameter value in double
      * @return the direction to change lane or go straight
      **/

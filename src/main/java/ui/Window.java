@@ -24,15 +24,30 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-
 import java.util.LinkedList;
 
+/********************************************
+ * Main window for traffic simulator GUI, javaFX is used
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ********************************************/
 public class Window extends Application {
 
+    /** simulation for stepping **/
     private Simulation simulation;
+
+    /** core engine for running simulation **/
     private CoreEngine engine;
+
+    /** renderer for drawing roads **/
     private IRoadRenderer renderer;
 
+    /**
+     * start method for JavaFX application
+     *
+     * @param primaryStage primary stage for JavaFX application
+     **/
     @Override
     public void start(Stage primaryStage) {
         // get renderer and simulation from AppContext
@@ -126,17 +141,23 @@ public class Window extends Application {
         });
 
         // export results when export button is pressed
-        exportBtn.setOnAction(e -> {
-            ResultsRecorder.getResultsRecorder().writeResults();
-        });
+        exportBtn.setOnAction(e -> ResultsRecorder.getResultsRecorder().writeResults());
 
         // first paint
         paintAll.run();
     }
 
+    /*
+     * handles drawing of cellular roads
+     *
+     * @param roads array of roads to draw
+     * @param canvas place to draw on
+     * @param gc graphics context to draw on
+     * @param GAP space between roads when drawing
+     */
     private void handleCellular(Road[] roads, Canvas canvas, GraphicsContext gc, final double GAP) {
-        final double CELL_PIXEL_SIZE = 8.0; // size of cell for ONLY DRAWING, CELLSIZE IN MODEL MAY,
-                                            // AND LIKELY IS DIFFERENT
+        final double CELL_PIXEL_SIZE = 8.0; // size of cell for ONLY DRAWING, CELL SIZE IN MODEL MAY, AND LIKELY IS
+                                            // DIFFERENT
 
         double neededHeight = GAP;
         double neededWidth  = 0;
@@ -155,6 +176,52 @@ public class Window extends Application {
             neededWidth = Math.max(neededWidth, cols * CELL_PIXEL_SIZE);
         }
 
+        this.drawRoads(canvas, gc, roads, GAP, CELL_PIXEL_SIZE, neededWidth, neededHeight);
+    }
+
+    /*
+     * handles drawing of continuous roads
+     *
+     * @param roads array of roads to draw
+     * @param canvas place to draw on
+     * @param gc graphics context to draw on
+     * @param GAP space between roads when drawing
+     */
+    private void handleContinuous(Road[] roads, Canvas canvas, GraphicsContext gc, final double GAP) {
+        final double LANE_WIDTH = 8.0; // size of lane
+
+        double neededHeight = GAP;
+        double neededWidth  = 0;
+
+        for (Road r : roads) {
+            int lanes = 1;
+            int length = 1;
+
+            if (r.getLength() > 0 && r.getNumberOfLanes() > 0) {
+                lanes = r.getNumberOfLanes();
+                length = (int) (r.getLength());
+            }
+
+            neededHeight += lanes * LANE_WIDTH + GAP;
+            neededWidth = Math.max(neededWidth, length);
+        }
+
+        this.drawRoads(canvas, gc, roads, GAP, LANE_WIDTH, neededWidth, neededHeight);
+    }
+
+    /*
+     * draws all roads on the canvas
+     *
+     * @param canvas place to draw on
+     * @param gc graphics context to draw on
+     * @param roads array of roads to draw
+     * @param GAP space between roads when drawing
+     * @param CELL_PIXEL_SIZE size of cell or lane for drawing
+     * @param neededWidth needed width of canvas
+     * @param neededHeight needed height of canvas
+     */
+    private void drawRoads(Canvas canvas, GraphicsContext gc, Road[] roads, final double GAP,
+                           final double CELL_PIXEL_SIZE, double neededWidth, double neededHeight) {
         canvas.setWidth(Math.max(neededWidth, canvas.getWidth()));
         canvas.setHeight(neededHeight);
 
@@ -183,53 +250,9 @@ public class Window extends Application {
         }
     }
 
-    private void handleContinuous(Road[] roads, Canvas canvas, GraphicsContext gc, final double GAP) {
-        final double LANE_WIDTH = 8.0; // size of lane
-
-        double neededHeight = GAP;
-        double neededWidth  = 0;
-
-        for (Road r : roads) {
-            int lanes = 1;
-            int length = 1;
-
-            if (r.getLength() > 0 && r.getNumberOfLanes() > 0) {
-                lanes = r.getNumberOfLanes();
-                length = (int) (r.getLength());
-            }
-
-            neededHeight += lanes * LANE_WIDTH + GAP;
-            neededWidth = Math.max(neededWidth, length);
-        }
-
-        canvas.setWidth(Math.max(neededWidth, canvas.getWidth()));
-        canvas.setHeight(neededHeight);
-
-        gc.setFill(Color.LIGHTGRAY);
-        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
-        double y = GAP;
-        int i = 0;
-        for (Road road : roads) {
-            int lanes = road.getNumberOfLanes();
-            double roadHeight = lanes * LANE_WIDTH;
-
-            // info string
-            String info = "Road: " + i + ", Lanes: " + lanes + ", Length: " + road.getLength() + ", Cars on road: " +
-                    road.getNumberOfCarsOnRoad() + ", Cars passed: " +
-                    ResultsRecorder.getResultsRecorder().getCarsPassedOnRoad(i);
-            gc.setFill(Color.BLACK);
-            gc.fillText(info, 0, y - 5);
-            gc.save();
-            gc.translate(0, y);
-            renderer.draw(gc, road, canvas.getWidth(), roadHeight, LANE_WIDTH);
-            gc.restore();
-
-            y += roadHeight + GAP;
-            i++;
-        }
-    }
-
+    /**
+     * stop method for JavaFX application
+     **/
     @Override
     public void stop() {
         if (engine != null && engine.getRunning()) {
@@ -238,6 +261,11 @@ public class Window extends Application {
         Platform.exit();
     }
 
+    /**
+     * main method to launch JavaFX application
+     *
+     * @param args command line arguments
+     **/
     public static void main(String[] args) {
         launch(args);
     }

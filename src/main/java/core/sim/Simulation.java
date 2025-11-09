@@ -4,16 +4,32 @@ import app.AppContext;
 import core.model.Road;
 import core.utils.ResultsRecorder;
 
+/***************************
+ * Class representing the simulation, holding roads and stepping through the simulation
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ***************************/
 public class Simulation {
 
+    /** array of roads in the simulation **/
     private final Road[] roads;
 
-    int stepCount = 0;
+    /** current step count of the simulation **/
+    private int stepCount = 0;
 
+    /**
+     * Constructor for Simulation
+     *
+     * @param roads array of roads in the simulation
+     **/
     public Simulation(Road[] roads) {
         this.roads = roads;
     }
 
+    /**
+     * Steps through the simulation, updating each road and recording results if writingResults is enabled
+     **/
     public void step() {
         if (AppContext.RUN_DETAILS.writingResults() && this.stepCount == 0) {
             ResultsRecorder.getResultsRecorder().startTimer();
@@ -33,22 +49,30 @@ public class Simulation {
             }
         }
 
+        // Stop the timer if writing results and the simulation duration has been reached
         if (AppContext.RUN_DETAILS.writingResults() && this.stepCount >= AppContext.RUN_DETAILS.duration - 1) {
             ResultsRecorder.getResultsRecorder().stopTimer();
         }
 
     }
 
+    /**
+     * Getter for roads in the simulation
+     *
+     * @return array of roads in the simulation
+     **/
     public Road[] getRoads() {
         return roads;
     }
 
-    public void runSimulation(double time, double timeStep) {
+    /**
+     * Runs the simulation for a specified amount of time
+     *
+     * @param time duration to run the simulation
+     **/
+    public void runSimulation(double time) {
         int timeSteps = (int) Math.ceil(time);
         for (int i = 0; i < timeSteps; i++) {
-            if (i == 5) {
-                int debug = 1;
-            }
             step();
         }
 

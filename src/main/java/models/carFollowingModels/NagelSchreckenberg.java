@@ -5,16 +5,36 @@ import models.ICarFollowingModel;
 
 import java.util.HashMap;
 
+/********************************************
+ * Nagel-Schreckenberg car following model implementation (cellular)
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ********************************************/
 public class NagelSchreckenberg implements ICarFollowingModel {
 
+    /** size of one cell in meters **/
     private final double CELL_SIZE = 7.5; // in meters
-    private String type;
-    private double slowDownChance = 0.3; // probability of random slowing down
 
+    /** type of the model **/
+    private final String type;
+
+    /** random chance of slowing down when car is moving **/
+    private final double slowDownChance = 0.3; // probability of random slowing down
+
+    /**
+     * constructor for Nagel-Schreckenberg model
+     **/
     public NagelSchreckenberg() {
         this.type = Constants.CELLULAR;
     }
 
+    /**
+     * function to get new speed based on Nagel-Schreckenberg algorithm
+     *
+     * @param parameters HashMap of parameters needed for calculation
+     * @return new speed as double (is converted to int later, returned as double for interface compatibility)
+     **/
     @Override
     public double getNewSpeed(HashMap<String, Double> parameters) {
         int currentSpeed = parameters.get(Constants.CURRENT_SPEED_REQUEST).intValue();
@@ -33,34 +53,64 @@ public class NagelSchreckenberg implements ICarFollowingModel {
         if (currentSpeed > 0 && Math.random() < this.slowDownChance) { // 30% chance to slow down
             currentSpeed--;
         }
+
         return Math.max(0, currentSpeed);
     }
 
+    /*
+     * function to get cell size in meters
+     *
+     * @return cell size as double
+     */
+    @Override
     public double getCellSize() {
         return this.CELL_SIZE;
     }
 
+    /**
+     * getter for ID of the model
+     **/
     @Override
     public String getID() {
         return "nagelschreckenberg";
     }
 
+    /**
+     * getter for type of the model (cellular)
+     **/
     @Override
     public String getType() {
         return this.type;
     }
 
+    /**
+     * function to get list of required parameters for the model when calculating new speed
+     *
+     * @return String of required parameters separated by Constants.REQUEST_SEPARATOR
+     **/
+    @Override
     public String requestParameters() {
         return Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
                 Constants.CURRENT_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
                 Constants.DISTANCE_TO_NEXT_CAR_REQUEST;
     }
 
+    /**
+     * function to get list of required parameters for the model when generating cars
+     *
+     * @return String of required parameters separated by Constants.REQUEST_SEPARATOR
+     **/
+    @Override
     public String getParametersForGeneration() {
         return Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR
                 + Constants.LENGTH_REQUEST + Constants.REQUEST_SEPARATOR;
     }
 
+    /**
+     * getter for name of the model
+     *
+     * @return name as String
+     **/
     @Override
     public String getName() {
         return "Nagel-Schreckenberg Model";

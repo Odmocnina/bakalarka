@@ -5,17 +5,39 @@ import models.ICarFollowingModel;
 
 import java.util.HashMap;
 
+/********************************************
+ * Head-leading car following model implementation (cellular)
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ********************************************/
 public class HeadLeading implements ICarFollowingModel {
 
+    /** size of one cell in meters **/
     private final double CELL_SIZE = 2.5; // in meters
-    private String type;
-    private double slowDownChance = 0.3; // probability of random slowing down
-    private double slowDownChanceStart = 0.5; // initial probability of random slowing down
 
+    /** type of the model **/
+    private final String type;
+
+    /** random chance of slowing down when car is moving **/
+    private final double slowDownChance = 0.3; // probability of random slowing down
+
+    /** random chance of slowing down when car is starting **/
+    private final double slowDownChanceStart = 0.5; // initial probability of random slowing down
+
+    /**
+     * constructor for head-leading model
+     **/
     public HeadLeading() {
         this.type = Constants.CELLULAR;
     }
 
+    /**
+     * function to get new speed based on head-leading algorithm
+     *
+     * @param parameters HashMap of parameters needed for calculation
+     * @return new speed as double (is converted to int later, returned as double for interface compatibility)
+     **/
     @Override
     public double getNewSpeed(HashMap<String, Double> parameters) {
         int currentSpeed = parameters.get(Constants.CURRENT_SPEED_REQUEST).intValue();
@@ -25,15 +47,17 @@ public class HeadLeading implements ICarFollowingModel {
 
         boolean starting = (currentSpeed == 0);
 
-        // Step 1: Acceleration
+        // acceleration
         if (currentSpeed < maxSpeed) {
             currentSpeed++;
         }
-        // Step 2: Slowing down
+        // slowing down
         if (distanceInCells <= currentSpeed) {
             currentSpeed = distanceInCells - 1;
         }
-        // Step 3: Randomization
+        // randomization
+        // use chance for starting when starting from 0 speed (to simulate slower start, should be higher than normal
+        // slow down chance
         double currentSlowDownChance = starting ? this.slowDownChanceStart : this.slowDownChance;
         if (currentSpeed > 0 && Math.random() < currentSlowDownChance) { // 30% chance to slow down
             currentSpeed--;
@@ -41,31 +65,61 @@ public class HeadLeading implements ICarFollowingModel {
         return Math.max(0, currentSpeed);
     }
 
+    /**
+     * getter for cell size
+     *
+     * @return cell size as double
+     **/
     public double getCellSize() {
         return this.CELL_SIZE;
     }
 
+    /**
+     * getter for ID of the model
+     *
+     * @return ID as String
+     **/
     @Override
     public String getID() {
         return "head-leading";
     }
 
+    /**
+     * getter for type of the model (cellular)
+     *
+     * @return type as String
+     **/
     @Override
     public String getType() {
         return this.type;
     }
 
+    /**
+     * function to get parameters needed for simulation step
+     *
+     * @return request parameters as String
+     **/
     public String requestParameters() {
         return Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
                 Constants.CURRENT_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
                 Constants.DISTANCE_TO_NEXT_CAR_REQUEST;
     }
 
+    /**
+     * function to get parameters needed for car generation
+     *
+     * @return request parameters as String
+     **/
     public String getParametersForGeneration() {
         return Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR
                 + Constants.LENGTH_REQUEST + Constants.REQUEST_SEPARATOR;
     }
 
+    /**
+     * getter for name of the model
+     *
+     * @return name as String
+     **/
     @Override
     public String getName() {
         return "Head-leading algorithm";

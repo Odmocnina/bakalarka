@@ -55,28 +55,28 @@ public class CellularRoad extends Road {
         }
 
         // first test of occupied cells, DELETE LATER
-        cells[0][5].setOccupied(true);
+        cells[4][5].setOccupied(true);
         CarParams carParams = new CarParams();
         carParams.setParameter(Constants.CURRENT_SPEED_REQUEST, 0);
         carParams.setParameter(Constants.MAX_SPEED_REQUEST, 3.0);
         carParams.xPosition = 5;
-        carParams.lane = 0;
+        carParams.lane = 4;
         carParams.setParameter(Constants.LENGTH_REQUEST, 1);
         carParams.color = Constants.CAR_COLORS[0];
-        cells[0][5].setCarParams(carParams);
-        cells[0][5].setHead(true);
+        cells[4][5].setCarParams(carParams);
+        cells[4][5].setHead(true);
 
-        cells[0][0].setOccupied(true);
-        cells[0][1].setOccupied(true);
+        cells[4][0].setOccupied(true);
+        cells[4][1].setOccupied(true);
         carParams = new CarParams();
         carParams.setParameter(Constants.CURRENT_SPEED_REQUEST, 0);
         carParams.setParameter(Constants.MAX_SPEED_REQUEST, 5.0);
         carParams.xPosition = 1;
-        carParams.lane = 0;
+        carParams.lane = 4;
         carParams.setParameter(Constants.LENGTH_REQUEST, 2);
         carParams.color = Constants.CAR_COLORS[0];
-        cells[0][1].setCarParams(carParams);
-        cells[0][1].setHead(true);
+        cells[4][1].setCarParams(carParams);
+        cells[4][1].setHead(true);
 
     }
 
@@ -414,7 +414,7 @@ public class CellularRoad extends Road {
         }
         String[] carGeneratedParams = this.generator.getCarGenerationParameters();
 
-        CarParams car = cells[lane][position].getCarParams();
+        CarParams car = this.cells[lane][position].getCarParams();
         for (String param : params) {
             if (StringEditor.isInArray(carGeneratedParams, param)) { // get parameters from car that is being inspected
                 parameters.put(param, car.getParameter(param));

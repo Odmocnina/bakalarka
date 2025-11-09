@@ -23,8 +23,8 @@ public class Main {
     /*
      * main function of application, loads configuration and starts gui if gui is supposed to be used, returns nothing
      *
-     * @param args command line arguments, first argument is path to configuration file, if not provided default \
-     *              config file is used
+     * @param args command line arguments, first argument is path to configuration file, if not provided default config
+     *             file is used
      */
     public static void main(String[] args) {
         String configFile;
@@ -86,7 +86,7 @@ public class Main {
         // check if car generator has all parameters needed for the selected car following model, for example person
         // loads car following model which need max speed, the model needs those parameters to work
         // so generator gives needs to generate cars with max speed parameter, otherwise model won't work properly, lol
-        if (carGenerator.checkIfAllParametresAreLoaded()) {
+        if (carGenerator.checkIfAllParametersAreLoaded()) {
             MyLogger.logBeforeLoading("Car generator parameters are valid for the selected car following model.",
                     Constants.INFO_FOR_LOGGING);
         } else { // missing some parameters, exit
@@ -167,7 +167,7 @@ public class Main {
             Window.main(args); // start gui
         } else { // if no gui, run simulation in console mode
             MyLogger.logBeforeLoading("Starting simulation in console mode.", Constants.INFO_FOR_LOGGING);
-            sim.runSimulation(runDetails.duration, runDetails.timeStep);
+            sim.runSimulation(runDetails.duration);
             MyLogger.logBeforeLoading("Simulation finished, exiting.", Constants.INFO_FOR_LOGGING);
             if (runDetails.writingResults()) {
                 ResultsRecorder.getResultsRecorder().writeResults();

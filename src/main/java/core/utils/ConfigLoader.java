@@ -14,15 +14,26 @@ import org.w3c.dom.Element;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/***********************************
+ * Class for loading configuration from XML file and road files
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ***********************************/
 public class ConfigLoader {
 
+    /** configuration file **/
     private static File configFile;
 
+    /**
+     * Method to set the configuration file path, if null or invalid, defaults to Constants.CONFIG_FILE
+     *
+     * @param filePath path to the configuration file
+     * @return true if the file was set successfully, false otherwise
+     **/
     public static boolean giveConfigFile(String filePath) {
         try {
             configFile = new File(filePath);
@@ -40,11 +51,16 @@ public class ConfigLoader {
         return true;
     }
 
+    /**
+     * Method to load what file is road file and how many roads to load from the configuration file
+     *
+     * @return array of loaded roads, or null if loading failed
+     **/
     public static Road[] loadRoads() {
         Road[] roads;
 
         try {
-            int numberOfRoads = 0;
+            int numberOfRoads;
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(configFile);
@@ -90,6 +106,12 @@ public class ConfigLoader {
         return null;
     }
 
+    /**
+     * Method to load a single road from the specified file path
+     *
+     * @param filePath path to the road configuration file
+     * @return loaded Road object, or null if loading failed
+     **/
     public static Road loadRoad(String filePath) {
         Road roadFormConfig;
         // Logic to read the configuration file for road parameters
@@ -154,6 +176,11 @@ public class ConfigLoader {
         return null;
     }
 
+    /**
+     * Method to load the car-following model from the configuration file
+     *
+     * @return loaded ICarFollowingModel object, or null if loading failed
+     **/
     public static ICarFollowingModel loadCarFollowingModel() {
         ICarFollowingModel modelFromConfig;
         // Logic to load and return the appropriate car-following model based on modelId
@@ -172,8 +199,6 @@ public class ConfigLoader {
                 modelFromConfig = new NagelSchreckenberg();
             } else if (id.equals("idm")) {
                 modelFromConfig = new IDM();
-            } else if (id.equals("idmn")) {
-                modelFromConfig = new IDMN();
             } else if (id.equals("rule184")) {
                 modelFromConfig = new Rule184();
             } else if (id.equals("ovm")) {
@@ -196,7 +221,6 @@ public class ConfigLoader {
                             , Constants.FATAL_FOR_LOGGING);
                     return null;
                 }
-                //AppContext.cellSize = cellSize;
             }
 
             return modelFromConfig;
@@ -208,6 +232,11 @@ public class ConfigLoader {
         return null;
     }
 
+    /**
+     * Method to load the lane-changing model from the configuration file
+     *
+     * @return loaded ILaneChangingModel object, or null if loading failed
+     **/
     public static ILaneChangingModel loadLaneChangingModel() {
         ILaneChangingModel modelFromConfig;
         try {
@@ -238,8 +267,13 @@ public class ConfigLoader {
         return null;
     }
 
+    /**
+     * Method to load the car generator from the configuration file
+     *
+     * @return loaded CarGenerator object, or null if loading failed
+     **/
     public static CarGenerator loadCarGenerator() {
-        CarGenerator loadedGenerator = null;
+        CarGenerator loadedGenerator;
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -317,6 +351,11 @@ public class ConfigLoader {
         return null;
     }
 
+    /**
+     * Method to load the run details from the configuration file
+     *
+     * @return loaded RunDetails object, or null if loading failed
+     **/
     public static RunDetails loadRunDetails() {
         try {
             RunDetails detailsFromConfig = new RunDetails();
@@ -334,7 +373,6 @@ public class ConfigLoader {
             Element logElements = (Element) runDetailsElement.getElementsByTagName("logging").item(0);
             Element timeBetweenSteps = (Element) runDetailsElement.getElementsByTagName("timeBetweenSteps")
                     .item(0);
-            //Element writeResults = (Element) runDetailsElement.getElementsByTagName("writeResults").item(0);
 
             if (duration != null) {
                 detailsFromConfig.duration = Integer.parseInt(duration.getTextContent());
@@ -406,59 +444,7 @@ public class ConfigLoader {
                 }
             }
 
-            final String generalLogging = "log";
-            final String infoLogging = "info";
-            final String warnLogging = "warn";
-            final String errorLogging = "error";
-            final String fatalLogging = "fatal";
-            final String debugLogging = "debug";
-
-            final int generalIndex = 0;
-            final int infoIndex = 1;
-            final int warnIndex = 2;
-            final int errorIndex = 3;
-            final int fatalIndex = 4;
-            final int debugIndex = 5;
-
-            if (logElements != null) {
-                NodeList logChildren = logElements.getChildNodes();
-                for (int i = 0; i < logChildren.getLength(); i++) {
-                    Node logNode = logChildren.item(i);
-                    if (logNode.getNodeType() == Node.ELEMENT_NODE) {
-                        Element logElement = (Element) logNode;
-                        String logType = logElement.getNodeName();
-                        boolean logValue = Boolean.parseBoolean(logElement.getTextContent());
-
-                        switch (logType) {
-                            case generalLogging:
-                                detailsFromConfig.log[generalIndex] = logValue;
-                                break;
-                            case infoLogging:
-                                detailsFromConfig.log[infoIndex] = logValue;
-                                break;
-                            case warnLogging:
-                                detailsFromConfig.log[warnIndex] = logValue;
-                                break;
-                            case errorLogging:
-                                detailsFromConfig.log[errorIndex] = logValue;
-                                break;
-                            case fatalLogging:
-                                detailsFromConfig.log[fatalIndex] = logValue;
-                                break;
-                            case debugLogging:
-                                detailsFromConfig.log[debugIndex] = logValue;
-                                break;
-                            default:
-                                MyLogger.logBeforeLoading("Unknown log type in run details: " + logType
-                                        , Constants.WARN_FOR_LOGGING);
-                                break;
-                        }
-                    }
-                }
-            } else {
-                MyLogger.logBeforeLoading("Missing log details in run details, all logging will be performed"
-                        , Constants.WARN_FOR_LOGGING);
-            }
+            loadLoggingFromConfig(detailsFromConfig, logElements);
 
             return detailsFromConfig;
         } catch (Exception e) {
@@ -467,6 +453,69 @@ public class ConfigLoader {
         }
 
         return null;
+    }
+
+    /**
+     * Helper method to load logging settings from the configuration file into RunDetails so that method loadRunDetails
+     * inst long as hell
+     *
+     * @param detailsFromConfig RunDetails object to populate
+     * @param logElements XML Element containing logging settings
+     **/
+    private static void loadLoggingFromConfig(RunDetails detailsFromConfig, Element logElements) {
+        final String generalLogging = "log";
+        final String infoLogging = "info";
+        final String warnLogging = "warn";
+        final String errorLogging = "error";
+        final String fatalLogging = "fatal";
+        final String debugLogging = "debug";
+
+        final int generalIndex = 0;
+        final int infoIndex = 1;
+        final int warnIndex = 2;
+        final int errorIndex = 3;
+        final int fatalIndex = 4;
+        final int debugIndex = 5;
+
+        if (logElements != null) {
+            NodeList logChildren = logElements.getChildNodes();
+            for (int i = 0; i < logChildren.getLength(); i++) {
+                Node logNode = logChildren.item(i);
+                if (logNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element logElement = (Element) logNode;
+                    String logType = logElement.getNodeName();
+                    boolean logValue = Boolean.parseBoolean(logElement.getTextContent());
+
+                    switch (logType) {
+                        case generalLogging:
+                            detailsFromConfig.log[generalIndex] = logValue;
+                            break;
+                        case infoLogging:
+                            detailsFromConfig.log[infoIndex] = logValue;
+                            break;
+                        case warnLogging:
+                            detailsFromConfig.log[warnIndex] = logValue;
+                            break;
+                        case errorLogging:
+                            detailsFromConfig.log[errorIndex] = logValue;
+                            break;
+                        case fatalLogging:
+                            detailsFromConfig.log[fatalIndex] = logValue;
+                            break;
+                        case debugLogging:
+                            detailsFromConfig.log[debugIndex] = logValue;
+                            break;
+                        default:
+                            MyLogger.logBeforeLoading("Unknown log type in run details: " + logType
+                                    , Constants.WARN_FOR_LOGGING);
+                            break;
+                    }
+                }
+            }
+        } else {
+            MyLogger.logBeforeLoading("Missing log details in run details, all logging will be performed"
+                    , Constants.WARN_FOR_LOGGING);
+        }
     }
 
 }

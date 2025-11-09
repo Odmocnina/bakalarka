@@ -5,8 +5,20 @@ import models.ICarFollowingModel;
 
 import java.util.HashMap;
 
+/********************************************
+ * Helly car following model implementation (continuous)
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ********************************************/
 public class Helly implements ICarFollowingModel {
 
+    /**
+     * function to get new speed based on Helly algorithm
+     *
+     * @param parameters HashMap of parameters needed for calculation
+     **/
+    @Override
     public double getNewSpeed(HashMap<String, Double> parameters) {
         double currentSpeed = parameters.get(Constants.CURRENT_SPEED_REQUEST);
         double xPosition = parameters.get(Constants.X_POSITION_REQUEST);
@@ -47,41 +59,73 @@ public class Helly implements ICarFollowingModel {
         return newSpeed;
     }
 
+    /**
+     * function to get list of required parameters for the model when calculating new speed
+     *
+     * @return String of required parameters separated by Constants.REQUEST_SEPARATOR
+     **/
+    @Override
     public String requestParameters() {
         return Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
-               Constants.CURRENT_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
-               Constants.X_POSITION_REQUEST + Constants.REQUEST_SEPARATOR +
-               Constants.X_POSITION_STRAIGHT_FORWARD_REQUEST + Constants.REQUEST_SEPARATOR +
-               Constants.LENGTH_STRAIGHT_FORWARD_REQUEST + Constants.REQUEST_SEPARATOR +
-               Constants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST + Constants.REQUEST_SEPARATOR +
-               Constants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST + Constants.REQUEST_SEPARATOR +
-               Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST + Constants.REQUEST_SEPARATOR +
-               Constants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST;
+                Constants.CURRENT_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
+                Constants.X_POSITION_REQUEST + Constants.REQUEST_SEPARATOR +
+                Constants.X_POSITION_STRAIGHT_FORWARD_REQUEST + Constants.REQUEST_SEPARATOR +
+                Constants.LENGTH_STRAIGHT_FORWARD_REQUEST + Constants.REQUEST_SEPARATOR +
+                Constants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST + Constants.REQUEST_SEPARATOR +
+                Constants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST + Constants.REQUEST_SEPARATOR +
+                Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST + Constants.REQUEST_SEPARATOR +
+                Constants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST;
     }
 
+    /**
+     * function to get list of required parameters for the model when generating cars
+     *
+     * @return String of required parameters separated by Constants.REQUEST_SEPARATOR
+     **/
+    @Override
     public String getParametersForGeneration() {
         return Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
-               Constants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST + Constants.REQUEST_SEPARATOR +
-               Constants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST + Constants.REQUEST_SEPARATOR +
-               Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST + Constants.REQUEST_SEPARATOR +
-               Constants.LENGTH_REQUEST;
+                Constants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST + Constants.REQUEST_SEPARATOR +
+                Constants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST + Constants.REQUEST_SEPARATOR +
+                Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST + Constants.REQUEST_SEPARATOR +
+                Constants.LENGTH_REQUEST;
     }
 
+    /**
+     * getter for ID of the model
+     *
+     * @return ID as String
+     **/
     @Override
     public String getID() {
         return "helly";
     }
 
-
+    /**
+     * getter for type of the model (continuous)
+     *
+     * @return type as String
+     **/
     @Override
     public String getType() {
         return Constants.CONTINOUS;
     }
 
+    /**
+     * getter for name of the model
+     *
+     * @return name as String
+     **/
+    @Override
     public String getName() {
         return "Helly Car Following Model";
     }
 
+    /**
+     * getter for cell size
+     *
+     * @return cell size as double
+     **/
     @Override
     public double getCellSize() {
         return Constants.PARAMETER_UNDEFINED;

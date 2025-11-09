@@ -8,7 +8,23 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import java.util.LinkedList;
 
+/********************************************
+ * Continuous road renderer implementation, used for drawing continuous roads
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ********************************************/
 public class ContinuousRoadRenderer implements IRoadRenderer {
+
+    /**
+     * function to draw the continuous road on the given graphics context
+     *
+     * @param gc GraphicsContext to draw on
+     * @param road Road to be drawn
+     * @param width Width of the drawing area
+     * @param height Height of the drawing area
+     * @param laneWidth Width of a single lane
+     **/
     @Override
     public void draw(GraphicsContext gc, Road road, double width, double height, double laneWidth) {
         int lanes = road.getNumberOfLanes();
@@ -34,7 +50,7 @@ public class ContinuousRoadRenderer implements IRoadRenderer {
 
         // cars in lanes
         Object roadContent = road.getContent();
-        if (roadContent == null || !(roadContent instanceof LinkedList[])) {
+        if (!(roadContent instanceof LinkedList[])) {
             return;
         }
         LinkedList<CarParams>[] vehicles = (LinkedList<CarParams>[]) roadContent;
@@ -52,7 +68,7 @@ public class ContinuousRoadRenderer implements IRoadRenderer {
             gc.fillRect(offsetX, y, roadWidthPx * widthMultiplayer, laneHpx);
 
             // cars in lane on index i
-            if (vehicles != null && i < vehicles.length && vehicles[i] != null) {
+            if (i < vehicles.length && vehicles[i] != null) {
                 for (CarParams car : vehicles[i]) {
                     // x place of car
                     double carX = offsetX + car.xPosition * widthMultiplayer;

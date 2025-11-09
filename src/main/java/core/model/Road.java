@@ -2,6 +2,12 @@ package core.model;
 
 import java.util.Queue;
 
+/********************************
+ * Abstract class representing a road, including its basic properties
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ********************************/
 public abstract class Road {
 
     /** length of road **/
@@ -22,6 +28,14 @@ public abstract class Road {
     /** queues of cars per lane **/
     protected Queue<CarParams>[] carQueuesPerLane = null;
 
+    /**
+     * constructor for road, initializing its basic properties, used in constructors of subclasses
+     *
+     * @param length length of road
+     * @param numberOfLanes number of lanes on road
+     * @param speedLimit speed limit on road
+     * @param type type of road
+     **/
     public Road(double length, int numberOfLanes, double speedLimit, String type) {
         this.length = length;
         this.numberOfLanes = numberOfLanes;
@@ -29,42 +43,93 @@ public abstract class Road {
         this.type = type;
     }
 
+    /**
+     * getter for length of road
+     *
+     * @return length of road
+     */
     public double getLength() {
         return length;
     }
 
+    /**
+     * getter for number of lanes on road
+     *
+     * @return number of lanes on road
+     */
     public int getNumberOfLanes() {
         return numberOfLanes;
     }
 
+    /**
+     * getter for speed limit on road
+     *
+     * @return speed limit on road
+     */
     public double getSpeedLimit() {
         return speedLimit;
     }
 
+    /**
+     * toString method for road
+     *
+     * @return string representation of road
+     **/
+    @Override
     public String toString() {
         return "Road[length=" + length + ", numberOfLanes=" + numberOfLanes + ", speedLimit=" + speedLimit +
                 ", type=" + type + "]";
     }
 
+    /**
+     * getter for type of road
+     *
+     * @return type of road
+     **/
     public String getType() {
         return type;
     }
 
-    public abstract Object getContent();
-
-    public abstract int updateRoad();
-
-    public abstract int getNumberOfCarsOnRoad();
-
+    /**
+     * setter for car generator
+     *
+     * @param generator car generator
+     **/
     public void setCarGenerator(CarGenerator generator) {
         this.generator = generator;
     }
 
+    /**
+     * method to initialize car queues per lane, called if generator generates to queues
+     **/
     public void initializeCarQueues() {
         carQueuesPerLane = new Queue[numberOfLanes];
         for (int i = 0; i < numberOfLanes; i++) {
             this.carQueuesPerLane[i] = this.generator.generateCarsInToQueue();
         }
     }
+
+    /**
+     * abstract method to get content of road, implemented in subclasses
+     *
+     * @return content of road in Object form, method then casts it to the correct type, so thread carefully
+     **/
+    public abstract Object getContent();
+
+    /**
+     * abstract method to update road state, implemented in subclasses
+     *
+     * @return number of cars updated on the road
+     **/
+    public abstract int updateRoad();
+
+    /**
+     * abstract method to get number of cars currently on the road
+     *
+     * @return number of cars on the road
+     **/
+    public abstract int getNumberOfCarsOnRoad();
+
+
 
 }

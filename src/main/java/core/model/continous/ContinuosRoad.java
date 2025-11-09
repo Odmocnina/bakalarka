@@ -42,7 +42,7 @@ public class ContinuosRoad extends Road {
             this.vehicles[lane] = new LinkedList<>();
         }
 
-        /*CarParams carParams = new CarParams();
+        CarParams carParams = new CarParams();
         carParams.setParameter(Constants.CURRENT_SPEED_REQUEST, 0);
         carParams.setParameter(Constants.MAX_SPEED_REQUEST, 40.33);
         carParams.xPosition = 20;
@@ -56,7 +56,7 @@ public class ContinuosRoad extends Road {
         carParams.setParameter(Constants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
         vehicles[0].add(carParams);
 
-        /*CarParams carParams2 = new CarParams();
+        CarParams carParams2 = new CarParams();
         carParams2.setParameter(Constants.CURRENT_SPEED_REQUEST, 0);
         carParams2.setParameter(Constants.MAX_SPEED_REQUEST, 10.0);
         carParams2.xPosition = 50;
@@ -68,7 +68,7 @@ public class ContinuosRoad extends Road {
         carParams2.setParameter(Constants.DECELERATION_COMFORT_REQUEST, 4.5);
         carParams2.setParameter(Constants.DESIRED_TIME_HEADWAY_REQUEST, 1.5);
         carParams2.setParameter(Constants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
-        vehicles[0].add(carParams2);*/
+        vehicles[0].add(carParams2);
     }
 
     /**
@@ -80,7 +80,7 @@ public class ContinuosRoad extends Road {
                 CarParams newCar = generator.generateCar();
 
                 if (okToPutCar(newCar, lane)) {
-                    placeCar(newCar, 0, lane);
+                    placeCar(newCar, newCar.getParameter(Constants.LENGTH_REQUEST), lane);
                     MyLogger.log("New car placed at lane " + lane + " position 0, carParams: " + newCar,
                             Constants.DEBUG_FOR_LOGGING);
                 }
@@ -185,7 +185,7 @@ public class ContinuosRoad extends Road {
         return carsPassed;
     }
 
-    private int updateLaneO(int lane) {
+    /*private int updateLaneO(int lane) {
         int carsPassed = 0;
         for (CarParams car : this.vehicles[lane]) {
             String requestParameters = AppContext.CAR_FOLLOWING_MODEL.requestParameters();
@@ -196,6 +196,10 @@ public class ContinuosRoad extends Road {
                 continue;
             }
             double newSpeed = AppContext.CAR_FOLLOWING_MODEL.getNewSpeed(parameters);
+
+            if (newSpeed > car.getParameter(Constants.MAX_SPEED_REQUEST)) {
+                newSpeed = car.getParameter(Constants.MAX_SPEED_REQUEST);
+            }
 
             if (newSpeed > super.speedLimit) {
                 newSpeed = super.speedLimit;
@@ -219,7 +223,7 @@ public class ContinuosRoad extends Road {
         }
 
         return carsPassed;
-    }
+    }*/
 
     /**
      * gets parameter about different car in proximity of car for witch are we using model
@@ -427,7 +431,8 @@ public class ContinuosRoad extends Road {
         double space = newCar.getParameter(Constants.LENGTH_REQUEST) +
                 newCar.getParameter(Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST);
         space += gap; // add length of the new car as well for better spacing
-        if (space <= firstCar.xPosition) { // space needed is smaller than
+        double carBackPosition = firstCar.xPosition - firstCar.getParameter(Constants.LENGTH_REQUEST);
+        if (space <= carBackPosition) { // space needed is smaller than
             return true;
         }
 

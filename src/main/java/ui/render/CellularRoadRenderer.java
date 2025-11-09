@@ -8,18 +8,33 @@ import core.utils.Constants;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+/********************************************
+ * Cellular road renderer implementation, used for drawing cellular roads
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ********************************************/
 public class CellularRoadRenderer implements IRoadRenderer {
+
+    /**
+     * function to draw the cellular road on the given graphics context
+     *
+     * @param gc GraphicsContext to draw on
+     * @param road Road to be drawn
+     * @param width Width of the drawing area
+     * @param height Height of the drawing area
+     * @param laneWidth Width of a single lane
+     **/
     @Override
     public void draw(GraphicsContext gc, Road road, double width, double height, double laneWidth) {
         Object roadContent = road.getContent();
 
-        if (roadContent == null || !(roadContent instanceof Cell[][])) { // sanity check
+        if (!(roadContent instanceof Cell[][] cells)) { // sanity check, if not cellular road, return
             return;
         }
-        Cell[][] cells = (Cell[][]) roadContent;
 
-        // sanitity check
-        if (cells == null || cells.length == 0 || cells[0].length == 0) {
+        // sanity check
+        if (cells.length == 0 || cells[0].length == 0) { // if no cells, return
             return;
         }
 
@@ -30,12 +45,8 @@ public class CellularRoadRenderer implements IRoadRenderer {
 
         // real size of road for drawing
         double roadWidthPx  = cols  * cellSize;
-        double roadHeightPx = lanes * cellSize;
-        /*double cellSize = AppContext.cellSize;          // fixní velikost buňky
-        double roadWidthPx  = cols  * cellSize;
-        double roadHeightPx = lanes * cellSize;*/
 
-        // centing of the road
+        // centering of the road
         double offsetX = 0;
         double offsetY = 0;
         Color carColor = Color.RED;
@@ -66,7 +77,7 @@ public class CellularRoadRenderer implements IRoadRenderer {
                 }
             }
 
-            // seperating line between lanes
+            // separating line between lanes
             if (lane < lanes - 1) {
                 gc.setStroke(Color.WHITE);
                 gc.setLineWidth(Constants.LINE_SEPARATOR_WIDTH);
