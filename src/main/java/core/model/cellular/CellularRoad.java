@@ -4,6 +4,7 @@ import app.AppContext;
 import core.model.CarParams;
 import core.model.Direction;
 import core.model.Road;
+import core.sim.Simulation;
 import core.utils.Constants;
 import core.utils.MyLogger;
 import core.utils.RequestConstants;
@@ -175,7 +176,7 @@ public class CellularRoad extends Road {
         for (LaneChangeResult lcr : changedCars) {
             Direction direction = lcr.direction;
             CarParams carParams = lcr.carParams;
-            if (direction == Direction.LEFT) {
+            if (direction == Direction.LEFT && AppContext.SIMULATION.getStepCount() % 2 == 0) {
                 int currentLane = carParams.lane;
                 if (currentLane > 0) {
                     int targetLane = currentLane - 1;
@@ -183,7 +184,7 @@ public class CellularRoad extends Road {
                     this.placeCar(carParams, (int) carParams.xPosition, targetLane);
                     this.removeCar(currentLane, (int) carParams.xPosition);
                 }
-            } else if (direction == Direction.RIGHT) {
+            } else if (direction == Direction.RIGHT && AppContext.SIMULATION.getStepCount() % 2 == 1) {
                 int currentLane = carParams.lane;
                 if (currentLane < numberOfLanes - 1) {
                     int targetLane = currentLane + 1;
@@ -657,13 +658,7 @@ public class CellularRoad extends Road {
      * @return Direction enum representing the desired direction of lane change (LEFT, RIGHT, STRAIGHT)
      **/
     private Direction attemptLaneChange(Cell cell) {
-        String requestParameters;
-        if (AppContext.SIMULATION.getStepCount() % 2 == 0) {
-            requestParameters = AppContext.LANE_CHANGING_MODEL.requestParameters(Direction.LEFT);
-        } else {
-            requestParameters = AppContext.LANE_CHANGING_MODEL.requestParameters(Direction.RIGHT);
-        }
-        //String requestParameters = AppContext.LANE_CHANGING_MODEL.requestParameters();
+        String requestParameters = AppContext.LANE_CHANGING_MODEL.requestParameters();
         HashMap<String, Double> parameters = getParameters(cell.getCarParams().lane,
                 (int) cell.getCarParams().xPosition, requestParameters);
         if (parameters == null) {

@@ -1,6 +1,7 @@
 package models.laneChangingModels;
 
 import core.model.Direction;
+import core.utils.RequestConstants;
 import models.ILaneChangingModel;
 
 import java.util.HashMap;
@@ -30,11 +31,41 @@ public class Mobil implements ILaneChangingModel {
      **/
     @Override
     public String requestParameters() {
-        return "";
+        return RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.POLITENESS_FACTOR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.NOW_ACCELERATION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.NOW_ACCELERATION_LEFT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.NOW_ACCELERATION_RIGHT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.NOW_ACCELERATION_STRAIGHT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.THEORETICAL_ACCELERATION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.THEORETICAL_ACCELERATION_LEFT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.THEORETICAL_ACCELERATION_RIGHT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.THEORETICAL_ACCELERATION_STRAIGHT_BACKWARD_REQUEST;
     }
 
     @Override
     public String requestParameters(Direction direction) {
+        if (direction == Direction.LEFT) {
+            return RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.POLITENESS_FACTOR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.NOW_ACCELERATION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.NOW_ACCELERATION_LEFT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.NOW_ACCELERATION_STRAIGHT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.THEORETICAL_ACCELERATION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.THEORETICAL_ACCELERATION_LEFT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR
+                    + RequestConstants.THEORETICAL_ACCELERATION_STRAIGHT_BACKWARD_REQUEST;
+
+        } else if (direction == Direction.RIGHT) {
+            return RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.POLITENESS_FACTOR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.NOW_ACCELERATION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.NOW_ACCELERATION_RIGHT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.NOW_ACCELERATION_STRAIGHT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.THEORETICAL_ACCELERATION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.THEORETICAL_ACCELERATION_RIGHT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR
+                    + RequestConstants.THEORETICAL_ACCELERATION_STRAIGHT_BACKWARD_REQUEST;
+        }
+
         return "";
     }
 
@@ -45,7 +76,10 @@ public class Mobil implements ILaneChangingModel {
      **/
     @Override
     public String getParametersForGeneration() {
-        return "";
+        return RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.DECELERATION_COMFORT_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.POLITENESS_FACTOR_REQUEST;
     }
 
     /**
@@ -57,6 +91,17 @@ public class Mobil implements ILaneChangingModel {
      **/
     @Override
     public Direction changeLaneIfDesired(HashMap<String, Double> parameters) {
+        double edgeValueForLaneChange = parameters.get(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST);
+        double politenessFactor = parameters.get(RequestConstants.POLITENESS_FACTOR_REQUEST);
+        double nowAcceleration = parameters.get(RequestConstants.NOW_ACCELERATION_REQUEST);
+        double nowAccelerationLeftBackward = parameters.get(RequestConstants.NOW_ACCELERATION_LEFT_BACKWARD_REQUEST);
+        double nowAccelerationRightBackward = parameters.get(RequestConstants.NOW_ACCELERATION_RIGHT_BACKWARD_REQUEST);
+        double nowAccelerationStraightBackward = parameters.get(RequestConstants.NOW_ACCELERATION_STRAIGHT_BACKWARD_REQUEST);
+        double theoreticalAcceleration = parameters.get(RequestConstants.THEORETICAL_ACCELERATION_REQUEST);
+        double theoreticalAccelerationLeftBackward = parameters.get(RequestConstants.THEORETICAL_ACCELERATION_LEFT_BACKWARD_REQUEST);
+        double theoreticalAccelerationRightBackward = parameters.get(RequestConstants.THEORETICAL_ACCELERATION_RIGHT_BACKWARD_REQUEST);
+        double theoreticalAccelerationStraightBackward = parameters.get(RequestConstants.THEORETICAL_ACCELERATION_STRAIGHT_BACKWARD_REQUEST);
+
 
 
         return Direction.STRAIGHT;

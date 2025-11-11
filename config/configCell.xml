@@ -58,7 +58,7 @@
     </generator>
 
     <runDetails>
-        <showGui>false</showGui>
+        <showGui>true</showGui>
         <drawCells>false</drawCells>
         <timeStep>1</timeStep>
         <duration>120</duration>

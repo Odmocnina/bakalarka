@@ -318,13 +318,13 @@ public class ContinuosRoad extends Road {
 
     ///////////////////////////////////////////////////////////////////////////////////
 
-//    private
-//
-//    private void prepareRoadForTheoreticalLaneChange(Direction direction, CarParams car) {
-//        this.changeLaneOfCar(direction, car);
-//    }
 
-    private double getAccelerationOfDifferentCars(CarParams car, Direction direction, Orientation orientation) {
+
+    private void prepareRoadForTheoreticalLaneChange(Direction direction, CarParams car) {
+        this.changeLaneOfCar(direction, car);
+    }
+
+    private double getAccelerationOfDifferentCar(CarParams car, Direction direction, Orientation orientation) {
         CarParams carToStudy;
 
         carToStudy = getCarInProximity(direction, orientation, car);
