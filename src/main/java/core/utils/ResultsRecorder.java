@@ -1,5 +1,7 @@
 package core.utils;
 
+import app.AppContext;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -29,6 +31,9 @@ public class ResultsRecorder {
 
     /** Output file name for writing results **/
     private String fileName;
+
+    /** Output type (txt/csv)**/
+    private String outputType = "txt";
 
     /**
      * Private constructor to prevent instantiation
@@ -145,6 +150,28 @@ public class ResultsRecorder {
      **/
     private BufferedWriter getBufferedWriter(FileWriter fw) throws IOException {
         BufferedWriter bw = new BufferedWriter(fw);
+        if (outputType.equalsIgnoreCase(Constants.RESULTS_OUTPUT_TXT)) {
+            this.writeTXT(bw);
+        } else if (outputType.equalsIgnoreCase(Constants.RESULTS_OUTPUT_CSV)) {
+            this.writeCSV(bw);
+        } else {
+            MyLogger.log("Unknown output type: " + outputType + ". Defaulting to TXT format.",
+                    Constants.WARN_FOR_LOGGING);
+            this.writeTXT(bw);
+        }
+        return bw;
+    }
+
+    private void writeTXT(BufferedWriter bw) throws IOException {
+        // Implementation for writing results in TXT format
+        bw.write("=== Traffic Simulation Results ===\n\n");
+        bw.write("=== Simulation details ===\n");
+        bw.write("Forward model used: " + AppContext.CAR_FOLLOWING_MODEL.getName() + "(" +
+                AppContext.CAR_FOLLOWING_MODEL.getType() + ")" + "\n");
+        bw.write("Lane changing model used: " + AppContext.LANE_CHANGING_MODEL.getName() + "\n");
+        String roadDetails = AppContext.SIMULATION.getRoads()[0].toString();
+        bw.write("Road details: " + roadDetails + "\n");
+        bw.write("Simulation parameters: " + AppContext.RUN_DETAILS.toString() + "\n\n");
         bw.write("=== Simulation Time Results ===\n");
         BigInteger elapsedTime = getElapsedTimeNs();
         int timeMillis = elapsedTime.divide(BigInteger.valueOf(1_000_000)).intValue();
@@ -153,7 +180,16 @@ public class ResultsRecorder {
         for (int i = 0; i < carsPassedPerRoad.length; i++) {
             bw.write("Road " + i + ": " + carsPassedPerRoad[i] + " cars passed.\n");
         }
-        return bw;
+    }
+
+    private void writeCSV(BufferedWriter bw) throws IOException {
+        // Implementation for writing results in CSV format
+
+        bw.write("Road Index;Cars Passed;Road details\n");
+        for (int i = 0; i < carsPassedPerRoad.length; i++) {
+            bw.write(i + Constants.DEFAULT_CSV_SEPARATOR + carsPassedPerRoad[i] + Constants.DEFAULT_CSV_SEPARATOR
+                    + AppContext.SIMULATION.getRoads()[i] + "\n");
+        }
     }
 
     /**
@@ -167,6 +203,10 @@ public class ResultsRecorder {
             return carsPassedPerRoad[index];
         }
         return 0;
+    }
+
+    public void setOutputType(String outputType) {
+        this.outputType = outputType;
     }
 
 }

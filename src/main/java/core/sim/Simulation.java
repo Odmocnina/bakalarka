@@ -44,10 +44,10 @@ public class Simulation {
                 if (AppContext.RUN_DETAILS.writingResults()) {
                     ResultsRecorder.getResultsRecorder().recordCarsPassed(i, carsPassed);
                 }
-
-                this.stepCount++;
             }
         }
+
+        this.stepCount++;
 
         // Stop the timer if writing results and the simulation duration has been reached
         if (AppContext.RUN_DETAILS.writingResults() && this.stepCount >= AppContext.RUN_DETAILS.duration - 1) {

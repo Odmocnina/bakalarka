@@ -368,7 +368,7 @@ public class ConfigLoader {
             Element duration = (Element) runDetailsElement.getElementsByTagName("duration").item(0);
             Element timeStep = (Element) runDetailsElement.getElementsByTagName("timeStep").item(0);
             Element showGui = (Element) runDetailsElement.getElementsByTagName("showGui").item(0);
-            Element outputFile = (Element) runDetailsElement.getElementsByTagName("outputFile").item(0);
+            Element outputElements = (Element) runDetailsElement.getElementsByTagName("output").item(0);
             Element drawCells = (Element) runDetailsElement.getElementsByTagName("drawCells").item(0);
             Element logElements = (Element) runDetailsElement.getElementsByTagName("logging").item(0);
             Element timeBetweenSteps = (Element) runDetailsElement.getElementsByTagName("timeBetweenSteps")
@@ -407,7 +407,7 @@ public class ConfigLoader {
                 detailsFromConfig.showGui = false;
             }
 
-            if (outputFile != null) {
+            /*if (outputFile != null) {
                 MyLogger.logBeforeLoading("Output file from config: " + outputFile.getTextContent()
                         , Constants.INFO_FOR_LOGGING);
                 detailsFromConfig.outputFile = outputFile.getTextContent();
@@ -415,6 +415,14 @@ public class ConfigLoader {
                 MyLogger.logBeforeLoading("Missing outputFile in run details, results will not be saved"
                         , Constants.WARN_FOR_LOGGING);
                 detailsFromConfig.outputFile = null;
+            }*/
+
+            boolean hasOutput = loadOutput(detailsFromConfig, outputElements);
+            if (hasOutput) {
+                MyLogger.logBeforeLoading("Output will be written to file: " + detailsFromConfig.outputFile
+                        , Constants.INFO_FOR_LOGGING);
+            } else {
+                MyLogger.logBeforeLoading("No output will be written", Constants.WARN_FOR_LOGGING);
             }
 
             if (drawCells != null) {
@@ -516,6 +524,51 @@ public class ConfigLoader {
             MyLogger.logBeforeLoading("Missing log details in run details, all logging will be performed"
                     , Constants.WARN_FOR_LOGGING);
         }
+    }
+
+    private static boolean loadOutput(RunDetails detailsFromConfig, Element outputElements) {
+        if (outputElements == null) {
+            MyLogger.logBeforeLoading("Missing output details in run details, defaulting to no output"
+                    , Constants.WARN_FOR_LOGGING);
+            detailsFromConfig.outputFile = null;
+            return false;
+        }
+
+        NodeList outputChildren = outputElements.getChildNodes();
+
+        boolean writeOutput = true;
+        String outputFile = null;
+        String outputType = "txt";
+
+        for (int i = 0; i < outputChildren.getLength(); i++) {
+            Node outputNode = outputChildren.item(i);
+            if (outputNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element outputElement = (Element) outputNode;
+                String nodeName = outputElement.getNodeName();
+
+                switch (nodeName) {
+                    case "file" -> outputFile = outputElement.getTextContent();
+                    case "writeOutput" -> writeOutput = Boolean.parseBoolean(outputElement.getTextContent());
+                    case "type" -> outputType = outputElement.getTextContent().toLowerCase().trim();
+                }
+            }
+        }
+
+        if (!writeOutput) {
+            detailsFromConfig.outputFile = null;
+            return false;
+        } else {
+            if (outputFile == null || outputFile.isEmpty()) {
+                MyLogger.logBeforeLoading("Output file is absent or empty in run details, results will be" +
+                                " saved to default output file: " + Constants.DEFAULT_OUTPUT_FILE
+                                , Constants.WARN_FOR_LOGGING);
+                outputFile = Constants.DEFAULT_OUTPUT_FILE;
+            }
+            detailsFromConfig.outputFile = outputFile;
+            ResultsRecorder.getResultsRecorder().setOutputType(outputType);
+            return true;
+        }
+
     }
 
 }

@@ -107,7 +107,8 @@ public class Window extends Application {
             }
 
             String infoString = "Forward model used: " + AppContext.CAR_FOLLOWING_MODEL.getName() +
-                    ", lane changing model used: " + AppContext.LANE_CHANGING_MODEL.getName();
+                    ", lane changing model used: " + AppContext.LANE_CHANGING_MODEL.getName() + ", time steps: " +
+                    simulation.getStepCount();
             // draw info string under all roads
             gc.setFill(Color.BLACK);
             gc.fillText(infoString, 0, canvas.getHeight() - 5);

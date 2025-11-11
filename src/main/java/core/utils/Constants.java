@@ -31,72 +31,10 @@ public class Constants {
     public static final String ERROR_FOR_LOGGING = "error";
     public static final String INFO_FOR_LOGGING = "info";
 
-    // directions
-    public static final String STRAIGHT = "STRAIGHT";
-    public static final String LEFT = "LEFT";
-    public static final String RIGHT = "RIGHT";
-
-    // orientations
-    public static final String FORWARD = "FORWARD";
-    public static final String BACKWARD = "BACKWARD";
-
-
-    // request string used when model is requesting parameters of road
-    public static final String REQUEST_SEPARATOR = ";";
-    public static final String SUBREQUEST_SEPARATOR = "_";
-    public static final String X_POSITION_REQUEST = "xPosition";
-    public static final String MAX_SPEED_REQUEST = "maxSpeed";
-    public static final String CURRENT_SPEED_REQUEST = "currentSpeed";
-    public static final String DISTANCE_TO_NEXT_CAR_REQUEST = "distanceToNextCar";
-    public static final String DISTANCE_TO_NEXT_CAR_LEFT_REQUEST = "distanceToNextCarLeft";
-    public static final String DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST = "distanceToNextCarRight";
-    public static final String MAX_ACCELERATION_REQUEST = "maxAcceleration";
-    public static final String SPEED_DIFFERENCE_TO_NEXT_CAR_REQUEST = "speedDifferenceToNextCar";
-    public static final String MINIMUM_GAP_TO_NEXT_CAR_REQUEST = "minimumGapToNextCar";
-    public static final String DECELERATION_COMFORT_REQUEST = "decelerationComfort";
-    public static final String DESIRED_TIME_HEADWAY_REQUEST = "desiredTimeHeadway";
-    public static final String DISTANCE_TO_PREVIOUS_CAR_REQUEST = "distanceToPreviousCar";
-    public static final String DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST = "distanceToPreviousCarLeft";
-    public static final String DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST = "distanceToPreviousCarRight";
-    public static final String LENGTH_REQUEST = "length";
-    public static final String DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST = "distanceDifferenceSensitivity";
-    public static final String SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST = "speedDifferenceSensitivity";
-    public static final String CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST = CURRENT_SPEED_REQUEST + SUBREQUEST_SEPARATOR
-            + STRAIGHT + SUBREQUEST_SEPARATOR + FORWARD;
-    public static final String CURRENT_SPEED_STRAIGHT_BACKWARDS_REQUEST = CURRENT_SPEED_REQUEST + SUBREQUEST_SEPARATOR
-            + STRAIGHT + SUBREQUEST_SEPARATOR + BACKWARD;
-    public static final String CURRENT_SPEED_LEFT_FORWARD_REQUEST = CURRENT_SPEED_REQUEST + SUBREQUEST_SEPARATOR
-            + LEFT + SUBREQUEST_SEPARATOR + FORWARD;
-    public static final String CURRENT_SPEED_LEFT_BACKWARD_REQUEST = CURRENT_SPEED_REQUEST + SUBREQUEST_SEPARATOR
-            + LEFT + SUBREQUEST_SEPARATOR + BACKWARD;
-    public static final String CURRENT_SPEED_RIGHT_FORWARD_REQUEST = CURRENT_SPEED_REQUEST + SUBREQUEST_SEPARATOR
-            + RIGHT + SUBREQUEST_SEPARATOR + FORWARD;
-    public static final String CURRENT_SPEED_RIGHT_BACKWARD_REQUEST = CURRENT_SPEED_REQUEST + SUBREQUEST_SEPARATOR
-            + RIGHT + SUBREQUEST_SEPARATOR + BACKWARD;
-    public static final String LENGTH_STRAIGHT_FORWARD_REQUEST = LENGTH_REQUEST + SUBREQUEST_SEPARATOR + STRAIGHT
-            + SUBREQUEST_SEPARATOR + FORWARD;
-    public static final String LENGTH_STRAIGHT_BACKWARDS_REQUEST = LENGTH_REQUEST + SUBREQUEST_SEPARATOR + STRAIGHT
-            + SUBREQUEST_SEPARATOR + BACKWARD;
-    public static final String LENGTH_LEFT_FORWARD_REQUEST = LENGTH_REQUEST + SUBREQUEST_SEPARATOR + LEFT
-            + SUBREQUEST_SEPARATOR + FORWARD;
-    public static final String LENGTH_LEFT_BACKWARD_REQUEST = LENGTH_REQUEST + SUBREQUEST_SEPARATOR + LEFT
-            + SUBREQUEST_SEPARATOR + BACKWARD;
-    public static final String LENGTH_RIGHT_FORWARD_REQUEST = LENGTH_REQUEST + SUBREQUEST_SEPARATOR + RIGHT
-            + SUBREQUEST_SEPARATOR + FORWARD;
-    public static final String LENGTH_RIGHT_BACKWARD_REQUEST = LENGTH_REQUEST + SUBREQUEST_SEPARATOR + RIGHT
-            + SUBREQUEST_SEPARATOR + BACKWARD;
-    public static final String X_POSITION_STRAIGHT_FORWARD_REQUEST = X_POSITION_REQUEST + SUBREQUEST_SEPARATOR
-            + STRAIGHT + SUBREQUEST_SEPARATOR + FORWARD;
-    public static final String X_POSITION_STRAIGHT_BACKWARDS_REQUEST = X_POSITION_REQUEST + SUBREQUEST_SEPARATOR
-            + STRAIGHT + SUBREQUEST_SEPARATOR + BACKWARD;
-    public static final String X_POSITION_LEFT_FORWARD_REQUEST = X_POSITION_REQUEST + SUBREQUEST_SEPARATOR
-            + LEFT + SUBREQUEST_SEPARATOR + FORWARD;
-    public static final String X_POSITION_LEFT_BACKWARD_REQUEST = X_POSITION_REQUEST + SUBREQUEST_SEPARATOR
-            + LEFT + SUBREQUEST_SEPARATOR + BACKWARD;
-    public static final String X_POSITION_RIGHT_FORWARD_REQUEST = X_POSITION_REQUEST + SUBREQUEST_SEPARATOR
-            + RIGHT + SUBREQUEST_SEPARATOR + FORWARD;
-    public static final String X_POSITION_RIGHT_BACKWARD_REQUEST = X_POSITION_REQUEST + SUBREQUEST_SEPARATOR
-            + RIGHT + SUBREQUEST_SEPARATOR + BACKWARD;
+    public static final String RESULTS_OUTPUT_CSV = "csv";
+    public static final String RESULTS_OUTPUT_TXT = "txt";
+    public static final String DEFAULT_OUTPUT_FILE = "output/output.txt";
+    public static final String DEFAULT_CSV_SEPARATOR = ";";
 
     // stock values for car generation
     public static final double DEFAULT_MIN_LENGTH = 3.0;

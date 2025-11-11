@@ -39,4 +39,16 @@ public class RunDetails {
     public boolean writingResults() {
         return this.outputFile != null && !this.outputFile.isEmpty();
     }
+
+    @Override
+    public String toString() {
+        return "RunDetails{" +
+                "duration=" + duration +
+                ", timeStep=" + timeStep +
+                ", showGui=" + showGui +
+                ", outputFile='" + outputFile + '\'' +
+                ", drawCells=" + drawCells +
+                ", timeBetweenSteps=" + timeBetweenSteps +
+                '}';
+    }
 }

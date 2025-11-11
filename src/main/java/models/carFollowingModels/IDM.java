@@ -1,6 +1,7 @@
 package models.carFollowingModels;
 
 import core.utils.Constants;
+import core.utils.RequestConstants;
 import models.ICarFollowingModel;
 
 import java.util.HashMap;
@@ -34,20 +35,20 @@ public class IDM implements ICarFollowingModel {
      **/
     @Override
     public double getNewSpeed(HashMap<String, Double> parameters) {
-        double currentSpeed = parameters.get(Constants.CURRENT_SPEED_REQUEST);
-        double maxSpeed = parameters.get(Constants.MAX_SPEED_REQUEST);
-        double xPosition = parameters.get(Constants.X_POSITION_REQUEST);
-        double xPositionNextCar = parameters.get(Constants.X_POSITION_STRAIGHT_FORWARD_REQUEST);
+        double currentSpeed = parameters.get(RequestConstants.CURRENT_SPEED_REQUEST);
+        double maxSpeed = parameters.get(RequestConstants.MAX_SPEED_REQUEST);
+        double xPosition = parameters.get(RequestConstants.X_POSITION_REQUEST);
+        double xPositionNextCar = parameters.get(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST);
         double distance;
         if (xPositionNextCar != Constants.NO_CAR_THERE) {
-            double lengthNextCar = parameters.get(Constants.LENGTH_STRAIGHT_FORWARD_REQUEST);
+            double lengthNextCar = parameters.get(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST);
             distance = xPositionNextCar - xPosition - lengthNextCar;
         } else {
             distance = Double.MAX_VALUE;
         }
 
-        double maxAcceleration = parameters.get(Constants.MAX_ACCELERATION_REQUEST);
-        double currentSpeedNextCar = parameters.get(Constants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST);
+        double maxAcceleration = parameters.get(RequestConstants.MAX_ACCELERATION_REQUEST);
+        double currentSpeedNextCar = parameters.get(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST);
         double speedDifferenceToTheNextCar;
         if (currentSpeedNextCar != Constants.NO_CAR_THERE) {
             speedDifferenceToTheNextCar = Math.abs(currentSpeed - currentSpeedNextCar);
@@ -55,9 +56,9 @@ public class IDM implements ICarFollowingModel {
             speedDifferenceToTheNextCar = 0.0;
         }
 
-        double minimumGapToNextCar = parameters.get(Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST);
-        double decelerationComfort = parameters.get(Constants.DECELERATION_COMFORT_REQUEST);
-        double desiredTimeHeadway = parameters.get(Constants.DESIRED_TIME_HEADWAY_REQUEST);
+        double minimumGapToNextCar = parameters.get(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST);
+        double decelerationComfort = parameters.get(RequestConstants.DECELERATION_COMFORT_REQUEST);
+        double desiredTimeHeadway = parameters.get(RequestConstants.DESIRED_TIME_HEADWAY_REQUEST);
 
         return currentSpeed + getAcceleration(currentSpeed, maxSpeed, distance,
                 maxAcceleration, speedDifferenceToTheNextCar, minimumGapToNextCar,
@@ -116,16 +117,16 @@ public class IDM implements ICarFollowingModel {
      **/
     @Override
     public String requestParameters() {
-        return Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.CURRENT_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.X_POSITION_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.X_POSITION_STRAIGHT_FORWARD_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.LENGTH_STRAIGHT_FORWARD_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.MAX_ACCELERATION_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.DECELERATION_COMFORT_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.DESIRED_TIME_HEADWAY_REQUEST;
+        return RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.CURRENT_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.X_POSITION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.MAX_ACCELERATION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.DECELERATION_COMFORT_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.DESIRED_TIME_HEADWAY_REQUEST;
     }
 
     /**
@@ -135,12 +136,12 @@ public class IDM implements ICarFollowingModel {
      **/
     @Override
     public String getParametersForGeneration() {
-        return Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.MAX_ACCELERATION_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.DECELERATION_COMFORT_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.DESIRED_TIME_HEADWAY_REQUEST + Constants.REQUEST_SEPARATOR
-                + Constants.LENGTH_REQUEST;
+        return RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.MAX_ACCELERATION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.DECELERATION_COMFORT_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.DESIRED_TIME_HEADWAY_REQUEST + RequestConstants.REQUEST_SEPARATOR
+                + RequestConstants.LENGTH_REQUEST;
     }
 
     /**

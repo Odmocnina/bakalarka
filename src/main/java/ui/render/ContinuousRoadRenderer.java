@@ -4,6 +4,7 @@ import core.model.CarParams;
 import core.model.Road;
 import core.utils.Constants;
 
+import core.utils.RequestConstants;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import java.util.LinkedList;
@@ -72,7 +73,7 @@ public class ContinuousRoadRenderer implements IRoadRenderer {
                 for (CarParams car : vehicles[i]) {
                     // x place of car
                     double carX = offsetX + car.xPosition * widthMultiplayer;
-                    double carW = car.getParameter(Constants.LENGTH_REQUEST) * widthMultiplayer;
+                    double carW = car.getParameter(RequestConstants.LENGTH_REQUEST) * widthMultiplayer;
 
                     // y place of car
                     double carY = y + laneHpx * carUpLiftFactor;

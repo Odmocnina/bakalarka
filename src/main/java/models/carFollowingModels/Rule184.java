@@ -1,6 +1,7 @@
 package models.carFollowingModels;
 
 import core.utils.Constants;
+import core.utils.RequestConstants;
 import models.ICarFollowingModel;
 
 /********************************************
@@ -32,7 +33,7 @@ public class Rule184 implements ICarFollowingModel {
      **/
     @Override
     public double getNewSpeed(java.util.HashMap<String, Double> parameters) {
-        double distanceDouble = parameters.get(Constants.DISTANCE_TO_NEXT_CAR_REQUEST);
+        double distanceDouble = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST);
         int distance = (int) distanceDouble; // convert distance to number of cells
 
         if (distance > 1) {
@@ -79,7 +80,7 @@ public class Rule184 implements ICarFollowingModel {
      **/
     @Override
     public String requestParameters() {
-        return Constants.DISTANCE_TO_NEXT_CAR_REQUEST;
+        return RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST;
     }
 
     /**
@@ -89,7 +90,7 @@ public class Rule184 implements ICarFollowingModel {
      **/
     @Override
     public String getParametersForGeneration() {
-        return Constants.LENGTH_REQUEST;
+        return RequestConstants.LENGTH_REQUEST;
     }
 
     /**

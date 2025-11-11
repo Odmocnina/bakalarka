@@ -1,6 +1,7 @@
 package models.carFollowingModels;
 
 import core.utils.Constants;
+import core.utils.RequestConstants;
 import models.ICarFollowingModel;
 
 import java.util.HashMap;
@@ -40,9 +41,9 @@ public class HeadLeading implements ICarFollowingModel {
      **/
     @Override
     public double getNewSpeed(HashMap<String, Double> parameters) {
-        int currentSpeed = parameters.get(Constants.CURRENT_SPEED_REQUEST).intValue();
-        int maxSpeed = parameters.get(Constants.MAX_SPEED_REQUEST).intValue();
-        double distance = parameters.get(Constants.DISTANCE_TO_NEXT_CAR_REQUEST).intValue();
+        int currentSpeed = parameters.get(RequestConstants.CURRENT_SPEED_REQUEST).intValue();
+        int maxSpeed = parameters.get(RequestConstants.MAX_SPEED_REQUEST).intValue();
+        double distance = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST).intValue();
         int distanceInCells = (int) Math.round(distance); // convert distance to number of cells
 
         boolean starting = (currentSpeed == 0);
@@ -100,9 +101,9 @@ public class HeadLeading implements ICarFollowingModel {
      * @return request parameters as String
      **/
     public String requestParameters() {
-        return Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.CURRENT_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.DISTANCE_TO_NEXT_CAR_REQUEST;
+        return RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.CURRENT_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST;
     }
 
     /**
@@ -111,8 +112,8 @@ public class HeadLeading implements ICarFollowingModel {
      * @return request parameters as String
      **/
     public String getParametersForGeneration() {
-        return Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR
-                + Constants.LENGTH_REQUEST + Constants.REQUEST_SEPARATOR;
+        return RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR
+                + RequestConstants.LENGTH_REQUEST + RequestConstants.REQUEST_SEPARATOR;
     }
 
     /**

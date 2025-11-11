@@ -1,6 +1,7 @@
 package models.carFollowingModels;
 
 import core.utils.Constants;
+import core.utils.RequestConstants;
 import models.ICarFollowingModel;
 
 /********************************************
@@ -18,10 +19,10 @@ public class OVM implements ICarFollowingModel {
      **/
     @Override
     public double getNewSpeed(java.util.HashMap<String, Double> parameters) {
-        double currentSpeed = parameters.get(Constants.CURRENT_SPEED_REQUEST);
-        double distance = parameters.get(Constants.DISTANCE_TO_NEXT_CAR_REQUEST);
+        double currentSpeed = parameters.get(RequestConstants.CURRENT_SPEED_REQUEST);
+        double distance = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST);
         double speedDifferenceSensitivityParameter =
-                parameters.get(Constants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST);
+                parameters.get(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST);
 
         return currentSpeed + speedDifferenceSensitivityParameter *
                (optimalVelocity(distance) - currentSpeed);
@@ -44,10 +45,10 @@ public class OVM implements ICarFollowingModel {
      **/
     @Override
     public String requestParameters() {
-        return Constants.CURRENT_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.DISTANCE_TO_NEXT_CAR_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST;
+        return RequestConstants.CURRENT_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST;
 
     }
 
@@ -58,9 +59,9 @@ public class OVM implements ICarFollowingModel {
      **/
     @Override
     public String getParametersForGeneration() {
-        return Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.LENGTH_REQUEST;
+        return RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.LENGTH_REQUEST;
     }
 
     /**

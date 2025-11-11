@@ -30,8 +30,8 @@ public class StringEditor {
             return params1;
         }
 
-        String[] requestParams1 = params1.split(Constants.REQUEST_SEPARATOR);
-        String[] requestParams2 = params2.split(Constants.REQUEST_SEPARATOR);
+        String[] requestParams1 = params1.split(RequestConstants.REQUEST_SEPARATOR);
+        String[] requestParams2 = params2.split(RequestConstants.REQUEST_SEPARATOR);
 
         Set<String> mergedSet = new LinkedHashSet<>(); // to maintain order and uniqueness, it throws away duplicates
 
@@ -49,7 +49,7 @@ public class StringEditor {
             }
         }
 
-        return String.join(Constants.REQUEST_SEPARATOR, mergedSet);
+        return String.join(RequestConstants.REQUEST_SEPARATOR, mergedSet);
 
     }
 

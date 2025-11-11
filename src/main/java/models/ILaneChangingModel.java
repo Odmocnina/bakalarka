@@ -28,6 +28,14 @@ public interface ILaneChangingModel {
     String requestParameters();
 
     /**
+     * function to request parameters needed for specific lane changing model, with direction consideration (so when
+     * changing to left lane, parameters for left lane change are requested)
+     *
+     * @return String of requested parameters
+     **/
+    String requestParameters(Direction direction);
+
+    /**
      * function to request parameters needed for generation of specific lane changing model
      *
      * @return String of requested parameters for generation

@@ -33,6 +33,11 @@ public class Mobil implements ILaneChangingModel {
         return "";
     }
 
+    @Override
+    public String requestParameters(Direction direction) {
+        return "";
+    }
+
     /**
      * function to request parameters needed for generation of MOBIL model
      *

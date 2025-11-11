@@ -4,6 +4,7 @@ import core.model.cellular.CellularRoad;
 import core.utils.Constants;
 import core.utils.MyLogger;
 
+import core.utils.RequestConstants;
 import javafx.scene.paint.Color;
 import java.util.HashMap;
 import java.util.Queue;
@@ -336,7 +337,7 @@ public class CarGenerator {
      * @param requestedParameters string of requested parameters separated by Constants.REQUEST_SEPARATOR
      **/
     public void setCarGenerationParameters(String requestedParameters) {
-        this.carGenerationParameters = requestedParameters.split(Constants.REQUEST_SEPARATOR);
+        this.carGenerationParameters = requestedParameters.split(RequestConstants.REQUEST_SEPARATOR);
     }
 
     /**

@@ -2,6 +2,7 @@ package models.laneChangingModels;
 
 import core.model.Direction;
 import core.utils.Constants;
+import core.utils.RequestConstants;
 import models.ILaneChangingModel;
 
 import java.util.HashMap;
@@ -30,17 +31,40 @@ public class Rickert implements ILaneChangingModel {
      * @return the list of parameters that the rickert model needs to make a decision
      **/
     public String requestParameters() {
-        return Constants.DISTANCE_TO_NEXT_CAR_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.MAX_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.CURRENT_SPEED_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST + Constants.REQUEST_SEPARATOR +
-                Constants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST;
+        return RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.CURRENT_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                RequestConstants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST;
     }
 
+    public String requestParameters(Direction direction) {
+        if (direction == LEFT) {
+            return RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.CURRENT_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST;
+        } else if (direction == RIGHT) {
+            return RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.CURRENT_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST + RequestConstants.REQUEST_SEPARATOR +
+                    RequestConstants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST;
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * gives the list of parameters that the rickert model needs for generation
+     *
+     * @return the list of parameters that the rickert model needs for generation
+     **/
     public String getParametersForGeneration() {
-        return Constants.MAX_SPEED_REQUEST;
+        return RequestConstants.MAX_SPEED_REQUEST;
     }
 
     /**
@@ -51,18 +75,18 @@ public class Rickert implements ILaneChangingModel {
      * @return the direction to change lane or go straight
      **/
     public Direction changeLaneIfDesired(HashMap<String, Double> parameters) {
-        int distanceToNextCar = parameters.get(Constants.DISTANCE_TO_NEXT_CAR_REQUEST).intValue();
-        int maxSpeed = parameters.get(Constants.MAX_SPEED_REQUEST).intValue();
-        int currentSpeed = parameters.get(Constants.CURRENT_SPEED_REQUEST).intValue() + 1;
-        int forwardGap = parameters.get(Constants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST).intValue();
-        int previousGap = parameters.get(Constants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST).intValue();
+        int distanceToNextCar = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST).intValue();
+        int maxSpeed = parameters.get(RequestConstants.MAX_SPEED_REQUEST).intValue();
+        int currentSpeed = parameters.get(RequestConstants.CURRENT_SPEED_REQUEST).intValue() + 1;
+        int forwardGap = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST).intValue();
+        int previousGap = parameters.get(RequestConstants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST).intValue();
 
         if (makeDecision(distanceToNextCar, maxSpeed, currentSpeed, forwardGap, previousGap)) {
             return LEFT;
         }
 
-        forwardGap = parameters.get(Constants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST).intValue();
-        previousGap = parameters.get(Constants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST).intValue();
+        forwardGap = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST).intValue();
+        previousGap = parameters.get(RequestConstants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST).intValue();
 
         if (makeDecision(distanceToNextCar, maxSpeed, currentSpeed, forwardGap, previousGap)) {
             return RIGHT;

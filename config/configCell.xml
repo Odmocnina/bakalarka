@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <numberOfRoads>10</numberOfRoads>
+    <numberOfRoads>50</numberOfRoads>
     <roadFile>config/roads/road2.xml</roadFile>
 
     <models>
@@ -20,11 +20,11 @@
             <minValue>1</minValue>
             <maxValue>2</maxValue>
         </queue>
-        <flowRate>0.7</flowRate>
+        <flowRate>1.0</flowRate>
         <carParams>
             <maxSpeed>
-                <minValue>50</minValue>
-                <maxValue>100</maxValue>
+                <minValue>20</minValue>
+                <maxValue>50</maxValue>
             </maxSpeed>
             <length>
                 <minValue>1</minValue>
@@ -58,7 +58,7 @@
     </generator>
 
     <runDetails>
-        <showGui>true</showGui>
+        <showGui>false</showGui>
         <drawCells>false</drawCells>
         <timeStep>1</timeStep>
         <duration>120</duration>
@@ -70,6 +70,11 @@
             <error>true</error>
             <fatal>true</fatal>
         </logging>
+        <output>
+            <writeOutput>true</writeOutput>
+            <file>output/simulationCellOutput.txt</file>
+            <type>txt</type>
+        </output>
         <outputFile>output/simulationCellOutput.txt</outputFile>
         <timeBetweenSteps>100</timeBetweenSteps>
     </runDetails>

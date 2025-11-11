@@ -5,7 +5,7 @@
 
     <models>
         <carFollowingModel>
-            <id>idm</id>
+            <id>helly</id>
         </carFollowingModel>
         <laneChangingModel>
             <id>rickert</id>
@@ -20,16 +20,16 @@
                 <maxValue>100</maxValue>
             </maxSpeed>
             <length>
-                <minValue>3</minValue>
-                <maxValue>10</maxValue>
+                <minValue>7</minValue>
+                <maxValue>7</maxValue>
             </length>
             <maxAcceleration>
                 <minValue>2</minValue>
                 <maxValue>2</maxValue>
             </maxAcceleration>
             <minimumGapToNextCar>
-                <minValue>1</minValue>
-                <maxValue>1</maxValue>
+                <minValue>5</minValue>
+                <maxValue>5</maxValue>
             </minimumGapToNextCar>
             <decelerationComfort>
                 <minValue>2</minValue>
@@ -51,10 +51,10 @@
     </generator>
 
     <runDetails>
-        <showGui>true</showGui>
+        <showGui>false</showGui>
         <drawCells>false</drawCells>
         <timeStep>1</timeStep>
-        <duration>60</duration>
+        <duration>200</duration>
         <logging>
             <log>true</log>
             <info>true</info>
@@ -63,7 +63,12 @@
             <error>true</error>
             <fatal>true</fatal>
         </logging>
-        <outputFile>output/simulationContOutput.txt</outputFile>
+        <output>
+            <writeOutput>true</writeOutput>
+            <file>output/simulationContOutput.csv</file>
+            <type>csv</type>
+        </output>
+        <outputFile>output/csvOutput.csv</outputFile>
         <timeBetweenSteps>100</timeBetweenSteps>
     </runDetails>
 

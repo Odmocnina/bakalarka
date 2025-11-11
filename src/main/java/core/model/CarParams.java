@@ -2,6 +2,7 @@ package core.model;
 
 import core.utils.Constants;
 
+import core.utils.RequestConstants;
 import javafx.scene.paint.Color;
 import java.util.HashMap;
 
@@ -47,7 +48,7 @@ public class CarParams {
      **/
     public double getParameter(String key) {
         return switch (key) {
-            case Constants.X_POSITION_REQUEST -> xPosition;
+            case RequestConstants.X_POSITION_REQUEST -> xPosition;
             case "lane" -> lane;
             case "id" -> id;
             default -> parameters.getOrDefault(key, Constants.PARAMETER_UNDEFINED);
