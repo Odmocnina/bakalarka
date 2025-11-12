@@ -127,7 +127,7 @@ public class CarGenerator {
         } else if (this.type.equals(Constants.CONTINOUS)) {
             car = generateCarContinuous();
         } else {
-            MyLogger.log("Unknown car generator type: " + this.type, Constants.WARN_FOR_LOGGING);
+            MyLogger.logBeforeLoading("Unknown car generator type: " + this.type, Constants.WARN_FOR_LOGGING);
         }
 
         this.id++;
@@ -306,7 +306,7 @@ public class CarGenerator {
         String[] requiredParams = this.carGenerationParameters;
 
         if (requiredParams.length == 0) {
-            MyLogger.log("CarGenerator: No parameters requested by the car following model."
+            MyLogger.logBeforeLoading("CarGenerator: No parameters requested by the car following model."
                     , Constants.FATAL_FOR_LOGGING);
             return false;
         }
@@ -315,13 +315,13 @@ public class CarGenerator {
             Parameter p = parameters.get(param);
 
             if (p == null) {
-                MyLogger.log("CarGenerator: Parameter " + param + " not set in car generator."
+                MyLogger.logBeforeLoading("CarGenerator: Parameter " + param + " not set in car generator."
                         , Constants.FATAL_FOR_LOGGING);
                 return false;
             }
 
             if (!p.checkIfValid()) {
-                MyLogger.log("CarGenerator: Parameter " + param + " has invalid range: min=" + p.minValue +
+                MyLogger.logBeforeLoading("CarGenerator: Parameter " + param + " has invalid range: min=" + p.minValue +
                         ", max=" + p.maxValue, Constants.FATAL_FOR_LOGGING);
                 return false;
             }

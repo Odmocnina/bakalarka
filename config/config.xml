@@ -5,10 +5,10 @@
 
     <models>
         <carFollowingModel>
-            <id>helly</id>
+            <id>idm</id>
         </carFollowingModel>
         <laneChangingModel>
-            <id>rickert</id>
+            <id>mobil</id>
         </laneChangingModel>
     </models>
 
@@ -47,11 +47,19 @@
                 <minValue>0.5</minValue>
                 <maxValue>1.5</maxValue>
             </distanceDifferenceSensitivity>
+            <edgeValueForLaneChange>
+                <minValue>0.1</minValue>
+                <maxValue>0.3</maxValue>
+            </edgeValueForLaneChange>
+            <politenessFactor>
+                <minValue>0.0</minValue>
+                <maxValue>1.0</maxValue>
+            </politenessFactor>
         </carParams>
     </generator>
 
     <runDetails>
-        <showGui>false</showGui>
+        <showGui>true</showGui>
         <drawCells>false</drawCells>
         <timeStep>1</timeStep>
         <duration>200</duration>

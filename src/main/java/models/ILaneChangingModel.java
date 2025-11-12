@@ -51,6 +51,8 @@ public interface ILaneChangingModel {
      **/
     Direction changeLaneIfDesired(HashMap<String, Double> parameters);
 
+    Direction changeLaneIfDesired(HashMap<String, Double> parameters, Direction direction);
+
     /**
      * function to get the name of the model
      *

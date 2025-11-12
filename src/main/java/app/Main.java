@@ -91,7 +91,7 @@ public class Main {
                     Constants.INFO_FOR_LOGGING);
         } else { // missing some parameters, exit
             MyLogger.logBeforeLoading("Car generator parameters are NOT valid for the selected " +
-                            "car following model, exiting.", Constants.FATAL_FOR_LOGGING);
+                            "car-following model/lane-changing model, exiting.", Constants.FATAL_FOR_LOGGING);
             return;
         }
 

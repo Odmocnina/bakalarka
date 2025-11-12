@@ -96,6 +96,29 @@ public class Rickert implements ILaneChangingModel {
         return STRAIGHT;
     }
 
+    public Direction changeLaneIfDesired(HashMap<String, Double> parameters, Direction direction) {
+        int distanceToNextCar = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST).intValue();
+        int maxSpeed = parameters.get(RequestConstants.MAX_SPEED_REQUEST).intValue();
+        int currentSpeed = parameters.get(RequestConstants.CURRENT_SPEED_REQUEST).intValue() + 1;
+        int forwardGap = 0;
+        int previousGap = 0;
+        if (direction == LEFT) {
+            forwardGap = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST).intValue();
+            previousGap = parameters.get(RequestConstants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST).intValue();
+        } else if (direction == RIGHT) {
+            forwardGap = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST).intValue();
+            previousGap = parameters.get(RequestConstants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST).intValue();
+        } else {
+            return STRAIGHT;
+        }
+
+        if (makeDecision(distanceToNextCar, maxSpeed, currentSpeed, forwardGap, previousGap)) {
+            return direction;
+        }
+
+        return STRAIGHT;
+    }
+
     /**
      * makes the decision to change lane or not based on the rickert model, returns true if the decision is to change
      * lane, false otherwise

@@ -203,6 +203,8 @@ public class ConfigLoader {
                 modelFromConfig = new Rule184();
             } else if (id.equals("ovm")) {
                 modelFromConfig = new OVM();
+            } else if (id.equals("fvdm")) {
+                modelFromConfig = new OVM();
             } else if (id.equals("helly")) {
                 modelFromConfig = new Helly();
             } else if (id.equals("headleading")) {
@@ -252,6 +254,8 @@ public class ConfigLoader {
             //TODO add reflexion for dynamic loading of models
             if (id.equals("rickert")) {
                 modelFromConfig = new Rickert();
+            } else if (id.equals("mobil")) {
+                modelFromConfig = new Mobil();
             } else {
                 MyLogger.logBeforeLoading("Unknown lane changing model id in config file: " + id + ", exiting"
                         , Constants.FATAL_FOR_LOGGING);
@@ -406,16 +410,6 @@ public class ConfigLoader {
                         , Constants.INFO_FOR_LOGGING);
                 detailsFromConfig.showGui = false;
             }
-
-            /*if (outputFile != null) {
-                MyLogger.logBeforeLoading("Output file from config: " + outputFile.getTextContent()
-                        , Constants.INFO_FOR_LOGGING);
-                detailsFromConfig.outputFile = outputFile.getTextContent();
-            } else {
-                MyLogger.logBeforeLoading("Missing outputFile in run details, results will not be saved"
-                        , Constants.WARN_FOR_LOGGING);
-                detailsFromConfig.outputFile = null;
-            }*/
 
             boolean hasOutput = loadOutput(detailsFromConfig, outputElements);
             if (hasOutput) {

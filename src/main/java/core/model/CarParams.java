@@ -13,7 +13,7 @@ import java.util.HashMap;
  * @author Michael Hladky
  * @version 1.0
  ********************************/
-public class CarParams {
+public class CarParams implements Cloneable {
 
     /** x position of the car on the road **/
     public double xPosition = Constants.PARAMETER_UNDEFINED;
@@ -68,6 +68,18 @@ public class CarParams {
         }
 
         return paramsString + "}}";
+    }
+
+    @Override
+    public CarParams clone() {
+        try {
+            CarParams cloned = (CarParams) super.clone(); // mělká kopie
+            cloned.parameters = new HashMap<>(this.parameters); // hluboká kopie HashMap
+            // Barva (Color) je neměnná (immutable), takže ji můžeš jen zkopírovat jako referenci
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // nemělo by nikdy nastat, protože implementuješ Cloneable
+        }
     }
 
 }
