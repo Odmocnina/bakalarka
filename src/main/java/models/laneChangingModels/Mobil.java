@@ -1,6 +1,7 @@
 package models.laneChangingModels;
 
 import core.model.Direction;
+import core.utils.Constants;
 import core.utils.RequestConstants;
 import models.ILaneChangingModel;
 
@@ -31,43 +32,55 @@ public class Mobil implements ILaneChangingModel {
      **/
     @Override
     public String requestParameters() {
-        return RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.POLITENESS_FACTOR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.NOW_ACCELERATION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.NOW_ACCELERATION_LEFT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.NOW_ACCELERATION_RIGHT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.NOW_ACCELERATION_STRAIGHT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.THEORETICAL_ACCELERATION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.THEORETICAL_ACCELERATION_LEFT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.THEORETICAL_ACCELERATION_RIGHT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.THEORETICAL_ACCELERATION_STRAIGHT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR
-                + RequestConstants.DECELERATION_COMFORT_LEFT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.DECELERATION_COMFORT_RIGHT_BACKWARD_REQUEST;
+        String[] requests = {
+                RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST,
+                RequestConstants.POLITENESS_FACTOR_REQUEST,
+                RequestConstants.NOW_ACCELERATION_REQUEST,
+                RequestConstants.NOW_ACCELERATION_LEFT_BACKWARD_REQUEST,
+                RequestConstants.NOW_ACCELERATION_RIGHT_BACKWARD_REQUEST,
+                RequestConstants.NOW_ACCELERATION_STRAIGHT_BACKWARD_REQUEST,
+                RequestConstants.THEORETICAL_ACCELERATION_REQUEST,
+                RequestConstants.THEORETICAL_ACCELERATION_LEFT_BACKWARD_REQUEST,
+                RequestConstants.THEORETICAL_ACCELERATION_RIGHT_BACKWARD_REQUEST,
+                RequestConstants.THEORETICAL_ACCELERATION_STRAIGHT_BACKWARD_REQUEST,
+                RequestConstants.DECELERATION_COMFORT_LEFT_BACKWARD_REQUEST,
+                RequestConstants.DECELERATION_COMFORT_RIGHT_BACKWARD_REQUEST
+        };
+
+        return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
     }
 
     @Override
     public String requestParameters(Direction direction) {
+        String[] requests;
         if (direction == Direction.LEFT) {
-            return RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.POLITENESS_FACTOR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.NOW_ACCELERATION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.NOW_ACCELERATION_LEFT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.NOW_ACCELERATION_STRAIGHT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.THEORETICAL_ACCELERATION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.THEORETICAL_ACCELERATION_LEFT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR
-                    + RequestConstants.THEORETICAL_ACCELERATION_STRAIGHT_BACKWARD_REQUEST +
-                    RequestConstants.REQUEST_SEPARATOR + RequestConstants.DECELERATION_COMFORT_LEFT_BACKWARD_REQUEST;
+            requests = new String[]{
+                    RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST,
+                    RequestConstants.POLITENESS_FACTOR_REQUEST,
+                    RequestConstants.NOW_ACCELERATION_REQUEST,
+                    RequestConstants.NOW_ACCELERATION_LEFT_BACKWARD_REQUEST,
+                    RequestConstants.NOW_ACCELERATION_STRAIGHT_BACKWARD_REQUEST,
+                    RequestConstants.THEORETICAL_ACCELERATION_REQUEST,
+                    RequestConstants.THEORETICAL_ACCELERATION_LEFT_BACKWARD_REQUEST,
+                    RequestConstants.THEORETICAL_ACCELERATION_STRAIGHT_BACKWARD_REQUEST,
+                    RequestConstants.DECELERATION_COMFORT_LEFT_BACKWARD_REQUEST
+            };
 
+            return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
         } else if (direction == Direction.RIGHT) {
-            return RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.POLITENESS_FACTOR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.NOW_ACCELERATION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.NOW_ACCELERATION_RIGHT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.NOW_ACCELERATION_STRAIGHT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.THEORETICAL_ACCELERATION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.THEORETICAL_ACCELERATION_RIGHT_BACKWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR
-                    + RequestConstants.THEORETICAL_ACCELERATION_STRAIGHT_BACKWARD_REQUEST +
-                    RequestConstants.REQUEST_SEPARATOR + RequestConstants.DECELERATION_COMFORT_RIGHT_BACKWARD_REQUEST;
+            requests = new String[]{
+                    RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST,
+                    RequestConstants.POLITENESS_FACTOR_REQUEST,
+                    RequestConstants.NOW_ACCELERATION_REQUEST,
+                    RequestConstants.NOW_ACCELERATION_RIGHT_BACKWARD_REQUEST,
+                    RequestConstants.NOW_ACCELERATION_STRAIGHT_BACKWARD_REQUEST,
+                    RequestConstants.THEORETICAL_ACCELERATION_REQUEST,
+                    RequestConstants.THEORETICAL_ACCELERATION_RIGHT_BACKWARD_REQUEST,
+                    RequestConstants.THEORETICAL_ACCELERATION_STRAIGHT_BACKWARD_REQUEST,
+                    RequestConstants.DECELERATION_COMFORT_RIGHT_BACKWARD_REQUEST
+            };
+
+            return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
         }
 
         return "";
@@ -130,9 +143,14 @@ public class Mobil implements ILaneChangingModel {
             return Direction.STRAIGHT;
         }
         double deacelarationForSaftey = Math.abs(theoreticalAcceleration);
+        if (decelerarion == Constants.NO_CAR_THERE) {
+            decelerarion = Double.MAX_VALUE;
+        }
         if (deacelarationForSaftey > decelerarion) { // safety check
             return Direction.STRAIGHT;
         }
+
+        //return direction;
 
         double nowAccelerationNeighborBackward = 0;
         double theoreticalAccelerationNeighborBackward = 0;

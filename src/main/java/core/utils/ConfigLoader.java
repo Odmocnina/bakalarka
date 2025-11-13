@@ -204,7 +204,7 @@ public class ConfigLoader {
             } else if (id.equals("ovm")) {
                 modelFromConfig = new OVM();
             } else if (id.equals("fvdm")) {
-                modelFromConfig = new OVM();
+                modelFromConfig = new FVDM();
             } else if (id.equals("helly")) {
                 modelFromConfig = new Helly();
             } else if (id.equals("headleading")) {
@@ -377,6 +377,7 @@ public class ConfigLoader {
             Element logElements = (Element) runDetailsElement.getElementsByTagName("logging").item(0);
             Element timeBetweenSteps = (Element) runDetailsElement.getElementsByTagName("timeBetweenSteps")
                     .item(0);
+            Element laneChange = (Element) runDetailsElement.getElementsByTagName("laneChange").item(0);
 
             if (duration != null) {
                 detailsFromConfig.duration = Integer.parseInt(duration.getTextContent());
@@ -429,6 +430,12 @@ public class ConfigLoader {
                 MyLogger.logBeforeLoading("Duration is undefined and GUI is disabled, simulation cannot run" +
                                 ", exiting", Constants.FATAL_FOR_LOGGING);
                 return null;
+            }
+
+            if (laneChange != null) {
+                detailsFromConfig.laneChange = Boolean.parseBoolean(laneChange.getTextContent());
+            } else {
+                detailsFromConfig.laneChange = true; // default to lane changing enabled
             }
 
             if (detailsFromConfig.showGui) {

@@ -4,12 +4,12 @@
     <Appenders>
         <!-- Výpis do konzole -->
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%d{HH:mm:ss.SSS}][%-5level][%logger{36}] - %msg%n"/>
+            <PatternLayout pattern="[%d{HH:mm:ss.SSS}][%-5level] - %msg%n"/>
         </Console>
 
         <!-- Výpis do souboru -->
         <File name="FileLogger" fileName="logs/app.log" append="false">
-            <PatternLayout pattern="[%d{HH:mm:ss.SSS}][%-5level][%logger{36}] - %msg%n"/>
+            <PatternLayout pattern="[%d{HH:mm:ss.SSS}][%-5level] - %msg%n"/>
         </File>
     </Appenders>
 

@@ -117,16 +117,20 @@ public class IDM implements ICarFollowingModel {
      **/
     @Override
     public String requestParameters() {
-        return RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.CURRENT_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.X_POSITION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.MAX_ACCELERATION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.DECELERATION_COMFORT_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.DESIRED_TIME_HEADWAY_REQUEST;
+        String[] requests = {
+                RequestConstants.MAX_SPEED_REQUEST,
+                RequestConstants.CURRENT_SPEED_REQUEST,
+                RequestConstants.X_POSITION_REQUEST,
+                RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
+                RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST,
+                RequestConstants.MAX_ACCELERATION_REQUEST,
+                RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST,
+                RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST,
+                RequestConstants.DECELERATION_COMFORT_REQUEST,
+                RequestConstants.DESIRED_TIME_HEADWAY_REQUEST
+        };
+
+        return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
     }
 
     /**
@@ -136,12 +140,16 @@ public class IDM implements ICarFollowingModel {
      **/
     @Override
     public String getParametersForGeneration() {
-        return RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.MAX_ACCELERATION_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.DECELERATION_COMFORT_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.DESIRED_TIME_HEADWAY_REQUEST + RequestConstants.REQUEST_SEPARATOR
-                + RequestConstants.LENGTH_REQUEST;
+        String[] requests = {
+                RequestConstants.MAX_SPEED_REQUEST,
+                RequestConstants.MAX_ACCELERATION_REQUEST,
+                RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST,
+                RequestConstants.DECELERATION_COMFORT_REQUEST,
+                RequestConstants.DESIRED_TIME_HEADWAY_REQUEST,
+                RequestConstants.LENGTH_REQUEST
+        };
+
+        return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
     }
 
     /**

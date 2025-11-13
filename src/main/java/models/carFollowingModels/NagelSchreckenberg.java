@@ -91,9 +91,13 @@ public class NagelSchreckenberg implements ICarFollowingModel {
      **/
     @Override
     public String requestParameters() {
-        return RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.CURRENT_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST;
+        String[] requests = {
+                RequestConstants.MAX_SPEED_REQUEST,
+                RequestConstants.CURRENT_SPEED_REQUEST,
+                RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST
+        };
+
+        return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
     }
 
     /**
@@ -103,8 +107,12 @@ public class NagelSchreckenberg implements ICarFollowingModel {
      **/
     @Override
     public String getParametersForGeneration() {
-        return RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR
-                + RequestConstants.LENGTH_REQUEST + RequestConstants.REQUEST_SEPARATOR;
+        String[] requests = {
+                RequestConstants.MAX_SPEED_REQUEST,
+                RequestConstants.LENGTH_REQUEST
+        };
+
+        return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
     }
 
     /**

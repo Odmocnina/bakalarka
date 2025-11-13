@@ -31,28 +31,40 @@ public class Rickert implements ILaneChangingModel {
      * @return the list of parameters that the rickert model needs to make a decision
      **/
     public String requestParameters() {
-        return RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.CURRENT_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST;
+        String[] requests = {
+                RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST,
+                RequestConstants.MAX_SPEED_REQUEST,
+                RequestConstants.CURRENT_SPEED_REQUEST,
+                RequestConstants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST,
+                RequestConstants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST,
+                RequestConstants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST,
+                RequestConstants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST
+        };
+
+        return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
     }
 
     public String requestParameters(Direction direction) {
         if (direction == LEFT) {
-            return RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.CURRENT_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST;
+            String[] requests = {
+                    RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST,
+                    RequestConstants.MAX_SPEED_REQUEST,
+                    RequestConstants.CURRENT_SPEED_REQUEST,
+                    RequestConstants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST,
+                    RequestConstants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST
+            };
+
+            return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
         } else if (direction == RIGHT) {
-            return RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.CURRENT_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                    RequestConstants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST;
+            String[] requests = {
+                    RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST,
+                    RequestConstants.MAX_SPEED_REQUEST,
+                    RequestConstants.CURRENT_SPEED_REQUEST,
+                    RequestConstants.DISTANCE_TO_NEXT_CAR_RIGHT_REQUEST,
+                    RequestConstants.DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST
+            };
+
+            return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
         } else {
             return "";
         }

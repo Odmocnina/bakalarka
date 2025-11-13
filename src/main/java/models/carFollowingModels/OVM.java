@@ -45,10 +45,14 @@ public class OVM implements ICarFollowingModel {
      **/
     @Override
     public String requestParameters() {
-        return RequestConstants.CURRENT_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST;
+        String[] requests = {
+                RequestConstants.CURRENT_SPEED_REQUEST,
+                RequestConstants.MAX_SPEED_REQUEST,
+                RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST,
+                RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST
+        };
+
+        return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
 
     }
 
@@ -59,9 +63,13 @@ public class OVM implements ICarFollowingModel {
      **/
     @Override
     public String getParametersForGeneration() {
-        return RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.LENGTH_REQUEST;
+        String[] requests = {
+                RequestConstants.MAX_SPEED_REQUEST,
+                RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.LENGTH_REQUEST
+        };
+
+        return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
     }
 
     /**

@@ -34,12 +34,19 @@
       <artifactId>javafx-controls</artifactId>
       <version>23.0.1</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.10.2</version>
+      <scope>test</scope>
+    </dependency>
     
   </dependencies>
 
   <build>
     <plugins>
-      <!-- spou�t�n�: mvn -q exec:java -->
+      <!-- spouštění: mvn -q exec:java -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -49,7 +56,7 @@
         </configuration>
       </plugin>
 
-      <!-- vytvo�en� spustiteln�ho JARu s Manifestem -->
+      <!-- vytvoření spustitelného JARu s Manifestem -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -63,7 +70,17 @@
         </configuration>
       </plugin>
 
-      <!-- (voliteln�) fat-jar: mvn -q clean package -Pshade vytvo�� jeden JAR se v�emi z�vislostmi -->
+      <!-- JUnit 5 runner -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.1.2</version>
+        <configuration>
+          <useModulePath>false</useModulePath>
+        </configuration>
+      </plugin>
+
+      <!-- fat-jar: mvn -q clean package -Pshade -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>

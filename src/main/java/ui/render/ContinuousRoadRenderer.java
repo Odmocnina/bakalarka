@@ -7,6 +7,8 @@ import core.utils.Constants;
 import core.utils.RequestConstants;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+
+import java.util.Iterator;
 import java.util.LinkedList;
 
 /********************************************
@@ -69,25 +71,30 @@ public class ContinuousRoadRenderer implements IRoadRenderer {
             gc.fillRect(offsetX, y, roadWidthPx * widthMultiplayer, laneHpx);
 
             // cars in lane on index i
-            if (i < vehicles.length && vehicles[i] != null) {
-                for (CarParams car : vehicles[i]) {
-                    // x place of car
-                    double carX = offsetX + car.xPosition * widthMultiplayer;
-                    double carW = car.getParameter(RequestConstants.LENGTH_REQUEST) * widthMultiplayer;
+            Iterator<CarParams> it = vehicles[i].iterator();
+            while (it.hasNext()) {
+                CarParams car = it.next();
 
-                    // y place of car
-                    double carY = y + laneHpx * carUpLiftFactor;
-                    double carH = laneHpx * carSmallingFactor;
+                // x place of car
+                double carX = offsetX + car.xPosition * widthMultiplayer;
+                double carW = car.getParameter(RequestConstants.LENGTH_REQUEST) * widthMultiplayer;
 
-                    if (car.color != null) {
-                        carColor = car.color;
-                    } else {
-                        carColor = Color.RED;
-                    }
+                // y place of car
+                double carY = y + laneHpx * carUpLiftFactor;
+                double carH = laneHpx * carSmallingFactor;
 
-                    gc.setFill(carColor);
-                    gc.fillRect(carX - carW, carY, carW, carH);
+                if (car.color != null) {
+                    carColor = car.color;
+                } else {
+                    carColor = Color.RED;
                 }
+
+                gc.setFill(carColor);
+                gc.fillRect(carX - carW, carY, carW, carH);
+                gc.setStroke(Color.BLACK);
+              //  gc.strokeRect(carX - carW, carY, carW, carH);
+                // draw recangle around car
+                gc.strokeRect(carX - carW, carY, carW, carH);
             }
 
             // separating line between lanes

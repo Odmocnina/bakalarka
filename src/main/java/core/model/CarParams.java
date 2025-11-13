@@ -30,6 +30,9 @@ public class CarParams implements Cloneable {
     /** color of the car **/
     public Color color = null;
 
+    /** flag indicating if the car has been processed in the current simulation step **/
+    public boolean processedInCurrentStep = false;
+
     /**
      * setter for parameter in the parameters HashMap
      *

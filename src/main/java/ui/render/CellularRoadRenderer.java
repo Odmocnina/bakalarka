@@ -81,7 +81,9 @@ public class CellularRoadRenderer implements IRoadRenderer {
             if (lane < lanes - 1) {
                 gc.setStroke(Color.WHITE);
                 gc.setLineWidth(Constants.LINE_SEPARATOR_WIDTH);
-                gc.setLineDashes(12, 8);
+                if (AppContext.RUN_DETAILS.laneChange) {
+                    gc.setLineDashes(12, 8);
+                }
                 double sepY = y + cellSize;
                 gc.strokeLine(offsetX, sepY, offsetX + roadWidthPx, sepY);
                 gc.setLineDashes(null);

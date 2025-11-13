@@ -24,6 +24,9 @@ public class RunDetails {
     /** Whether to draw cells in the GUI if cellular model **/
     public boolean drawCells;
 
+    /** Whether lane changing is enabled **/
+    public boolean laneChange;
+
     /** Logging settings: [general, info, warn, error, fatal, debug] **/
     public boolean[] log = new boolean[] { true, true, true, true, true, true };
 

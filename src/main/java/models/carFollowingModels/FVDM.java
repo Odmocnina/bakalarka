@@ -4,6 +4,8 @@ import core.utils.Constants;
 import core.utils.RequestConstants;
 import models.ICarFollowingModel;
 
+import java.util.HashMap;
+
 /********************************************
  * Optimal Velocity Model (OVM) car following model implementation (continuous)
  *
@@ -18,16 +20,31 @@ public class FVDM implements ICarFollowingModel {
      * @param parameters HashMap of parameters needed for calculation
      **/
     @Override
-    public double getNewSpeed(java.util.HashMap<String, Double> parameters) {
+    public double getNewSpeed(HashMap<String, Double> parameters) {
         double currentSpeed = parameters.get(RequestConstants.CURRENT_SPEED_REQUEST);
-        double distance = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST);
+        double xPosition = parameters.get(RequestConstants.X_POSITION_REQUEST);
+        double xPositionStraightForward = parameters.get(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST);
+
+        double distance;
+        if (xPositionStraightForward == Constants.NO_CAR_THERE) {
+            distance = Double.MAX_VALUE;
+        } else {
+            distance = xPositionStraightForward - xPosition;
+        }
         double speedDifferenceSensitivityParameter =
                 parameters.get(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST);
         double currentSpeedStraightForward =
                 parameters.get(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST);
-        double speedDifference = currentSpeedStraightForward - currentSpeed;
-        double positionSensitivity =
-                parameters.get(RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST);
+
+        double speedDifference;
+        if (currentSpeedStraightForward == Constants.NO_CAR_THERE) {
+            speedDifference = 0;
+        } else {
+            speedDifference = currentSpeedStraightForward - currentSpeed;
+        }
+        double positionSensitivity = parameters.get(RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST);
+
+
 
         return currentSpeed + (positionSensitivity *
                 (optimalVelocity(distance) - currentSpeed) + speedDifferenceSensitivityParameter * speedDifference);
@@ -50,11 +67,18 @@ public class FVDM implements ICarFollowingModel {
      **/
     @Override
     public String requestParameters() {
-        return RequestConstants.CURRENT_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST;
+        String[] requests = {
+                RequestConstants.CURRENT_SPEED_REQUEST,
+                RequestConstants.MAX_SPEED_REQUEST,
+                RequestConstants.X_POSITION_REQUEST,
+                RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
+                RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST
+        };
+
+
+        return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
 
     }
 
@@ -65,9 +89,14 @@ public class FVDM implements ICarFollowingModel {
      **/
     @Override
     public String getParametersForGeneration() {
-        return RequestConstants.MAX_SPEED_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST + RequestConstants.REQUEST_SEPARATOR +
-                RequestConstants.LENGTH_REQUEST;
+        String[] requests = {
+                RequestConstants.MAX_SPEED_REQUEST,
+                RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.LENGTH_REQUEST
+        };
+
+        return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
     }
 
     /**

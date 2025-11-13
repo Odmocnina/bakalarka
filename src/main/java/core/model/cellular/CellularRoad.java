@@ -4,7 +4,6 @@ import app.AppContext;
 import core.model.CarParams;
 import core.model.Direction;
 import core.model.Road;
-import core.sim.Simulation;
 import core.utils.Constants;
 import core.utils.MyLogger;
 import core.utils.RequestConstants;
@@ -253,7 +252,11 @@ public class CellularRoad extends Road {
      **/
     @Override
     public int updateRoad() {
-        this.laneChangeStep();
+
+        if (AppContext.RUN_DETAILS.laneChange) {
+            this.laneChangeStep();
+        }
+
         int carsPassed = this.forwardStep();
 
         if (true)
