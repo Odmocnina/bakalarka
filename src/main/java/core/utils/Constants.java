@@ -23,6 +23,7 @@ public class Constants {
             Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.ORANGE,
             Color.PURPLE, Color.PINK, Color.BROWN, Color.CYAN, Color.MAGENTA
     };
+    public static final double CONTINOUS_ROAD_DRAWING_SCALE_FACTOR = 2.0;
     public static final String GENERATOR_QUEUE = "queue";
     public static final double NO_CAR_THERE = -10000.0;
     public static final String WARN_FOR_LOGGING = "warn";

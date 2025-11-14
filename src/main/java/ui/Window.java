@@ -200,7 +200,7 @@ public class Window extends Application {
 
             if (r.getLength() > 0 && r.getNumberOfLanes() > 0) {
                 lanes = r.getNumberOfLanes();
-                length = (int) (r.getLength());
+                length = (int) (r.getLength() * Constants.CONTINOUS_ROAD_DRAWING_SCALE_FACTOR);
             }
 
             neededHeight += lanes * LANE_WIDTH + GAP;

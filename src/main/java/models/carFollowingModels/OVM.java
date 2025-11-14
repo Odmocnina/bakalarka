@@ -20,7 +20,14 @@ public class OVM implements ICarFollowingModel {
     @Override
     public double getNewSpeed(java.util.HashMap<String, Double> parameters) {
         double currentSpeed = parameters.get(RequestConstants.CURRENT_SPEED_REQUEST);
-        double distance = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST);
+        double distance;
+        double xPosition = parameters.get(RequestConstants.X_POSITION_REQUEST);
+        double xPositionStraightForward = parameters.get(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST);
+        if (xPositionStraightForward == Constants.NO_CAR_THERE) {
+            distance = Double.MAX_VALUE;
+        } else {
+            distance = xPositionStraightForward - xPosition;
+        }
         double speedDifferenceSensitivityParameter =
                 parameters.get(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST);
 
@@ -48,7 +55,8 @@ public class OVM implements ICarFollowingModel {
         String[] requests = {
                 RequestConstants.CURRENT_SPEED_REQUEST,
                 RequestConstants.MAX_SPEED_REQUEST,
-                RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST,
+                RequestConstants.X_POSITION_REQUEST,
+                RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
                 RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST
         };
 

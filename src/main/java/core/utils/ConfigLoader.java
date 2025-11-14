@@ -256,6 +256,8 @@ public class ConfigLoader {
                 modelFromConfig = new Rickert();
             } else if (id.equals("mobil")) {
                 modelFromConfig = new Mobil();
+            } else if (id.equals("mobil-simple")) {
+                modelFromConfig = new MobilSimple();
             } else {
                 MyLogger.logBeforeLoading("Unknown lane changing model id in config file: " + id + ", exiting"
                         , Constants.FATAL_FOR_LOGGING);

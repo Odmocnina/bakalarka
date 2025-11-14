@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <numberOfRoads>50</numberOfRoads>
+    <numberOfRoads>10</numberOfRoads>
     <roadFile>config/roads/road1.xml</roadFile>
 
     <models>
         <carFollowingModel>
-            <id>fvdm</id>
+            <id>idm</id>
         </carFollowingModel>
         <laneChangingModel>
-            <id>mobil</id>
+            <id>mobil-simple</id>
         </laneChangingModel>
     </models>
 
     <generator>
-        <flowRate>0.2</flowRate>
+        <flowRate>1.0</flowRate>
         <carParams>
             <maxSpeed>
                 <minValue>20</minValue>
@@ -41,10 +41,10 @@
             </desiredTimeHeadway>
             <speedDifferenceSensitivity>
                 <minValue>0.5</minValue>
-                <maxValue>1.5</maxValue>
+                <maxValue>0.5</maxValue>
             </speedDifferenceSensitivity>
             <distanceDifferenceSensitivity>
-                <minValue>0.5</minValue>
+                <minValue>1.5</minValue>
                 <maxValue>1.5</maxValue>
             </distanceDifferenceSensitivity>
             <edgeValueForLaneChange>
@@ -61,8 +61,9 @@
     <runDetails>
         <showGui>true</showGui>
         <drawCells>false</drawCells>
+        <laneChange>true</laneChange>
         <timeStep>1</timeStep>
-        <duration>200</duration>
+        <duration>500</duration>
         <logging>
             <log>true</log>
             <info>true</info>
@@ -73,10 +74,9 @@
         </logging>
         <output>
             <writeOutput>true</writeOutput>
-            <file>output/simulationContOutput.csv</file>
-            <type>csv</type>
+            <file>output/simulationContOutputMobilSimple2.txt</file>
+            <type>txt</type>
         </output>
-        <outputFile>output/csvOutput.csv</outputFile>
         <timeBetweenSteps>100</timeBetweenSteps>
     </runDetails>
 

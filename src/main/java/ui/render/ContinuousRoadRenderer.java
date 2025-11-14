@@ -49,7 +49,7 @@ public class ContinuousRoadRenderer implements IRoadRenderer {
         double carSmallingFactor = 0.8;
         double carUpLiftFactor = 0.1;
         // width multiplayer so that it looks better
-        double widthMultiplayer = 2.0;
+        double widthMultiplayer = Constants.CONTINOUS_ROAD_DRAWING_SCALE_FACTOR;
 
         // cars in lanes
         Object roadContent = road.getContent();
@@ -87,6 +87,12 @@ public class ContinuousRoadRenderer implements IRoadRenderer {
                     carColor = car.color;
                 } else {
                     carColor = Color.RED;
+                }
+
+                if (true) {
+                    gc.setFill(Color.PURPLE);
+                    String idInString = Integer.toString(car.id);
+                    gc.fillText(idInString, carX - carW / 2, carY);
                 }
 
                 gc.setFill(carColor);
