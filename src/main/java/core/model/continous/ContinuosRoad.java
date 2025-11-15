@@ -183,7 +183,6 @@ public class ContinuosRoad extends Road {
      * @return number of cars that passed the end of the road
      **/
     private int forwardStep() {
-        int carsPassed = 0;
         for (int lane = this.numberOfLanes - 1; lane >= 0; lane--) {
             MyLogger.log("Updating lane " + lane + " with " + this.vehicles[lane].size() + " vehicles.",
                     Constants.DEBUG_FOR_LOGGING);
@@ -213,6 +212,10 @@ public class ContinuosRoad extends Road {
         // nothing to update if lane is empty
         if (this.vehicles[lane] == null || this.vehicles[lane].isEmpty()) {
             return 0;
+        }
+
+        if (AppContext.SIMULATION.getStepCount() > 10) {
+            int i = 0;
         }
 
         // safe iteration and removal using ListIterator
@@ -426,6 +429,7 @@ public class ContinuosRoad extends Road {
             return null;
         }
         String[] carGeneratedParams = this.generator.getCarGenerationParameters();
+        String[] roadSimulationParams = {RequestConstants.TIME_STEP_REQUEST, RequestConstants.MAX_ROAD_SPEED_REQUEST};
 
         CarParams car = this.getCarById(carChangingLane.id, road);
         for (String param : params) {
@@ -441,6 +445,8 @@ public class ContinuosRoad extends Road {
                     acceleration = this.getAccelerationOfDifferentCar(carForInspection, param, vehicles);
                 }
                 parameters.put(param, acceleration);
+            } else if (StringEditor.isInArray(roadSimulationParams, param)) { //get from road/simulation
+                this.getRoadSimulationParameter(parameters, param, car);
             } else {   // get parameter from different car in proximity
                 this. getParametersAboutDifferentCarN(parameters, param, car, road);
             }
@@ -450,10 +456,10 @@ public class ContinuosRoad extends Road {
 
     ///////////////////////////////////////////////////////////////////////////////////
 
-    private void getParametersAboutDifferentCarN(HashMap<String, Double> parameters, String param, CarParams car, LinkedList<CarParams>[] road) {
+    private void getParametersAboutDifferentCarN(HashMap<String, Double> parameters, String param, CarParams car,
+                                                 LinkedList<CarParams>[] road) {
         String[] paramSeparate = param.split(RequestConstants.SUBREQUEST_SEPARATOR);
         String wantedParam = paramSeparate[0];
-        Direction direction = Direction.valueOf(paramSeparate[1]);
         Orientation orientation = Orientation.valueOf(paramSeparate[2]);
 
         CarParams otherCar = getCarInProximityN(orientation, car, road);
@@ -627,7 +633,6 @@ public class ContinuosRoad extends Road {
             }
 
             road[lane].add(place, car);
-            //road[oldLane].remove(car);
             car.lane = lane;
             return true;
         }

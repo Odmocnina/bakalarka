@@ -49,6 +49,7 @@ public class Gipps implements ICarFollowingModel {
                 RequestConstants.MAX_ACCELERATION_REQUEST,
                 RequestConstants.DECELERATION_COMFORT_REQUEST,
                 RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST,
+                RequestConstants.LENGTH_REQUEST
         };
 
         return String.join(RequestConstants.REQUEST_SEPARATOR, params);
@@ -66,24 +67,24 @@ public class Gipps implements ICarFollowingModel {
         double maxRoadSpeed = parameters.get(RequestConstants.MAX_ROAD_SPEED_REQUEST);
         double maxSpeed = parameters.get(RequestConstants.MAX_SPEED_REQUEST);
         double timeStep = parameters.get(RequestConstants.TIME_STEP_REQUEST);
-        double leadingSpeed = parameters.get(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST);
-        if (leadingSpeed == Constants.NO_CAR_THERE) {
-            leadingSpeed = Double.MAX_VALUE;
-        }
         double minGap = parameters.get(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST);
-        double maxDeceleration = parameters.get(RequestConstants.DECELERATION_COMFORT_REQUEST);
-        double maxDecelerationBack = parameters.get(RequestConstants.DECELERATION_COMFORT_REQUEST_STRAIGHT_FORWARD);
+        double maxDeceleration = -parameters.get(RequestConstants.DECELERATION_COMFORT_REQUEST);
+        double maxDecelerationFront = -parameters.get(RequestConstants.DECELERATION_COMFORT_REQUEST_STRAIGHT_FORWARD);
         double xPosition = parameters.get(RequestConstants.X_POSITION_REQUEST);
         double leadingXPosition = parameters.get(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST);
         if (leadingXPosition == Constants.NO_CAR_THERE) {
-            leadingXPosition = Double.MAX_VALUE;
+            return this.getFreeFlowSpeed(currentSpeed, maxAcceleration,
+                    Math.min(maxRoadSpeed, maxSpeed), timeStep);
         }
-
+        double leadingSpeed = parameters.get(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST);
         double desiredSpeed = Math.min(maxRoadSpeed, maxSpeed);
 
         double freeFlowSpeed = getFreeFlowSpeed(currentSpeed, maxAcceleration, desiredSpeed, timeStep);
         double safeSpeed = safeSpeed(currentSpeed, maxDeceleration, leadingSpeed, minGap,
-                maxDecelerationBack, timeStep, xPosition, leadingXPosition);
+                maxDecelerationFront, timeStep, xPosition, leadingXPosition);
+        if (safeSpeed < 0 || Double.isNaN(safeSpeed)) {
+            safeSpeed = 0;
+        }
 
         return Math.min(freeFlowSpeed, safeSpeed);
     }
@@ -95,12 +96,13 @@ public class Gipps implements ICarFollowingModel {
     }
 
     private double safeSpeed(double currentSpeed, double maxDeceleration, double leadingSpeed, double minGap,
-                             double maxDecelerationBack, double timeStep, double xPosition, double leadingXPosition) {
+                             double maxDecelerationFront, double timeStep, double xPosition, double leadingXPosition) {
         double firstPart = maxDeceleration * timeStep;
         double positionGap = leadingXPosition - xPosition - minGap;
         double firstPartUnderSqrt = maxDeceleration * maxDeceleration * timeStep * timeStep;
-        double endingPartBraces = currentSpeed * timeStep - (leadingSpeed * leadingSpeed)/maxDecelerationBack;
-        double secondTerm = Math.sqrt(firstPartUnderSqrt - maxDeceleration * (2 * positionGap - endingPartBraces));
+        double endingPartBraces = currentSpeed * timeStep - (leadingSpeed * leadingSpeed)/maxDecelerationFront;
+        double partUnderSqrt = firstPartUnderSqrt - maxDeceleration * (2 * positionGap - endingPartBraces);
+        double secondTerm = Math.sqrt(partUnderSqrt);
         double newSpeed = firstPart + secondTerm;
 
         return newSpeed;

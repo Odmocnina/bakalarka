@@ -24,8 +24,8 @@
                 <maxValue>9</maxValue>
             </length>
             <maxAcceleration>
-                <minValue>2</minValue>
-                <maxValue>2</maxValue>
+                <minValue>1</minValue>
+                <maxValue>1.5</maxValue>
             </maxAcceleration>
             <minimumGapToNextCar>
                 <minValue>5</minValue>
@@ -33,7 +33,7 @@
             </minimumGapToNextCar>
             <decelerationComfort>
                 <minValue>2</minValue>
-                <maxValue>5</maxValue>
+                <maxValue>3</maxValue>
             </decelerationComfort>
             <desiredTimeHeadway>
                 <minValue>1</minValue>
@@ -61,7 +61,7 @@
     <runDetails>
         <showGui>true</showGui>
         <drawCells>false</drawCells>
-        <laneChange>false</laneChange>
+        <laneChange>true</laneChange>
         <timeStep>1</timeStep>
         <duration>500</duration>
         <debug>true</debug>
