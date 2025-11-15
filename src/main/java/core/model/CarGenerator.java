@@ -17,7 +17,7 @@ import java.util.Random;
  * @author Michael Hladky
  * @version 1.0
  ********************************************/
-public class CarGenerator {
+public class CarGenerator implements Cloneable {
 
     /** parameters need for car generation, which cars need for models (for example model needs, politeness factor ->
      politeness factor will be in here, and it will be generated, if it is not necessary it will not be here and won't
@@ -373,6 +373,20 @@ public class CarGenerator {
         }
 
         return string + "}";
+    }
+
+    @Override
+    public CarGenerator clone() {
+        CarGenerator copy = new CarGenerator(this.lambdaPerSec);
+        copy.type = this.type;
+        copy.id = this.id;
+        copy.allowMultiplePerTick = this.allowMultiplePerTick;
+        copy.carGenerationParameters = this.carGenerationParameters;
+        for (String key : this.parameters.keySet()) {
+            Parameter param = this.parameters.get(key);
+            copy.parameters.put(key, new Parameter(param.minValue, param.maxValue));
+        }
+        return copy;
     }
 
     /*********************

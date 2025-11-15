@@ -120,7 +120,7 @@ public class Main {
         // set type of road for generator and store roads in road instance
         carGenerator.setType(roads[0]);
         for (Road road : roads) {
-            road.setCarGenerator(carGenerator);
+            road.setCarGenerator(carGenerator.clone());
 
             if (carGenerator.generatingToQueue()) {
                 MyLogger.logBeforeLoading("Car generator is generating cars to queue."

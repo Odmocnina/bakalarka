@@ -43,6 +43,9 @@ public class RunDetails {
         return this.outputFile != null && !this.outputFile.isEmpty();
     }
 
+    /** Enable debug mode, writing id of cars, controlling if cars aren't duplicated or in collision **/
+    public boolean debug = false;
+
     @Override
     public String toString() {
         return "RunDetails{" +

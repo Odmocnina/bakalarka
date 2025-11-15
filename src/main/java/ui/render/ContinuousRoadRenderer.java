@@ -1,10 +1,12 @@
 package ui.render;
 
+import app.AppContext;
 import core.model.CarParams;
 import core.model.Road;
 import core.utils.Constants;
 
 import core.utils.RequestConstants;
+import core.utils.RunDetails;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -59,7 +61,9 @@ public class ContinuousRoadRenderer implements IRoadRenderer {
         LinkedList<CarParams>[] vehicles = (LinkedList<CarParams>[]) roadContent;
 
         // pattern for dashed lines
-        gc.setLineDashes(separatingLinesWidth);
+        if (AppContext.RUN_DETAILS.laneChange) {
+            gc.setLineDashes(separatingLinesWidth);
+        }
 
         Color carColor;
 
@@ -89,7 +93,7 @@ public class ContinuousRoadRenderer implements IRoadRenderer {
                     carColor = Color.RED;
                 }
 
-                if (true) {
+                if (AppContext.RUN_DETAILS.debug) {
                     gc.setFill(Color.PURPLE);
                     String idInString = Integer.toString(car.id);
                     gc.fillText(idInString, carX - carW / 2, carY);
@@ -97,10 +101,8 @@ public class ContinuousRoadRenderer implements IRoadRenderer {
 
                 gc.setFill(carColor);
                 gc.fillRect(carX - carW, carY, carW, carH);
-                gc.setStroke(Color.BLACK);
-              //  gc.strokeRect(carX - carW, carY, carW, carH);
-                // draw recangle around car
-                gc.strokeRect(carX - carW, carY, carW, carH);
+//                gc.setStroke(Color.BLACK);
+//                gc.strokeRect(carX - carW, carY, carW, carH);
             }
 
             // separating line between lanes

@@ -193,8 +193,10 @@ public class ContinuosRoad extends Road {
 
         this.resetProcessedFlags();
 
-        this.checkForCollisions();
-        this.checkForDuplicates();
+        if (AppContext.RUN_DETAILS.debug) {
+            this.checkForCollisions();
+            this.checkForDuplicates();
+        }
 
         return this.checkRelevancyOfCars();
     }
@@ -214,11 +216,8 @@ public class ContinuosRoad extends Road {
         }
 
         // safe iteration and removal using ListIterator
-        //final ListIterator<CarParams> it = this.vehicles[lane].listIterator();
         final ListIterator<CarParams> it = this.vehicles[lane].listIterator(this.vehicles[lane].size());
-        //while (it.hasNext()) {
         while (it.hasPrevious()) {
-            //CarParams car = it.next();
             CarParams car = it.previous();
 
             if (car.processedInCurrentStep) {
@@ -251,13 +250,10 @@ public class ContinuosRoad extends Road {
             }
 
             // try lane change
-            if (AppContext.SIMULATION.getStepCount() > 10) {
-                int ii = 0;
+            Direction direction = Direction.STRAIGHT;
+            if (AppContext.RUN_DETAILS.laneChange) {
+                direction = this.tryLaneChange(car);
             }
-            double speedDifference = newSpeed - car.getParameter(RequestConstants.CURRENT_SPEED_REQUEST);
-            Direction direction = this.tryLaneChange(car);
-            //Direction direction = Direction.STRAIGHT;
-                    ///////////
 
             car.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, newSpeed);
             car.xPosition += newSpeed;
@@ -271,10 +267,6 @@ public class ContinuosRoad extends Road {
             if (direction != Direction.STRAIGHT) {
                 it.remove();
             }
-            /*if (!checkIfCarStillRelevant(car)) {
-                it.remove();
-                carsPassed++;
-            }*/
 
         }
 
@@ -385,6 +377,14 @@ public class ContinuosRoad extends Road {
         return null;
     }
 
+    private void getRoadSimulationParameter(HashMap<String, Double> parameters, String param, CarParams car) {
+        if (param.equals(RequestConstants.TIME_STEP_REQUEST)) {
+            parameters.put(param, AppContext.RUN_DETAILS.timeStep);
+        } else if (param.equals(RequestConstants.MAX_ROAD_SPEED_REQUEST)) {
+            parameters.put(param, super.speedLimit);
+        }
+    }
+
     /**
      * method to get all parameters needed for car following / lane-changing model for given car on given position in
      * given lane
@@ -402,12 +402,15 @@ public class ContinuosRoad extends Road {
             return null;
         }
         String[] carGeneratedParams = this.generator.getCarGenerationParameters();
+        String[] roadSimulationParams = {RequestConstants.TIME_STEP_REQUEST, RequestConstants.MAX_ROAD_SPEED_REQUEST};
 
         CarParams car = vehicles[lane].get(position);
         for (String param : params) {
             if (StringEditor.isInArray(carGeneratedParams, param) || param.equals(RequestConstants.X_POSITION_REQUEST)
                     || param.equals(RequestConstants.CURRENT_SPEED_REQUEST)) { //get directly from car we are inspecting
                 parameters.put(param, car.getParameter(param));
+            } else if (StringEditor.isInArray(roadSimulationParams, param)) { //get from road/simulation
+                this.getRoadSimulationParameter(parameters, param, car);
             } else {   // get parameter from different car in proximity
                 this.getParametersAboutDifferentCar(parameters, param, car);
             }

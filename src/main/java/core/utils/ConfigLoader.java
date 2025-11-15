@@ -209,6 +209,8 @@ public class ConfigLoader {
                 modelFromConfig = new Helly();
             } else if (id.equals("headleading")) {
                 modelFromConfig = new HeadLeading();
+            } else if (id.equals("gipps")) {
+                modelFromConfig = new Gipps();
             } else {
                 MyLogger.logBeforeLoading("Unknown car-following model id in config file: " + id + ", exiting"
                         , Constants.FATAL_FOR_LOGGING);
@@ -380,6 +382,7 @@ public class ConfigLoader {
             Element timeBetweenSteps = (Element) runDetailsElement.getElementsByTagName("timeBetweenSteps")
                     .item(0);
             Element laneChange = (Element) runDetailsElement.getElementsByTagName("laneChange").item(0);
+            Element debug = (Element) runDetailsElement.getElementsByTagName("debug").item(0);
 
             if (duration != null) {
                 detailsFromConfig.duration = Integer.parseInt(duration.getTextContent());
@@ -420,6 +423,12 @@ public class ConfigLoader {
                         , Constants.INFO_FOR_LOGGING);
             } else {
                 MyLogger.logBeforeLoading("No output will be written", Constants.WARN_FOR_LOGGING);
+            }
+
+            if (debug != null) {
+                detailsFromConfig.debug = Boolean.parseBoolean(drawCells.getTextContent());
+            } else {
+                detailsFromConfig.debug = false;
             }
 
             if (drawCells != null) {
