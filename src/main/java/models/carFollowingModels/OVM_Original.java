@@ -10,7 +10,7 @@ import models.ICarFollowingModel;
  * @author Michael Hladky
  * @version 1.0
  ********************************************/
-public class OVM implements ICarFollowingModel {
+public class OVM_Original implements ICarFollowingModel {
 
     /**
      * function to get new speed based on OVM algorithm
@@ -23,16 +23,26 @@ public class OVM implements ICarFollowingModel {
         double distance;
         double xPosition = parameters.get(RequestConstants.X_POSITION_REQUEST);
         double xPositionStraightForward = parameters.get(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST);
+        double maxSpeedRoad = parameters.get(RequestConstants.MAX_ROAD_SPEED_REQUEST);
+        double maxSpeed = Math.min(parameters.get(RequestConstants.MAX_SPEED_REQUEST), maxSpeedRoad);
+        double minGap = parameters.get(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST);
+        double lengthStraightForward = parameters.get(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST);
         if (xPositionStraightForward == Constants.NO_CAR_THERE) {
             distance = Double.MAX_VALUE;
         } else {
-            distance = xPositionStraightForward - xPosition;
+            distance = xPositionStraightForward - xPosition - lengthStraightForward;
         }
-        double speedDifferenceSensitivityParameter =
-                parameters.get(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST);
+        double distanceDifferenceSensitivityParameter =
+                parameters.get(RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST);
 
-        return currentSpeed + speedDifferenceSensitivityParameter *
-               (optimalVelocity(distance) - currentSpeed);
+        double optimalVelocity = optimalVelocity(distance, maxSpeedRoad, minGap);
+        double newSpeed = currentSpeed + distanceDifferenceSensitivityParameter * (optimalVelocity - currentSpeed);
+
+        if (distance < newSpeed) {
+            newSpeed = distance - minGap; // prevent collisions
+        }
+
+        return Math.min(newSpeed, maxSpeed);
     }
 
     /**
@@ -41,8 +51,8 @@ public class OVM implements ICarFollowingModel {
      * @param distance distance to the next car
      * @return optimal velocity as double
      **/
-    private double optimalVelocity(double distance) {
-        return 16.8 * (Math.tanh(0.086 * (distance - 25) + 0.913));
+    protected double optimalVelocity(double distance, double maxSpeedRoad, double minGap) {
+        return (maxSpeedRoad / 2) * (Math.tanh(distance - minGap) + Math.tanh(minGap));
     }
 
     /**
@@ -57,7 +67,10 @@ public class OVM implements ICarFollowingModel {
                 RequestConstants.MAX_SPEED_REQUEST,
                 RequestConstants.X_POSITION_REQUEST,
                 RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
-                RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST
+                RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.MAX_ROAD_SPEED_REQUEST,
+                RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST,
+                RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST
         };
 
         return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
@@ -73,8 +86,9 @@ public class OVM implements ICarFollowingModel {
     public String getParametersForGeneration() {
         String[] requests = {
                 RequestConstants.MAX_SPEED_REQUEST,
-                RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
-                RequestConstants.LENGTH_REQUEST
+                RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.LENGTH_REQUEST,
+                RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST
         };
 
         return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
@@ -87,7 +101,7 @@ public class OVM implements ICarFollowingModel {
      **/
     @Override
     public String getID() {
-        return "ovm";
+        return "ovm-original";
     }
 
     /**
@@ -107,7 +121,7 @@ public class OVM implements ICarFollowingModel {
      **/
     @Override
     public String getName() {
-        return "Optimal Velocity Model";
+        return "Optimal Velocity Model (original)";
     }
 
     /**

@@ -5,7 +5,7 @@
 
     <models>
         <carFollowingModel>
-            <id>gipps</id>
+            <id>ovm-different</id>
         </carFollowingModel>
         <laneChangingModel>
             <id>mobil-simple</id>
@@ -13,11 +13,11 @@
     </models>
 
     <generator>
-        <flowRate>1.0</flowRate>
+        <flowRate>0.2</flowRate>
         <carParams>
             <maxSpeed>
-                <minValue>20</minValue>
-                <maxValue>100</maxValue>
+                <minValue>5</minValue>
+                <maxValue>20</maxValue>
             </maxSpeed>
             <length>
                 <minValue>3</minValue>
@@ -28,8 +28,8 @@
                 <maxValue>1.5</maxValue>
             </maxAcceleration>
             <minimumGapToNextCar>
-                <minValue>5</minValue>
-                <maxValue>5</maxValue>
+                <minValue>10</minValue>
+                <maxValue>10</maxValue>
             </minimumGapToNextCar>
             <decelerationComfort>
                 <minValue>2</minValue>
@@ -45,7 +45,7 @@
             </speedDifferenceSensitivity>
             <distanceDifferenceSensitivity>
                 <minValue>1.5</minValue>
-                <maxValue>1.5</maxValue>
+                <maxValue>2.2</maxValue>
             </distanceDifferenceSensitivity>
             <edgeValueForLaneChange>
                 <minValue>0.1</minValue>
@@ -61,7 +61,7 @@
     <runDetails>
         <showGui>true</showGui>
         <drawCells>false</drawCells>
-        <laneChange>true</laneChange>
+        <laneChange>false</laneChange>
         <timeStep>1</timeStep>
         <duration>500</duration>
         <debug>true</debug>

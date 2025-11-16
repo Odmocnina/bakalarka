@@ -2,7 +2,6 @@ package models.carFollowingModels;
 
 import core.utils.Constants;
 import core.utils.RequestConstants;
-import models.ICarFollowingModel;
 
 import java.util.HashMap;
 
@@ -12,7 +11,7 @@ import java.util.HashMap;
  * @author Michael Hladky
  * @version 1.0
  ********************************************/
-public class FVDM implements ICarFollowingModel {
+public class FVDM extends OVM_Original {
 
     /**
      * function to get new speed based on OVM algorithm
@@ -21,43 +20,19 @@ public class FVDM implements ICarFollowingModel {
      **/
     @Override
     public double getNewSpeed(HashMap<String, Double> parameters) {
-        double currentSpeed = parameters.get(RequestConstants.CURRENT_SPEED_REQUEST);
-        double xPosition = parameters.get(RequestConstants.X_POSITION_REQUEST);
-        double xPositionStraightForward = parameters.get(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST);
-
-        double distance;
-        if (xPositionStraightForward == Constants.NO_CAR_THERE) {
-            distance = Double.MAX_VALUE;
-        } else {
-            distance = xPositionStraightForward - xPosition;
-        }
         double speedDifferenceSensitivityParameter =
                 parameters.get(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST);
         double currentSpeedStraightForward =
                 parameters.get(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST);
-
-        double speedDifference;
         if (currentSpeedStraightForward == Constants.NO_CAR_THERE) {
-            speedDifference = 0;
-        } else {
-            speedDifference = currentSpeedStraightForward - currentSpeed;
+            currentSpeedStraightForward = Double.MAX_VALUE;
         }
-        double positionSensitivity = parameters.get(RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST);
+        double currentSpeed = parameters.get(RequestConstants.CURRENT_SPEED_REQUEST);
+        double speedDifference = currentSpeedStraightForward - currentSpeed;
 
+        double newSpeed = super.getNewSpeed(parameters);
 
-
-        return currentSpeed + (positionSensitivity *
-                (optimalVelocity(distance) - currentSpeed) + speedDifferenceSensitivityParameter * speedDifference);
-    }
-
-    /**
-     * function to calculate optimal velocity based on distance to the next car
-     *
-     * @param distance distance to the next car
-     * @return optimal velocity as double
-     **/
-    private double optimalVelocity(double distance) {
-        return 16.8 * (Math.tanh(0.086 * (distance - 25) + 0.913));
+        return newSpeed + speedDifferenceSensitivityParameter * speedDifference;
     }
 
     /**
@@ -74,7 +49,10 @@ public class FVDM implements ICarFollowingModel {
                 RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
                 RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
                 RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST,
-                RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST
+                RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST,
+                RequestConstants.MAX_ROAD_SPEED_REQUEST,
+                RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST,
+                RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST
         };
 
 
@@ -93,7 +71,8 @@ public class FVDM implements ICarFollowingModel {
                 RequestConstants.MAX_SPEED_REQUEST,
                 RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
                 RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST,
-                RequestConstants.LENGTH_REQUEST
+                RequestConstants.LENGTH_REQUEST,
+                RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST
         };
 
         return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
@@ -110,16 +89,6 @@ public class FVDM implements ICarFollowingModel {
     }
 
     /**
-     * function to get type of the model
-     *
-     * @return type as String
-     **/
-    @Override
-    public String getType() {
-        return Constants.CONTINOUS;
-    }
-
-    /**
      * function to get name of the model
      *
      * @return name as String
@@ -127,16 +96,6 @@ public class FVDM implements ICarFollowingModel {
     @Override
     public String getName() {
         return "Full Velocity Difference Model";
-    }
-
-    /**
-     * function to get cell size in meters
-     *
-     * @return cell size as double
-     **/
-    @Override
-    public double getCellSize() {
-        return Constants.PARAMETER_UNDEFINED;
     }
 
 }

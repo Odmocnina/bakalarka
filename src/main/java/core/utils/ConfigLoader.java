@@ -201,8 +201,10 @@ public class ConfigLoader {
                 modelFromConfig = new IDM();
             } else if (id.equals("rule184")) {
                 modelFromConfig = new Rule184();
-            } else if (id.equals("ovm")) {
-                modelFromConfig = new OVM();
+            } else if (id.equals("ovm-original")) {
+                modelFromConfig = new OVM_Original();
+            } else if (id.equals("ovm-different")) {
+                modelFromConfig = new OVM_Different();
             } else if (id.equals("fvdm")) {
                 modelFromConfig = new FVDM();
             } else if (id.equals("helly")) {
