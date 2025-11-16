@@ -5,11 +5,9 @@
 
     <models>
         <carFollowingModel>
-            <name>rule184</name>
-            <id>headleading</id>
+            <id>kkw-quadratic</id>
         </carFollowingModel>
         <laneChangingModel>
-            <name>Minimizing Overall Braking Induced by Lane changes (MOBIL)</name>
             <id>rickert</id>
         </laneChangingModel>
     </models>
@@ -58,11 +56,11 @@
     </generator>
 
     <runDetails>
-        <showGui>true</showGui>
+        <showGui>false</showGui>
         <laneChange>true</laneChange>
         <drawCells>false</drawCells>
         <timeStep>1</timeStep>
-        <duration>120</duration>
+        <duration>1200</duration>
         <logging>
             <log>true</log>
             <info>true</info>
@@ -73,10 +71,9 @@
         </logging>
         <output>
             <writeOutput>true</writeOutput>
-            <file>output/simulationCellOutput.txt</file>
+            <file>output/simulationKKWQ.txt</file>
             <type>txt</type>
         </output>
-        <outputFile>output/simulationCellOutput.txt</outputFile>
         <timeBetweenSteps>100</timeBetweenSteps>
     </runDetails>
 </config>

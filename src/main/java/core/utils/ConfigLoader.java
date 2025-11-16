@@ -211,6 +211,10 @@ public class ConfigLoader {
                 modelFromConfig = new HeadLeading();
             } else if (id.equals("gipps")) {
                 modelFromConfig = new Gipps();
+            } else if (id.equals("kkw-linear")) {
+                modelFromConfig = new KKW_Linear();
+            } else if (id.equals("kkw-quadratic")) {
+                modelFromConfig = new KKW_Quadratic();
             } else {
                 MyLogger.logBeforeLoading("Unknown car-following model id in config file: " + id + ", exiting"
                         , Constants.FATAL_FOR_LOGGING);

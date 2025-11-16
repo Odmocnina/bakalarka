@@ -396,6 +396,22 @@ public class CellularRoad extends Road {
                 }
                 break;
 
+            case RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST: // current speed of vehicle straight ahead
+                nextCarPos = getNextOccupiedCell(lane, position, Direction.STRAIGHT);
+                if (nextCarPos == Constants.NO_CAR_IN_FRONT) {
+                    parameters.put(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST,
+                            Constants.NO_CAR_THERE);
+                } else {
+                    parameters.put(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST,
+                            cells[lane][nextCarPos].getCarParams().getParameter(RequestConstants.
+                                    CURRENT_SPEED_REQUEST));
+                }
+                break;
+
+            case RequestConstants.TIME_STEP_REQUEST: // time step of the simulation
+                parameters.put(RequestConstants.TIME_STEP_REQUEST, AppContext.RUN_DETAILS.timeStep);
+                break;
+
             default:
                 MyLogger.log("Unknown parameter requested: " + param, Constants.DEBUG_FOR_LOGGING);
         }
