@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <numberOfRoads>50</numberOfRoads>
+    <numberOfRoads>10</numberOfRoads>
     <roadFile>config/roads/road2.xml</roadFile>
 
     <models>
         <carFollowingModel>
-            <id>kkw-quadratic</id>
+            <id>headleading</id>
         </carFollowingModel>
         <laneChangingModel>
             <id>rickert</id>
@@ -56,7 +56,7 @@
     </generator>
 
     <runDetails>
-        <showGui>false</showGui>
+        <showGui>true</showGui>
         <laneChange>true</laneChange>
         <drawCells>false</drawCells>
         <timeStep>1</timeStep>
@@ -71,8 +71,8 @@
         </logging>
         <output>
             <writeOutput>true</writeOutput>
-            <file>output/simulationKKWQ.txt</file>
-            <type>txt</type>
+            <file>output/simulationKKWQ.csv</file>
+            <type>csv</type>
         </output>
         <timeBetweenSteps>100</timeBetweenSteps>
     </runDetails>

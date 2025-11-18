@@ -43,7 +43,7 @@ public class ContinuosRoad extends Road {
             this.vehicles[lane] = new LinkedList<>();
         }
 
-       /* CarParams carParams = new CarParams();
+        CarParams carParams = new CarParams();
         carParams.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
         carParams.setParameter(RequestConstants.MAX_SPEED_REQUEST, 40.33);
         carParams.xPosition = 20;
@@ -142,7 +142,7 @@ public class ContinuosRoad extends Road {
         carParams2.setParameter(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
         carParams2.setParameter(RequestConstants.POLITENESS_FACTOR_REQUEST, 0.3);
         carParams2.setParameter(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST, 1.0);
-        vehicles[5].add(carParams2);*/
+        vehicles[5].add(carParams2);
     }
 
     /**

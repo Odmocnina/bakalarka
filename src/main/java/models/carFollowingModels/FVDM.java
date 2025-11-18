@@ -11,7 +11,7 @@ import java.util.HashMap;
  * @author Michael Hladky
  * @version 1.0
  ********************************************/
-public class FVDM extends OVM_Original {
+public class FVDM extends OVM_Different {
 
     /**
      * function to get new speed based on OVM algorithm

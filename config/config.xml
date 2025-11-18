@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <numberOfRoads>10</numberOfRoads>
+    <numberOfRoads>1</numberOfRoads>
     <roadFile>config/roads/road1.xml</roadFile>
 
     <models>
         <carFollowingModel>
-            <id>ovm-different</id>
+            <id>idm</id>
         </carFollowingModel>
         <laneChangingModel>
-            <id>mobil-simple</id>
+            <id>mobil</id>
         </laneChangingModel>
     </models>
 
     <generator>
         <flowRate>0.2</flowRate>
+        <queue>
+            <use>true</use>
+            <minValue>1</minValue>
+            <maxValue>2</maxValue>
+        </queue>
         <carParams>
             <maxSpeed>
                 <minValue>5</minValue>
@@ -75,11 +80,9 @@
         </logging>
         <output>
             <writeOutput>true</writeOutput>
-            <file>output/simulationContOutputMobilSimple2.txt</file>
+            <file>output/simulationContOutput.txt</file>
             <type>txt</type>
         </output>
-        <timeBetweenSteps>100</timeBetweenSteps>
+        <timeBetweenSteps>10</timeBetweenSteps>
     </runDetails>
-
-
 </config>

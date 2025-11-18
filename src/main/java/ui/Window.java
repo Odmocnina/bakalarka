@@ -14,15 +14,20 @@ import core.sim.Simulation;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import java.util.LinkedList;
 
@@ -30,7 +35,7 @@ import java.util.LinkedList;
  * Main window for traffic simulator GUI, javaFX is used
  *
  * @author Michael Hladky
- * @version 1.0
+ * @version 1.1
  ********************************************/
 public class Window extends Application {
 
@@ -42,6 +47,11 @@ public class Window extends Application {
 
     /** renderer for drawing roads **/
     private IRoadRenderer renderer;
+
+    // Scrollbars added to class scope to be accessible
+    private ScrollBar hScroll;
+    private ScrollBar vScroll;
+    private Label infoLabel; // Label for top info text
 
     /**
      * start method for JavaFX application
@@ -55,11 +65,22 @@ public class Window extends Application {
         this.renderer = AppContext.RENDERER;
 
         // canvas for drawing
-        Canvas canvas = new Canvas(2000, 800);
-        ScrollPane scrollPane = new ScrollPane(canvas);
-        scrollPane.setPannable(true);
-        scrollPane.setFitToWidth(false);
-        scrollPane.setFitToHeight(false);
+        // FIXED: Canvas size is now handled by parent Pane, preventing crash on large roads
+        Canvas canvas = new Canvas();
+        Pane canvasPane = new Pane(canvas);
+        canvas.widthProperty().bind(canvasPane.widthProperty()); // this shit binds that graphics needs to only allocate
+        canvas.heightProperty().bind(canvasPane.heightProperty()); // stuff we see
+
+        // Scrollbars for navigation
+        hScroll = new ScrollBar();
+        hScroll.setOrientation(Orientation.HORIZONTAL);
+        vScroll = new ScrollBar();
+        vScroll.setOrientation(Orientation.VERTICAL);
+
+        // Info label at the top (moved from canvas drawing)
+        infoLabel = new Label("Initializing...");
+        infoLabel.setFont(Font.font("System", FontWeight.BOLD, 12));
+        infoLabel.setPadding(new Insets(5, 10, 5, 10));
 
         final String START_BUTTON_TEXT = "Start";
         final String STOP_BUTTON_TEXT = "Stop";
@@ -79,10 +100,15 @@ public class Window extends Application {
         HBox controls = new HBox(10, btnStart, exportBtn, btnStop, btnStep, statusLabel);
         controls.setPadding(new Insets(10));
 
+        // VBox to hold scrollbar and controls at the bottom
+        VBox bottomLayout = new VBox(hScroll, controls);
+
         // main layout of gui
         BorderPane root = new BorderPane();
-        root.setCenter(scrollPane);
-        root.setBottom(controls);
+        root.setTop(infoLabel);      // Added info label to top
+        root.setCenter(canvasPane);  // Changed to Pane with Canvas
+        root.setRight(vScroll);      // Added vertical scrollbar
+        root.setBottom(bottomLayout);// Controls + Horizontal Scrollbar
 
         Scene scene = new Scene(root, 1200, 700, Color.LIGHTGRAY);
         primaryStage.setScene(scene);
@@ -93,26 +119,33 @@ public class Window extends Application {
         Runnable paintAll = () -> {
             GraphicsContext gc = canvas.getGraphicsContext2D();
             Road[] roads = simulation.getRoads();
+
+            // Update info string in the top label instead of drawing on canvas
+            String infoString = "Forward model used: " + AppContext.CAR_FOLLOWING_MODEL.getName() +
+                    " | lane changing model used: " + AppContext.LANE_CHANGING_MODEL.getName() + " | time steps: " +
+                    simulation.getStepCount();
+            Platform.runLater(() -> infoLabel.setText(infoString));
+
             if (roads == null || roads.length == 0) {
                 MyLogger.log("Error while getting roads to render", Constants.ERROR_FOR_LOGGING);
+                gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
                 return;
             }
 
             final double GAP = 20.0;           // gap between roads when drawing
             Object content = roads[0].getContent();
+
+            // Determine what to draw
             if (content instanceof Cell[][]) {
                 this.handleCellular(roads, canvas, gc, GAP);
             } else if (content instanceof LinkedList[]) {
                 this.handleContinuous(roads, canvas, gc, GAP);
             }
-
-            String infoString = "Forward model used: " + AppContext.CAR_FOLLOWING_MODEL.getName() +
-                    ", lane changing model used: " + AppContext.LANE_CHANGING_MODEL.getName() + ", time steps: " +
-                    simulation.getStepCount();
-            // draw info string under all roads
-            gc.setFill(Color.BLACK);
-            gc.fillText(infoString, 0, canvas.getHeight() - 5);
         };
+
+        // Listeners for scrollbars to repaint when scrolling
+        hScroll.valueProperty().addListener(o -> paintAll.run());
+        vScroll.valueProperty().addListener(o -> paintAll.run());
 
         // tick of engine - one simulation step and repaint
         Runnable tick = () -> {
@@ -158,7 +191,7 @@ public class Window extends Application {
      */
     private void handleCellular(Road[] roads, Canvas canvas, GraphicsContext gc, final double GAP) {
         final double CELL_PIXEL_SIZE = 8.0; // size of cell for ONLY DRAWING, CELL SIZE IN MODEL MAY, AND LIKELY IS
-                                            // DIFFERENT
+        // DIFFERENT
 
         double neededHeight = GAP;
         double neededWidth  = 0;
@@ -223,11 +256,32 @@ public class Window extends Application {
      */
     private void drawRoads(Canvas canvas, GraphicsContext gc, Road[] roads, final double GAP,
                            final double CELL_PIXEL_SIZE, double neededWidth, double neededHeight) {
-        canvas.setWidth(Math.max(neededWidth, canvas.getWidth()));
-        canvas.setHeight(neededHeight);
 
+        // Setup Scrollbars based on content size
+        double viewportW = canvas.getWidth();
+        double viewportH = canvas.getHeight();
+
+        double maxScrollH = Math.max(0, neededWidth - viewportW);
+        double maxScrollV = Math.max(0, neededHeight - viewportH);
+
+        hScroll.setMax(maxScrollH);
+        hScroll.setVisibleAmount(viewportW);
+
+        vScroll.setMax(maxScrollV);
+        vScroll.setVisibleAmount(viewportH);
+
+        // Get camera position
+        double camX = hScroll.getValue();
+        double camY = vScroll.getValue();
+
+        // Clear Screen
+        gc.clearRect(0, 0, viewportW, viewportH);
         gc.setFill(Color.LIGHTGRAY);
-        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.fillRect(0, 0, viewportW, viewportH);
+
+        // Translate camera
+        gc.save();
+        gc.translate(-camX, -camY);
 
         double y = GAP;
         int i = 0;
@@ -235,20 +289,30 @@ public class Window extends Application {
             int lanes = road.getNumberOfLanes();
             double roadHeight = lanes * CELL_PIXEL_SIZE;
 
-            // info string
-            String info = "Road: " + i + ", Lanes: " + lanes + ", Length: " + road.getLength() + ", Cars on road: " +
-                    road.getNumberOfCarsOnRoad() + ", Cars passed: " +
+            // Optimization: Don't draw if road is outside vertical view
+            if (y + roadHeight < camY || y > camY + viewportH) {
+                y += roadHeight + GAP;
+                i++;
+                continue;
+            }
+
+            // info string (kept per road)
+            String info = "Road: " + i + " | Lanes: " + lanes + " | Length: " + road.getLength() + " | Cars on road: " +
+                    road.getNumberOfCarsOnRoad() + " | Cars passed: " +
                     ResultsRecorder.getResultsRecorder().getCarsPassedOnRoad(i);
             gc.setFill(Color.BLACK);
             gc.fillText(info, 0, y - 5);
             gc.save();
             gc.translate(0, y);
-            renderer.draw(gc, road, canvas.getWidth(), roadHeight, CELL_PIXEL_SIZE);
+
+            // Use max of neededWidth to ensure renderer doesn't cut off drawing loop
+            renderer.draw(gc, road, Math.max(neededWidth, viewportW), roadHeight, CELL_PIXEL_SIZE);
             gc.restore();
 
             y += roadHeight + GAP;
             i++;
         }
+        gc.restore(); // Restore translation
     }
 
     /**

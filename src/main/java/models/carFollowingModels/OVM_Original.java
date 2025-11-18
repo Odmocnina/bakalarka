@@ -52,7 +52,8 @@ public class OVM_Original implements ICarFollowingModel {
      * @return optimal velocity as double
      **/
     protected double optimalVelocity(double distance, double maxSpeedRoad, double minGap) {
-        return (maxSpeedRoad / 2) * (Math.tanh(distance - minGap) + Math.tanh(minGap));
+        //return (maxSpeedRoad / 2) * (Math.tanh(distance - minGap) + Math.tanh(minGap));
+        return Math.tanh(distance - 2) - Math.tanh(2);
     }
 
     /**
