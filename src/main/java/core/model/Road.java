@@ -110,6 +110,23 @@ public abstract class Road {
     }
 
     /**
+     * method to check if all car queues are empty, if they are used
+     *
+     * @return true if all queues are empty, false otherwise
+     **/
+    public boolean areAllQueuesEmpty() {
+        if (carQueuesPerLane == null) {
+            return true;
+        }
+        for (Queue<CarParams> queue : carQueuesPerLane) {
+            if (queue != null && !queue.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * abstract method to get content of road, implemented in subclasses
      *
      * @return content of road in Object form, method then casts it to the correct type, so thread carefully
@@ -129,6 +146,14 @@ public abstract class Road {
      * @return number of cars on the road
      **/
     public abstract int getNumberOfCarsOnRoad();
+
+    public boolean generatingToQueue() {
+        return this.generator.generatingToQueue();
+    }
+
+    public CarGenerator getCarGenerator() {
+        return this.generator;
+    }
 
 
 

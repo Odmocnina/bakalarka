@@ -65,7 +65,6 @@ public class Window extends Application {
         this.renderer = AppContext.RENDERER;
 
         // canvas for drawing
-        // FIXED: Canvas size is now handled by parent Pane, preventing crash on large roads
         Canvas canvas = new Canvas();
         Pane canvasPane = new Pane(canvas);
         canvas.widthProperty().bind(canvasPane.widthProperty()); // this shit binds that graphics needs to only allocate
@@ -306,7 +305,9 @@ public class Window extends Application {
             gc.translate(0, y);
 
             // Use max of neededWidth to ensure renderer doesn't cut off drawing loop
-            renderer.draw(gc, road, Math.max(neededWidth, viewportW), roadHeight, CELL_PIXEL_SIZE);
+            synchronized (road) {
+                renderer.draw(gc, road, Math.max(neededWidth, viewportW), roadHeight, CELL_PIXEL_SIZE);
+            }
             gc.restore();
 
             y += roadHeight + GAP;

@@ -2,6 +2,8 @@ package core.sim;
 
 import app.AppContext;
 import core.model.Road;
+import core.utils.Constants;
+import core.utils.MyLogger;
 import core.utils.ResultsRecorder;
 
 /***************************
@@ -17,6 +19,9 @@ public class Simulation {
 
     /** current step count of the simulation **/
     private int stepCount = 0;
+
+    /** flag indicating if the simulation is running **/
+    private boolean running = false;
 
     /**
      * Constructor for Simulation
@@ -50,7 +55,8 @@ public class Simulation {
         this.stepCount++;
 
         // Stop the timer if writing results and the simulation duration has been reached
-        if (AppContext.RUN_DETAILS.writingResults() && this.stepCount >= AppContext.RUN_DETAILS.duration - 1) {
+        boolean shouldRun = this.stepCount >= (AppContext.RUN_DETAILS.duration - 1) && this.running;
+        if (AppContext.RUN_DETAILS.writingResults() && shouldRun) {
             ResultsRecorder.getResultsRecorder().stopTimer();
         }
 
@@ -81,10 +87,44 @@ public class Simulation {
      **/
     public void runSimulation(double time) {
         int timeSteps = (int) Math.ceil(time);
-        for (int i = 0; i < timeSteps; i++) {
+        this.running = true;
+
+        while (this.stepCount < timeSteps && this.running) {
             step();
+            if (areAllRoadsAndQueuesEmpty(this.roads)) {
+                MyLogger.log("All car queues and roads are empty, ending simulation early at step " +
+                        this.stepCount + ".", Constants.INFO_FOR_LOGGING);
+                this.running = false;
+            }
         }
 
         ResultsRecorder.getResultsRecorder().stopTimer();
+    }
+
+    public boolean areAllRoadsAndQueuesEmpty(Road[] roads) {
+        for (Road road : roads) {
+            if (road.getNumberOfCarsOnRoad() > 0 || !road.areAllQueuesEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean areAllQueuesEmpty(Road[] roads) {
+        for (Road road : roads) {
+            if (!road.areAllQueuesEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean areAllRoadsEmpty(Road[] roads) {
+        for (Road road : roads) {
+            if (road.getNumberOfCarsOnRoad() > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }

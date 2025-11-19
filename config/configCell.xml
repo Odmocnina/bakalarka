@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <numberOfRoads>10</numberOfRoads>
+    <numberOfRoads>1</numberOfRoads>
     <roadFile>config/roads/road2.xml</roadFile>
 
     <models>
@@ -14,9 +14,9 @@
 
     <generator>
         <queue>
-            <use>false</use>
+            <use>true</use>
             <minValue>1</minValue>
-            <maxValue>2</maxValue>
+            <maxValue>1</maxValue>
         </queue>
         <flowRate>1.0</flowRate>
         <carParams>
@@ -74,6 +74,6 @@
             <file>output/simulationKKWQ.csv</file>
             <type>csv</type>
         </output>
-        <timeBetweenSteps>100</timeBetweenSteps>
+        <timeBetweenSteps>10</timeBetweenSteps>
     </runDetails>
 </config>

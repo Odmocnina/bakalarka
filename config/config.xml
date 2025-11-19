@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <numberOfRoads>1</numberOfRoads>
+    <numberOfRoads>50</numberOfRoads>
     <roadFile>config/roads/road1.xml</roadFile>
 
     <models>
         <carFollowingModel>
-            <id>idm</id>
+            <id>helly</id>
         </carFollowingModel>
         <laneChangingModel>
             <id>mobil</id>
@@ -16,8 +16,8 @@
         <flowRate>0.2</flowRate>
         <queue>
             <use>true</use>
-            <minValue>1</minValue>
-            <maxValue>2</maxValue>
+            <minValue>100</minValue>
+            <maxValue>100</maxValue>
         </queue>
         <carParams>
             <maxSpeed>
@@ -64,11 +64,11 @@
     </generator>
 
     <runDetails>
-        <showGui>true</showGui>
+        <showGui>false</showGui>
         <drawCells>false</drawCells>
         <laneChange>false</laneChange>
         <timeStep>1</timeStep>
-        <duration>500</duration>
+        <duration>5000</duration>
         <debug>true</debug>
         <logging>
             <log>true</log>
@@ -80,9 +80,18 @@
         </logging>
         <output>
             <writeOutput>true</writeOutput>
-            <file>output/simulationContOutput.txt</file>
+            <file>output/simulationContOutputHelly.txt</file>
             <type>txt</type>
+            <csvSeparator>;</csvSeparator>
+            <whatToWrite>
+                <simulationDetails>true</simulationDetails>
+                <simulationTime>true</simulationTime>
+                <carsPassed>true</carsPassed>
+                <carsOnRoad>true</carsOnRoad>
+                <roadDetails>true</roadDetails>
+                <generationDetails>true</generationDetails>
+            </whatToWrite>
         </output>
-        <timeBetweenSteps>10</timeBetweenSteps>
+        <timeBetweenSteps>1</timeBetweenSteps>
     </runDetails>
 </config>

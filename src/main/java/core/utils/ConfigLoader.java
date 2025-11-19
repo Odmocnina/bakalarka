@@ -573,6 +573,7 @@ public class ConfigLoader {
         }
 
         if (!writeOutput) {
+            MyLogger.logBeforeLoading("Output writing disabled in run details", Constants.INFO_FOR_LOGGING);
             detailsFromConfig.outputFile = null;
             return false;
         } else {

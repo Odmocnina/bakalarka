@@ -1,6 +1,7 @@
 package core.utils;
 
 import app.AppContext;
+import core.model.Road;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -162,33 +163,97 @@ public class ResultsRecorder {
         return bw;
     }
 
-    private void writeTXT(BufferedWriter bw) throws IOException {
-        // Implementation for writing results in TXT format
-        bw.write("=== Traffic Simulation Results ===\n\n");
-        bw.write("=== Simulation details ===\n");
+    private void writeRoadDetails(BufferedWriter bw) throws IOException {
+        bw.write("=== Road Details ===\n");
+        Road[] roads = AppContext.SIMULATION.getRoads();
+        for (int i = 0; i < roads.length; i++) {
+            bw.write("Road " + i + ": " + roads[i].toString() + "\n");
+        }
+        bw.write("\n");
+    }
+
+    private void writeSimulationDetails(BufferedWriter bw) throws IOException {
+        bw.write("=== Simulation details ===\n"); // simulation details
         bw.write("Forward model used: " + AppContext.CAR_FOLLOWING_MODEL.getName() + "(" +
-                AppContext.CAR_FOLLOWING_MODEL.getType() + ")" + "\n");
-        bw.write("Lane changing model used: " + AppContext.LANE_CHANGING_MODEL.getName() + "\n");
-        String roadDetails = AppContext.SIMULATION.getRoads()[0].toString();
-        bw.write("Road details: " + roadDetails + "\n");
-        bw.write("Simulation parameters: " + AppContext.RUN_DETAILS.toString() + "\n\n");
+                AppContext.CAR_FOLLOWING_MODEL.getType() + ")" + "\n"); // car following model
+        bw.write("Lane changing model used: " + AppContext.LANE_CHANGING_MODEL.getName() + "\n");//lane change model
+        bw.write("Simulation parameters: " + AppContext.RUN_DETAILS.toString() + "\n"); // simulation parameters
+
+        boolean queueUsed = AppContext.SIMULATION.getRoads()[0].generatingToQueue();
+        if (queueUsed) {
+            bw.write("Car generation: Cars were generated to queues before entering the roads.\n");
+            if (AppContext.SIMULATION.areAllQueuesEmpty(AppContext.SIMULATION.getRoads())) {
+                bw.write("All car queues were emptied during the simulation. Number of steps in simulation: " +
+                        AppContext.SIMULATION.getStepCount() + "\n\n");
+            } else {
+                bw.write("During the simulation time (" + AppContext.RUN_DETAILS.duration + " steps), not all cars "
+                        + " in queues were emptied.\n\n");
+            }
+        } else {
+            bw.write("Car generation: Cars were generated directly on the roads.\n\n");
+        }
+    }
+
+    private void writeSimulationTimeResults(BufferedWriter bw) throws IOException {
         bw.write("=== Simulation Time Results ===\n");
         BigInteger elapsedTime = getElapsedTimeNs();
         int timeMillis = elapsedTime.divide(BigInteger.valueOf(1_000_000)).intValue();
         bw.write("Total Simulation Time: " + timeMillis + " ms\n\n");
+    }
+
+    private void writeCarsPassedResults(BufferedWriter bw) throws IOException {
         bw.write("=== Cars Passed Results ===\n");
         for (int i = 0; i < carsPassedPerRoad.length; i++) {
             bw.write("Road " + i + ": " + carsPassedPerRoad[i] + " cars passed.\n");
         }
+        bw.write("\n");
+    }
+
+    private void writeGenerationParams(BufferedWriter bw) throws IOException {
+        bw.write("=== Car Generation Parameters ===\n");
+        Road[] roads = AppContext.SIMULATION.getRoads();
+        for (int i = 0; i < roads.length; i++) {
+            bw.write("Road " + i + " Generation Params: " + roads[i].getCarGenerator().toString() + "\n");
+        }
+    }
+
+    private void writeCarsOnTheRoad(BufferedWriter bw) throws IOException {
+        bw.write("=== Cars Currently on the Road ===\n");
+        Road[] roads = AppContext.SIMULATION.getRoads();
+        for (int i = 0; i < roads.length; i++) {
+            bw.write("Road " + i + " Cars: " + roads[i].getNumberOfCarsOnRoad() + "\n");
+        }
+        bw.write("\n");
+    }
+
+    private void writeTXT(BufferedWriter bw) throws IOException {
+        // Implementation for writing results in TXT format
+        bw.write("=== Traffic Simulation Results ===\n\n"); // header of the results file
+        this.writeSimulationDetails(bw);
+        this.writeSimulationTimeResults(bw);
+        this.writeCarsPassedResults(bw);
+        this.writeCarsOnTheRoad(bw);
+        this.writeRoadDetails(bw);
+        this.writeGenerationParams(bw);
     }
 
     private void writeCSV(BufferedWriter bw) throws IOException {
         // Implementation for writing results in CSV format
+        String header = "";
+        header = header + "Road Index" + Constants.DEFAULT_CSV_SEPARATOR;
+        header = header + "Cars Passed" + Constants.DEFAULT_CSV_SEPARATOR;
+        header = header + "Cars on Road" + Constants.DEFAULT_CSV_SEPARATOR;
+        header = header + "Road details" + Constants.DEFAULT_CSV_SEPARATOR;
+        header = header + "Generation Params";
+        header = header.trim();
 
-        bw.write("Road Index;Cars Passed;Road details\n");
+        bw.write(header + "\n");
         for (int i = 0; i < carsPassedPerRoad.length; i++) {
-            bw.write(i + Constants.DEFAULT_CSV_SEPARATOR + carsPassedPerRoad[i] + Constants.DEFAULT_CSV_SEPARATOR
-                    + AppContext.SIMULATION.getRoads()[i] + "\n");
+            bw.write(i + Constants.DEFAULT_CSV_SEPARATOR);
+            bw.write(carsPassedPerRoad[i] + Constants.DEFAULT_CSV_SEPARATOR);
+            bw.write(AppContext.SIMULATION.getRoads()[i].getNumberOfCarsOnRoad() + Constants.DEFAULT_CSV_SEPARATOR);
+            bw.write(AppContext.SIMULATION.getRoads()[i].toString() + Constants.DEFAULT_CSV_SEPARATOR);
+            bw.write(AppContext.SIMULATION.getRoads()[i].getCarGenerator().toString() + "\n");
         }
     }
 
