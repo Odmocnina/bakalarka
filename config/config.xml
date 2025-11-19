@@ -5,7 +5,7 @@
 
     <models>
         <carFollowingModel>
-            <id>helly</id>
+            <id>kww-linear</id>
         </carFollowingModel>
         <laneChangingModel>
             <id>mobil</id>

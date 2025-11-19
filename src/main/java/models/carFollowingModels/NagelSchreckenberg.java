@@ -5,6 +5,7 @@ import core.utils.RequestConstants;
 import models.ICarFollowingModel;
 
 import java.util.HashMap;
+import java.util.Random;
 
 /********************************************
  * Nagel-Schreckenberg car following model implementation (cellular)
@@ -23,11 +24,14 @@ public class NagelSchreckenberg implements ICarFollowingModel {
     /** random chance of slowing down when car is moving **/
     private final double slowDownChance = 0.3; // probability of random slowing down
 
+    private final Random random;
+
     /**
      * constructor for Nagel-Schreckenberg model
      **/
     public NagelSchreckenberg() {
         this.type = Constants.CELLULAR;
+        this.random = new Random();
     }
 
     /**
@@ -51,7 +55,7 @@ public class NagelSchreckenberg implements ICarFollowingModel {
             currentSpeed = distanceInCells - 1;
         }
         // Step 3: Randomization
-        if (currentSpeed > 0 && Math.random() < this.slowDownChance) { // 30% chance to slow down
+        if (currentSpeed > 0 && random.nextDouble() < this.slowDownChance) { // 30% chance to slow down
             currentSpeed--;
         }
 
@@ -123,5 +127,15 @@ public class NagelSchreckenberg implements ICarFollowingModel {
     @Override
     public String getName() {
         return "Nagel-Schreckenberg Model";
+    }
+
+    /**
+     * Constructor with injected Random for testing purposes
+     *
+     * @param random Random instance to use
+     **/
+    NagelSchreckenberg(Random random) {
+        this.type = Constants.CELLULAR;
+        this.random = random;
     }
 }

@@ -8,18 +8,39 @@ import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**************************************************
+ * Unit tests for Gipps car-following model class.
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ **************************************************/
 class GippsTest {
 
     /**
      * helper to create a fresh Gipps instance for each test
-     */
+     *
+     * @return new Gipps instance
+     **/
     private Gipps createGipps() {
         return new Gipps();
     }
 
     /**
      * helper to build parameter map for Gipps.getNewSpeed
-     */
+     *
+     * @param currentSpeed current speed of the vehicle
+     * @param maxAcceleration maximum acceleration of the vehicle
+     * @param maxSpeed maximum speed of the vehicle
+     * @param maxRoadSpeed maximum speed allowed by the road
+     * @param timeStep simulation time step
+     * @param currentSpeedForward speed of the leading vehicle
+     * @param minimumGap minimum gap to the leading vehicle
+     * @param decelerationComfort comfortable deceleration of the vehicle
+     * @param decelerationComfortForward comfortable deceleration of the leading vehicle
+     * @param xPosition current x position of the vehicle
+     * @param xPositionForward x position of the leading vehicle
+     * @return HashMap with all parameters set
+     **/
     private HashMap<String, Double> buildParameters(
             double currentSpeed,
             double maxAcceleration,
@@ -54,6 +75,9 @@ class GippsTest {
     // simple getters and metadata tests
     // ------------------------------------------------------------
 
+    /**
+     * Test: getID() should return "gipps"
+     **/
     @Test
     void getId_shouldReturnGipps() {
         Gipps gipps = createGipps();
@@ -61,6 +85,9 @@ class GippsTest {
         assertEquals("gipps", gipps.getID(), "Model ID should be 'gipps'.");
     }
 
+    /**
+     * Test: getName() should return: Gipps Car-Following Model
+     **/
     @Test
     void getName_shouldReturnReadableName() {
         Gipps gipps = createGipps();
@@ -69,6 +96,9 @@ class GippsTest {
                 "Model name should be human readable Gipps model name.");
     }
 
+    /**
+     * Test: getType() should return Constants.CONTINOUS
+     **/
     @Test
     void getType_shouldReturnContinuousTypeConstant() {
         Gipps gipps = createGipps();
@@ -77,6 +107,9 @@ class GippsTest {
                 "Model type should match Constants.CONTINOUS.");
     }
 
+    /**
+     * Test: getCellSize() should return Constants.PARAMETER_UNDEFINED
+     **/
     @Test
     void getCellSize_shouldReturnParameterUndefined() {
         Gipps gipps = createGipps();
@@ -85,6 +118,9 @@ class GippsTest {
                 "Cell size should be PARAMETER_UNDEFINED for continuous model.");
     }
 
+    /**
+     * Test: requestParameters() should return correct request string
+     **/
     @Test
     void requestParameters_shouldReturnCorrectRequestString() {
         Gipps gipps = createGipps();
@@ -109,6 +145,9 @@ class GippsTest {
                 "Request parameters string should contain all required parameters in the correct order.");
     }
 
+    /**
+     * Test: getParametersForGeneration() should return correct request string for generation
+     **/
     @Test
     void getParametersForGeneration_shouldReturnCorrectRequestString() {
         Gipps gipps = createGipps();
@@ -131,6 +170,9 @@ class GippsTest {
     // getNewSpeed behaviour tests
     // ------------------------------------------------------------
 
+    /**
+     * Test: getNewSpeed should use free-flow speed formula when no leading car is present
+     **/
     @Test
     void getNewSpeed_noLeadingCar_shouldUseFreeFlowSpeed() {
         Gipps gipps = createGipps();
@@ -181,6 +223,9 @@ class GippsTest {
                 "New speed should follow Gipps free-flow speed formula when no leader is present.");
     }
 
+    /**
+     * Test: getNewSpeed should limit speed by safe speed formula when a leading car is present
+     **/
     @Test
     void getNewSpeed_withLeader_shouldBeLimitedBySafeSpeed() {
         Gipps gipps = createGipps();
@@ -247,6 +292,9 @@ class GippsTest {
                 "New speed must not exceed free-flow speed when a leader is present.");
     }
 
+    /**
+     * Test: getNewSpeed should clamp safe speed to zero if it becomes NaN or negative
+     **/
     @Test
     void getNewSpeed_whenSafeSpeedNaNOrNegative_shouldClampToZero() {
         Gipps gipps = createGipps();

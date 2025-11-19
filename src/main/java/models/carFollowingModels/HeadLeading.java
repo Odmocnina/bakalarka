@@ -5,6 +5,7 @@ import core.utils.RequestConstants;
 import models.ICarFollowingModel;
 
 import java.util.HashMap;
+import java.util.Random;
 
 /********************************************
  * Head-leading car following model implementation (cellular)
@@ -26,11 +27,14 @@ public class HeadLeading implements ICarFollowingModel {
     /** random chance of slowing down when car is starting **/
     private final double slowDownChanceStart = 0.5; // initial probability of random slowing down
 
+    private final Random random;
+
     /**
      * constructor for head-leading model
      **/
     public HeadLeading() {
         this.type = Constants.CELLULAR;
+        this.random = new Random();
     }
 
     /**
@@ -60,7 +64,7 @@ public class HeadLeading implements ICarFollowingModel {
         // use chance for starting when starting from 0 speed (to simulate slower start, should be higher than normal
         // slow down chance
         double currentSlowDownChance = starting ? this.slowDownChanceStart : this.slowDownChance;
-        if (currentSpeed > 0 && Math.random() < currentSlowDownChance) { // 30% chance to slow down
+        if (currentSpeed > 0 && random.nextDouble() < currentSlowDownChance) { // 30% chance to slow down
             currentSpeed--;
         }
         return Math.max(0, currentSpeed);
@@ -132,6 +136,16 @@ public class HeadLeading implements ICarFollowingModel {
     @Override
     public String getName() {
         return "Head-leading algorithm";
+    }
+
+    /**
+     * Constructor with injected Random for testing purposes
+     *
+     * @param random Random instance to use
+     **/
+    HeadLeading(Random random) {
+        this.type = Constants.CELLULAR;
+        this.random = random;
     }
 }
 

@@ -7,13 +7,25 @@ import models.ICarFollowingModel;
 import java.util.HashMap;
 import java.util.Random;
 
+/********************************************
+ * Kerner-Klenov-Wolf (linear) car following model implementation (cellular)
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ********************************************/
 public class KKW_Linear implements ICarFollowingModel {
 
+    /** Random number generator **/
     Random rand = new Random();
-    private double cellSize = 1.5; // size of one cell in meters
-    private double d = 2.0; // minimum gap
 
-    protected double k = 1.0; // synchronization coefficient
+    /** size of one cell in meters **/
+    private double cellSize = 1.5;
+
+    /** minimum gap **/
+    private double d = 2.0;
+
+    /** synchronization coefficient **/
+    protected double k = 1.0;
     private double v_p = 3;
     private double pa1 = 0.1; // random probability parameter a1, probability of random acceleration when v_curr < v_p
                               // (when car is slow)
