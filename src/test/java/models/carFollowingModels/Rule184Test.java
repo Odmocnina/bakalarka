@@ -62,5 +62,22 @@ class Rule184Test {
     void getName_isCorrect() {
         assertEquals("Rule 184", model.getName());
     }
+
+    @Test
+    void getID_isRule184() {
+        assertEquals("rule184", model.getID());
+    }
+
+    @Test
+    void requestParameters_isCorrect() {
+        String expected = RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST;
+        assertEquals(expected, model.requestParameters());
+    }
+
+    @Test
+    void getParametersForGeneration_isEmpty() {
+        String expected = RequestConstants.LENGTH_REQUEST;
+        assertEquals(expected, model.getParametersForGeneration());
+    }
 }
 

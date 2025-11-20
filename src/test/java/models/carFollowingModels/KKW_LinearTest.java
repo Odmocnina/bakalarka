@@ -303,5 +303,33 @@ class KKW_LinearTest {
         KKW_Linear model = new KKW_Linear();
         assertEquals(1.5, model.getCellSize(), 1e-9);
     }
+
+    /**
+     * Test: will use random slowdown for starts when starting from 0 speed.
+     **/
+    @Test
+    void getNewSpeed_usesRandomSlowdownForStarts() throws Exception {
+        KKW_Linear model = new KKW_Linear();
+        setRandom(model, new FixedRandomSlowdown());
+
+        HashMap<String, Double> params = new HashMap<>();
+
+        // freeSpeed
+        params.put(RequestConstants.MAX_SPEED_REQUEST, 10.0);
+        // currentSpeed = 0
+        params.put(RequestConstants.CURRENT_SPEED_REQUEST, 0.0);
+        // distance to next car
+        params.put(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST, 10.0);
+        // time step
+        params.put(RequestConstants.TIME_STEP_REQUEST, 1.0);
+        // speed of next car
+        params.put(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST, 3.0);
+
+        double result = model.getNewSpeed(params);
+
+        // With random slowdown when starting, speed should remain 0
+        assertEquals(0.0, result, 1e-9,
+                "When starting from 0 speed, random slowdown for starts should keep speed at 0.");
+    }
 }
 

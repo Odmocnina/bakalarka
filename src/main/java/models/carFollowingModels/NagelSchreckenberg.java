@@ -128,14 +128,4 @@ public class NagelSchreckenberg implements ICarFollowingModel {
     public String getName() {
         return "Nagel-Schreckenberg Model";
     }
-
-    /**
-     * Constructor with injected Random for testing purposes
-     *
-     * @param random Random instance to use
-     **/
-    NagelSchreckenberg(Random random) {
-        this.type = Constants.CELLULAR;
-        this.random = random;
-    }
 }
