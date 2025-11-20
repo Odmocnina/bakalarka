@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <numberOfRoads>50</numberOfRoads>
+    <numberOfRoads>1</numberOfRoads>
     <roadFile>config/roads/road1.xml</roadFile>
 
     <models>
         <carFollowingModel>
-            <id>kww-linear</id>
+            <id>gipps</id>
         </carFollowingModel>
         <laneChangingModel>
             <id>mobil</id>
@@ -66,9 +66,9 @@
     <runDetails>
         <showGui>false</showGui>
         <drawCells>false</drawCells>
-        <laneChange>false</laneChange>
+        <laneChange>true</laneChange>
         <timeStep>1</timeStep>
-        <duration>5000</duration>
+        <duration>50</duration>
         <debug>true</debug>
         <logging>
             <log>true</log>
@@ -80,18 +80,18 @@
         </logging>
         <output>
             <writeOutput>true</writeOutput>
-            <file>output/simulationContOutputHelly.txt</file>
-            <type>txt</type>
-            <csvSeparator>;</csvSeparator>
+            <file>output/simulationContOutputGipps.csv</file>
+            <type>csv</type>
+            <csvSeparator>,</csvSeparator>
             <whatToWrite>
                 <simulationDetails>true</simulationDetails>
                 <simulationTime>true</simulationTime>
                 <carsPassed>true</carsPassed>
-                <carsOnRoad>true</carsOnRoad>
-                <roadDetails>true</roadDetails>
-                <generationDetails>true</generationDetails>
+                <carsOnRoad>false</carsOnRoad>
+                <roadDetails>false</roadDetails>
+                <generationDetails>false</generationDetails>
             </whatToWrite>
         </output>
-        <timeBetweenSteps>1</timeBetweenSteps>
+        <timeBetweenSteps>100</timeBetweenSteps>
     </runDetails>
 </config>

@@ -1,5 +1,9 @@
 package core.model;
 
+import app.AppContext;
+import core.utils.RequestConstants;
+
+import java.util.HashMap;
 import java.util.Queue;
 
 /********************************
@@ -124,6 +128,14 @@ public abstract class Road {
             }
         }
         return true;
+    }
+
+    protected void getRoadSimulationParameter(HashMap<String, Double> parameters, String param, CarParams car) {
+        if (param.equals(RequestConstants.TIME_STEP_REQUEST)) {
+            parameters.put(param, AppContext.RUN_DETAILS.timeStep);
+        } else if (param.equals(RequestConstants.MAX_ROAD_SPEED_REQUEST)) {
+            parameters.put(param, speedLimit);
+        }
     }
 
     /**

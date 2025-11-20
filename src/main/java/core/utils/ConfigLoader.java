@@ -425,8 +425,8 @@ public class ConfigLoader {
 
             boolean hasOutput = loadOutput(detailsFromConfig, outputElements);
             if (hasOutput) {
-                MyLogger.logBeforeLoading("Output will be written to file: " + detailsFromConfig.outputFile
-                        , Constants.INFO_FOR_LOGGING);
+                MyLogger.logBeforeLoading("Output will be written to file: " + detailsFromConfig.outputDetails
+                                .outputFile, Constants.INFO_FOR_LOGGING);
             } else {
                 MyLogger.logBeforeLoading("No output will be written", Constants.WARN_FOR_LOGGING);
             }
@@ -548,7 +548,7 @@ public class ConfigLoader {
         if (outputElements == null) {
             MyLogger.logBeforeLoading("Missing output details in run details, defaulting to no output"
                     , Constants.WARN_FOR_LOGGING);
-            detailsFromConfig.outputFile = null;
+            detailsFromConfig.outputDetails = null;
             return false;
         }
 
@@ -557,6 +557,8 @@ public class ConfigLoader {
         boolean writeOutput = true;
         String outputFile = null;
         String outputType = "txt";
+        String csvSeparator = Constants.DEFAULT_CSV_SEPARATOR;
+        OutputDetails outputDetails = new OutputDetails();
 
         for (int i = 0; i < outputChildren.getLength(); i++) {
             Node outputNode = outputChildren.item(i);
@@ -568,13 +570,15 @@ public class ConfigLoader {
                     case "file" -> outputFile = outputElement.getTextContent();
                     case "writeOutput" -> writeOutput = Boolean.parseBoolean(outputElement.getTextContent());
                     case "type" -> outputType = outputElement.getTextContent().toLowerCase().trim();
+                    case "csvSeparator" -> csvSeparator = outputElement.getTextContent();
+                    case "whatToWrite" -> outputDetails.changeWhatToOutput(outputElement);
                 }
             }
         }
 
         if (!writeOutput) {
             MyLogger.logBeforeLoading("Output writing disabled in run details", Constants.INFO_FOR_LOGGING);
-            detailsFromConfig.outputFile = null;
+            detailsFromConfig.outputDetails = null;
             return false;
         } else {
             if (outputFile == null || outputFile.isEmpty()) {
@@ -583,7 +587,9 @@ public class ConfigLoader {
                                 , Constants.WARN_FOR_LOGGING);
                 outputFile = Constants.DEFAULT_OUTPUT_FILE;
             }
-            detailsFromConfig.outputFile = outputFile;
+            outputDetails.outputFile = outputFile;
+            outputDetails.csvSeparator = csvSeparator;
+            detailsFromConfig.outputDetails = outputDetails;
             ResultsRecorder.getResultsRecorder().setOutputType(outputType);
             return true;
         }

@@ -229,31 +229,66 @@ public class ResultsRecorder {
     private void writeTXT(BufferedWriter bw) throws IOException {
         // Implementation for writing results in TXT format
         bw.write("=== Traffic Simulation Results ===\n\n"); // header of the results file
-        this.writeSimulationDetails(bw);
-        this.writeSimulationTimeResults(bw);
-        this.writeCarsPassedResults(bw);
-        this.writeCarsOnTheRoad(bw);
-        this.writeRoadDetails(bw);
-        this.writeGenerationParams(bw);
+        OutputDetails outputDetails = AppContext.RUN_DETAILS.outputDetails;
+        if (outputDetails == null) {
+            MyLogger.log("RunDetails is null. Cannot write simulation details.", Constants.ERROR_FOR_LOGGING);
+            return;
+        }
+        if (outputDetails.writePart("simulationDetails")) {
+            this.writeSimulationDetails(bw);
+        }
+        if (outputDetails.writePart("simulationTime")) {
+            this.writeSimulationTimeResults(bw);
+        }
+        if (outputDetails.writePart("carsPassed")) {
+            this.writeCarsPassedResults(bw);
+        }
+        if (outputDetails.writePart("carsOnRoad")) {
+            this.writeCarsOnTheRoad(bw);
+        }
+        if (outputDetails.writePart("roadDetails")) {
+            this.writeRoadDetails(bw);
+        }
+        if (outputDetails.writePart("generationDetails")) {
+            this.writeGenerationParams(bw);
+        }
     }
 
     private void writeCSV(BufferedWriter bw) throws IOException {
         // Implementation for writing results in CSV format
+        OutputDetails outputDetails = AppContext.RUN_DETAILS.outputDetails;
+        String csvSeparator = outputDetails.csvSeparator;
         String header = "";
-        header = header + "Road Index" + Constants.DEFAULT_CSV_SEPARATOR;
-        header = header + "Cars Passed" + Constants.DEFAULT_CSV_SEPARATOR;
-        header = header + "Cars on Road" + Constants.DEFAULT_CSV_SEPARATOR;
-        header = header + "Road details" + Constants.DEFAULT_CSV_SEPARATOR;
-        header = header + "Generation Params";
+        header = header + "Road Index" + csvSeparator;
+        if (outputDetails.writePart("carsPassed")) {
+            header = header + "Cars Passed" + csvSeparator;
+        }
+        if (outputDetails.writePart("carsOnRoad")) {
+            header = header + "Cars on Road" + csvSeparator;
+        }
+        if (outputDetails.writePart("roadDetails")) {
+            header = header + "Road details" + csvSeparator;
+        }
+        if (outputDetails.writePart("generationDetails")) {
+            header = header + "Generation Params";
+        }
         header = header.trim();
 
         bw.write(header + "\n");
         for (int i = 0; i < carsPassedPerRoad.length; i++) {
-            bw.write(i + Constants.DEFAULT_CSV_SEPARATOR);
-            bw.write(carsPassedPerRoad[i] + Constants.DEFAULT_CSV_SEPARATOR);
-            bw.write(AppContext.SIMULATION.getRoads()[i].getNumberOfCarsOnRoad() + Constants.DEFAULT_CSV_SEPARATOR);
-            bw.write(AppContext.SIMULATION.getRoads()[i].toString() + Constants.DEFAULT_CSV_SEPARATOR);
-            bw.write(AppContext.SIMULATION.getRoads()[i].getCarGenerator().toString() + "\n");
+            bw.write(i + csvSeparator);
+            if (outputDetails.writePart("carsPassed")) {
+                bw.write(carsPassedPerRoad[i] + csvSeparator);
+            }
+            if (outputDetails.writePart("carsOnRoad")) {
+                bw.write(AppContext.SIMULATION.getRoads()[i].getNumberOfCarsOnRoad() + csvSeparator);
+            }
+            if (outputDetails.writePart("roadDetails")) {
+                bw.write(AppContext.SIMULATION.getRoads()[i].toString() + csvSeparator);
+            }
+            if (outputDetails.writePart("generationDetails")) {
+                bw.write(AppContext.SIMULATION.getRoads()[i].getCarGenerator().toString() + "\n");
+            }
         }
     }
 

@@ -109,6 +109,7 @@ public class HeadLeading implements ICarFollowingModel {
                 RequestConstants.MAX_SPEED_REQUEST,
                 RequestConstants.CURRENT_SPEED_REQUEST,
                 RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST
+               // RequestConstants.X_POSITION_REQUEST
         };
 
         return String.join(RequestConstants.REQUEST_SEPARATOR, requests);

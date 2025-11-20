@@ -150,12 +150,12 @@ public class Main {
             return;
         } else {
             MyLogger.logBeforeLoading("Loaded run details: duration=" + runDetails.duration + ", timeStep=" +
-                    runDetails.timeStep + ", showGui=" + runDetails.showGui + ", outputFile=" + runDetails.outputFile +
-                    ", drawCells=" + runDetails.drawCells, Constants.INFO_FOR_LOGGING);
+                    runDetails.timeStep + ", showGui=" + runDetails.showGui + ", outputFile=" + runDetails.outputDetails
+                    .outputFile + ", drawCells=" + runDetails.drawCells, Constants.INFO_FOR_LOGGING);
         }
         AppContext.RUN_DETAILS = runDetails;
 
-        ResultsRecorder.getResultsRecorder().initialize(roads.length, runDetails.outputFile);
+        ResultsRecorder.getResultsRecorder().initialize(roads.length, runDetails.outputDetails.outputFile);
 
         // create simulation and store it in app context, simulation is the thing that updates all roads and cars
         Simulation sim = new Simulation(roads);

@@ -410,14 +410,6 @@ public class ContinuosRoad extends Road {
         return null;
     }
 
-    private void getRoadSimulationParameter(HashMap<String, Double> parameters, String param, CarParams car) {
-        if (param.equals(RequestConstants.TIME_STEP_REQUEST)) {
-            parameters.put(param, AppContext.RUN_DETAILS.timeStep);
-        } else if (param.equals(RequestConstants.MAX_ROAD_SPEED_REQUEST)) {
-            parameters.put(param, super.speedLimit);
-        }
-    }
-
     /**
      * method to get all parameters needed for car following / lane-changing model for given car on given position in
      * given lane
@@ -443,9 +435,9 @@ public class ContinuosRoad extends Road {
                     || param.equals(RequestConstants.CURRENT_SPEED_REQUEST)) { //get directly from car we are inspecting
                 parameters.put(param, car.getParameter(param));
             } else if (StringEditor.isInArray(roadSimulationParams, param)) { //get from road/simulation
-                this.getRoadSimulationParameter(parameters, param, car);
+                super.getRoadSimulationParameter(parameters, param, car);
             } else {   // get parameter from different car in proximity
-                this.getParametersAboutDifferentCar(parameters, param, car);
+                this.getParametersAboutDifferentCarN(parameters, param, car, this.vehicles);
             }
         }
         return parameters;
@@ -622,7 +614,7 @@ public class ContinuosRoad extends Road {
             return false;
         }
 
-        if (lane.size() == 0) {
+        if (lane.isEmpty()) {
             return true;
         }
 

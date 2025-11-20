@@ -3,6 +3,7 @@ package core.model.cellular;
 import app.AppContext;
 import core.model.CarParams;
 import core.model.Direction;
+import core.model.Orientation;
 import core.model.Road;
 import core.utils.Constants;
 import core.utils.MyLogger;
@@ -433,16 +434,103 @@ public class CellularRoad extends Road {
             return null;
         }
         String[] carGeneratedParams = this.generator.getCarGenerationParameters();
+        String[] roadSimulationParams = {RequestConstants.TIME_STEP_REQUEST, RequestConstants.MAX_ROAD_SPEED_REQUEST};
 
         CarParams car = this.cells[lane][position].getCarParams();
         for (String param : params) {
             if (StringEditor.isInArray(carGeneratedParams, param)) { // get parameters from car that is being inspected
                 parameters.put(param, car.getParameter(param));
+            } else if (StringEditor.isInArray(roadSimulationParams, param)) { //get from road/simulation
+                super.getRoadSimulationParameter(parameters, param, car);
             } else {
                 this.getRoadDependedParameters(parameters, param, car);
             }
         }
         return parameters;
+    }
+
+    /**
+     * gets parameter about different car in proximity of car for witch are we using model
+     *
+     * @param parameters hashmap to put parameter into
+     * @param param parameter to get
+     * @param car car for which we are getting parameter about different car
+     **/
+    private void getParametersAboutDifferentCar(HashMap<String, Double> parameters, String param, CarParams car) {
+        String[] paramSeparate = param.split(RequestConstants.SUBREQUEST_SEPARATOR);
+        String wantedParam = paramSeparate[0];
+        Direction direction = Direction.valueOf(paramSeparate[1]);
+        Orientation orientation = Orientation.valueOf(paramSeparate[2]);
+
+        CarParams otherCar = getCarInProximity(direction, orientation, car);
+
+        if (otherCar != null) {
+            parameters.put(param, otherCar.getParameter(wantedParam));
+        } else {
+            parameters.put(param, Constants.NO_CAR_THERE);
+        }
+    }
+
+    private CarParams getCarInProximity(Direction direction, Orientation orientation, CarParams car) {
+        int lane = car.lane;
+        int position = (int) car.xPosition;
+
+        if (direction == Direction.STRAIGHT) {
+            if (orientation == Orientation.FORWARD) {
+                if (position < this.numberOfCells - 1) {
+                    return this.getNextCarInLane(lane, position);
+                } else {
+                    return null;
+                }
+            } else {
+                if (position > 0) {
+                    return this.getPreviousCarInLane(lane, position);
+                } else {
+                    return null;
+                }
+            }
+        } else if (direction == Direction.LEFT) {
+            if (lane == 0) {
+                return null;
+            }
+
+            if (orientation == Orientation.FORWARD) {
+                return this.getNextCarInLane(lane - 1, position);
+            } else {
+                return this.getPreviousCarInLane(lane - 1, position);
+            }
+        } else if (direction == Direction.RIGHT) {
+            if (lane == numberOfLanes - 1) {
+                return null;
+            }
+
+            if (orientation == Orientation.FORWARD) {
+                return this.getNextCarInLane(lane + 1, position);
+            } else {
+                return this.getPreviousCarInLane(lane + 1, position);
+            }
+        }
+
+        return null;
+
+    }
+
+    private CarParams getNextCarInLane(int lane, int position) {
+        for (int pos = position + 1; pos < this.numberOfCells; pos++) {
+            if (cells[lane][pos].isOccupied() && cells[lane][pos].isHead()) {
+                return cells[lane][pos].getCarParams();
+            }
+        }
+        return null;
+    }
+
+    private CarParams getPreviousCarInLane(int lane, int position) {
+        for (int pos = position - 1; pos >= 0; pos--) {
+            if (cells[lane][pos].isOccupied() && cells[lane][pos].isHead()) {
+                return cells[lane][pos].getCarParams();
+            }
+        }
+        return null;
     }
 
     /**

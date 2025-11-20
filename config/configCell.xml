@@ -74,6 +74,6 @@
             <file>output/simulationKKWQ.csv</file>
             <type>csv</type>
         </output>
-        <timeBetweenSteps>10</timeBetweenSteps>
+        <timeBetweenSteps>100</timeBetweenSteps>
     </runDetails>
 </config>

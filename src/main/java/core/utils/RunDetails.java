@@ -19,7 +19,10 @@ public class RunDetails {
     public boolean showGui;
 
     /** Output file name for writing simulation results **/
-    public String outputFile;
+    public OutputDetails outputDetails = null;
+    /*public String outputFile;
+
+    public boolean[] output;*/
 
     /** Whether to draw cells in the GUI if cellular model **/
     public boolean drawCells;
@@ -34,13 +37,13 @@ public class RunDetails {
     public int timeBetweenSteps;
 
     /**
-     * Checks if the simulation results should be written to an output file (null or empty output file means results
-     * should not be recorded).
+     * Checks if the simulation results should be written to an output file (null or empty output file/details
+     * means results should not be recorded).
      *
      * @return true if an output file is specified, false otherwise.
      **/
     public boolean writingResults() {
-        return this.outputFile != null && !this.outputFile.isEmpty();
+        return this.outputDetails != null && outputDetails.outputFile != null && !outputDetails.outputFile.isEmpty();
     }
 
     /** Enable debug mode, writing id of cars, controlling if cars aren't duplicated or in collision **/
@@ -52,7 +55,7 @@ public class RunDetails {
                 "duration=" + duration +
                 ", timeStep=" + timeStep +
                 ", showGui=" + showGui +
-                ", outputFile='" + outputFile + '\'' +
+                ", output='" + outputDetails + '\'' +
                 ", drawCells=" + drawCells +
                 ", timeBetweenSteps=" + timeBetweenSteps +
                 '}';
