@@ -43,7 +43,9 @@ public class KKW_Linear implements ICarFollowingModel {
         String[] params = {
                 RequestConstants.CURRENT_SPEED_REQUEST,
                 RequestConstants.MAX_SPEED_REQUEST,
-                RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST,
+                RequestConstants.X_POSITION_REQUEST,
+                RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
+                RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST,
                 RequestConstants.TIME_STEP_REQUEST,
                 RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST,
         };
@@ -65,7 +67,15 @@ public class KKW_Linear implements ICarFollowingModel {
     public double getNewSpeed(HashMap<String, Double> parameters) {
         double freeSpeed = parameters.get(RequestConstants.MAX_SPEED_REQUEST);
         double currentSpeed = parameters.get(RequestConstants.CURRENT_SPEED_REQUEST);
-        double distanceToNextCar = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST);
+        int xPosition = parameters.get(RequestConstants.X_POSITION_REQUEST).intValue();
+        int xPositionStraightForward = parameters.get(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST).intValue();
+        int lengthStraightForward = parameters.get(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST).intValue();
+        double distance;
+        if (xPositionStraightForward == Constants.NO_CAR_THERE) {
+            distance = Double.MAX_VALUE; // no car ahead
+        } else {
+            distance = (xPositionStraightForward - xPosition - lengthStraightForward); // distance in cells
+        }
         double timeStep = parameters.get(RequestConstants.TIME_STEP_REQUEST);
         double speedNextCar = parameters.get(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST);
         if (speedNextCar == Constants.NO_CAR_THERE) {
@@ -73,9 +83,9 @@ public class KKW_Linear implements ICarFollowingModel {
         }
 
         // deterministic part
-        double safeSpeed = getSafeSpeed(distanceToNextCar, timeStep);
+        double safeSpeed = getSafeSpeed(distance, timeStep);
         int syncGap = getSynchronizationGap(currentSpeed, d, k, timeStep);
-        double synchronizedSpeed = getSynchronizedSpeed(currentSpeed, syncGap, distanceToNextCar, timeStep,
+        double synchronizedSpeed = getSynchronizedSpeed(currentSpeed, syncGap, distance, timeStep,
                 speedNextCar);
         double deterministicSpeed = Math.max(0, Math.min(freeSpeed, Math.min(safeSpeed, synchronizedSpeed)));
 
@@ -86,8 +96,7 @@ public class KKW_Linear implements ICarFollowingModel {
         double randomAffectSpeed = deterministicSpeed + randomSpeedChance * acceleration * timeStep;
 
         double smallestSpeed = Math.min(currentSpeed + acceleration * timeStep, Math.min(freeSpeed, safeSpeed));
-        double newSpeed = Math.max(0, Math.min(randomAffectSpeed, smallestSpeed));
-        return newSpeed;
+        return Math.max(0, Math.min(randomAffectSpeed, smallestSpeed));
 
     }
 

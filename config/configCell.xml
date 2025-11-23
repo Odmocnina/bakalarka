@@ -5,7 +5,7 @@
 
     <models>
         <carFollowingModel>
-            <id>kkw-linear</id>
+            <id>nagelschreckenberg</id>
         </carFollowingModel>
         <laneChangingModel>
             <id>rickert</id>
@@ -18,7 +18,7 @@
             <minValue>1</minValue>
             <maxValue>1</maxValue>
         </queue>
-        <flowRate>1.0</flowRate>
+        <flowRate>0.2</flowRate>
         <carParams>
             <maxSpeed>
                 <minValue>20</minValue>

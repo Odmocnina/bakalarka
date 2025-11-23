@@ -65,7 +65,7 @@ public class AppContextTest {
         RunDetails runDetails = new RunDetails();
         runDetails.timeBetweenSteps = 123;
         runDetails.showGui = true;
-        runDetails.outputFile = null;
+        runDetails.outputDetails = null;
 
         AppContext.RENDERER = renderer;
         AppContext.CAR_FOLLOWING_MODEL = cfModel;

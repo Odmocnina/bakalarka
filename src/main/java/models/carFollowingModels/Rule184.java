@@ -33,8 +33,15 @@ public class Rule184 implements ICarFollowingModel {
      **/
     @Override
     public double getNewSpeed(java.util.HashMap<String, Double> parameters) {
-        double distanceDouble = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST);
-        int distance = (int) distanceDouble; // convert distance to number of cells
+        int xPosition = parameters.get(RequestConstants.X_POSITION_REQUEST).intValue();
+        int xPositionStraightForward = parameters.get(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST).intValue();
+        int lengthStraightForward = parameters.get(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST).intValue();
+        double distance;
+        if (xPositionStraightForward == Constants.NO_CAR_THERE) {
+            distance = Double.MAX_VALUE; // no car ahead
+        } else {
+            distance = (xPositionStraightForward - xPosition - lengthStraightForward); // distance in cells
+        }
 
         if (distance > 1) {
             return 1;
@@ -80,7 +87,13 @@ public class Rule184 implements ICarFollowingModel {
      **/
     @Override
     public String requestParameters() {
-        return RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST;
+        String[] params = {
+                RequestConstants.X_POSITION_REQUEST,
+                RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
+                RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST
+        };
+
+        return String.join(RequestConstants.REQUEST_SEPARATOR, params);
     }
 
     /**

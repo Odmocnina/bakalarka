@@ -44,8 +44,16 @@ public class NagelSchreckenberg implements ICarFollowingModel {
     public double getNewSpeed(HashMap<String, Double> parameters) {
         int currentSpeed = parameters.get(RequestConstants.CURRENT_SPEED_REQUEST).intValue();
         int maxSpeed = parameters.get(RequestConstants.MAX_SPEED_REQUEST).intValue();
-        double distance = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST).intValue();
-        int distanceInCells = (int) Math.round(distance); // convert distance to number of cells
+        int xPosition = parameters.get(RequestConstants.X_POSITION_REQUEST).intValue();
+        int xPositionStraightForward = parameters.get(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST).intValue();
+        int lengthStraightForward = parameters.get(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST).intValue();
+        double distance;
+        if (xPositionStraightForward == Constants.NO_CAR_THERE) {
+            distance = Double.MAX_VALUE; // no car ahead
+        } else {
+            distance = (xPositionStraightForward - xPosition - lengthStraightForward); // distance in cells
+        }
+        int distanceInCells = (int) distance;
         // Step 1: Acceleration
         if (currentSpeed < maxSpeed) {
             currentSpeed++;
@@ -98,7 +106,9 @@ public class NagelSchreckenberg implements ICarFollowingModel {
         String[] requests = {
                 RequestConstants.MAX_SPEED_REQUEST,
                 RequestConstants.CURRENT_SPEED_REQUEST,
-                RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST
+                RequestConstants.X_POSITION_REQUEST,
+                RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
+                RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST
         };
 
         return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
