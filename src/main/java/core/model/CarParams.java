@@ -76,12 +76,11 @@ public class CarParams implements Cloneable {
     @Override
     public CarParams clone() {
         try {
-            CarParams cloned = (CarParams) super.clone(); // mělká kopie
-            cloned.parameters = new HashMap<>(this.parameters); // hluboká kopie HashMap
-            // Barva (Color) je neměnná (immutable), takže ji můžeš jen zkopírovat jako referenci
+            CarParams cloned = (CarParams) super.clone();
+            cloned.parameters = new HashMap<>(this.parameters);
             return cloned;
         } catch (CloneNotSupportedException e) {
-            throw new AssertionError(); // nemělo by nikdy nastat, protože implementuješ Cloneable
+            throw new AssertionError();
         }
     }
 

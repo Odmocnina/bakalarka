@@ -4,8 +4,6 @@ import core.utils.Constants;
 import core.utils.RequestConstants;
 import org.junit.jupiter.api.*;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -26,22 +24,32 @@ class HeadLeadingTest {
      * Helper to build parameter map for getNewSpeed()
      *
      * @param currentSpeed current speed of the car
-     * @param maxSpeed maximum speed of the car
-     * @param distance distance to the next car
+     * @param maxSpeed     maximum speed of the car
+     * @param distance     distance to the next car (in cells)
      * @return HashMap with parameters
      **/
     private HashMap<String, Double> buildParams(double currentSpeed, double maxSpeed, double distance) {
         HashMap<String, Double> map = new HashMap<>();
+
         map.put(RequestConstants.CURRENT_SPEED_REQUEST, currentSpeed);
         map.put(RequestConstants.MAX_SPEED_REQUEST, maxSpeed);
-        map.put(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST, distance);
+
+        // For distance = x2 - x1 - length. Choose x1 = 0, length = 1 → x2 = distance + 1.
+        double xPosition = 0.0;
+        double lengthStraightForward = 1.0;
+        double xPositionStraightForward = distance + xPosition + lengthStraightForward;
+
+        map.put(RequestConstants.X_POSITION_REQUEST, xPosition);
+        map.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, xPositionStraightForward);
+        map.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, lengthStraightForward);
+
         return map;
     }
 
     /**
-     * Override Math.random() to return a fixed value for testing.
+     * Constructor helper with injected Random for testing purposes
      *
-     * @param fixedValue the fixed value to return from Math.random()
+     * @param fixedValue the fixed value to return from Random.nextDouble()
      **/
     private HeadLeading createWithFixedRandom(double fixedValue) {
         Random fixedRandom = new Random() {
@@ -106,7 +114,9 @@ class HeadLeadingTest {
         String[] expected = {
                 RequestConstants.MAX_SPEED_REQUEST,
                 RequestConstants.CURRENT_SPEED_REQUEST,
-                RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST
+                RequestConstants.X_POSITION_REQUEST,
+                RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
+                RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST
         };
 
         assertEquals(String.join(RequestConstants.REQUEST_SEPARATOR, expected),
@@ -155,7 +165,7 @@ class HeadLeadingTest {
     @Test
     void getNewSpeed_shouldLimitByDistanceToNextCar() {
         HeadLeading hl = createWithFixedRandom(1.0);
-        var params = buildParams(4, 10, 3); // distance = 3 -> distanceInCells=3
+        var params = buildParams(4, 10, 3);
 
         double newSpeed = hl.getNewSpeed(params);
 
@@ -171,7 +181,7 @@ class HeadLeadingTest {
         HeadLeading hl = createWithFixedRandom(0.2);
         var params = buildParams(0, 5, 10);
 
-        double newSpeed = hl.getNewSpeed(params); // start: currentSpeed=0 -> becomes 1 -> slowed to 0
+        double newSpeed = hl.getNewSpeed(params);
 
         assertEquals(0, newSpeed,
                 "Starting car should have higher slowdown chance and may drop back to 0.");
@@ -179,7 +189,6 @@ class HeadLeadingTest {
 
     @Test
     void getNewSpeed_shouldNotSlowDownWhenRandomAboveThreshold() {
-        // random > slowdownChance => no slowdown
         HeadLeading hl = createWithFixedRandom(0.9);
         var params = buildParams(1, 5, 10);
 
@@ -190,9 +199,20 @@ class HeadLeadingTest {
     }
 
     @Test
+    void getNewSpeed_getSpeedWhenNoCarAhead() {
+        HeadLeading hl = createWithFixedRandom(1.0);
+        var params = buildParams(3, 5, Double.MAX_VALUE);
+
+        double newSpeed = hl.getNewSpeed(params);
+
+        assertEquals(4, newSpeed,
+                "When there is no car ahead, car should accelerate normally.");
+    }
+
+    @Test
     void getNewSpeed_neverReturnsNegativeSpeed() {
         HeadLeading hl = createWithFixedRandom(1.0);
-        var params = buildParams(0, 3, 0); // distanceInCells=0 -> new speed becomes -1
+        var params = buildParams(0, 3, 0);
 
         double newSpeed = hl.getNewSpeed(params);
 
@@ -200,4 +220,3 @@ class HeadLeadingTest {
                 "Speed should never be negative (clamped to 0).");
     }
 }
-

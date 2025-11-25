@@ -31,14 +31,13 @@ class KKW_QuadraticTest {
     void synchronizationGap_usesQuadraticFormula() throws Exception {
         KKW_Quadratic model = new KKW_Quadratic();
 
-        double currentSpeed = 10.0;  // v
+        double currentSpeed = 10.0;
         double d = 2.0;
-        double k = 1.0;              // not used in quadratic version
-        double dt = 1.5;             // timeStep
+        double k = 1.0;
+        double dt = 1.5;
         double beta = 0.5;
         double a = getAcceleration(model);
 
-        // manual expected value from formula
         double expectedDouble =
                 d + currentSpeed * dt + currentSpeed +
                         beta * currentSpeed / (2 * a);
@@ -100,15 +99,12 @@ class KKW_QuadraticTest {
     void inheritsLinearBehavior_notOverriddenMethodsStillWork() throws Exception {
         KKW_Quadratic model = new KKW_Quadratic();
 
-        // Use simple parameters to test getCellSize(), inherited unchanged
         double cellSize = model.getCellSize();
 
         assertEquals(1.5, cellSize, 1e-9,
                 "KKW_Quadratic should inherit cell size from KKW_Linear.");
 
-        // Also test that getType() works (inherited)
         assertNotNull(model.getType(),
                 "KKW_Quadratic should inherit a valid type from KKW_Linear.");
     }
 }
-

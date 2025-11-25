@@ -25,8 +25,17 @@ class KKW_LinearTest {
         params.put(RequestConstants.MAX_SPEED_REQUEST, 10.0);
         // currentSpeed = 3
         params.put(RequestConstants.CURRENT_SPEED_REQUEST, 3.0);
-        // distance to next car
-        params.put(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST, 10.0);
+
+        // position setup: distance to next car = 10 cells
+        double xPosition = 0.0;
+        double distanceToNextCar = 10.0;
+        double lengthStraightForward = 1.0;
+        double xPositionStraightForward = xPosition + lengthStraightForward + distanceToNextCar;
+
+        params.put(RequestConstants.X_POSITION_REQUEST, xPosition);
+        params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, xPositionStraightForward);
+        params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, lengthStraightForward);
+
         // time step
         params.put(RequestConstants.TIME_STEP_REQUEST, 1.0);
         // speed of next car
@@ -50,8 +59,17 @@ class KKW_LinearTest {
         params.put(RequestConstants.MAX_SPEED_REQUEST, 30.0);
         // currentSpeed = 10
         params.put(RequestConstants.CURRENT_SPEED_REQUEST, 10.0);
-        // distance to next car - small enough to be within synchronization gap
-        params.put(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST, 10.0);
+
+        // position setup: distance to next car = 10 cells (within synchronization gap)
+        double xPosition = 0.0;
+        double distanceToNextCar = 10.0;
+        double lengthStraightForward = 1.0;
+        double xPositionStraightForward = xPosition + lengthStraightForward + distanceToNextCar;
+
+        params.put(RequestConstants.X_POSITION_REQUEST, xPosition);
+        params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, xPositionStraightForward);
+        params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, lengthStraightForward);
+
         // time step
         params.put(RequestConstants.TIME_STEP_REQUEST, 1.0);
         // next car is slower
@@ -118,7 +136,9 @@ class KKW_LinearTest {
         String[] expected = {
                 RequestConstants.CURRENT_SPEED_REQUEST,
                 RequestConstants.MAX_SPEED_REQUEST,
-                RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST,
+                RequestConstants.X_POSITION_REQUEST,
+                RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
+                RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST,
                 RequestConstants.TIME_STEP_REQUEST,
                 RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST
         };
@@ -225,7 +245,7 @@ class KKW_LinearTest {
     }
 
     /**
-     * Test: when there is no car ahead (speedNextCar == NO_CAR_THERE),
+     * Test: when the speed of the car ahead is unknown (speedNextCar == NO_CAR_THERE),
      * getNewSpeed() should treat the next car speed as freeSpeed.
      * We mainly verify that the method runs and stays within [0, freeSpeed].
      */
@@ -237,12 +257,12 @@ class KKW_LinearTest {
         HashMap<String, Double> params = createBaseParamsScenario1();
         double freeSpeed = 15.0;
         params.put(RequestConstants.MAX_SPEED_REQUEST, freeSpeed);
-        params.put(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST, Constants.NO_CAR_THERE);
+        params.put(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST, (double) Constants.NO_CAR_THERE);
 
         double result = model.getNewSpeed(params);
 
         assertTrue(result >= 0.0 && result <= freeSpeed,
-                "When no car is ahead, new speed should remain within [0, freeSpeed].");
+                "When next car speed is unknown, new speed should remain within [0, freeSpeed].");
     }
 
     /**
@@ -318,8 +338,17 @@ class KKW_LinearTest {
         params.put(RequestConstants.MAX_SPEED_REQUEST, 10.0);
         // currentSpeed = 0
         params.put(RequestConstants.CURRENT_SPEED_REQUEST, 0.0);
-        // distance to next car
-        params.put(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST, 10.0);
+
+        // position setup: distance to next car = 10 cells
+        double xPosition = 0.0;
+        double distanceToNextCar = 10.0;
+        double lengthStraightForward = 1.0;
+        double xPositionStraightForward = xPosition + lengthStraightForward + distanceToNextCar;
+
+        params.put(RequestConstants.X_POSITION_REQUEST, xPosition);
+        params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, xPositionStraightForward);
+        params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, lengthStraightForward);
+
         // time step
         params.put(RequestConstants.TIME_STEP_REQUEST, 1.0);
         // speed of next car
@@ -332,4 +361,3 @@ class KKW_LinearTest {
                 "When starting from 0 speed, random slowdown for starts should keep speed at 0.");
     }
 }
-

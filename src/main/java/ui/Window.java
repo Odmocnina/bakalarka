@@ -8,6 +8,8 @@ import core.model.cellular.CellularRoad;
 import core.utils.Constants;
 import core.utils.MyLogger;
 import core.utils.ResultsRecorder;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
 import ui.render.IRoadRenderer;
 import core.sim.Simulation;
 
@@ -18,9 +20,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -52,6 +51,10 @@ public class Window extends Application {
     private ScrollBar hScroll;
     private ScrollBar vScroll;
     private Label infoLabel; // Label for top info text
+
+    private Label flowRateValueLabel;
+    private Slider flowRateSlider;
+    private Button flowRateButton;
 
     /**
      * start method for JavaFX application
@@ -102,9 +105,41 @@ public class Window extends Application {
         // VBox to hold scrollbar and controls at the bottom
         VBox bottomLayout = new VBox(hScroll, controls);
 
+        // Configuration bar
+
+        double currentFlowRate = 0.25; // TODO: read from your config
+
+        Label flowRateLabel = new Label("Flow rate:");
+        flowRateValueLabel = new Label(String.format("%.2f", currentFlowRate));
+
+        flowRateButton = new Button("Change");
+
+// slider 0–1, initially hidden
+        flowRateSlider = new Slider(0.0, 1.0, currentFlowRate);
+        flowRateSlider.setShowTickMarks(true);
+        flowRateSlider.setShowTickLabels(true);
+        flowRateSlider.setMajorTickUnit(0.25);
+        flowRateSlider.setBlockIncrement(0.01);
+
+// slider is hidden at start
+        flowRateSlider.setVisible(false);
+        flowRateSlider.setManaged(false); // so it doesn't take space when hidden
+
+        HBox flowRateBar = new HBox(10, flowRateLabel, flowRateValueLabel, flowRateButton);
+        flowRateBar.setPadding(new Insets(5, 10, 5, 10));
+        flowRateBar.setAlignment(Pos.CENTER_LEFT);
+
+// top panel = info label + flow bar + (schovaný) slider
+        VBox topPane = new VBox(infoLabel, flowRateBar, flowRateSlider);
+
+
+        ////////////////////////////////////////
+
+
         // main layout of gui
         BorderPane root = new BorderPane();
-        root.setTop(infoLabel);      // Added info label to top
+        root.setTop(topPane);
+       // root.setTop(infoLabel);      // Added info label to top
         root.setCenter(canvasPane);  // Changed to Pane with Canvas
         root.setRight(vScroll);      // Added vertical scrollbar
         root.setBottom(bottomLayout);// Controls + Horizontal Scrollbar

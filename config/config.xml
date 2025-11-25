@@ -5,7 +5,7 @@
 
     <models>
         <carFollowingModel>
-            <id>gipps</id>
+            <id>idm</id>
         </carFollowingModel>
         <laneChangingModel>
             <id>mobil</id>
@@ -64,32 +64,32 @@
     </generator>
 
     <runDetails>
-        <showGui>false</showGui>
+        <showGui>true</showGui>
         <drawCells>false</drawCells>
         <laneChange>true</laneChange>
         <timeStep>1</timeStep>
-        <duration>50</duration>
+        <duration>5000</duration>
         <debug>true</debug>
         <logging>
             <log>true</log>
             <info>true</info>
             <warn>true</warn>
-            <debug>false</debug>
+            <debug>true</debug>
             <error>true</error>
             <fatal>true</fatal>
         </logging>
         <output>
             <writeOutput>true</writeOutput>
-            <file>output/simulationContOutputGipps.csv</file>
-            <type>csv</type>
+            <file>output/simulationContOutputIDM2.txt</file>
+            <type>txt</type>
             <csvSeparator>,</csvSeparator>
             <whatToWrite>
                 <simulationDetails>true</simulationDetails>
                 <simulationTime>true</simulationTime>
                 <carsPassed>true</carsPassed>
-                <carsOnRoad>false</carsOnRoad>
-                <roadDetails>false</roadDetails>
-                <generationDetails>false</generationDetails>
+                <carsOnRoad>true</carsOnRoad>
+                <roadDetails>true</roadDetails>
+                <generationDetails>true</generationDetails>
             </whatToWrite>
         </output>
         <timeBetweenSteps>100</timeBetweenSteps>

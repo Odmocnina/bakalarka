@@ -19,7 +19,8 @@ import java.util.ListIterator;
  ****************************/
 public class ContinuosRoad extends Road {
 
-    /** each linked list in array is one lane, CarParams in linked list are cars, so this represents entire road **/
+    /** structure storing cars on the road, each linked list in array is one lane, CarParams in linked list are cars,
+     * so this represents entire road **/
     LinkedList<CarParams>[] vehicles;
 
     /**
@@ -43,7 +44,7 @@ public class ContinuosRoad extends Road {
             this.vehicles[lane] = new LinkedList<>();
         }
 
-       /* CarParams carParams = new CarParams();
+      /*  CarParams carParams = new CarParams();
         carParams.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
         carParams.setParameter(RequestConstants.MAX_SPEED_REQUEST, 40.33);
         carParams.xPosition = 20;
@@ -167,8 +168,8 @@ public class ContinuosRoad extends Road {
     private void addFromQueue(int lane) {
         CarParams cp = super.carQueuesPerLane[lane].peek();
 
-        if (cp != null && okToPutCar(cp, lane)) {
-            placeCar(cp, (int) (cp.getParameter(RequestConstants.LENGTH_REQUEST) - 1), lane);
+        if (cp != null && okToPutCarAtStart(cp, lane)) {
+            placeCarAtStart(cp, (int) (cp.getParameter(RequestConstants.LENGTH_REQUEST) - 1), lane);
             super.carQueuesPerLane[lane].poll();
         }
     }
@@ -182,8 +183,8 @@ public class ContinuosRoad extends Road {
         if (super.generator.decideIfNewCar()) {
             CarParams newCar = generator.generateCar();
 
-            if (okToPutCar(newCar, lane)) {
-                placeCar(newCar, newCar.getParameter(RequestConstants.LENGTH_REQUEST), lane);
+            if (newCar != null && okToPutCarAtStart(newCar, lane)) {
+                placeCarAtStart(newCar, newCar.getParameter(RequestConstants.LENGTH_REQUEST), lane);
                 MyLogger.log("New car placed at lane " + lane + " position 0, carParams: " + newCar,
                         Constants.DEBUG_FOR_LOGGING);
             }
@@ -192,7 +193,7 @@ public class ContinuosRoad extends Road {
 
     /**
      * method to update the road, move cars forward according to car following model, synchronized to avoid concurrency
-     * issues, because when gui is used, it's running in different thread than simulation and if too much cars are at
+     * issues, because when gui is used, it's running in different thread than simulation and if too many cars are at
      * one time it can cause concurrent modification exception
      *
      * @return number of cars that passed the end of the road
@@ -244,10 +245,6 @@ public class ContinuosRoad extends Road {
             return 0;
         }
 
-        if (AppContext.SIMULATION.getStepCount() > 10) {
-            int i = 0;
-        }
-
         // safe iteration and removal using ListIterator
         final ListIterator<CarParams> it = this.vehicles[lane].listIterator(this.vehicles[lane].size());
         while (it.hasPrevious()) {
@@ -265,8 +262,7 @@ public class ContinuosRoad extends Road {
             }
 
             String requestParameters = AppContext.CAR_FOLLOWING_MODEL.requestParameters();
-            HashMap<String, Double> parameters = getParameters(lane, this.vehicles[lane].indexOf(car),
-                    requestParameters);
+            HashMap<String, Double> parameters = getParameters(car, this.vehicles, requestParameters);
             if (parameters == null) {
                 MyLogger.log("Error getting parameters for car at lane " + lane + ", position " +
                         this.vehicles[lane].indexOf(car), Constants.ERROR_FOR_LOGGING);
@@ -311,115 +307,15 @@ public class ContinuosRoad extends Road {
     }
 
     /**
-     * gets parameter about different car in proximity of car for witch are we using model
-     *
-     * @param parameters hashmap to put parameter into
-     * @param param parameter to get
-     * @param car car for which we are getting parameter about different car
-     **/
-    private void getParametersAboutDifferentCar(HashMap<String, Double> parameters, String param, CarParams car) {
-        String[] paramSeparate = param.split(RequestConstants.SUBREQUEST_SEPARATOR);
-        String wantedParam = paramSeparate[0];
-        Direction direction = Direction.valueOf(paramSeparate[1]);
-        Orientation orientation = Orientation.valueOf(paramSeparate[2]);
-
-        CarParams otherCar = getCarInProximity(direction, orientation, car);
-
-        if (otherCar != null) {
-            parameters.put(param, otherCar.getParameter(wantedParam));
-        } else {
-            parameters.put(param, Constants.NO_CAR_THERE);
-        }
-    }
-
-    /**
-     * function to get car in proximity lane in given orientation, can give for example same lane (car ahead/back of the
-     * inspected car), or different lane (car ahead/back of the inspected car in left/right lane), which lane is decided
-     * by the lane parameter, which is linked list of cars in that lane
-     *
-     * @param orientation orientation to look for car in (FORWARD or BACKWARD)
-     * @param car car for which we are looking for other car in proximity lane
-     * @param lane lane in which to look for car
-     * @return car in proximity lane in given orientation, null if no car found (free space)
-     **/
-    private CarParams getCarInProximityLane(Orientation orientation, CarParams car, LinkedList<CarParams> lane) {
-        if (orientation == Orientation.FORWARD) {
-            for (int i = 0; i < lane.size(); i++) {
-                CarParams otherCar = lane.get(i);
-                if (otherCar.xPosition > car.xPosition) {
-                    return otherCar;
-                }
-            }
-        } else if (orientation == Orientation.BACKWARD) {
-            for (int i = lane.size() - 1; i >= 0; i--) {
-                CarParams otherCar = lane.get(i);
-                if (otherCar.xPosition < car.xPosition) {
-                    return otherCar;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * function to get car in proximity in given direction and orientation, for example car ahead in same lane is
-     * STRAIGHT FORWARD, car behind in left lane is LEFT BACKWARD, car ahead in right lane is RIGHT FORWARD, etc., car
-     * then is used when its parameters are wanted for model, like its speed, position, etc.
-     *
-     * @param direction direction (lane) to look for car in (STRAIGHT, LEFT, RIGHT)
-     * @param orientation orientation to look for car in (FORWARD or BACKWARD)
-     * @param car car for which we are looking for other car in proximity
-     * @return car in proximity in given direction and orientation, null if no car found (free space) also technically
-     *         will return null if no lane is there in given direction, so thread carefully, should be handled properly
-     *         by caller method
-     **/
-    private CarParams getCarInProximity(Direction direction, Orientation orientation, CarParams car) {
-        int lane = car.lane;
-        int position = this.vehicles[lane].indexOf(car);
-
-        if (direction == Direction.STRAIGHT) {
-            if (orientation == Orientation.FORWARD) {
-                if (position < this.vehicles[lane].size() - 1) {
-                    return this.vehicles[lane].get(position + 1);
-                } else {
-                    return null;
-                }
-            } else {
-                if (position > 0) {
-                    return this.vehicles[lane].get(position - 1);
-                } else {
-                    return null;
-                }
-            }
-        } else if (direction == Direction.LEFT) {
-            if (lane == 0) {
-                return null;
-            }
-            LinkedList<CarParams> laneForScan = this.vehicles[lane - 1];
-            return this.getCarInProximityLane(orientation, car, laneForScan);
-        } else if (direction == Direction.RIGHT) {
-            if (lane == numberOfLanes - 1) {
-                return null;
-            }
-
-            LinkedList<CarParams> laneForScan = this.vehicles[lane + 1];
-            return this.getCarInProximityLane(orientation, car, laneForScan);
-        }
-
-        return null;
-    }
-
-    /**
      * method to get all parameters needed for car following / lane-changing model for given car on given position in
      * given lane
      *
-     * @param lane lane of the car
-     * @param position position of the car in the lane (index in linked list)
-     * @param requestParameters string with all requested parameters separated by request separator
-     * @return hashmap with all requested parameters and their values
+     * @param inspectedCar car for which the parameters are being gathered
+     * @param road road structure to get parameters from, can be real road or fake road for lane change calculation
+     * @param requestParameters string of requested parameters separated by REQUEST_SEPARATOR
      **/
-    private HashMap<String, Double> getParameters(int lane, int position, String requestParameters) {
+    private HashMap<String, Double> getParameters(CarParams inspectedCar, LinkedList<CarParams>[] road,
+                                                  String requestParameters) {
         HashMap<String, Double> parameters = new HashMap<>();
         String[] params = requestParameters.split(RequestConstants.REQUEST_SEPARATOR);
         if (params.length == 0) {
@@ -429,36 +325,12 @@ public class ContinuosRoad extends Road {
         String[] carGeneratedParams = this.generator.getCarGenerationParameters();
         String[] roadSimulationParams = {RequestConstants.TIME_STEP_REQUEST, RequestConstants.MAX_ROAD_SPEED_REQUEST};
 
-        CarParams car = vehicles[lane].get(position);
+        CarParams car = this.getCarById(inspectedCar.id, road);
         for (String param : params) {
             if (StringEditor.isInArray(carGeneratedParams, param) || param.equals(RequestConstants.X_POSITION_REQUEST)
                     || param.equals(RequestConstants.CURRENT_SPEED_REQUEST)) { //get directly from car we are inspecting
                 parameters.put(param, car.getParameter(param));
-            } else if (StringEditor.isInArray(roadSimulationParams, param)) { //get from road/simulation
-                super.getRoadSimulationParameter(parameters, param, car);
-            } else {   // get parameter from different car in proximity
-                this.getParametersAboutDifferentCarN(parameters, param, car, this.vehicles);
-            }
-        }
-        return parameters;
-    }
-
-    private HashMap<String, Double> getParametersLaneChange(CarParams carChangingLane, LinkedList<CarParams>[] road, String requestParameters) {
-        HashMap<String, Double> parameters = new HashMap<>();
-        String[] params = requestParameters.split(RequestConstants.REQUEST_SEPARATOR);
-        if (params.length == 0) {
-            MyLogger.log("No parameters requested", Constants.DEBUG_FOR_LOGGING);
-            return null;
-        }
-        String[] carGeneratedParams = this.generator.getCarGenerationParameters();
-        String[] roadSimulationParams = {RequestConstants.TIME_STEP_REQUEST, RequestConstants.MAX_ROAD_SPEED_REQUEST};
-
-        CarParams car = this.getCarById(carChangingLane.id, road);
-        for (String param : params) {
-            if (StringEditor.isInArray(carGeneratedParams, param) || param.equals(RequestConstants.X_POSITION_REQUEST)
-                    || param.equals(RequestConstants.CURRENT_SPEED_REQUEST)) { //get directly from car we are inspecting
-                parameters.put(param, car.getParameter(param));
-            } else if (param.contains("Acceleration")) {
+            } else if (param.contains("Acceleration")) {    //get acceleration what would be if lane change occurs
                 double acceleration;
                 if (param.contains("theoretical")) {
                     acceleration = this.getAccelerationOfDifferentCar(car, param, road);
@@ -470,21 +342,22 @@ public class ContinuosRoad extends Road {
             } else if (StringEditor.isInArray(roadSimulationParams, param)) { //get from road/simulation
                 this.getRoadSimulationParameter(parameters, param, car);
             } else {   // get parameter from different car in proximity
-                this. getParametersAboutDifferentCarN(parameters, param, car, road);
+                this.getParametersAboutDifferentCar(parameters, param, car, road);
             }
         }
+
         return parameters;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
 
-    private void getParametersAboutDifferentCarN(HashMap<String, Double> parameters, String param, CarParams car,
-                                                 LinkedList<CarParams>[] road) {
+    private void getParametersAboutDifferentCar(HashMap<String, Double> parameters, String param, CarParams car,
+                                                LinkedList<CarParams>[] road) {
         String[] paramSeparate = param.split(RequestConstants.SUBREQUEST_SEPARATOR);
         String wantedParam = paramSeparate[0];
         Orientation orientation = Orientation.valueOf(paramSeparate[2]);
 
-        CarParams otherCar = getCarInProximityN(orientation, car, road);
+        CarParams otherCar = getCarInProximity(orientation, car, road);
 
         if (otherCar != null) {
             parameters.put(param, otherCar.getParameter(wantedParam));
@@ -493,7 +366,11 @@ public class ContinuosRoad extends Road {
         }
     }
 
-
+    /**
+     * method to check relevancy of cars on the road, remove cars that passed the end of the road
+     *
+     * @return number of cars that passed the end of the road
+     **/
     private int checkRelevancyOfCars() {
         int carsPassed = 0;
         for (int lane = 0; lane < this.numberOfLanes; lane++) {
@@ -506,9 +383,13 @@ public class ContinuosRoad extends Road {
                 }
             }
         }
+
         return carsPassed;
     }
 
+    /**
+     * method to reset processed flags of all cars after update step
+     **/
     private void resetProcessedFlags() {
         for (int lane = 0; lane < this.numberOfLanes; lane++) {
             for (CarParams car : this.vehicles[lane]) {
@@ -517,7 +398,15 @@ public class ContinuosRoad extends Road {
         }
     }
 
-    private CarParams getCarInProximityN(Orientation orientation, CarParams car, LinkedList<CarParams>[] road) {
+    /**
+     * method to get car in proximity (forward or backward) on the same lane
+     *
+     * @param orientation orientation (forward or backward)
+     * @param car car to check from
+     * @param road road structure to check in
+     * @return car in proximity or null if no car found
+     **/
+    private CarParams getCarInProximity(Orientation orientation, CarParams car, LinkedList<CarParams>[] road) {
         int lane = car.lane;
         int position = road[lane].indexOf(car);
 
@@ -534,9 +423,15 @@ public class ContinuosRoad extends Road {
                 return null;
             }
         }
-
     }
 
+    /**
+     * method that attempts to change lane for given car, if it does so, it updates the car's lane and position in the
+     * road structure
+     *
+     * @param car car to attempt lane change for
+     * @return direction of lane change (LEFT, RIGHT, STRAIGHT)
+     */
     private Direction tryLaneChange(CarParams car) {
         int lane = car.lane;
         int index = vehicles[lane].indexOf(car);
@@ -550,10 +445,10 @@ public class ContinuosRoad extends Road {
             requestParameters = AppContext.LANE_CHANGING_MODEL.requestParameters(direction);
             fakeRoad = this.createFakeRoad(direction, car);
             if (fakeRoad != null) {
-                parameters = getParametersLaneChange(car, fakeRoad, requestParameters);
+                parameters = getParameters(car, fakeRoad, requestParameters);
                 desiredDirection = AppContext.LANE_CHANGING_MODEL.changeLaneIfDesired(parameters, direction);
                 if (desiredDirection == Direction.LEFT) {
-                    this.placeCarN(car, this.vehicles, Direction.LEFT);
+                    this.placeCar(car, this.vehicles, Direction.LEFT);
                     MyLogger.log("Car at lane " + lane + " position " + index + " changed lane to LEFT.",
                             Constants.DEBUG_FOR_LOGGING);
                     return Direction.LEFT;
@@ -566,13 +461,10 @@ public class ContinuosRoad extends Road {
             requestParameters = AppContext.LANE_CHANGING_MODEL.requestParameters(direction);
             fakeRoad = this.createFakeRoad(direction, car);
             if (fakeRoad != null) {
-                if (AppContext.SIMULATION.getStepCount() > 100) {
-                    int i = 0;
-                }
-                parameters = getParametersLaneChange(car, fakeRoad, requestParameters);
+                parameters = getParameters(car, fakeRoad, requestParameters);
                 desiredDirection = AppContext.LANE_CHANGING_MODEL.changeLaneIfDesired(parameters, direction);
                 if (desiredDirection == Direction.RIGHT) {
-                    this.placeCarN(car, this.vehicles, Direction.RIGHT);
+                    this.placeCar(car, this.vehicles, Direction.RIGHT);
                     MyLogger.log("Car at lane " + lane + " position " + index + " changed lane to RIGHT.",
                             Constants.DEBUG_FOR_LOGGING);
                     return Direction.RIGHT;
@@ -581,9 +473,16 @@ public class ContinuosRoad extends Road {
         }
 
         return Direction.STRAIGHT;
-
     }
 
+    /**
+     * method to get acceleration of different car in proximity (used for lane changing models)
+     *
+     * @param car car to check from
+     * @param param parameter string containing info about which car to check
+     * @param road road structure to check in
+     * @return acceleration of the different car
+     **/
     private double getAccelerationOfDifferentCar(CarParams car, String param, LinkedList<CarParams>[] road) {
         String[] paramSeparate = param.split(RequestConstants.SUBREQUEST_SEPARATOR);
         CarParams carToStudy;
@@ -591,7 +490,7 @@ public class ContinuosRoad extends Road {
         if (paramSeparate.length >= 3) {
             Direction direction = Direction.valueOf(paramSeparate[1]);
             Orientation orientation = Orientation.valueOf(paramSeparate[2]);
-            carToStudy = getCarInProximityN(orientation, car, road);
+            carToStudy = getCarInProximity(orientation, car, road);
         } else {
             carToStudy = car;
         }
@@ -601,8 +500,7 @@ public class ContinuosRoad extends Road {
         }
 
         String requestParameters = AppContext.CAR_FOLLOWING_MODEL.requestParameters();
-        int index = road[carToStudy.lane].indexOf(carToStudy);
-        HashMap<String, Double> parameters = getParametersLaneChange(carToStudy, road, requestParameters);
+        HashMap<String, Double> parameters = getParameters(carToStudy, road, requestParameters);
         double newSpeed = AppContext.CAR_FOLLOWING_MODEL.getNewSpeed(parameters);
         double oldSpeed = carToStudy.getParameter(RequestConstants.CURRENT_SPEED_REQUEST);
 
@@ -622,7 +520,7 @@ public class ContinuosRoad extends Road {
             double backXOfCar = (car.xPosition - car.getParameter(RequestConstants.LENGTH_REQUEST));
             CarParams carBehind = lane.get(place - 1);
             if (carBehind.xPosition >= backXOfCar) {
-                return false;
+               return false;
             }
         }
 
@@ -630,15 +528,13 @@ public class ContinuosRoad extends Road {
             CarParams carInFront = lane.get(place);
             double backXOfCarInFront = carInFront.xPosition - carInFront.getParameter(RequestConstants.LENGTH_REQUEST);
 
-            if (car.xPosition >= backXOfCarInFront) {
-                return false;
-            }
+            return !(car.xPosition >= backXOfCarInFront);
         }
 
         return true;
     }
 
-    private boolean placeCarN(CarParams car, LinkedList<CarParams>[] road, Direction direction) {
+    private boolean placeCar(CarParams car, LinkedList<CarParams>[] road, Direction direction) {
         int lane = car.lane;
         double position = car.xPosition;
         if (direction == Direction.LEFT) {
@@ -648,7 +544,7 @@ public class ContinuosRoad extends Road {
         }
 
         if (lane >= 0 && lane < road.length) {
-            int place = findPlaceForCarN(position, road[lane]);
+            int place = findPlaceForCar(position, road[lane]);
 
             if (!isPlaceOkInLane(road[lane], place, car)) {
                 return false;
@@ -662,7 +558,15 @@ public class ContinuosRoad extends Road {
         return false;
     }
 
-    private int findPlaceForCarN(double x, LinkedList<CarParams> lane) {
+    /**
+     * method to find place for car in given lane based on x position, DOES NOT CHECK IF PLACE IS OK, that must be done
+     * separately
+     *
+     * @param x x position of the car
+     * @param lane lane to find place in
+     * @return index in linked list where the car should be placed
+     **/
+    private int findPlaceForCar(double x, LinkedList<CarParams> lane) {
         if (lane.isEmpty()) {
             return 0;
         }
@@ -675,13 +579,12 @@ public class ContinuosRoad extends Road {
     }
 
 
-
     private LinkedList<CarParams>[] createFakeRoad(Direction direction, CarParams car) {
         LinkedList<CarParams>[] fakeRoad = this.copyRoadStructureDeep();
         int lane = car.lane;
         int index = vehicles[lane].indexOf(car);
         CarParams carForFakeRoad = fakeRoad[lane].get(index);
-        boolean successfulCreation = this.placeCarN(carForFakeRoad, fakeRoad, direction);
+        boolean successfulCreation = this.placeCar(carForFakeRoad, fakeRoad, direction);
         if (!successfulCreation) {
             return null;
         }
@@ -691,6 +594,13 @@ public class ContinuosRoad extends Road {
         return fakeRoad;
     }
 
+    /**
+     * method to create a deep copy of the road structure, used for lane change, where models like mobil look what would
+     * the acceleration be if the lane change occurs for car inspected and cars in proximity, change is done in fake
+     * road structure and the values are calculated there
+     *
+     * @return deep copy of the road structure (array of linked lists of cars)
+     */
     private LinkedList<CarParams>[] copyRoadStructureDeep() {
         LinkedList<CarParams>[] roadCopy = new LinkedList[this.numberOfLanes];
         for (int lane = 0; lane < this.numberOfLanes; lane++) {
@@ -699,6 +609,7 @@ public class ContinuosRoad extends Road {
                 roadCopy[lane].add(car.clone());
             }
         }
+
         return roadCopy;
     }
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -720,7 +631,7 @@ public class ContinuosRoad extends Road {
      * @param lane lane to put the car in
      * @return true if it is ok to put the car, false otherwise
      **/
-    private boolean okToPutCar(CarParams newCar, int lane) {
+    private boolean okToPutCarAtStart(CarParams newCar, int lane) {
         if (vehicles[lane].isEmpty()) {
             return true;
         }
@@ -747,31 +658,12 @@ public class ContinuosRoad extends Road {
      * @param position position to place the car at
      * @param lane lane to place the car in
      **/
-    private void placeCar(CarParams newCar, double position, int lane) {
+    private void placeCarAtStart(CarParams newCar, double position, int lane) {
         newCar.xPosition = position;
         newCar.lane = lane;
-        int place = findPlaceForCar(position, lane);
+        int place = findPlaceForCar(position, vehicles[lane]);
 
         vehicles[lane].add(place, newCar);
-    }
-
-    /**
-     * method to find the correct place for new car in given lane, so that the lane remains sorted by xPosition
-     *
-     * @param x x position of the new car
-     * @param lane lane to find the place in
-     * @return index in linked list of the place to put the new car at
-     **/
-    private int findPlaceForCar(double x, int lane) {
-        if (vehicles[lane].isEmpty()) {
-            return 0;
-        }
-        for (int i = 0; i < vehicles[lane].size(); i++) {
-            if (vehicles[lane].get(i).xPosition > x) {
-                return i;
-            }
-        }
-        return vehicles[lane].size() - 1;
     }
 
     /**
@@ -810,9 +702,16 @@ public class ContinuosRoad extends Road {
         return totalCars;
     }
 
+    /**
+     * method to get car by its ID from the road structure
+     *
+     * @param id ID of the car to get
+     * @param road road structure to search in
+     * @return car with given ID or null if not found
+     **/
     private CarParams getCarById(int id, LinkedList<CarParams>[] road) {
-        for (int lane = 0; lane < road.length; lane++) {
-            for (CarParams car : road[lane]) {
+        for (LinkedList<CarParams> carParams : road) {
+            for (CarParams car : carParams) {
                 if (car.id == id) {
                     return car;
                 }
@@ -821,6 +720,9 @@ public class ContinuosRoad extends Road {
         return null;
     }
 
+    /**
+     * method to check for duplicate cars on the road, for debugging purposes
+     **/
     private void checkForDuplicates() {
         for (int lane = 0; lane < numberOfLanes; lane++) {
             LinkedList<CarParams> laneList = vehicles[lane];
@@ -837,6 +739,9 @@ public class ContinuosRoad extends Road {
         }
     }
 
+    /**
+     * method to check for collisions on the road, log error if collision detected
+     **/
     private void checkForCollisions() {
         for (int lane = 0; lane < numberOfLanes; lane++) {
             LinkedList<CarParams> laneList = vehicles[lane];
@@ -851,6 +756,4 @@ public class ContinuosRoad extends Road {
             }
         }
     }
-
-
 }

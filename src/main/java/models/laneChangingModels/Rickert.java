@@ -165,8 +165,8 @@ public class Rickert implements ILaneChangingModel {
         int distanceToNextCar = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST).intValue();
         int maxSpeed = parameters.get(RequestConstants.MAX_SPEED_REQUEST).intValue();
         int currentSpeed = parameters.get(RequestConstants.CURRENT_SPEED_REQUEST).intValue() + 1;
-        int forwardGap = 0;
-        int previousGap = 0;
+        int forwardGap;
+        int previousGap;
         if (direction == LEFT) {
             forwardGap = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_LEFT_REQUEST).intValue();
             previousGap = parameters.get(RequestConstants.DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST).intValue();

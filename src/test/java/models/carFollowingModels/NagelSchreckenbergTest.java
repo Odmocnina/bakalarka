@@ -26,7 +26,16 @@ class NagelSchreckenbergTest {
         HashMap<String, Double> params = new HashMap<>();
         params.put(RequestConstants.CURRENT_SPEED_REQUEST, currentSpeed);
         params.put(RequestConstants.MAX_SPEED_REQUEST, maxSpeed);
-        params.put(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST, distanceToNextCar);
+
+        // encode distanceToNextCar using positions and length
+        double xPosition = 0.0;
+        double lengthStraightForward = 1.0;
+        double xPositionStraightForward = xPosition + lengthStraightForward + distanceToNextCar;
+
+        params.put(RequestConstants.X_POSITION_REQUEST, xPosition);
+        params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, xPositionStraightForward);
+        params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, lengthStraightForward);
+
         return params;
     }
 
@@ -73,7 +82,9 @@ class NagelSchreckenbergTest {
         String[] expected = {
                 RequestConstants.MAX_SPEED_REQUEST,
                 RequestConstants.CURRENT_SPEED_REQUEST,
-                RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST
+                RequestConstants.X_POSITION_REQUEST,
+                RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
+                RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST
         };
         String expectedString = String.join(RequestConstants.REQUEST_SEPARATOR, expected);
 
@@ -204,4 +215,3 @@ class NagelSchreckenbergTest {
                 "Speed in Nagel-Schreckenberg cellular model should be integer-valued (in cells per time step).");
     }
 }
-

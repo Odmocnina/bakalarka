@@ -317,18 +317,19 @@ public class CellularRoad extends Road {
             MyLogger.log("No parameters requested", Constants.DEBUG_FOR_LOGGING);
             return null;
         }
-        String[] carGeneratedParams = this.generator.getCarGenerationParameters();
+        String[] carGeneratedParams = this.generator.getCarGenerationParameters(); //parameters that car has
         String[] roadSimulationParams = {RequestConstants.TIME_STEP_REQUEST, RequestConstants.MAX_ROAD_SPEED_REQUEST};
+        // parameters that road has
 
         CarParams car = this.cells[lane][position].getCarParams();
         for (String param : params) {
             if (StringEditor.isInArray(carGeneratedParams, param) || param.equals(RequestConstants.X_POSITION_REQUEST)
-                    || param.equals(RequestConstants.CURRENT_SPEED_REQUEST)) { // get parameters from car that is being inspected
-                parameters.put(param, car.getParameter(param));
-            } else if (StringEditor.isInArray(roadSimulationParams, param)) { //get from road/simulation
+                    || param.equals(RequestConstants.CURRENT_SPEED_REQUEST)) { // get parameters from car that is being
+                parameters.put(param, car.getParameter(param));                // inspected
+            } else if (StringEditor.isInArray(roadSimulationParams, param)) {  //get from road/simulation
                 super.getRoadSimulationParameter(parameters, param, car);
-            } else {
-                this.getParametersAboutDifferentCar(parameters, param, car);
+            } else {                                                           // get parameters about different car in
+                this.getParametersAboutDifferentCar(parameters, param, car);   // proximity of the inspected car
             }
         }
         return parameters;
@@ -364,6 +365,14 @@ public class CellularRoad extends Road {
         }
     }
 
+    /**
+     * function to get the car in proximity based on direction and orientation
+     *
+     * @param direction Direction to look for the car (STRAIGHT, LEFT, RIGHT)
+     * @param orientation Orientation to look for the car (FORWARD, BACKWARD)
+     * @param car CarParams of the car for which we are looking for another car in proximity
+     * @return CarParams of the car in proximity, or null if no car is found
+     **/
     private CarParams getCarInProximity(Direction direction, Orientation orientation, CarParams car) {
         int lane = car.lane;
         int position = (int) car.xPosition;
@@ -408,6 +417,13 @@ public class CellularRoad extends Road {
 
     }
 
+    /**
+     * function to get the next car in the lane ahead of the given position
+     *
+     * @param lane lane number to search in
+     * @param position position to start searching from
+     * @return CarParams of the next car ahead, or null if no car is found
+     **/
     private CarParams getNextCarInLane(int lane, int position) {
         for (int pos = position + 1; pos < this.numberOfCells; pos++) {
             if (cells[lane][pos].isOccupied() && cells[lane][pos].isHead()) {
@@ -417,6 +433,13 @@ public class CellularRoad extends Road {
         return null;
     }
 
+    /**
+     * function to get the previous car in the lane behind the given position
+     *
+     * @param lane lane number to search in
+     * @param position position to start searching from
+     * @return CarParams of the previous car behind, or null if no car is found
+     **/
     private CarParams getPreviousCarInLane(int lane, int position) {
         for (int pos = position - 1; pos >= 0; pos--) {
             if (cells[lane][pos].isOccupied() && cells[lane][pos].isHead()) {
@@ -424,77 +447,6 @@ public class CellularRoad extends Road {
             }
         }
         return null;
-    }
-
-    /**
-     * get index of lane where to look for info based on direction, like next of previous occupied cell
-     *
-     * @param lane lane number of the car
-     * @param direction Direction enum representing the direction to check (LEFT, RIGHT, STRAIGHT)
-     * @return int lane number to look for info, or Constants.NO_LANE_THERE if no lane is there in that direction
-     **/
-    private int getLaneForInfo(int lane, Direction direction) {
-        if (direction == Direction.LEFT) {
-            if (lane > 0) {
-                return lane - 1;
-            } else {
-                return Constants.NO_LANE_THERE;
-            }
-        } else if (direction == Direction.RIGHT) {
-            if (lane < numberOfLanes - 1) {
-                return lane + 1;
-            } else {
-                return Constants.NO_LANE_THERE;
-            }
-        }
-
-        return lane; // STRAIGHT
-    }
-
-    /**
-     * function to get the position of the previous occupied cell in a given lane and direction
-     *
-     * @param lane lane number of the car
-     * @param position position of the car on the road
-     * @param direction Direction enum representing the direction to check (LEFT, RIGHT, STRAIGHT)
-     * @return int position of the previous occupied cell, or Constants.NO_CAR_IN_FRONT if none found,
-     *         or Constants.NO_LANE_THERE if lane change is not possible
-     **/
-    private int getPreviousOccupiedCell(int lane, int position, Direction direction) {
-        int laneNew = getLaneForInfo(lane, direction);
-        if (laneNew == Constants.NO_LANE_THERE) {
-            return Constants.NO_LANE_THERE;
-        }
-
-        for (int pos = position - 1; pos >= 0; pos--) {
-            if (cells[laneNew][pos].isOccupied()) {
-                return pos;
-            }
-        }
-        return Constants.NO_CAR_IN_FRONT;
-    }
-
-    /**
-     * function to get the position of the next occupied cell in a given lane and direction
-     *
-     * @param lane lane number of the car
-     * @param position position of the car on the road
-     * @param direction Direction enum representing the direction to check (LEFT, RIGHT, STRAIGHT)
-     * @return int position of the next occupied cell, or Constants.NO_CAR_IN_FRONT if none found,
-     *         or Constants.NO_LANE_THERE if lane change is not possible
-     **/
-    private int getNextOccupiedCell(int lane, int position, Direction direction) {
-        int laneNew = getLaneForInfo(lane, direction);
-        if (laneNew == Constants.NO_LANE_THERE) {
-            return Constants.NO_LANE_THERE;
-        }
-
-        for (int pos = position + 1; pos < this.numberOfCells; pos++) {
-            if (cells[laneNew][pos].isOccupied()) {
-                return pos;
-            }
-        }
-        return Constants.NO_CAR_IN_FRONT;
     }
 
     /**
@@ -601,7 +553,7 @@ public class CellularRoad extends Road {
      * Function to check if car is over or is touching the end of the road
      *
      * @param car car that we are checking
-     * @param  
+     * @param newSpeed speed of the car (that puts it outside the road)
      **/
     private boolean isCarAtEnd(CarParams car, int newSpeed) {
         if (car == null) { // sanity check
