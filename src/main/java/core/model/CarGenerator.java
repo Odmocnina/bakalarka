@@ -31,7 +31,7 @@ public class CarGenerator implements Cloneable {
     private String type;
 
     /** unique id for generated cars **/
-    private int id = 0;
+    private int id = 7; //its seven becouse if there are testing cars on the road, there will be cars with duplicate id, which is a propblem, delete later
 
     /** lambda parameter for exponential distribution of inter-arrival times **/
     private double lambdaPerSec;

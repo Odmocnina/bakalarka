@@ -5,7 +5,7 @@
 
     <models>
         <carFollowingModel>
-            <id>idm</id>
+            <id>gipps</id>
         </carFollowingModel>
         <laneChangingModel>
             <id>mobil</id>
@@ -74,7 +74,7 @@
             <log>true</log>
             <info>true</info>
             <warn>true</warn>
-            <debug>true</debug>
+            <debug>false</debug>
             <error>true</error>
             <fatal>true</fatal>
         </logging>

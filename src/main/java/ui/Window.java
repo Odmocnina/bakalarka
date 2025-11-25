@@ -107,21 +107,21 @@ public class Window extends Application {
 
         // Configuration bar
 
-        double currentFlowRate = 0.25; // TODO: read from your config
+        double currentFlowRate = AppContext.SIMULATION.getRoads()[0].getCarGenerator().
 
         Label flowRateLabel = new Label("Flow rate:");
         flowRateValueLabel = new Label(String.format("%.2f", currentFlowRate));
 
         flowRateButton = new Button("Change");
 
-// slider 0–1, initially hidden
+        // slider 0–1, initially hidden
         flowRateSlider = new Slider(0.0, 1.0, currentFlowRate);
         flowRateSlider.setShowTickMarks(true);
         flowRateSlider.setShowTickLabels(true);
         flowRateSlider.setMajorTickUnit(0.25);
         flowRateSlider.setBlockIncrement(0.01);
 
-// slider is hidden at start
+        // slider is hidden at start
         flowRateSlider.setVisible(false);
         flowRateSlider.setManaged(false); // so it doesn't take space when hidden
 
@@ -129,7 +129,6 @@ public class Window extends Application {
         flowRateBar.setPadding(new Insets(5, 10, 5, 10));
         flowRateBar.setAlignment(Pos.CENTER_LEFT);
 
-// top panel = info label + flow bar + (schovaný) slider
         VBox topPane = new VBox(infoLabel, flowRateBar, flowRateSlider);
 
 

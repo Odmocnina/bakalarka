@@ -44,7 +44,7 @@ public class ContinuosRoad extends Road {
             this.vehicles[lane] = new LinkedList<>();
         }
 
-      /*  CarParams carParams = new CarParams();
+        CarParams carParams = new CarParams();
         carParams.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
         carParams.setParameter(RequestConstants.MAX_SPEED_REQUEST, 40.33);
         carParams.xPosition = 20;
@@ -58,7 +58,7 @@ public class ContinuosRoad extends Road {
         carParams.setParameter(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
         carParams.setParameter(RequestConstants.POLITENESS_FACTOR_REQUEST, 0.9);
         carParams.setParameter(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST, 0.5);
-        vehicles[0].add(carParams);
+        vehicles[0].add(0, carParams);
 
         CarParams carParams2 = new CarParams();
         carParams2.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
@@ -75,75 +75,75 @@ public class ContinuosRoad extends Road {
         carParams2.setParameter(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
         carParams2.setParameter(RequestConstants.POLITENESS_FACTOR_REQUEST, 0.3);
         carParams2.setParameter(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST, 1.0);
-        vehicles[1].add(carParams2);
+        vehicles[1].add(0, carParams2);
 
-        carParams2 = new CarParams();
-        carParams2.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
-        carParams2.setParameter(RequestConstants.MAX_SPEED_REQUEST, 10.0);
-        carParams2.xPosition = 50;
-        carParams2.lane = 0;
-        carParams2.id = 3;
-        carParams2.color = Constants.CAR_COLORS[2];
-        carParams2.setParameter(RequestConstants.LENGTH_REQUEST, 6.5);
-        carParams2.setParameter(RequestConstants.MAX_ACCELERATION_REQUEST, 2.0);
-        carParams2.setParameter(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 2.0);
-        carParams2.setParameter(RequestConstants.DECELERATION_COMFORT_REQUEST, 4.5);
-        carParams2.setParameter(RequestConstants.DESIRED_TIME_HEADWAY_REQUEST, 1.5);
-        carParams2.setParameter(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
-        carParams2.setParameter(RequestConstants.POLITENESS_FACTOR_REQUEST, 0.3);
-        carParams2.setParameter(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST, 1.0);
-        vehicles[0].add(carParams2);
+        CarParams carParams3 = new CarParams();
+        carParams3.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
+        carParams3.setParameter(RequestConstants.MAX_SPEED_REQUEST, 10.0);
+        carParams3.xPosition = 50;
+        carParams3.lane = 0;
+        carParams3.id = 3;
+        carParams3.color = Constants.CAR_COLORS[2];
+        carParams3.setParameter(RequestConstants.LENGTH_REQUEST, 6.5);
+        carParams3.setParameter(RequestConstants.MAX_ACCELERATION_REQUEST, 2.0);
+        carParams3.setParameter(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 2.0);
+        carParams3.setParameter(RequestConstants.DECELERATION_COMFORT_REQUEST, 4.5);
+        carParams3.setParameter(RequestConstants.DESIRED_TIME_HEADWAY_REQUEST, 1.5);
+        carParams3.setParameter(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
+        carParams3.setParameter(RequestConstants.POLITENESS_FACTOR_REQUEST, 0.3);
+        carParams3.setParameter(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST, 1.0);
+        vehicles[0].add(1, carParams3);
 
-        carParams2 = new CarParams();
-        carParams2.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
-        carParams2.setParameter(RequestConstants.MAX_SPEED_REQUEST, 10.0);
-        carParams2.xPosition = 50;
-        carParams2.lane = 5;
-        carParams2.id = 4;
-        carParams2.color = Constants.CAR_COLORS[2];
-        carParams2.setParameter(RequestConstants.LENGTH_REQUEST, 6.5);
-        carParams2.setParameter(RequestConstants.MAX_ACCELERATION_REQUEST, 2.0);
-        carParams2.setParameter(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 2.0);
-        carParams2.setParameter(RequestConstants.DECELERATION_COMFORT_REQUEST, 4.5);
-        carParams2.setParameter(RequestConstants.DESIRED_TIME_HEADWAY_REQUEST, 1.5);
-        carParams2.setParameter(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
-        carParams2.setParameter(RequestConstants.POLITENESS_FACTOR_REQUEST, 0.3);
-        carParams2.setParameter(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST, 1.0);
-        vehicles[5].add(carParams2);
+        CarParams carParams4 = new CarParams();
+        carParams4.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
+        carParams4.setParameter(RequestConstants.MAX_SPEED_REQUEST, 10.0);
+        carParams4.xPosition = 50;
+        carParams4.lane = 5;
+        carParams4.id = 4;
+        carParams4.color = Constants.CAR_COLORS[2];
+        carParams4.setParameter(RequestConstants.LENGTH_REQUEST, 6.5);
+        carParams4.setParameter(RequestConstants.MAX_ACCELERATION_REQUEST, 2.0);
+        carParams4.setParameter(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 2.0);
+        carParams4.setParameter(RequestConstants.DECELERATION_COMFORT_REQUEST, 4.5);
+        carParams4.setParameter(RequestConstants.DESIRED_TIME_HEADWAY_REQUEST, 1.5);
+        carParams4.setParameter(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
+        carParams4.setParameter(RequestConstants.POLITENESS_FACTOR_REQUEST, 0.3);
+        carParams4.setParameter(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST, 1.0);
+        vehicles[5].add(0, carParams4);
 
-        carParams2 = new CarParams();
-        carParams2.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
-        carParams2.setParameter(RequestConstants.MAX_SPEED_REQUEST, 10.0);
-        carParams2.xPosition = 60;
-        carParams2.lane = 5;
-        carParams2.id = 5;
-        carParams2.color = Constants.CAR_COLORS[2];
-        carParams2.setParameter(RequestConstants.LENGTH_REQUEST, 6.5);
-        carParams2.setParameter(RequestConstants.MAX_ACCELERATION_REQUEST, 2.0);
-        carParams2.setParameter(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 2.0);
-        carParams2.setParameter(RequestConstants.DECELERATION_COMFORT_REQUEST, 4.5);
-        carParams2.setParameter(RequestConstants.DESIRED_TIME_HEADWAY_REQUEST, 1.5);
-        carParams2.setParameter(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
-        carParams2.setParameter(RequestConstants.POLITENESS_FACTOR_REQUEST, 0.3);
-        carParams2.setParameter(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST, 1.0);
-        vehicles[5].add(carParams2);
+        CarParams carParams5 = new CarParams();
+        carParams5.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
+        carParams5.setParameter(RequestConstants.MAX_SPEED_REQUEST, 10.0);
+        carParams5.xPosition = 60;
+        carParams5.lane = 5;
+        carParams5.id = 5;
+        carParams5.color = Constants.CAR_COLORS[2];
+        carParams5.setParameter(RequestConstants.LENGTH_REQUEST, 6.5);
+        carParams5.setParameter(RequestConstants.MAX_ACCELERATION_REQUEST, 2.0);
+        carParams5.setParameter(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 2.0);
+        carParams5.setParameter(RequestConstants.DECELERATION_COMFORT_REQUEST, 4.5);
+        carParams5.setParameter(RequestConstants.DESIRED_TIME_HEADWAY_REQUEST, 1.5);
+        carParams5.setParameter(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
+        carParams5.setParameter(RequestConstants.POLITENESS_FACTOR_REQUEST, 0.3);
+        carParams5.setParameter(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST, 1.0);
+        vehicles[5].add(1, carParams5);
 
-        carParams2 = new CarParams();
-        carParams2.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
-        carParams2.setParameter(RequestConstants.MAX_SPEED_REQUEST, 10.0);
-        carParams2.xPosition = 70;
-        carParams2.lane = 5;
-        carParams2.id = 6;
-        carParams2.color = Constants.CAR_COLORS[2];
-        carParams2.setParameter(RequestConstants.LENGTH_REQUEST, 6.5);
-        carParams2.setParameter(RequestConstants.MAX_ACCELERATION_REQUEST, 2.0);
-        carParams2.setParameter(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 2.0);
-        carParams2.setParameter(RequestConstants.DECELERATION_COMFORT_REQUEST, 4.5);
-        carParams2.setParameter(RequestConstants.DESIRED_TIME_HEADWAY_REQUEST, 1.5);
-        carParams2.setParameter(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
-        carParams2.setParameter(RequestConstants.POLITENESS_FACTOR_REQUEST, 0.3);
-        carParams2.setParameter(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST, 1.0);
-        vehicles[5].add(carParams2);*/
+        CarParams carParams6 = new CarParams();
+        carParams6.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
+        carParams6.setParameter(RequestConstants.MAX_SPEED_REQUEST, 10.0);
+        carParams6.xPosition = 70;
+        carParams6.lane = 5;
+        carParams6.id = 6;
+        carParams6.color = Constants.CAR_COLORS[2];
+        carParams6.setParameter(RequestConstants.LENGTH_REQUEST, 6.5);
+        carParams6.setParameter(RequestConstants.MAX_ACCELERATION_REQUEST, 2.0);
+        carParams6.setParameter(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 2.0);
+        carParams6.setParameter(RequestConstants.DECELERATION_COMFORT_REQUEST, 4.5);
+        carParams6.setParameter(RequestConstants.DESIRED_TIME_HEADWAY_REQUEST, 1.5);
+        carParams6.setParameter(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
+        carParams6.setParameter(RequestConstants.POLITENESS_FACTOR_REQUEST, 0.3);
+        carParams6.setParameter(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST, 1.0);
+        vehicles[5].add(2, carParams6);
     }
 
     /**
@@ -223,7 +223,7 @@ public class ContinuosRoad extends Road {
 
         this.resetProcessedFlags();
 
-        if (AppContext.RUN_DETAILS.debug) {
+        if (true) {
             this.checkForCollisions();
             this.checkForDuplicates();
         }
@@ -746,14 +746,18 @@ public class ContinuosRoad extends Road {
         for (int lane = 0; lane < numberOfLanes; lane++) {
             LinkedList<CarParams> laneList = vehicles[lane];
             for (int i = 0; i < laneList.size() - 1; i++) {
-                CarParams carA = laneList.get(i);
-                CarParams carB = laneList.get(i + 1);
-                double carABack = carA.xPosition - carA.getParameter(RequestConstants.LENGTH_REQUEST);
-                if (carB.xPosition < carABack) {
+                CarParams carA = laneList.get(i);     // back
+                CarParams carB = laneList.get(i + 1); // front
+
+                double aFront = carA.xPosition;
+                double bBack = carB.xPosition - carB.getParameter(RequestConstants.LENGTH_REQUEST);
+
+                if (bBack < aFront) { // intervals are overlapping
                     MyLogger.log("Collision detected in lane " + lane + " between cars ID: " + carA.id +
                             " and ID: " + carB.id, Constants.ERROR_FOR_LOGGING);
                 }
             }
         }
     }
+
 }
