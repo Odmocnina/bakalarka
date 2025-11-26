@@ -68,7 +68,7 @@ public class ConfigLoader {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(configFile);
-            Element numberOfRoadsElement = (Element) doc.getElementsByTagName("numberOfRoads").item(0);
+            Element numberOfRoadsElement = (Element) doc.getElementsByTagName(ConfigConstants.NUMBER_OF_ROADS_TAG).item(0);
             numberOfRoads = Integer.parseInt(numberOfRoadsElement.getTextContent());
 
             if (numberOfRoads <= 0) {
@@ -77,7 +77,7 @@ public class ConfigLoader {
                 return null;
             }
 
-            String roadFile = doc.getElementsByTagName("roadFile").item(0).getTextContent();
+            String roadFile = doc.getElementsByTagName(ConfigConstants.ROAD_FILE_TAG).item(0).getTextContent();
 
             if (roadFile == null || roadFile.isEmpty()) {
                 MyLogger.logBeforeLoading("Road file path is empty, exiting", Constants.FATAL_FOR_LOGGING);
@@ -193,9 +193,9 @@ public class ConfigLoader {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(configFile);
             doc.getDocumentElement().normalize();
-            Element models = (Element) doc.getElementsByTagName("models").item(0);
-            Element model = (Element) models.getElementsByTagName("carFollowingModel").item(0);
-            String id = model.getElementsByTagName("id").item(0).getTextContent();
+            Element models = (Element) doc.getElementsByTagName(ConfigConstants.MODELS_TAG).item(0);
+            Element model = (Element) models.getElementsByTagName(ConfigConstants.CAR_FOLLOWING_MODEL_TAG).item(0);
+            String id = model.getElementsByTagName(ConfigConstants.ID_TAG).item(0).getTextContent();
             id = id.toLowerCase().trim();
 
             //TODO add reflexion for dynamic loading of models
@@ -258,9 +258,9 @@ public class ConfigLoader {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(configFile);
             doc.getDocumentElement().normalize();
-            Element models = (Element) doc.getElementsByTagName("models").item(0);
-            Element model = (Element) models.getElementsByTagName("laneChangingModel").item(0);
-            String id = model.getElementsByTagName("id").item(0).getTextContent();
+            Element models = (Element) doc.getElementsByTagName(ConfigConstants.MODELS_TAG).item(0);
+            Element model = (Element) models.getElementsByTagName(ConfigConstants.LANE_CHANGING_MODEL_TAG).item(0);
+            String id = model.getElementsByTagName(ConfigConstants.ID_TAG).item(0).getTextContent();
             id = id.toLowerCase().trim();
 
             //TODO add reflexion for dynamic loading of models
@@ -298,11 +298,11 @@ public class ConfigLoader {
             Document doc = dBuilder.parse(configFile);
             doc.getDocumentElement().normalize();
 
-            Element generator = (Element) doc.getElementsByTagName("generator").item(0);
-            Element flowRate = (Element) generator.getElementsByTagName("flowRate").item(0);
+            Element generator = (Element) doc.getElementsByTagName(ConfigConstants.GENERATOR_TAG).item(0);
+            Element flowRate = (Element) generator.getElementsByTagName(ConfigConstants.FLOW_RATE_TAG).item(0);
 
-            Element carParams = (Element) generator.getElementsByTagName("carParams").item(0);
-            Element queue = (Element) generator.getElementsByTagName("queue").item(0);
+            Element carParams = (Element) generator.getElementsByTagName(ConfigConstants.CAR_PARAMS_TAG).item(0);
+            Element queue = (Element) generator.getElementsByTagName(ConfigConstants.QUEUE_TAG).item(0);
 
 
             if (flowRate == null) {
@@ -321,12 +321,12 @@ public class ConfigLoader {
             loadedGenerator = new CarGenerator(flow);
 
             if (queue != null) {
-                Element useQueue = (Element) queue.getElementsByTagName("use").item(0);
+                Element useQueue = (Element) queue.getElementsByTagName(ConfigConstants.USE_TAG).item(0);
 
                 if (useQueue != null && Boolean.parseBoolean(useQueue.getTextContent())) {
                     try {
-                        int min = Integer.parseInt(queue.getElementsByTagName("minValue").item(0).getTextContent());
-                        int max = Integer.parseInt(queue.getElementsByTagName("maxValue").item(0).getTextContent());
+                        int min = Integer.parseInt(queue.getElementsByTagName(ConfigConstants.MIN_VALUE_TAG).item(0).getTextContent());
+                        int max = Integer.parseInt(queue.getElementsByTagName(ConfigConstants.MAX_VALUE_TAG).item(0).getTextContent());
 
                         if (min < 0 || max < 0 || min > max) {
                             MyLogger.logBeforeLoading("Invalid queue parameters in config file, it will be" +
@@ -351,9 +351,9 @@ public class ConfigLoader {
 
                     if (param.getNodeType() == Node.ELEMENT_NODE) {
                         Element paramElement = (Element) param;
-                        double minValue = Double.parseDouble(paramElement.getElementsByTagName("minValue").
+                        double minValue = Double.parseDouble(paramElement.getElementsByTagName(ConfigConstants.MIN_VALUE_TAG).
                                 item(0).getTextContent());
-                        double maxValue = Double.parseDouble(paramElement.getElementsByTagName("maxValue").
+                        double maxValue = Double.parseDouble(paramElement.getElementsByTagName(ConfigConstants.MAX_VALUE_TAG).
                                 item(0).getTextContent());
                         loadedGenerator.addParameter(paramName, minValue, maxValue);
                     }
@@ -382,17 +382,18 @@ public class ConfigLoader {
             Document doc = dBuilder.parse(configFile);
             doc.getDocumentElement().normalize();
 
-            Element runDetailsElement = (Element) doc.getElementsByTagName("runDetails").item(0);
-            Element duration = (Element) runDetailsElement.getElementsByTagName("duration").item(0);
-            Element timeStep = (Element) runDetailsElement.getElementsByTagName("timeStep").item(0);
-            Element showGui = (Element) runDetailsElement.getElementsByTagName("showGui").item(0);
-            Element outputElements = (Element) runDetailsElement.getElementsByTagName("output").item(0);
-            Element drawCells = (Element) runDetailsElement.getElementsByTagName("drawCells").item(0);
-            Element logElements = (Element) runDetailsElement.getElementsByTagName("logging").item(0);
-            Element timeBetweenSteps = (Element) runDetailsElement.getElementsByTagName("timeBetweenSteps")
+            Element runDetailsElement = (Element) doc.getElementsByTagName(ConfigConstants.RUN_DETAILS_TAG).
+                    item(0);
+            Element duration = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.DURATION_TAG).item(0);
+            Element timeStep = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.TIME_STEP_TAG).item(0);
+            Element showGui = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.SHOW_GUI_TAG).item(0);
+            Element outputElements = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.OUTPUT_TAG).item(0);
+            Element drawCells = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.DRAW_CELLS_TAG).item(0);
+            Element logElements = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.LOGGING_TAG).item(0);
+            Element timeBetweenSteps = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.TIME_BETWEEN_STEPS_TAG)
                     .item(0);
-            Element laneChange = (Element) runDetailsElement.getElementsByTagName("laneChange").item(0);
-            Element debug = (Element) runDetailsElement.getElementsByTagName("debug").item(0);
+            Element laneChange = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.LANE_CHANGE_TAG).item(0);
+            Element debug = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.DEBUG_TAG).item(0);
 
             if (duration != null) {
                 detailsFromConfig.duration = Integer.parseInt(duration.getTextContent());
@@ -493,12 +494,12 @@ public class ConfigLoader {
      * @param logElements XML Element containing logging settings
      **/
     private static void loadLoggingFromConfig(RunDetails detailsFromConfig, Element logElements) {
-        final String GENERAL_LOGGING = "log";
-        final String INFO_LOGGING = "info";
-        final String WARN_LOGGING = "warn";
-        final String ERROR_LOGGING = "error";
-        final String FATAL_LOGGING = "fatal";
-        final String DEBUG_LOGGING = "debug";
+        final String GENERAL_LOGGING = ConfigConstants.LOG_GENERAL_TAG;
+        final String INFO_LOGGING = ConfigConstants.LOG_INFO_TAG;
+        final String WARN_LOGGING = ConfigConstants.LOG_WARN_TAG;
+        final String ERROR_LOGGING = ConfigConstants.LOG_ERROR_TAG;
+        final String FATAL_LOGGING = ConfigConstants.LOG_FATAL_TAG;
+        final String DEBUG_LOGGING = ConfigConstants.LOG_DEBUG_TAG;
 
         final int GENERAL_INDEX = 0;
         final int INFO_INDEX = 1;
@@ -571,11 +572,11 @@ public class ConfigLoader {
                 String nodeName = outputElement.getNodeName();
 
                 switch (nodeName) {
-                    case "file" -> outputFile = outputElement.getTextContent();
-                    case "writeOutput" -> writeOutput = Boolean.parseBoolean(outputElement.getTextContent());
-                    case "type" -> outputType = outputElement.getTextContent().toLowerCase().trim();
-                    case "csvSeparator" -> csvSeparator = outputElement.getTextContent();
-                    case "whatToWrite" -> outputDetails.changeWhatToOutput(outputElement);
+                    case ConfigConstants.FILE_TAG -> outputFile = outputElement.getTextContent();
+                    case ConfigConstants.WRITE_OUTPUT_TAG -> writeOutput = Boolean.parseBoolean(outputElement.getTextContent());
+                    case ConfigConstants.TYPE_TAG -> outputType = outputElement.getTextContent().toLowerCase().trim();
+                    case ConfigConstants.CSV_SEPARATOR_TAG -> csvSeparator = outputElement.getTextContent();
+                    case ConfigConstants.WHAT_TO_WRITE_TAG -> outputDetails.changeWhatToOutput(outputElement);
                 }
             }
         }
@@ -600,7 +601,7 @@ public class ConfigLoader {
 
     }
 
-    public void loadAllConfig(String[] args) {
+    public static boolean loadAllConfig(String[] args) {
         String configFile;
         if (args.length == 0) { // use default config file if none provided
             MyLogger.logBeforeLoading("No config file provided, using default: " + Constants.CONFIG_FILE,
@@ -618,7 +619,7 @@ public class ConfigLoader {
         } else {
             MyLogger.logBeforeLoading("Failed to open config file: " + configFile + ", exiting.",
                     Constants.FATAL_FOR_LOGGING);
-            return;
+            return false;
         }
 
         // load car following model
@@ -626,7 +627,7 @@ public class ConfigLoader {
         if (carFollowingModel == null) {
             MyLogger.logBeforeLoading("Failed to load car following model, exiting."
                     , Constants.FATAL_FOR_LOGGING);
-            return;
+            return false;
         } else {
             MyLogger.logBeforeLoading("Loaded car following model: " + carFollowingModel.getID(),
                     Constants.INFO_FOR_LOGGING);
@@ -637,7 +638,7 @@ public class ConfigLoader {
         ILaneChangingModel laneChangingModel = ConfigLoader.loadLaneChangingModel();
         if (laneChangingModel == null) {
             MyLogger.logBeforeLoading("Failed to load lane changing model, exiting.", Constants.FATAL_FOR_LOGGING);
-            return;
+            return false;
         } else {
             MyLogger.logBeforeLoading("Loaded lane changing model: " + laneChangingModel.getID(),
                     Constants.INFO_FOR_LOGGING);
@@ -648,7 +649,7 @@ public class ConfigLoader {
         CarGenerator carGenerator = ConfigLoader.loadCarGenerator();
         if (carGenerator == null) {
             MyLogger.logBeforeLoading("Failed to load car generator, exiting.", Constants.FATAL_FOR_LOGGING);
-            return;
+            return false;
         } else {
             MyLogger.logBeforeLoading("Loaded car generator: " + carGenerator, Constants.INFO_FOR_LOGGING);
         }
@@ -666,7 +667,7 @@ public class ConfigLoader {
         } else { // missing some parameters, exit
             MyLogger.logBeforeLoading("Car generator parameters are NOT valid for the selected " +
                     "car-following model/lane-changing model, exiting.", Constants.FATAL_FOR_LOGGING);
-            return;
+            return false;
         }
 
         // load roads from config
@@ -675,7 +676,7 @@ public class ConfigLoader {
         if (roads == null) {
             MyLogger.logBeforeLoading("Failed to load road configuration, exiting."
                     , Constants.FATAL_FOR_LOGGING);
-            return;
+            return false;
         } else {
             MyLogger.logBeforeLoading("Loaded road: " + roads[0].toString() + ", number of roads: "
                     + roads.length, Constants.INFO_FOR_LOGGING);
@@ -685,7 +686,7 @@ public class ConfigLoader {
         if (!roads[0].getType().equals(carFollowingModel.getType())) {
             MyLogger.logBeforeLoading("Types of car following model and road do not match: model type=" +
                     carFollowingModel.getType() + ", road type=" + roads[0].getType(), Constants.FATAL_FOR_LOGGING);
-            return;
+            return false;
         } else {
             MyLogger.logBeforeLoading("Types of car following model and road match: " + roads[0].getType(),
                     Constants.INFO_FOR_LOGGING);
@@ -714,14 +715,14 @@ public class ConfigLoader {
             renderer = new ContinuousRoadRenderer();
         } else {
             MyLogger.logBeforeLoading("Unknown road type: " + roads[0].getType(), Constants.FATAL_FOR_LOGGING);
-            return;
+            return false;
         }
         AppContext.RENDERER = renderer;
 
         RunDetails runDetails = ConfigLoader.loadRunDetails(); // loading run details (show gui, duration...)
         if (runDetails == null) {
             MyLogger.logBeforeLoading("Failed to load run details, exiting.", Constants.FATAL_FOR_LOGGING);
-            return;
+            return false;
         } else {
             MyLogger.logBeforeLoading("Loaded run details: duration=" + runDetails.duration + ", timeStep=" +
                     runDetails.timeStep + ", showGui=" + runDetails.showGui + ", outputFile=" + runDetails.outputDetails
@@ -732,8 +733,16 @@ public class ConfigLoader {
         ResultsRecorder.getResultsRecorder().initialize(roads.length, runDetails.outputDetails.outputFile);
 
         // create simulation and store it in app context, simulation is the thing that updates all roads and cars
-        Simulation sim = new Simulation(roads);
-        AppContext.SIMULATION = sim;
+        AppContext.SIMULATION = new Simulation(roads);
+        return true;
+    }
+
+    public static File getConfigFile() {
+        return configFile;
+    }
+
+    public void writeIntoConfig(String path, String content) {
+
     }
 
 }

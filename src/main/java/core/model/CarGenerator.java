@@ -389,6 +389,10 @@ public class CarGenerator implements Cloneable {
         return copy;
     }
 
+    public double getLambdaPerSec() {
+        return this.lambdaPerSec;
+    }
+
     /*********************
      * class representing a parameter with min and max values
      *

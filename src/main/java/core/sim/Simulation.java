@@ -127,4 +127,8 @@ public class Simulation {
         }
         return true;
     }
+
+    public double getFlowRate() {
+        return roads[0].getCarGenerator().getLambdaPerSec();
+    }
 }

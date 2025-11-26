@@ -55,11 +55,4 @@ public class Constants {
     public static final double DEFAULT_MIN_POLITENESS_FACTOR = 0.0;
     public static final double DEFAULT_MAX_POLITENESS_FACTOR = 1.0;
 
-    // constants for config loading
-    public static final String GENERATOR_TAG = "generator";
-    public static final String RUN_DETAILS_TAG = "runDetails";
-    public static final String MODELS_TAG = "models";
-
-    public static final String CAR_FOLLOWING_MODEL_TAG = "carFollowingModel";
-
 }

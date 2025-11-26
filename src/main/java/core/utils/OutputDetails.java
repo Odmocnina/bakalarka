@@ -40,12 +40,12 @@ public class OutputDetails {
 
     /** Names of the output details corresponding to their indices **/
     private final String[] DETAILS_NAME = {// Mapping detail names from XML to their corresponding indices, bullshit
-            "simulationDetails",
-            "simulationTime",
-            "carsPassed",
-            "carsOnRoad",
-            "roadDetails",
-            "generationDetails"
+            ConfigConstants.SIMULATION_DETAILS_TAG,
+            ConfigConstants.SIMULATION_TIME_TAG,
+            ConfigConstants.CARS_PASSED_TAG,
+            ConfigConstants.CARS_ON_ROAD_TAG,
+            ConfigConstants.ROAD_DETAILS_TAG,
+            ConfigConstants.GENERATION_DETAILS_TAG
     };
 
     /** Indices of the output details corresponding to their names **/
