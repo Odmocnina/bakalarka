@@ -1,6 +1,5 @@
 package models.laneChangingModels;
 
-import app.AppContext;
 import core.model.Direction;
 import core.utils.Constants;
 import core.utils.RequestConstants;
@@ -10,26 +9,26 @@ import java.util.HashMap;
 import static core.model.Direction.*;
 
 /****************************************************
- * Rickert lane changing model class for deciding lane changes
+ * Rickert lane changing model (transsims version) class for deciding lane changes
  *
  * @author Michael Hladky
  * @version 1.0
  *****************************************************/
-public class Rickert implements ILaneChangingModel {
+public class RickertTranssims implements ILaneChangingModel {
 
     /**
-     * gives the unique ID of the rickert model
+     * gives the unique ID of the rickert model (transsims version)
      *
-     * @return the unique ID of the rickert model
+     * @return the unique ID of the rickert model (transsims version)
      **/
     public String getID() {
-        return "rickert";
+        return "rickert-transsims";
     }
 
     /*
-     * gives the list of parameters that the rickert model needs to make a decision
+     * gives the list of parameters that the rickert model (transsims version) needs to make a decision
      *
-     * @return the list of parameters that the rickert model needs to make a decision
+     * @return the list of parameters that the rickert model (transsims version) needs to make a decision
      **/
     public String requestParameters() {
         String[] requests = {
@@ -85,25 +84,22 @@ public class Rickert implements ILaneChangingModel {
     }
 
     /**
-     * gives the list of parameters that the rickert model needs for generation
+     * gives the list of parameters that the rickert model (transsims version) needs for generation
      *
-     * @return the list of parameters that the rickert model needs for generation
+     * @return the list of parameters that the rickert model (transsims version) needs for generation
      **/
     public String getParametersForGeneration() {
         return RequestConstants.MAX_SPEED_REQUEST;
     }
 
     /**
-     * decides whether to change lane or not based on the rickert model
+     * decides whether to change lane or not based on the rickert model (transsims version) model
      *
      * @param parameters the parameters needed to make a decision in hashmap form, where key is the parameter name and
      *                   value is the parameter value in double
      * @return the direction to change lane or go straight
      **/
     public Direction changeLaneIfDesired(HashMap<String, Double> parameters) {
-        if (AppContext.SIMULATION.getStepCount() > 2) {
-            int i = 0;
-        }
         int xPosition = parameters.get(RequestConstants.X_POSITION_REQUEST).intValue();
         int xPositionStraightForward = parameters.get(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST).intValue();
         int lengthStraightForward = parameters.get(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST).intValue();
@@ -114,9 +110,10 @@ public class Rickert implements ILaneChangingModel {
             distanceToNextCar = (xPositionStraightForward - xPosition - lengthStraightForward); // distance in cells
         }
         int maxSpeed = parameters.get(RequestConstants.MAX_SPEED_REQUEST).intValue();
-        int maxSpeedRoad = parameters.get(RequestConstants.MAX_ROAD_SPEED_REQUEST).intValue();
         int currentSpeed = parameters.get(RequestConstants.CURRENT_SPEED_REQUEST).intValue() + 1;
+
         int xPositionInDifferentLaneForward = parameters.get(RequestConstants.X_POSITION_LEFT_FORWARD_REQUEST).intValue();
+        int maxRoadSpeed = parameters.get(RequestConstants.MAX_ROAD_SPEED_REQUEST).intValue();
         int lengthInDifferentLaneForward;
         int forwardGap;
         int xPositionInDifferentLaneBackward;
@@ -137,7 +134,7 @@ public class Rickert implements ILaneChangingModel {
                 previousGap = Integer.MAX_VALUE;
             }
 
-            if (makeDecision((int) distanceToNextCar, maxSpeed, currentSpeed, forwardGap, previousGap, maxSpeedRoad)) {
+            if (makeDecision((int) distanceToNextCar, maxSpeed, currentSpeed, forwardGap, previousGap, maxRoadSpeed)) {
                 return LEFT;
             }
         }
@@ -159,7 +156,7 @@ public class Rickert implements ILaneChangingModel {
                 previousGap = Integer.MAX_VALUE;
             }
 
-            if (makeDecision((int) distanceToNextCar, maxSpeed, currentSpeed, forwardGap, previousGap, maxSpeedRoad)) {
+            if (makeDecision((int) distanceToNextCar, maxSpeed, currentSpeed, forwardGap, previousGap, maxRoadSpeed)) {
                 return RIGHT;
             }
         }
@@ -172,7 +169,7 @@ public class Rickert implements ILaneChangingModel {
         int distanceToNextCar = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST).intValue();
         int maxSpeed = parameters.get(RequestConstants.MAX_SPEED_REQUEST).intValue();
         int currentSpeed = parameters.get(RequestConstants.CURRENT_SPEED_REQUEST).intValue() + 1;
-        int maxSpeedRoad = parameters.get(RequestConstants.MAX_ROAD_SPEED_REQUEST).intValue();
+        int maxRoadSpeed = parameters.get(RequestConstants.MAX_ROAD_SPEED_REQUEST).intValue();
         int forwardGap;
         int previousGap;
         if (direction == LEFT) {
@@ -185,7 +182,7 @@ public class Rickert implements ILaneChangingModel {
             return STRAIGHT;
         }
 
-        if (makeDecision(distanceToNextCar, maxSpeed, currentSpeed, forwardGap, previousGap, maxSpeedRoad)) {
+        if (makeDecision(distanceToNextCar, maxSpeed, currentSpeed, forwardGap, previousGap, maxRoadSpeed)) {
             return direction;
         }
 
@@ -193,7 +190,7 @@ public class Rickert implements ILaneChangingModel {
     }
 
     /**
-     * makes the decision to change lane or not based on the rickert model, returns true if the decision is to change
+     * makes the decision to change lane or not based on the rickert model (transsims version), returns true if the decision is to change
      * lane, false otherwise
      *
      * @param distanceToNextCar the distance to the next car in the current lane
@@ -204,38 +201,39 @@ public class Rickert implements ILaneChangingModel {
      * @return true if the decision is to change lane, false otherwise
      **/
     private boolean makeDecision(int distanceToNextCar, int maxSpeed, int currentSpeed, int newLaneForwardGap,
-                                 int newLanePreviousGap, int maxRoadSpeed) {
+                                 int newLanePreviousGap, int speedLimit) {
 
         if (newLaneForwardGap <= 0 || newLanePreviousGap <= 0) {
             return false;
         }
-
         int theoreticalSpeed = Math.min(currentSpeed, maxSpeed);
-
-        if (distanceToNextCar > theoreticalSpeed) {
-            return false;
+        int weight1;
+        if (distanceToNextCar < theoreticalSpeed && newLaneForwardGap > distanceToNextCar) {
+            weight1 = 1;
+        } else {
+            weight1 = 0;
         }
 
-        if (newLaneForwardGap <= distanceToNextCar) {
-            return false;
+        int weight2 = theoreticalSpeed - newLaneForwardGap;
+        int weight3 = speedLimit - newLanePreviousGap;
+        if (weight2 < 0) {
+            weight2 = 0;
+        }
+        if (weight3 < 0) {
+            weight3 = 0;
         }
 
-        if (newLanePreviousGap <= maxRoadSpeed) {
-            return false;
-        }
-
-        return true;
-
+        return weight1 > weight2 && weight1 > weight3;
     }
 
     /**
-     * gives the name of the rickert model, used for display purposes
+     * gives the name of the rickert model (transsims version), used for display purposes
      *
-     * @return the name of the rickert model
+     * @return the name of the rickert model (transsims version)
      **/
     @Override
     public String getName() {
-        return "Rickert Model";
+        return "Rickert Model, Transsims version";
     }
 
 }

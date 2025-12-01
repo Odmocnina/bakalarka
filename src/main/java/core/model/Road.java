@@ -1,6 +1,7 @@
 package core.model;
 
 import app.AppContext;
+import core.utils.Constants;
 import core.utils.RequestConstants;
 
 import java.util.HashMap;
@@ -134,6 +135,13 @@ public abstract class Road {
         if (param.equals(RequestConstants.TIME_STEP_REQUEST)) {
             parameters.put(param, AppContext.RUN_DETAILS.timeStep);
         } else if (param.equals(RequestConstants.MAX_ROAD_SPEED_REQUEST)) {
+            double speedLimit;
+            if (type.equals(Constants.CELLULAR)) {
+                speedLimit = this.getSpeedLimit() / AppContext.CAR_FOLLOWING_MODEL.getCellSize();
+                speedLimit = Math.ceil(speedLimit);
+            } else {
+                speedLimit = this.getSpeedLimit();
+            }
             parameters.put(param, speedLimit);
         }
     }

@@ -30,6 +30,8 @@ public class CellularRoad extends Road {
     /** size of each cell in meters, used to translate length given in config to length in cells **/
     private double cellSize;
 
+    private int speedLimitInCells;
+
     /**
      * Constructor for CellularRoad, creates the road and initializes cells, and other parameters, like cell size
      *
@@ -41,6 +43,7 @@ public class CellularRoad extends Road {
     public CellularRoad(double length, int numberOfLanes, double speedLimit, double cellSize) {
         super(length, numberOfLanes, speedLimit, Constants.CELLULAR);
         this.cellSize = cellSize;
+        this.speedLimitInCells = (int) Math.ceil(speedLimit / cellSize);
         createRoad();
     }
 
@@ -224,6 +227,10 @@ public class CellularRoad extends Road {
                     }
 
                     double newSpeed = AppContext.CAR_FOLLOWING_MODEL.getNewSpeed(parameters);
+
+                    if (newSpeed > this.speedLimitInCells) {
+                        newSpeed = this.speedLimitInCells;
+                    }
 
                     if (isCarAtEnd(cells[lane][position].getCarParams(), (int) newSpeed)) {
                         if (checkIfCarStillRelevant(cells[lane][position].getCarParams(), (int) newSpeed)) {

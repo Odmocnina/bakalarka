@@ -270,6 +270,7 @@ public class ContinuosRoad extends Road {
             }
             double newSpeed = AppContext.CAR_FOLLOWING_MODEL.getNewSpeed(parameters);
 
+
             if (newSpeed > super.speedLimit) {
                 newSpeed = super.speedLimit;
             }
@@ -737,6 +738,22 @@ public class ContinuosRoad extends Road {
                 }
             }
         }
+    }
+
+    private double getCollisionFreeSpeed(CarParams car, double newSpeed) {
+        int lane = car.lane;
+        int position = vehicles[lane].indexOf(car);
+
+        if (position < vehicles[lane].size() - 1) {
+            CarParams carInFront = vehicles[lane].get(position + 1);
+            double distanceToCarInFront = carInFront.xPosition - carInFront.getParameter(RequestConstants.LENGTH_REQUEST)
+                    - car.xPosition;
+            if (distanceToCarInFront < newSpeed) {
+                return distanceToCarInFront - 1.0;
+            }
+        }
+
+        return newSpeed;
     }
 
     /**

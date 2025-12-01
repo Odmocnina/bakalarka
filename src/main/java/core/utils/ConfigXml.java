@@ -1,26 +1,27 @@
 package core.utils;
 
-import app.AppContext;
 import org.w3c.dom.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 import java.io.File;
+import java.io.FileOutputStream;
 
 /**
- * helper pro práci s config.xml – drží si odkazy na důležité sekce
+ * Helper for working with config.xml using standard w3c.dom.
+ * Allows reading/writing values using path strings (e.g., "logging/debug").
  */
 public class ConfigXml {
 
     private final File file;
     private final Document doc;
-
     private final Element root;
-    private final Element generator;
-    private final Element runDetails;
-    private final Element model;
 
     public ConfigXml(File fileConf) throws Exception {
         this.file = fileConf;
@@ -32,106 +33,124 @@ public class ConfigXml {
         this.doc = builder.parse(file);
 
         this.root = doc.getDocumentElement();
-
-        // tady si vytáhneš a uložíš podsekce
-        this.generator = getFirstChildElementByTag(root, ConfigConstants.GENERATOR_TAG);
-        this.runDetails = getFirstChildElementByTag(root, ConfigConstants.RUN_DETAILS_TAG);
-        this.model = getFirstChildElementByTag(root, ConfigConstants.MODELS_TAG);
     }
 
-    // ====== obecné pomocné metody ======
+    // ==========================================
+    //       UNIVERSAL PATH METHODS
+    // ==========================================
 
-    private Element getFirstChildElementByTag(Element parent, String tag) {
-        NodeList nl = parent.getElementsByTagName(tag);
-        if (nl.getLength() == 0) return null;
-        return (Element) nl.item(0);
+    /**
+     * Gets a String value from XML based on path "section/subsection/tag".
+     * Returns null if path doesn't exist.
+     */
+    public String getValue(String path) {
+        Element current = getElementByPath(path, false); // false = don't create
+        return (current != null) ? current.getTextContent().trim() : null;
     }
 
-    private Element getDirectChild(Element parent, String tag) {
-        NodeList children = parent.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            Node n = children.item(i);
-            if (n instanceof Element && ((Element) n).getTagName().equals(tag)) {
-                return (Element) n;
+    /**
+     * Helper for boolean values. Returns false if tag missing or not "true".
+     */
+    public boolean getBool(String path) {
+        String val = getValue(path);
+        return "true".equalsIgnoreCase(val);
+    }
+
+    /**
+     * Sets a value at specific path. Creates tags if they don't exist.
+     */
+    public void setValue(String path, String value) {
+        Element target = getElementByPath(path, true); // true = create if missing
+        if (target != null) {
+            target.setTextContent(value);
+        }
+    }
+
+    /**
+     * Helper for setting boolean values.
+     */
+    public void setBool(String path, boolean value) {
+        setValue(path, String.valueOf(value));
+    }
+
+    private void removeEmptyTextNodes(Document doc) throws Exception {
+        XPathFactory xpathFactory = XPathFactory.newInstance();
+        XPath xpath = xpathFactory.newXPath();
+
+        // find all text nodes that are empty or contain only whitespace
+        XPathExpression expr = xpath.compile("//text()[normalize-space(.) = '']");
+        NodeList emptyNodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+
+        for (int i = 0; i < emptyNodes.getLength(); i++) {
+            Node node = emptyNodes.item(i);
+            node.getParentNode().removeChild(node);
+        }
+    }
+
+    /**
+     * Saves the current state of Document back to the XML file.
+     */
+    public void save() throws Exception {
+        removeEmptyTextNodes(doc);
+
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+
+        // Pretty print settings
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        // Omit XML declaration if you want (optional)
+        // transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
+        DOMSource source = new DOMSource(doc);
+        StreamResult result = new StreamResult(new FileOutputStream(file));
+        transformer.transform(source, result);
+    }
+
+    // ==========================================
+    //           INTERNAL HELPERS
+    // ==========================================
+
+    /**
+     * Traverses the XML tree based on path.
+     * @param path String like "logging/debug"
+     * @param createIfMissing If true, creates missing elements along the path.
+     */
+    private Element getElementByPath(String path, boolean createIfMissing) {
+        if (path == null || path.isEmpty()) {
+            return null;
+        }
+
+        String[] tags = path.split(ConfigConstants.CONFIG_REQUEST_SEPARATOR);
+        Element current = root;
+
+        for (String tagName : tags) {
+            Element child = getDirectChild(current, tagName);
+
+            if (child == null) {
+                if (createIfMissing) {
+                    child = doc.createElement(tagName);
+                    current.appendChild(child);
+                } else {
+                    return null; // Path doesn't exist and we are not creating it
+                }
+            }
+            current = child;
+        }
+        return current;
+    }
+
+    /**
+     * Finds a direct child element by tag name (standard DOM is clumsy at this).
+     */
+    private Element getDirectChild(Element parent, String tagName) {
+        NodeList list = parent.getChildNodes();
+        for (int i = 0; i < list.getLength(); i++) {
+            Node node = list.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().equals(tagName)) {
+                return (Element) node;
             }
         }
         return null;
     }
-
-    private String getSingleChildText(Element parent, String childName) {
-        Element child = getDirectChild(parent, childName);
-        return (child != null) ? child.getTextContent().trim() : null;
-    }
-
-    private void setSingleChildText(Element parent, String childName, String value) {
-        Element child = getDirectChild(parent, childName);
-        if (child == null) {
-            child = doc.createElement(childName);
-            parent.appendChild(child);
-        }
-        child.setTextContent(value);
-    }
-
-    public void save() throws Exception {
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-        transformer.transform(new DOMSource(doc), new StreamResult(file));
-    }
-
-    // ====== konkrétní „API“ pro GUI ======
-    // GENERATOR
-
-    public double getFlowRate() {
-        String txt = getSingleChildText(generator, ConfigConstants.FLOW_RATE_TAG);
-        return (txt != null && !txt.isEmpty()) ? Double.parseDouble(txt) : 0.0;
-    }
-
-    public void setFlowRate(double value) {
-        setSingleChildText(generator, ConfigConstants.FLOW_RATE_TAG, String.valueOf(value));
-    }
-
-    // queue/use
-    public boolean isQueueUsed() {
-        Element queue = getDirectChild(generator, ConfigConstants.QUEUE_TAG);
-        if (queue == null) return false;
-        String txt = getSingleChildText(queue, ConfigConstants.USE_TAG);
-        return Boolean.parseBoolean(txt);
-    }
-
-    public void setQueueUsed(boolean use) {
-        Element queue = getDirectChild(generator, ConfigConstants.QUEUE_TAG);
-        if (queue == null) {
-            queue = doc.createElement(ConfigConstants.QUEUE_TAG);
-            generator.appendChild(queue);
-        }
-        setSingleChildText(queue, ConfigConstants.USE_TAG, String.valueOf(use));
-    }
-
-    public int getTimeStep() {
-        String txt = getSingleChildText(runDetails, "timeStep");
-        return (txt != null && !txt.isEmpty()) ? Integer.parseInt(txt) : 1;
-    }
-
-    public void setTimeStep(int ts) {
-        setSingleChildText(runDetails, "timeStep", String.valueOf(ts));
-    }
-
-    public int getNumberOfRoads() {
-        return 0;
-    }
-
-    public String getRoadFile() {
-        return AppContext.RUN_DETAILS.outputDetails.outputFile;
-    }
-
-    public void setRoadFile(String filePath) {
-
-    }
-
-    public void setNumberOfRoads(int numRoads) {
-
-    }
-
 }

@@ -52,6 +52,12 @@ public class ConfigLoader {
             }
         }
 
+        try {
+            AppContext.CONFIG_XML = new ConfigXml(configFile);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         return true;
     }
 
@@ -213,7 +219,7 @@ public class ConfigLoader {
                 modelFromConfig = new FVDM();
             } else if (id.equals("helly")) {
                 modelFromConfig = new Helly();
-            } else if (id.equals("headleading")) {
+            } else if (id.equals("head-leading")) {
                 modelFromConfig = new HeadLeading();
             } else if (id.equals("gipps")) {
                 modelFromConfig = new Gipps();
@@ -264,8 +270,12 @@ public class ConfigLoader {
             id = id.toLowerCase().trim();
 
             //TODO add reflexion for dynamic loading of models
-            if (id.equals("rickert")) {
+            if (id.equals("rickert-transsims")) {
+                modelFromConfig = new RickertTranssims();
+            } else if (id.equals("rickert")) {
                 modelFromConfig = new Rickert();
+            } else if (id.equals("f-stca")) {
+                modelFromConfig = new F_STCA();
             } else if (id.equals("mobil")) {
                 modelFromConfig = new Mobil();
             } else if (id.equals("mobil-simple")) {

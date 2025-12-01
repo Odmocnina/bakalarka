@@ -1,6 +1,7 @@
 package app;
 
 import core.sim.Simulation;
+import core.utils.ConfigXml;
 import core.utils.RunDetails;
 import models.ICarFollowingModel;
 import models.ILaneChangingModel;
@@ -33,4 +34,5 @@ public final class AppContext {
 
     /** run detail such as if gui is to be shown, if results are to be written... **/
     public static RunDetails RUN_DETAILS;
+    public static ConfigXml CONFIG_XML;
 }
