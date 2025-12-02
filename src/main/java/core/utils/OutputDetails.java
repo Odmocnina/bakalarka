@@ -14,8 +14,8 @@ public class OutputDetails {
     /** Output file name for writing simulation results **/
     public String outputFile;
 
-    /** Output settings: [simulationDetails, simulationTime, carsPassed, carsOnRoad, roadDetails, generationDetails] **/
-    public boolean[] output = new boolean[] { true, true, true, true, true, false };
+    /** Output settings: [simulationDetails, simulationTime, carsPassed, carsOnRoad, roadDetails, generationDetails, collisions] **/
+    public boolean[] output = new boolean[] { true, true, true, true, true, false, true };
 
     /** CSV separator character **/
     public String csvSeparator = Constants.DEFAULT_CSV_SEPARATOR;
@@ -38,6 +38,9 @@ public class OutputDetails {
     /** index of true/false in output array of generation details **/
     final int GENERATION_DETAILS_INDEX = 5;
 
+    /** index of true/false in output array of collision count **/
+    final int COLLISION_COUNT_INDEX = 6;
+
     /** Names of the output details corresponding to their indices **/
     private final String[] DETAILS_NAME = {// Mapping detail names from XML to their corresponding indices, bullshit
             ConfigConstants.SIMULATION_DETAILS_TAG,
@@ -45,7 +48,8 @@ public class OutputDetails {
             ConfigConstants.CARS_PASSED_TAG,
             ConfigConstants.CARS_ON_ROAD_TAG,
             ConfigConstants.ROAD_DETAILS_TAG,
-            ConfigConstants.GENERATION_DETAILS_TAG
+            ConfigConstants.GENERATION_DETAILS_TAG,
+            ConfigConstants.COLLISION_COUNT_TAG
     };
 
     /** Indices of the output details corresponding to their names **/
@@ -55,7 +59,8 @@ public class OutputDetails {
             CARS_PASSED_INDEX,
             CARS_ON_ROAD_INDEX,
             ROAD_DETAILS_INDEX,
-            GENERATION_DETAILS_INDEX
+            GENERATION_DETAILS_INDEX,
+            COLLISION_COUNT_INDEX
     };
 
     /**

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <road>
     <maxSpeed>37</maxSpeed>
-    <lanes>1</lanes>
+    <lanes>10</lanes>
     <roadLength>200000</roadLength>
 </road>

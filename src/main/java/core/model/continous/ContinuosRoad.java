@@ -2,10 +2,7 @@ package core.model.continous;
 
 import app.AppContext;
 import core.model.*;
-import core.utils.Constants;
-import core.utils.MyLogger;
-import core.utils.RequestConstants;
-import core.utils.StringEditor;
+import core.utils.*;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -44,7 +41,7 @@ public class ContinuosRoad extends Road {
             this.vehicles[lane] = new LinkedList<>();
         }
 
-        CarParams carParams = new CarParams();
+        /*CarParams carParams = new CarParams();
         carParams.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
         carParams.setParameter(RequestConstants.MAX_SPEED_REQUEST, 40.33);
         carParams.xPosition = 20;
@@ -143,7 +140,7 @@ public class ContinuosRoad extends Road {
         carParams6.setParameter(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6);
         carParams6.setParameter(RequestConstants.POLITENESS_FACTOR_REQUEST, 0.3);
         carParams6.setParameter(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST, 1.0);
-        vehicles[5].add(2, carParams6);
+        vehicles[5].add(2, carParams6);*/
     }
 
     /**
@@ -270,7 +267,6 @@ public class ContinuosRoad extends Road {
             }
             double newSpeed = AppContext.CAR_FOLLOWING_MODEL.getNewSpeed(parameters);
 
-
             if (newSpeed > super.speedLimit) {
                 newSpeed = super.speedLimit;
             }
@@ -284,6 +280,8 @@ public class ContinuosRoad extends Road {
             if (AppContext.RUN_DETAILS.laneChange) {
                 direction = this.tryLaneChange(car);
             }
+
+            newSpeed = this.resolveCollision(car, newSpeed);
 
             car.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, newSpeed);
             car.xPosition += newSpeed;
@@ -740,7 +738,7 @@ public class ContinuosRoad extends Road {
         }
     }
 
-    private double getCollisionFreeSpeed(CarParams car, double newSpeed) {
+    private double resolveCollision(CarParams car, double newSpeed) {
         int lane = car.lane;
         int position = vehicles[lane].indexOf(car);
 
@@ -749,7 +747,10 @@ public class ContinuosRoad extends Road {
             double distanceToCarInFront = carInFront.xPosition - carInFront.getParameter(RequestConstants.LENGTH_REQUEST)
                     - car.xPosition;
             if (distanceToCarInFront < newSpeed) {
-                return distanceToCarInFront - 1.0;
+                ResultsRecorder.getResultsRecorder().addCollision();
+                if (AppContext.RUN_DETAILS.preventCollisions) {
+                    return distanceToCarInFront - 1.0;
+                }
             }
         }
 

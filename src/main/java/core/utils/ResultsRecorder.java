@@ -36,6 +36,8 @@ public class ResultsRecorder {
     /** Output type (txt/csv)**/
     private String outputType = "txt";
 
+    private int collisionsCount = 0;
+
     /**
      * Private constructor to prevent instantiation
      **/
@@ -226,6 +228,11 @@ public class ResultsRecorder {
         bw.write("\n");
     }
 
+    private void writeCollisionsCount(BufferedWriter bw) throws IOException {
+        bw.write("=== Collisions Count ===\n");
+        bw.write("Total Collisions: " + this.collisionsCount + "\n\n");
+    }
+
     private void writeTXT(BufferedWriter bw) throws IOException {
         // Implementation for writing results in TXT format
         bw.write("=== Traffic Simulation Results ===\n\n"); // header of the results file
@@ -245,6 +252,9 @@ public class ResultsRecorder {
         }
         if (outputDetails.writePart("carsOnRoad")) {
             this.writeCarsOnTheRoad(bw);
+        }
+        if (outputDetails.writePart("collisionCount")) {
+            this.writeCollisionsCount(bw);
         }
         if (outputDetails.writePart("roadDetails")) {
             this.writeRoadDetails(bw);
@@ -269,6 +279,9 @@ public class ResultsRecorder {
         if (outputDetails.writePart("roadDetails")) {
             header = header + "Road details" + csvSeparator;
         }
+        if (outputDetails.writePart("collisionCount")) {
+            header = header + "Collisions Count" + csvSeparator;
+        }
         if (outputDetails.writePart("generationDetails")) {
             header = header + "Generation Params";
         }
@@ -285,6 +298,9 @@ public class ResultsRecorder {
             }
             if (outputDetails.writePart("roadDetails")) {
                 bw.write(AppContext.SIMULATION.getRoads()[i].toString() + csvSeparator);
+            }
+            if (outputDetails.writePart("collisionCount")) {
+                bw.write(this.collisionsCount + csvSeparator);
             }
             if (outputDetails.writePart("generationDetails")) {
                 bw.write(AppContext.SIMULATION.getRoads()[i].getCarGenerator().toString() + "\n");
@@ -303,6 +319,10 @@ public class ResultsRecorder {
             return carsPassedPerRoad[index];
         }
         return 0;
+    }
+
+    public void addCollision() {
+        this.collisionsCount++;
     }
 
     public void setOutputType(String outputType) {

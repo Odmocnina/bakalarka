@@ -3,12 +3,13 @@ package core.model;
 import core.model.cellular.CellularRoad;
 import core.utils.Constants;
 import core.utils.MyLogger;
-
 import core.utils.RequestConstants;
+
 import javafx.scene.paint.Color;
 import java.util.HashMap;
 import java.util.Queue;
 import java.util.Random;
+
 
 /********************************************
  * class representing a car generator, generates cars in queue or one by one. One by one generation is dependent on
@@ -47,6 +48,8 @@ public class CarGenerator implements Cloneable {
 
     /** available car colors **/
     private final Color[] COLORS = Constants.CAR_COLORS;
+
+    private Queue<CarParams> carQueue = null;
 
     /**
      * constructor for car generator
@@ -430,5 +433,9 @@ public class CarGenerator implements Cloneable {
         private boolean checkIfValid() {
             return minValue <= maxValue && range >= 0;
         }
+    }
+
+    public void initCarQueue() {
+        this.carQueue = this.generateCarsInToQueue();
     }
 }

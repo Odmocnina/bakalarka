@@ -36,6 +36,8 @@ public class RunDetails {
     /** Time between steps for GUI updates in milliseconds **/
     public int timeBetweenSteps;
 
+    public boolean preventCollisions = true;
+
     /**
      * Checks if the simulation results should be written to an output file (null or empty output file/details
      * means results should not be recorded).

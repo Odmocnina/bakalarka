@@ -17,6 +17,8 @@ import static core.model.Direction.*;
  *****************************************************/
 public class Rickert implements ILaneChangingModel {
 
+    private double chance = 0.9;
+
     /**
      * gives the unique ID of the rickert model
      *
@@ -137,7 +139,8 @@ public class Rickert implements ILaneChangingModel {
                 previousGap = Integer.MAX_VALUE;
             }
 
-            if (makeDecision((int) distanceToNextCar, maxSpeed, currentSpeed, forwardGap, previousGap, maxSpeedRoad)) {
+            if (makeDecision((int) distanceToNextCar, maxSpeed, currentSpeed, forwardGap, previousGap, maxSpeedRoad)
+                    && Math.random() < chance) {
                 return LEFT;
             }
         }
@@ -159,7 +162,8 @@ public class Rickert implements ILaneChangingModel {
                 previousGap = Integer.MAX_VALUE;
             }
 
-            if (makeDecision((int) distanceToNextCar, maxSpeed, currentSpeed, forwardGap, previousGap, maxSpeedRoad)) {
+            if (makeDecision((int) distanceToNextCar, maxSpeed, currentSpeed, forwardGap, previousGap, maxSpeedRoad)
+                    && Math.random() < chance) {
                 return RIGHT;
             }
         }

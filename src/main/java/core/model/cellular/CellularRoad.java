@@ -5,10 +5,7 @@ import core.model.CarParams;
 import core.model.Direction;
 import core.model.Orientation;
 import core.model.Road;
-import core.utils.Constants;
-import core.utils.MyLogger;
-import core.utils.RequestConstants;
-import core.utils.StringEditor;
+import core.utils.*;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -60,7 +57,7 @@ public class CellularRoad extends Road {
         }
 
         // first test of occupied cells, DELETE LATER
-        cells[0][5].setOccupied(true);
+       /* cells[0][5].setOccupied(true);
         CarParams carParams = new CarParams();
         carParams.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
         carParams.setParameter(RequestConstants.MAX_SPEED_REQUEST, 1.0);
@@ -81,7 +78,7 @@ public class CellularRoad extends Road {
         carParams.setParameter(RequestConstants.LENGTH_REQUEST, 2);
         carParams.color = Constants.CAR_COLORS[0];
         cells[0][1].setCarParams(carParams);
-        cells[0][1].setHead(true);
+        cells[0][1].setHead(true);*/
 
     }
 
@@ -645,6 +642,25 @@ public class CellularRoad extends Road {
         }
 
         return Direction.STRAIGHT;
+    }
+
+    private int resolveCollisions(CarParams car, int newSpeed) {
+        int lane = car.lane;
+        int oldX = (int) car.xPosition;
+        int newX = oldX + newSpeed;
+        for (int pos = oldX + 1; pos <= newX; pos++) {
+            if (pos >= numberOfCells) {
+                break; // beyond road end
+            }
+            if (cells[lane][pos].isOccupied()) {
+                ResultsRecorder.getResultsRecorder().addCollision();
+                if (AppContext.RUN_DETAILS.preventCollisions) {
+                    return pos - 1 - oldX; // return distance to the cell before collision
+                }
+            }
+        }
+
+        return newSpeed;
     }
 
     /**

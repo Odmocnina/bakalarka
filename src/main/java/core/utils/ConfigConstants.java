@@ -42,4 +42,6 @@ public class ConfigConstants {
     public static final String ROAD_DETAILS_TAG = "roadDetails";
     public static final String GENERATION_DETAILS_TAG = "generationDetails";
     public static final String TIME_BETWEEN_STEPS_TAG = "timeBetweenSteps";
+    public static final String PREVENT_COLLISION_TAG = "preventCollision";
+    public static final String COLLISION_COUNT_TAG = "collisionCount";
 }

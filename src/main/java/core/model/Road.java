@@ -33,6 +33,8 @@ public abstract class Road {
     /** queues of cars per lane **/
     protected Queue<CarParams>[] carQueuesPerLane = null;
 
+    public int id;
+
     /**
      * constructor for road, initializing its basic properties, used in constructors of subclasses
      *
@@ -166,6 +168,7 @@ public abstract class Road {
      * @return number of cars on the road
      **/
     public abstract int getNumberOfCarsOnRoad();
+
 
     public boolean generatingToQueue() {
         return this.generator.generatingToQueue();

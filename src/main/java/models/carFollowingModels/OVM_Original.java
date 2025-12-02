@@ -38,10 +38,6 @@ public class OVM_Original implements ICarFollowingModel {
         double optimalVelocity = optimalVelocity(distance, maxSpeedRoad, minGap);
         double newSpeed = currentSpeed + distanceDifferenceSensitivityParameter * (optimalVelocity - currentSpeed);
 
-        if (distance < newSpeed) {
-            newSpeed = distance - minGap; // prevent collisions
-        }
-
         return Math.min(newSpeed, maxSpeed);
     }
 

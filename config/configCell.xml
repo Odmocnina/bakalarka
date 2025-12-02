@@ -8,7 +8,7 @@
             <id>head-leading</id>
         </carFollowingModel>
         <laneChangingModel>
-            <id>rickert-transsims</id>
+            <id>f-stca</id>
         </laneChangingModel>
     </models>
 

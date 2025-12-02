@@ -404,6 +404,7 @@ public class ConfigLoader {
                     .item(0);
             Element laneChange = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.LANE_CHANGE_TAG).item(0);
             Element debug = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.DEBUG_TAG).item(0);
+            Element preventCollisions = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.PREVENT_COLLISION_TAG).item(0);
 
             if (duration != null) {
                 detailsFromConfig.duration = Integer.parseInt(duration.getTextContent());
@@ -454,8 +455,20 @@ public class ConfigLoader {
 
             if (drawCells != null) {
                 detailsFromConfig.drawCells = Boolean.parseBoolean(drawCells.getTextContent());
+                MyLogger.logBeforeLoading("Draw cells from config: " + drawCells.getTextContent()
+                        , Constants.INFO_FOR_LOGGING);
             } else {
                 detailsFromConfig.drawCells = false;
+                MyLogger.logBeforeLoading("Draw cells from config: false", Constants.INFO_FOR_LOGGING);
+            }
+
+            if (preventCollisions != null) {
+                detailsFromConfig.preventCollisions = Boolean.parseBoolean(preventCollisions.getTextContent());
+                MyLogger.logBeforeLoading("Prevent collisions from config: " + preventCollisions.getTextContent()
+                        , Constants.INFO_FOR_LOGGING);
+            } else {
+                detailsFromConfig.preventCollisions = true;
+                MyLogger.logBeforeLoading("Prevent collisions from config: true", Constants.INFO_FOR_LOGGING);
             }
 
             if (detailsFromConfig.duration == Constants.PARAMETER_UNDEFINED && !detailsFromConfig.showGui) {
