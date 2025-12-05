@@ -63,7 +63,7 @@
     <runDetails>
         <showGui>true</showGui>
         <drawCells>false</drawCells>
-        <laneChange>false</laneChange>
+        <laneChange>true</laneChange>
         <timeStep>1</timeStep>
         <duration>5000</duration>
         <debug>true</debug>

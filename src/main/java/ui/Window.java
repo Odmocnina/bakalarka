@@ -101,7 +101,7 @@ public class Window extends Application {
 
         // Configuration bar
 
-        TabPane configTabs = new TabPane();
+      /*  TabPane configTabs = new TabPane();
         configTabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE); // aby nešly zavírat
 
         TabCreator tc = new TabCreator();
@@ -115,7 +115,7 @@ public class Window extends Application {
 
 // top: info label + konfigurační taby
         VBox topPane = new VBox(infoLabel, configTabs);
-        topPane.setSpacing(5);
+        topPane.setSpacing(5);*/
 
 
         ////////////////////////////////////////
@@ -123,7 +123,7 @@ public class Window extends Application {
 
         // main layout of gui
         BorderPane root = new BorderPane();
-        root.setTop(topPane);
+      //  root.setTop(topPane);
        // root.setTop(infoLabel);      // Added info label to top
         root.setCenter(canvasPane);  // Changed to Pane with Canvas
         root.setRight(vScroll);      // Added vertical scrollbar

@@ -718,7 +718,7 @@ public class ConfigLoader {
         // set type of road for generator and store roads in road instance
         carGenerator.setType(roads[0]);
         for (Road road : roads) {
-            road.setCarGenerator(carGenerator.clone());
+            road.setCarGenerators(carGenerator.clone());
 
             if (carGenerator.generatingToQueue()) {
                 MyLogger.logBeforeLoading("Car generator is generating cars to queue."

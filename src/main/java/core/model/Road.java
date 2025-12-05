@@ -2,6 +2,7 @@ package core.model;
 
 import app.AppContext;
 import core.utils.Constants;
+import core.utils.MyLogger;
 import core.utils.RequestConstants;
 
 import java.util.HashMap;
@@ -27,8 +28,8 @@ public abstract class Road {
     /** type of road, cellular, continuous... **/
     protected String type;
 
-    /** car generator assigned to this road **/
-    protected CarGenerator generator;
+    /** car generators assigned to this lanes **/
+    protected CarGenerator[] generators;
 
     /** queues of cars per lane **/
     protected Queue<CarParams>[] carQueuesPerLane = null;
@@ -102,8 +103,15 @@ public abstract class Road {
      *
      * @param generator car generator
      **/
-    public void setCarGenerator(CarGenerator generator) {
-        this.generator = generator;
+    public void setCarGenerators(CarGenerator generator) {
+        this.generators = new CarGenerator[numberOfLanes];
+        for (int i = 0; i < numberOfLanes; i++) {
+            this.generators[i] = generator;
+        }
+    }
+
+    public void setCarGenerators(CarGenerator[] generators) {
+        this.generators = generators;
     }
 
     /**
@@ -112,7 +120,7 @@ public abstract class Road {
     public void initializeCarQueues() {
         carQueuesPerLane = new Queue[numberOfLanes];
         for (int i = 0; i < numberOfLanes; i++) {
-            this.carQueuesPerLane[i] = this.generator.generateCarsInToQueue();
+            this.carQueuesPerLane[i] = this.generators[i].generateCarsInToQueue();
         }
     }
 
@@ -148,6 +156,42 @@ public abstract class Road {
         }
     }
 
+    protected void tryToAddCar() {
+        for (int lane = 0; lane < numberOfLanes; lane++) {
+            if (this.generators[lane].generatingToQueue()) {
+                this.addFromQueue(lane);
+            } else {
+                this.addFromGenerator(lane);
+            }
+        }
+    }
+
+    protected void addFromQueue(int lane) {
+        CarParams cp = this.carQueuesPerLane[lane].peek();
+
+        if (cp != null && this.okToPutCarAtStart(cp, lane)) {
+            this.placeCarAtStart(cp, (int) (cp.getParameter(RequestConstants.LENGTH_REQUEST)), lane);
+            this.carQueuesPerLane[lane].poll();
+        }
+    }
+
+    protected void addFromGenerator(int lane) {
+        if (this.generators[lane].decideIfNewCar()) {
+            CarParams newCar = generators[lane].generateCar();
+
+            if (newCar != null && this.okToPutCarAtStart(newCar, lane)) {
+                this.placeCarAtStart(newCar, (int) (newCar.getParameter(RequestConstants.LENGTH_REQUEST)), lane);
+                MyLogger.log("New car placed at lane " + lane + " position: " +
+                                newCar.getParameter(RequestConstants.LENGTH_REQUEST) + ", carParams: " + newCar,
+                                Constants.DEBUG_FOR_LOGGING);
+            }
+        }
+    }
+
+    protected abstract void placeCarAtStart(CarParams car, double length, int lane);
+    protected abstract boolean okToPutCarAtStart(CarParams car, int lane);
+
+
     /**
      * abstract method to get content of road, implemented in subclasses
      *
@@ -171,11 +215,11 @@ public abstract class Road {
 
 
     public boolean generatingToQueue() {
-        return this.generator.generatingToQueue();
+        return this.generators[0].generatingToQueue();
     }
 
     public CarGenerator getCarGenerator() {
-        return this.generator;
+        return this.generators[0];
     }
 
 
