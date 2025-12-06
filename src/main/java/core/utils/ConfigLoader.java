@@ -276,6 +276,8 @@ public class ConfigLoader {
                 modelFromConfig = new Rickert();
             } else if (id.equals("f-stca")) {
                 modelFromConfig = new F_STCA();
+            } else if (id.equals("stca")) {
+                modelFromConfig = new STCA();
             } else if (id.equals("mobil")) {
                 modelFromConfig = new Mobil();
             } else if (id.equals("mobil-simple")) {

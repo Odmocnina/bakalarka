@@ -70,7 +70,7 @@ public class ConfigXml {
      * Helper for setting boolean values.
      */
     public void setBool(String path, boolean value) {
-        setValue(path, String.valueOf(value));
+        this.setValue(path, String.valueOf(value));
     }
 
     private void removeEmptyTextNodes(Document doc) throws Exception {

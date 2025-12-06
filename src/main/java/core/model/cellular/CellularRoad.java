@@ -57,7 +57,7 @@ public class CellularRoad extends Road {
         }
 
         // first test of occupied cells, DELETE LATER
-       /* cells[0][5].setOccupied(true);
+       cells[0][5].setOccupied(true);
         CarParams carParams = new CarParams();
         carParams.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
         carParams.setParameter(RequestConstants.MAX_SPEED_REQUEST, 1.0);
@@ -78,7 +78,7 @@ public class CellularRoad extends Road {
         carParams.setParameter(RequestConstants.LENGTH_REQUEST, 2);
         carParams.color = Constants.CAR_COLORS[0];
         cells[0][1].setCarParams(carParams);
-        cells[0][1].setHead(true);*/
+        cells[0][1].setHead(true);
 
     }
 

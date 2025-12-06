@@ -7,6 +7,7 @@ import core.utils.RequestConstants;
 import models.ILaneChangingModel;
 
 import java.util.HashMap;
+
 import static core.model.Direction.*;
 
 /****************************************************
@@ -15,21 +16,23 @@ import static core.model.Direction.*;
  * @author Michael Hladky
  * @version 1.0
  *****************************************************/
-public class X_STCA implements ILaneChangingModel {
+public class STCA implements ILaneChangingModel {
+
+    private double chance = 0.9;
 
     /**
-     * gives the unique ID of the x-stca model
+     * gives the unique ID of the rickert model
      *
-     * @return the unique ID of the x-stca model
+     * @return the unique ID of the rickert model
      **/
     public String getID() {
-        return "x-stca";
+        return "stca";
     }
 
     /*
-     * gives the list of parameters that the x-stca model needs to make a decision
+     * gives the list of parameters that the rickert model needs to make a decision
      *
-     * @return the list of parameters that the x-stca model needs to make a decision
+     * @return the list of parameters that the rickert model needs to make a decision
      **/
     public String requestParameters() {
         String[] requests = {
@@ -85,16 +88,16 @@ public class X_STCA implements ILaneChangingModel {
     }
 
     /**
-     * gives the list of parameters that the x-stca model needs for generation
+     * gives the list of parameters that the rickert model needs for generation
      *
-     * @return the list of parameters that the x-stca model needs for generation
+     * @return the list of parameters that the rickert model needs for generation
      **/
     public String getParametersForGeneration() {
         return RequestConstants.MAX_SPEED_REQUEST;
     }
 
     /**
-     * decides whether to change lane or not based on the x-stca model
+     * decides whether to change lane or not based on the rickert model
      *
      * @param parameters the parameters needed to make a decision in hashmap form, where key is the parameter name and
      *                   value is the parameter value in double
@@ -193,7 +196,7 @@ public class X_STCA implements ILaneChangingModel {
     }
 
     /**
-     * makes the decision to change lane or not based on the x-stca model, returns true if the decision is to change
+     * makes the decision to change lane or not based on the rickert model, returns true if the decision is to change
      * lane, false otherwise
      *
      * @param distanceToNextCar the distance to the next car in the current lane
@@ -216,15 +219,11 @@ public class X_STCA implements ILaneChangingModel {
             return false;
         }
 
-        int neededGapForward = 1 + Math.min(theoreticalSpeed, maxRoadSpeed);
-
         if (newLaneForwardGap <= distanceToNextCar) {
             return false;
         }
 
-        int neededGapBack = 1 + maxSpeed - theoreticalSpeed;
-
-        if (newLanePreviousGap <= neededGapBack) {
+        if (newLanePreviousGap <= maxRoadSpeed) {
             return false;
         }
 
@@ -233,13 +232,13 @@ public class X_STCA implements ILaneChangingModel {
     }
 
     /**
-     * gives the name of the x-stca model, used for display purposes
+     * gives the name of the rickert model, used for display purposes
      *
-     * @return the name of the x-stca model
+     * @return the name of the rickert model
      **/
     @Override
     public String getName() {
-        return "X-STCA (Symmetric Two-lane Cellular Automata)";
+        return "STCA (Symetric Two-lane Cellular Automata)";
     }
 
 }

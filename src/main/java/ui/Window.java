@@ -8,6 +8,8 @@ import core.model.cellular.CellularRoad;
 import core.utils.*;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import ui.render.IRoadRenderer;
 import core.sim.Simulation;
@@ -117,13 +119,51 @@ public class Window extends Application {
         VBox topPane = new VBox(infoLabel, configTabs);
         topPane.setSpacing(5);*/
 
+        Button runDetailsBtn = createIconButton("/icons/road.png", "Run details");
+        Button roadsBtn      = createIconButton("/icons/changeLane.png", "Road configuration");
+        Button changeLaneBtn     = createIconButton("/icons/changeLane.png", "Lane change ban");
+        Button generatorBtn  = createIconButton("/icons/road.png", "Generator");
+
+        // sem si pak dáš reálné akce – zatím placeholder
+        runDetailsBtn.setOnAction(e -> {
+            // TODO: otevřít okno / dialog s nastavením "Run details"
+            System.out.println("Run details clicked");
+        });
+
+        roadsBtn.setOnAction(e -> {
+            // TODO: otevřít nastavení silnic
+            System.out.println("Roads config clicked");
+        });
+
+        changeLaneBtn.setOnAction(e -> {
+            ConfigModificator.changeLaneChangeBan();
+            System.out.println("Change lane change clicked");
+        });
+
+        generatorBtn.setOnAction(e -> {
+            // TODO: otevřít nastavení generátoru
+            System.out.println("Generator clicked");
+        });
+
+        ToolBar configToolbar = new ToolBar(
+                generatorBtn,
+                runDetailsBtn,
+                changeLaneBtn,
+                roadsBtn
+        );
+
+        // top: info label + toolbar
+        VBox topPane = new VBox(infoLabel, configToolbar);
+        topPane.setSpacing(5);
+        topPane.setPadding(new Insets(5, 10, 5, 10));
+
 
         ////////////////////////////////////////
 
 
         // main layout of gui
         BorderPane root = new BorderPane();
-      //  root.setTop(topPane);
+        root.setTop(topPane);
        // root.setTop(infoLabel);      // Added info label to top
         root.setCenter(canvasPane);  // Changed to Pane with Canvas
         root.setRight(vScroll);      // Added vertical scrollbar
@@ -335,6 +375,31 @@ public class Window extends Application {
         }
         gc.restore(); // Restore translation
     }
+
+    /**
+     * helper method to create button with icon
+     *
+     * @param resourcePath path to icon in resources (e.g. "/icons/run.png")
+     * @param tooltipText tooltip text for button
+     * @return Button with icon
+     */
+    private Button createIconButton(String resourcePath, String tooltipText) {
+        Image image = new Image(
+                getClass().getResourceAsStream(resourcePath)
+        );
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(16);
+        imageView.setFitHeight(16);
+        imageView.setPreserveRatio(true);
+
+        Button button = new Button();
+        button.setGraphic(imageView);
+        button.setTooltip(new Tooltip(tooltipText));
+        button.setFocusTraversable(false);  // aby se to furt nefokusovalo tabem
+
+        return button;
+    }
+
 
     /**
      * stop method for JavaFX application

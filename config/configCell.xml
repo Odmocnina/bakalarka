@@ -8,7 +8,7 @@
             <id>head-leading</id>
         </carFollowingModel>
         <laneChangingModel>
-            <id>f-stca</id>
+            <id>stca</id>
         </laneChangingModel>
     </models>
 

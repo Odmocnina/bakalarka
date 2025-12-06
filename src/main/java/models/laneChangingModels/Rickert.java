@@ -220,7 +220,7 @@ public class Rickert implements ILaneChangingModel {
             return false;
         }
 
-        if (newLaneForwardGap <= distanceToNextCar) {
+        if (newLaneForwardGap <= theoreticalSpeed) {
             return false;
         }
 
