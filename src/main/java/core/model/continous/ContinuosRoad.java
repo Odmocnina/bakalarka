@@ -3,6 +3,8 @@ package core.model.continous;
 import app.AppContext;
 import core.model.*;
 import core.utils.*;
+import core.utils.constants.Constants;
+import core.utils.constants.RequestConstants;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -305,6 +307,14 @@ public class ContinuosRoad extends Road {
 
     ///////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * method to get parameter about different car in proximity (used for lane changing models)
+     *
+     * @param parameters hashmap to put the parameter into
+     * @param param parameter string containing info about which car to check
+     * @param car car to check from
+     * @param road road structure to check in
+     **/
     private void getParametersAboutDifferentCar(HashMap<String, Double> parameters, String param, CarParams car,
                                                 LinkedList<CarParams>[] road) {
         String[] paramSeparate = param.split(RequestConstants.SUBREQUEST_SEPARATOR);
@@ -395,7 +405,7 @@ public class ContinuosRoad extends Road {
         HashMap<String, Double> parameters;
         Direction desiredDirection;
 
-        if (lane > 0) {
+        if (lane > 0) { // try to change lane to the left
             requestParameters = AppContext.LANE_CHANGING_MODEL.requestParameters(direction);
             fakeRoad = this.createFakeRoad(direction, car);
             if (fakeRoad != null) {
@@ -410,7 +420,7 @@ public class ContinuosRoad extends Road {
             }
         }
 
-        if (lane < this.numberOfLanes - 1) {
+        if (lane < this.numberOfLanes - 1) { // try to change lane to the right
             direction = Direction.RIGHT;
             requestParameters = AppContext.LANE_CHANGING_MODEL.requestParameters(direction);
             fakeRoad = this.createFakeRoad(direction, car);
@@ -426,7 +436,7 @@ public class ContinuosRoad extends Road {
             }
         }
 
-        return Direction.STRAIGHT;
+        return Direction.STRAIGHT; // if no lane change possible or desired, return straight
     }
 
     /**
@@ -460,6 +470,14 @@ public class ContinuosRoad extends Road {
         return newSpeed - oldSpeed;
     }
 
+    /**
+     * method to check if given place in given lane is ok to place the car in (no collisions with other cars)
+     *
+     * @param lane lane to check in
+     * @param place index in linked list to check
+     * @param car car to place
+     * @return true if place is ok, false otherwise
+     **/
     private boolean isPlaceOkInLane(LinkedList<CarParams> lane, int place, CarParams car) {
         if (place < 0) {
             return false;
@@ -487,6 +505,14 @@ public class ContinuosRoad extends Road {
         return true;
     }
 
+    /**
+     * method to place car in given lane in given direction (left, right or if on the same lane then straight)
+     *
+     * @param car car to place
+     * @param road road structure to place the car in
+     * @param direction direction to place the car in (left or right)
+     * @return true if placement was successful, false otherwise
+     **/
     private boolean placeCar(CarParams car, LinkedList<CarParams>[] road, Direction direction) {
         int lane = car.lane;
         double position = car.xPosition;
@@ -694,6 +720,13 @@ public class ContinuosRoad extends Road {
         }
     }
 
+    /**
+     * method to resolve collision for given car and new speed, if collision detected, log it and adjust speed
+     *
+     * @param car car to check for collision
+     * @param newSpeed new speed of the car
+     * @return adjusted speed to avoid collision
+     **/
     private double resolveCollision(CarParams car, double newSpeed) {
         int lane = car.lane;
         int position = vehicles[lane].indexOf(car);

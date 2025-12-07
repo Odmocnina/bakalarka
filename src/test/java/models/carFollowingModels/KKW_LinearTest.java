@@ -1,7 +1,7 @@
 package models.carFollowingModels;
 
-import core.utils.Constants;
-import core.utils.RequestConstants;
+import core.utils.constants.Constants;
+import core.utils.constants.RequestConstants;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;

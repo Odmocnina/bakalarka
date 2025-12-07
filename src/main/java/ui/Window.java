@@ -6,7 +6,7 @@ import core.model.Road;
 import core.model.cellular.Cell;
 import core.model.cellular.CellularRoad;
 import core.utils.*;
-import javafx.geometry.Pos;
+import core.utils.constants.Constants;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

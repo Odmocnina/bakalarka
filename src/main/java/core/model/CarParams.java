@@ -1,8 +1,8 @@
 package core.model;
 
-import core.utils.Constants;
+import core.utils.constants.Constants;
 
-import core.utils.RequestConstants;
+import core.utils.constants.RequestConstants;
 import javafx.scene.paint.Color;
 import java.util.HashMap;
 

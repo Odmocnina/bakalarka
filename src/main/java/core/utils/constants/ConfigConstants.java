@@ -1,4 +1,4 @@
-package core.utils;
+package core.utils.constants;
 
 public class ConfigConstants {
     public static final String CONFIG_REQUEST_SEPARATOR = "/";

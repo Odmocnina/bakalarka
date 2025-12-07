@@ -3,10 +3,9 @@ package ui.render;
 import app.AppContext;
 import core.model.CarParams;
 import core.model.Road;
-import core.utils.Constants;
+import core.utils.constants.Constants;
 
-import core.utils.RequestConstants;
-import core.utils.RunDetails;
+import core.utils.constants.RequestConstants;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 

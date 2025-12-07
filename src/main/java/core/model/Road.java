@@ -1,9 +1,9 @@
 package core.model;
 
 import app.AppContext;
-import core.utils.Constants;
+import core.utils.constants.Constants;
 import core.utils.MyLogger;
-import core.utils.RequestConstants;
+import core.utils.constants.RequestConstants;
 
 import java.util.HashMap;
 import java.util.Queue;
@@ -35,6 +35,8 @@ public abstract class Road {
     protected Queue<CarParams>[] carQueuesPerLane = null;
 
     public int id;
+
+    protected LightPlan[] lightPlansOnLanes = null;
 
     /**
      * constructor for road, initializing its basic properties, used in constructors of subclasses

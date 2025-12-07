@@ -1,7 +1,6 @@
 package ui;
 
-import app.AppContext;
-import core.utils.ConfigConstants;
+import core.utils.constants.ConfigConstants;
 import core.utils.ConfigXml;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

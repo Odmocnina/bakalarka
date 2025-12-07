@@ -5,6 +5,8 @@ import core.model.*;
 import core.model.cellular.CellularRoad;
 import core.model.continous.ContinuosRoad;
 import core.sim.Simulation;
+import core.utils.constants.ConfigConstants;
+import core.utils.constants.Constants;
 import models.ICarFollowingModel;
 import models.ILaneChangingModel;
 import models.carFollowingModels.*;
@@ -149,6 +151,9 @@ public class ConfigLoader {
                         , Constants.FATAL_FOR_LOGGING);
                 return null;
             }
+
+
+
             int getMaxSpeed = Integer.parseInt(road.getElementsByTagName("maxSpeed").item(0).getTextContent());
             if (getMaxSpeed <= 0) {
                 MyLogger.logBeforeLoading("Max speed must be greater than 0, exiting"

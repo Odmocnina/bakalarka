@@ -2,7 +2,7 @@ package core.sim;
 
 import app.AppContext;
 import core.model.Road;
-import core.utils.Constants;
+import core.utils.constants.Constants;
 import core.utils.MyLogger;
 import core.utils.ResultsRecorder;
 

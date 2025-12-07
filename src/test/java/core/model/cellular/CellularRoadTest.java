@@ -2,8 +2,8 @@ package core.model.cellular;
 
 import core.model.CarParams;
 import core.model.Direction;
-import core.utils.Constants;
-import core.utils.RequestConstants;
+import core.utils.constants.Constants;
+import core.utils.constants.RequestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

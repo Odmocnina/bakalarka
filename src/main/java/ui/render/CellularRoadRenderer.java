@@ -3,7 +3,7 @@ package ui.render;
 import app.AppContext;
 import core.model.Road;
 import core.model.cellular.Cell;
-import core.utils.Constants;
+import core.utils.constants.Constants;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;

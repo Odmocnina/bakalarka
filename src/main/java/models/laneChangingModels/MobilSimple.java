@@ -1,8 +1,8 @@
 package models.laneChangingModels;
 
 import core.model.Direction;
-import core.utils.Constants;
-import core.utils.RequestConstants;
+import core.utils.constants.Constants;
+import core.utils.constants.RequestConstants;
 import models.ILaneChangingModel;
 
 import java.util.HashMap;
