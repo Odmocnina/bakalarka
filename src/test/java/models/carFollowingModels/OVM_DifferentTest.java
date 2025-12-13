@@ -29,7 +29,7 @@ class OVM_DifferentTest {
         p.put(RequestConstants.MAX_SPEED_REQUEST, 30.0);
         p.put(RequestConstants.X_POSITION_REQUEST, 100.0);
         p.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, 130.0); // gap 130 - 100 - 4 = 26
-        p.put(RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST, 0.5);
+        p.put(RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.5);
         p.put(RequestConstants.MAX_ROAD_SPEED_REQUEST, 30.0);
         p.put(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 4.0);
         p.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, 4.0);
@@ -124,7 +124,7 @@ class OVM_DifferentTest {
         );
 
         double minGap = p.get(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST);
-        double sensitivity = p.get(RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST);
+        double sensitivity = p.get(RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST);
         double maxSpeedRoad = p.get(RequestConstants.MAX_ROAD_SPEED_REQUEST);
 
         // expected optimalVelocity using OVM_Different formula

@@ -326,7 +326,16 @@ public class CellularRoad extends Road {
                 parameters.put(param, (double) Constants.NO_LANE_THERE);
                 return;
             }
-            parameters.put(param, Constants.NO_CAR_THERE);
+
+            if (orientation == Orientation.FORWARD && !super.isLaneGreen(car.lane)) {
+                if (wantedParam.equals(RequestConstants.X_POSITION_REQUEST)) {
+                    parameters.put(param, (double) this.numberOfCells);
+                } else {
+                    parameters.put(param, 0.0);
+                }
+            } else {
+                parameters.put(param, Constants.NO_CAR_THERE);
+            }
         }
     }
 

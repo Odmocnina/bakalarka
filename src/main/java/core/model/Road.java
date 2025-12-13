@@ -36,7 +36,10 @@ public abstract class Road {
 
     public int id;
 
-    protected LightPlan[] lightPlansOnLanes = null;
+    protected LightPlan[] lightPlansOnLanes = {
+            new LightPlan(90, 40, true),
+            new LightPlan(90, 40, true),
+    };
 
     /**
      * constructor for road, initializing its basic properties, used in constructors of subclasses
@@ -222,6 +225,19 @@ public abstract class Road {
 
     public CarGenerator getCarGenerator() {
         return this.generators[0];
+    }
+
+    public boolean isLaneGreen(int lane) {
+        if (lane < 0 || lane >= lightPlansOnLanes.length) {
+            return true;
+        }
+        return lightPlansOnLanes[lane].isGreen();
+    }
+
+    public void updateLights(int currentTime) {
+        for (LightPlan lp : lightPlansOnLanes) {
+            lp.tryToSwitchLight(currentTime);
+        }
     }
 
 

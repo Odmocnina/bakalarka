@@ -48,7 +48,7 @@ public class FVDM extends OVM_Different {
                 RequestConstants.X_POSITION_REQUEST,
                 RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
                 RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
-                RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
                 RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST,
                 RequestConstants.MAX_ROAD_SPEED_REQUEST,
                 RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST,
@@ -70,7 +70,7 @@ public class FVDM extends OVM_Different {
         String[] requests = {
                 RequestConstants.MAX_SPEED_REQUEST,
                 RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
-                RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
                 RequestConstants.LENGTH_REQUEST,
                 RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST
         };

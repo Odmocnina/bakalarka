@@ -326,7 +326,15 @@ public class ContinuosRoad extends Road {
         if (otherCar != null) {
             parameters.put(param, otherCar.getParameter(wantedParam));
         } else {
-            parameters.put(param, Constants.NO_CAR_THERE);
+            if (orientation == Orientation.FORWARD && !super.isLaneGreen(car.lane)) {
+                if (wantedParam.equals(RequestConstants.X_POSITION_REQUEST)) {
+                    parameters.put(param, super.length);
+                } else {
+                    parameters.put(param, 0.0);
+                }
+            } else {
+                parameters.put(param, Constants.NO_CAR_THERE);
+            }
         }
     }
 

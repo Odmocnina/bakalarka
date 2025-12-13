@@ -41,7 +41,7 @@ public class Helly implements ICarFollowingModel {
         }
 
         double speedDifferenceSensitivityParameter = parameters.get(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST);
-        double distanceDifferenceSensitivityParameter = parameters.get(RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST);
+        double distanceDifferenceSensitivityParameter = parameters.get(RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST);
         double minimumGapToNextCar = parameters.get(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST);
         double maxSpeed = parameters.get(RequestConstants.MAX_SPEED_REQUEST);
 
@@ -76,7 +76,7 @@ public class Helly implements ICarFollowingModel {
                 RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST,
                 RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
                 RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST,
-                RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST
+                RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST
         };
 
         return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
@@ -92,7 +92,7 @@ public class Helly implements ICarFollowingModel {
         String[] requests = {
                 RequestConstants.MAX_SPEED_REQUEST,
                 RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
-                RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
                 RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST,
                 RequestConstants.LENGTH_REQUEST
         };

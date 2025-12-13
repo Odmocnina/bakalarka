@@ -103,31 +103,14 @@ public class Window extends Application {
 
         // Configuration bar
 
-      /*  TabPane configTabs = new TabPane();
-        configTabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE); // aby nešly zavírat
-
-        TabCreator tc = new TabCreator();
-
-        Tab generatorTab = null;//createGeneratorTab();
-        Tab runDetailsTab = tc.createRunDetailsTab(configXml, infoLabel);
-        Tab modelsTab = null;//createModelsTab();
-        Tab roadsTab = tc.createRoadConfigTab(configXml);
-
-        configTabs.getTabs().addAll(runDetailsTab, roadsTab);
-
-// top: info label + konfigurační taby
-        VBox topPane = new VBox(infoLabel, configTabs);
-        topPane.setSpacing(5);*/
-
-        Button runDetailsBtn = createIconButton("/icons/road.png", "Run details");
-        Button roadsBtn      = createIconButton("/icons/changeLane.png", "Road configuration");
+        Button createMapButton = createIconButton("/icons/road.png", "Create new map");
+        Button roadsBtn = createIconButton("/icons/changeLane.png", "Road configuration");
         Button changeLaneBtn     = createIconButton("/icons/changeLane.png", "Lane change ban");
         Button generatorBtn  = createIconButton("/icons/road.png", "Generator");
 
-        // sem si pak dáš reálné akce – zatím placeholder
-        runDetailsBtn.setOnAction(e -> {
-            // TODO: otevřít okno / dialog s nastavením "Run details"
-            System.out.println("Run details clicked");
+        createMapButton.setOnAction(e -> {
+            MyLogger.log("Creating new map pressed...", Constants.INFO_FOR_LOGGING);
+            DialogMaker.newMapDialog(primaryStage);
         });
 
         roadsBtn.setOnAction(e -> {
@@ -147,7 +130,7 @@ public class Window extends Application {
 
         ToolBar configToolbar = new ToolBar(
                 generatorBtn,
-                runDetailsBtn,
+                createMapButton,
                 changeLaneBtn,
                 roadsBtn
         );

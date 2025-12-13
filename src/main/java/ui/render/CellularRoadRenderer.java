@@ -55,6 +55,13 @@ public class CellularRoadRenderer implements IRoadRenderer {
         for (int lane = 0; lane < lanes; lane++) {
             double y = offsetY + lane * cellSize;
 
+            if (road.isLaneGreen(lane)) {
+                gc.setFill(Color.LIGHTGREEN);
+            } else {
+                gc.setFill(Color.RED);
+            }
+            gc.fillRect(roadWidthPx, y, cellSize, cellSize);
+
             for (int col = cols - 1; col >= 0; col--) {
                 Cell cell = cells[lane][col];
                 if (cell == null) {

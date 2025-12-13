@@ -33,7 +33,7 @@ public class OVM_Original implements ICarFollowingModel {
             distance = xPositionStraightForward - xPosition - lengthStraightForward;
         }
         double distanceDifferenceSensitivityParameter =
-                parameters.get(RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST);
+                parameters.get(RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST);
 
         double optimalVelocity = optimalVelocity(distance, maxSpeedRoad, minGap);
         double newSpeed = currentSpeed + distanceDifferenceSensitivityParameter * (optimalVelocity - currentSpeed);
@@ -64,7 +64,7 @@ public class OVM_Original implements ICarFollowingModel {
                 RequestConstants.MAX_SPEED_REQUEST,
                 RequestConstants.X_POSITION_REQUEST,
                 RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
-                RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
                 RequestConstants.MAX_ROAD_SPEED_REQUEST,
                 RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST,
                 RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST
@@ -83,7 +83,7 @@ public class OVM_Original implements ICarFollowingModel {
     public String getParametersForGeneration() {
         String[] requests = {
                 RequestConstants.MAX_SPEED_REQUEST,
-                RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
                 RequestConstants.LENGTH_REQUEST,
                 RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST
         };

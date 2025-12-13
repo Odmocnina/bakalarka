@@ -5,7 +5,7 @@
 
     <models>
         <carFollowingModel>
-            <id>head-leading</id>
+            <id>nagelschreckenberg</id>
         </carFollowingModel>
         <laneChangingModel>
             <id>stca</id>
@@ -74,6 +74,6 @@
             <file>output/simulationKKWQ.csv</file>
             <type>csv</type>
         </output>
-        <timeBetweenSteps>100</timeBetweenSteps>
+        <timeBetweenSteps>1000</timeBetweenSteps>
     </runDetails>
 </config>

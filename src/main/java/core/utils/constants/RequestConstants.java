@@ -30,8 +30,10 @@ public class RequestConstants {
     public static final String DISTANCE_TO_PREVIOUS_CAR_LEFT_REQUEST = "distanceToPreviousCarLeft";
     public static final String DISTANCE_TO_PREVIOUS_CAR_RIGHT_REQUEST = "distanceToPreviousCarRight";
     public static final String LENGTH_REQUEST = "length";
-    public static final String DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST = "distanceDifferenceSensitivity";
+    public static final String DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST = "distanceDifferenceSensitivity";
     public static final String SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST = "speedDifferenceSensitivity";
+
+    // parameters of specific direction and orientation (different cars)
     public static final String CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST = CURRENT_SPEED_REQUEST + SUBREQUEST_SEPARATOR
             + STRAIGHT + SUBREQUEST_SEPARATOR + FORWARD;
     public static final String CURRENT_SPEED_STRAIGHT_BACKWARDS_REQUEST = CURRENT_SPEED_REQUEST + SUBREQUEST_SEPARATOR

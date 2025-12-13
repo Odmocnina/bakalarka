@@ -30,7 +30,7 @@ class FVDMTest {
         params.put(RequestConstants.X_POSITION_REQUEST, 100.0);              // x
         params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, 120.0); // x_l
         params.put(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.5); // λ
-        params.put(RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6); // α
+        params.put(RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.6); // α
         params.put(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST, 25.0); // v_l
         params.put(RequestConstants.MAX_ROAD_SPEED_REQUEST, 33.33);
         params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, 4.5);
@@ -104,7 +104,7 @@ class FVDMTest {
                 RequestConstants.X_POSITION_REQUEST,
                 RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
                 RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
-                RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
                 RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST,
                 RequestConstants.MAX_ROAD_SPEED_REQUEST,
                 RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST,
@@ -126,7 +126,7 @@ class FVDMTest {
         String[] expectedRequests = {
                 RequestConstants.MAX_SPEED_REQUEST,
                 RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
-                RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
                 RequestConstants.LENGTH_REQUEST,
                 RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST
         };

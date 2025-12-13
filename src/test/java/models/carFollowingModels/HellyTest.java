@@ -24,7 +24,7 @@ class HellyTest {
         params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, 4.0);
         params.put(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST, 25.0); // v_l
         params.put(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.5); // lambda
-        params.put(RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST, 0.2); // alpha
+        params.put(RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.2); // alpha
         params.put(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 2.0);
         params.put(RequestConstants.LENGTH_REQUEST, 4.0);
 
@@ -102,7 +102,7 @@ class HellyTest {
         params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, 101.0); // very small gap
         params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, 4.0);
         params.put(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 50.0);
-        params.put(RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST, 10.0);
+        params.put(RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 10.0);
 
         double result = helly.getNewSpeed(params);
 
@@ -148,7 +148,7 @@ class HellyTest {
                 RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST,
                 RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
                 RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST,
-                RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST
+                RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST
         };
 
         String expected = String.join(RequestConstants.REQUEST_SEPARATOR, expectedList);
@@ -167,7 +167,7 @@ class HellyTest {
         String[] expectedList = {
                 RequestConstants.MAX_SPEED_REQUEST,
                 RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
-                RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
                 RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST,
                 RequestConstants.LENGTH_REQUEST
         };

@@ -28,4 +28,8 @@ public class LightPlan {
         }
     }
 
+    public boolean isGreen() {
+        return isGreen;
+    }
+
 }

@@ -70,13 +70,19 @@ public class ContinuousRoadRenderer implements IRoadRenderer {
             double y = offsetY + i * laneHpx;
 
             // lane
+            double laneLength = roadWidthPx * widthMultiplayer;
             gc.setFill(Constants.ROAD_COLOR);
-            gc.fillRect(offsetX, y, roadWidthPx * widthMultiplayer, laneHpx);
+            gc.fillRect(offsetX, y, laneLength, laneHpx);
 
-
-            if (AppContext.SIMULATION.getStepCount() > 10) {
-                int oi = 0;
+            if (road.isLaneGreen(i)) {
+                gc.setFill(Color.LIGHTGREEN);
+            } else {
+                gc.setFill(Color.RED);
             }
+            gc.fillRect(laneLength, y, laneHpx, laneHpx);
+
+            gc.setFill(Constants.ROAD_COLOR);
+
             // cars in lane on index i
             Iterator<CarParams> it = vehicles[i].iterator();
             while (it.hasNext()) {

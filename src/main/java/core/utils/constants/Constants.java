@@ -20,7 +20,7 @@ public class Constants {
     public static final double LANE_WIDTH = 3.5; // in meters
     public static final int NO_LANE_THERE = -2;
     public static final Color[] CAR_COLORS = {
-            Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.ORANGE,
+            Color.DARKRED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.ORANGE,
             Color.PURPLE, Color.PINK, Color.BROWN, Color.CYAN, Color.MAGENTA
     };
     public static final double CONTINOUS_ROAD_DRAWING_SCALE_FACTOR = 2.0;

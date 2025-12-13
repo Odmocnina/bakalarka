@@ -30,7 +30,7 @@ class OVM_OriginalTest {
         params.put(RequestConstants.MAX_SPEED_REQUEST, 25.0);                 // driver max speed
         params.put(RequestConstants.X_POSITION_REQUEST, 100.0);               // x
         params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, 120.0); // x_l
-        params.put(RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST, 0.5);
+        params.put(RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 0.5);
         params.put(RequestConstants.MAX_ROAD_SPEED_REQUEST, 30.0);           // road max speed
         params.put(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 2.0);   // minGap
         params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, 4.0);   // length of car ahead
@@ -76,7 +76,7 @@ class OVM_OriginalTest {
         double maxSpeed = Math.min(maxSpeedDriver, maxSpeedRoad);
         double minGap = params.get(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST);
         double lengthL = params.get(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST);
-        double sensitivity = params.get(RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST);
+        double sensitivity = params.get(RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST);
 
         // distance to next car
         double distance = xL - x - lengthL;
@@ -138,7 +138,7 @@ class OVM_OriginalTest {
         params.put(RequestConstants.X_POSITION_REQUEST, 100.0);
         params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, 108.0); // distance = 108 - 100 - 4 = 4
         params.put(RequestConstants.CURRENT_SPEED_REQUEST, 10.0); // large current speed
-        params.put(RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST, 1.0);
+        params.put(RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, 1.0);
         params.put(RequestConstants.MAX_SPEED_REQUEST, 50.0);
         params.put(RequestConstants.MAX_ROAD_SPEED_REQUEST, 50.0);
         params.put(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, 2.0);
@@ -149,7 +149,7 @@ class OVM_OriginalTest {
         double distance = xL - x - lengthL; // 4
 
         double currentSpeed = params.get(RequestConstants.CURRENT_SPEED_REQUEST);
-        double sensitivity = params.get(RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST);
+        double sensitivity = params.get(RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST);
         double minGap = params.get(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST);
         double maxSpeed = Math.min(
                 params.get(RequestConstants.MAX_SPEED_REQUEST),
@@ -186,7 +186,7 @@ class OVM_OriginalTest {
                 RequestConstants.MAX_SPEED_REQUEST,
                 RequestConstants.X_POSITION_REQUEST,
                 RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
-                RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
                 RequestConstants.MAX_ROAD_SPEED_REQUEST,
                 RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST,
                 RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST
@@ -207,7 +207,7 @@ class OVM_OriginalTest {
 
         String[] expectedRequests = {
                 RequestConstants.MAX_SPEED_REQUEST,
-                RequestConstants.DISTANCE_DIFFRENCE_SENSITIVITY_PARAMETER_REQUEST,
+                RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST,
                 RequestConstants.LENGTH_REQUEST,
                 RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST
         };

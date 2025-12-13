@@ -2,5 +2,5 @@
 <road>
     <maxSpeed>14</maxSpeed>
     <lanes>2</lanes>
-    <roadLength>2000</roadLength>
+    <roadLength>20</roadLength>
 </road>

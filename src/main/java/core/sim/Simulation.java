@@ -53,6 +53,7 @@ public class Simulation {
         }
 
         this.stepCount++;
+        this.updateLights();
 
         // Stop the timer if writing results and the simulation duration has been reached
         boolean shouldRun = this.stepCount >= (AppContext.RUN_DETAILS.duration - 1) && this.running;
@@ -126,6 +127,12 @@ public class Simulation {
             }
         }
         return true;
+    }
+
+    private void updateLights() {
+        for (Road road : roads) {
+            road.updateLights(this.stepCount);
+        }
     }
 
     public double getFlowRate() {
