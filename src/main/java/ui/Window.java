@@ -103,36 +103,90 @@ public class Window extends Application {
 
         // Configuration bar
 
-        Button createMapButton = createIconButton("/icons/road.png", "Create new map");
-        Button roadsBtn = createIconButton("/icons/changeLane.png", "Road configuration");
-        Button changeLaneBtn     = createIconButton("/icons/changeLane.png", "Lane change ban");
-        Button generatorBtn  = createIconButton("/icons/road.png", "Generator");
+        MenuItem itemNewFile = new MenuItem("New map file", createMenuIcon("/icons/newMapFile.png"));
+        MenuItem itemEditFile = new MenuItem("Modify current map file", createMenuIcon("/icons/editMapFile.png"));
+        MenuItem itemOpenFile = new MenuItem("Open map file", createMenuIcon("/icons/openMapFile.png"));
+        MenuItem itemSaveFile = new MenuItem("Save map file", createMenuIcon("/icons/saveMapFile.png"));
+        MenuItem itemSaveAsFile = new MenuItem("Save map file as...", createMenuIcon("/icons/saveAsMapFile.png"));
 
-        createMapButton.setOnAction(e -> {
+        itemNewFile.setOnAction(e -> {
             MyLogger.log("Creating new map pressed...", Constants.INFO_FOR_LOGGING);
             DialogMaker.newMapDialog(primaryStage);
         });
 
-        roadsBtn.setOnAction(e -> {
-            // TODO: otevřít nastavení silnic
-            System.out.println("Roads config clicked");
+        itemEditFile.setOnAction(e -> {
+            MyLogger.log("Modifying map file...", Constants.INFO_FOR_LOGGING);
+
         });
+
+        itemOpenFile.setOnAction(e -> {
+            MyLogger.log("Opening map file...", Constants.INFO_FOR_LOGGING);
+
+        });
+
+        itemSaveFile.setOnAction(e -> {
+            MyLogger.log("Saving map file...", Constants.INFO_FOR_LOGGING);
+
+        });
+
+        itemSaveAsFile.setOnAction(e -> {
+            MyLogger.log("Saving map file as...", Constants.INFO_FOR_LOGGING);
+
+        });
+
+        MenuButton fileMenuBtn = new MenuButton("Map file", null, itemNewFile, itemEditFile, itemOpenFile,
+                itemSaveFile, itemSaveAsFile);
+        fileMenuBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+
+        Button newMapFileBtn = createIconButton("/icons/newMapFile.png", "New map file");
+        Button editMapFileBtn = createIconButton("/icons/editMapFile.png", "Modify current map file");
+        Button openMapFileBtn = createIconButton("/icons/openMapFile.png", "Open map file");
+        Button saveMapFileBtn = createIconButton("/icons/saveMapFile.png", "Save map file");
+        Button saveAsMapFileBtn = createIconButton("/icons/saveAsMapFile.png", "Save map file as...");
+        Button changeLaneBtn = createIconButton("/icons/changeLane.png", "Lane change ban");
+        Button startStopBtn = createIconButton("/icons/run.png", "Start/Stop simulation");
+
+        fileMenuBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+        changeLaneBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+        editMapFileBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+        newMapFileBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+        openMapFileBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+        saveMapFileBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+        saveAsMapFileBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+        startStopBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
 
         changeLaneBtn.setOnAction(e -> {
             ConfigModificator.changeLaneChangeBan();
             System.out.println("Change lane change clicked");
         });
 
-        generatorBtn.setOnAction(e -> {
-            // TODO: otevřít nastavení generátoru
-            System.out.println("Generator clicked");
+        newMapFileBtn.setOnAction(e -> {
+            MyLogger.log("Creating new map pressed...", Constants.INFO_FOR_LOGGING);
+            DialogMaker.newMapDialog(primaryStage);
         });
 
+        startStopBtn.setOnAction(e -> {
+            if (engine.getRunning()) {
+                setButtonImage("/icons/run.png", startStopBtn);
+                engine.stop();
+                statusLabel.setText(STATUS_STOPPED_BUTTON_TEXT);
+            } else {
+                setButtonImage("/icons/stop.png", startStopBtn);
+                engine.start();
+                statusLabel.setText(STATUS_RUNNING_BUTTON_TEXT);
+            }
+        });
+
+
         ToolBar configToolbar = new ToolBar(
-                generatorBtn,
-                createMapButton,
-                changeLaneBtn,
-                roadsBtn
+                fileMenuBtn,
+                startStopBtn,
+                newMapFileBtn,
+                editMapFileBtn,
+                openMapFileBtn,
+                saveMapFileBtn,
+                saveAsMapFileBtn,
+                changeLaneBtn
         );
 
         // top: info label + toolbar
@@ -381,6 +435,33 @@ public class Window extends Application {
         button.setFocusTraversable(false);  // aby se to furt nefokusovalo tabem
 
         return button;
+    }
+
+    private void setButtonImage(String resourcePath, Button button) {
+        Image image = new Image(
+                getClass().getResourceAsStream(resourcePath)
+        );
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(16);
+        imageView.setFitHeight(16);
+        imageView.setPreserveRatio(true);
+
+        button.setGraphic(imageView);
+    }
+
+    private ImageView createMenuIcon(String resourcePath) {
+        // Ošetření pro případ, že obrázek neexistuje, aby program nespadl
+        if (getClass().getResourceAsStream(resourcePath) == null) {
+            MyLogger.log("Icon resource not found: " + resourcePath, Constants.ERROR_FOR_LOGGING);
+            return null;
+        }
+
+        Image image = new Image(getClass().getResourceAsStream(resourcePath));
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(16);
+        imageView.setFitHeight(16);
+        imageView.setPreserveRatio(true);
+        return imageView;
     }
 
 

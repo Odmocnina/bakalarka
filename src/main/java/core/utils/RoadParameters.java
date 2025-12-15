@@ -1,7 +1,10 @@
 package core.utils;
 
+import core.model.LightPlan;
+
 public class RoadParameters {
-    public static double maxSpeed;
-    public static double length;
-    public static int lanes;
+    public double maxSpeed;
+    public double length;
+    public int lanes;
+    public LightPlan[] lightPlan;
 }

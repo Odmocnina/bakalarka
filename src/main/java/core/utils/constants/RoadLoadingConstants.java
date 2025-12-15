@@ -11,5 +11,9 @@ public class RoadLoadingConstants {
     public static final String LIGHT_PLAN_TAG = "lightPlan";
     public static final String GENERATOR_TAG = "generator";
     public static final String NUMBER_OF_LANES_TAG = "numberOfLanes";
+    public static final String CYCLE_DURATION_TAG = "cycleDuration";
+    public static final String TIME_OF_SWITCH_TAG = "timeOfSwitch";
+    public static final String START_WITH_GREEN_TAG = "startWithGreen";
+
 
 }

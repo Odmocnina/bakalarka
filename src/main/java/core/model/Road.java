@@ -240,6 +240,16 @@ public abstract class Road {
         }
     }
 
+    public void setLightPlan(LightPlan[] lightPlans) {
+        this.lightPlansOnLanes = lightPlans;
+    }
+
+    public void setLightPlan(int lane, LightPlan lightPlan) {
+        if (lane >= 0 && lane < lightPlansOnLanes.length) {
+            this.lightPlansOnLanes[lane] = lightPlan;
+        }
+    }
+
 
 
 

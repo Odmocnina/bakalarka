@@ -26,6 +26,9 @@ public class DefaultValues {
     public static final double DEFAULT_ROAD_MAX_SPEED = 14.0; // m/s (~50 km/h)
     public static final int DEFAULT_ROAD_LENGTH = 1000; // meters
     public static final int DEFAULT_ROAD_LANES = 3;
+    public static final int DEFAULT_LIGHT_PLAN_CYCLE_DURATION = 60; // seconds
+    public static final int DEFAULT_LIGHT_PLAN_GREEN_DURATION = 30; // seconds
+    public static final boolean DEFAULT_LIGHT_PLAN_START_WITH_GREEN = true;
 
     public static final double DEFAULT_FLOW_RATE = 0.2;
     public static final CarGenerator DEFAULT_CAR_GENERATOR = new CarGenerator(DEFAULT_FLOW_RATE) {{

@@ -1,5 +1,6 @@
 package core.utils;
 
+import core.model.LightPlan;
 import core.utils.constants.Constants;
 import core.utils.constants.DefaultValues;
 import core.utils.constants.RoadLoadingConstants;
@@ -20,8 +21,7 @@ import java.util.ArrayList;
 
 public class RoadXml {
 
-    public static void writeMapToXml(ArrayList<Double> lengths, ArrayList<Double> speeds,
-                                     ArrayList<Integer> numberOfLanes, int numberOfRoads, String mapFileName) {
+    public static void writeMapToXml(ArrayList<RoadParameters> roadParameters, int numberOfRoads, String mapFileName) {
 
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -32,11 +32,12 @@ public class RoadXml {
 
             for (int i = 0; i < numberOfRoads; i++) {
                 // getting values from fields
-                int lanes = numberOfLanes.get(i);
-                String lengthText = String.valueOf(lengths.get(i));
-                String speedText = String.valueOf(speeds.get(i));
+                int lanes = roadParameters.get(i).lanes;
+                String lengthText = String.valueOf(roadParameters.get(i).length);
+                String speedText = String.valueOf(roadParameters.get(i).maxSpeed);
+                LightPlan[] lp = roadParameters.get(i).lightPlan;
 
-                processRoad(lanes, lengthText, speedText, doc, rootElement, i);
+                processRoad(lanes, lengthText, speedText, lp, doc, rootElement, i);
             }
 
             // writing the content into xml file
@@ -59,8 +60,8 @@ public class RoadXml {
         }
     }
 
-    private static void processRoad(int lanes, String lengthText, String speedText, Document doc, Element rootElement,
-                                    int i) {
+    private static void processRoad(int lanes, String lengthText, String speedText, LightPlan[] lp, Document doc,
+                                    Element rootElement, int i) {
 
         double length = 0;
         double speed = 0;
@@ -101,12 +102,38 @@ public class RoadXml {
                     " default value.", Constants.ERROR_FOR_LOGGING);
         }
 
+        if (lp == null) {
+            lp = new LightPlan[lanes];
+            for (int j = 0; j < lanes; j++) {
+                lp[j] = new LightPlan(DefaultValues.DEFAULT_LIGHT_PLAN_CYCLE_DURATION,
+                        DefaultValues.DEFAULT_LIGHT_PLAN_GREEN_DURATION,
+                        DefaultValues.DEFAULT_LIGHT_PLAN_START_WITH_GREEN);
+            }
+            MyLogger.logBeforeLoading("No light plan defined for road: " + (i + 1) + ", setting to default " +
+                    "value.", Constants.ERROR_FOR_LOGGING);
+        }
 
-        addRoadToXml(lanes, length, speed, doc, rootElement, i);
+        for (int lane = 0; lane < lp.length; lane++) {
+            if (lp[lane] == null) {
+                lp[lane] = new LightPlan(DefaultValues.DEFAULT_LIGHT_PLAN_CYCLE_DURATION,
+                        DefaultValues.DEFAULT_LIGHT_PLAN_GREEN_DURATION,
+                        DefaultValues.DEFAULT_LIGHT_PLAN_START_WITH_GREEN);
+                MyLogger.logBeforeLoading("No light plan defined for lane: " + (lane + 1) + " in road: " + (i + 1) +
+                        ", setting to default value.", Constants.ERROR_FOR_LOGGING);
+            } else if (!lp[lane].isLegitimate()) {
+                lp[lane] = new LightPlan(DefaultValues.DEFAULT_LIGHT_PLAN_CYCLE_DURATION,
+                        DefaultValues.DEFAULT_LIGHT_PLAN_GREEN_DURATION,
+                        DefaultValues.DEFAULT_LIGHT_PLAN_START_WITH_GREEN);
+                MyLogger.logBeforeLoading("Wrong light plan defined for road: " + (i + 1) + ", setting to default " +
+                        "value.", Constants.ERROR_FOR_LOGGING);
+            }
+        }
+
+        addRoadToXml(lanes, length, speed, lp, doc, rootElement, i);
     }
 
-    private static void addRoadToXml(int numberOfLanes, double length, double speed, Document doc, Element rootElement,
-                                     int index) {
+    private static void addRoadToXml(int numberOfLanes, double length, double speed, LightPlan[] lp, Document doc,
+                                     Element rootElement, int index) {
         Element roadElement = doc.createElement(RoadLoadingConstants.ROAD_TAG);
         rootElement.appendChild(roadElement);
 
@@ -133,6 +160,17 @@ public class RoadXml {
             laneElement.appendChild(generatorElement);
             Element lightPlanElement = doc.createElement(RoadLoadingConstants.LIGHT_PLAN_TAG);
             laneElement.appendChild(lightPlanElement);
+
+            // write light plan to XML
+            Element lightPlanCycleDurationElement = doc.createElement(RoadLoadingConstants.CYCLE_DURATION_TAG);
+            lightPlanElement.appendChild(lightPlanCycleDurationElement);
+            lightPlanCycleDurationElement.appendChild(doc.createTextNode(String.valueOf(lp[lane].getCycleTime())));
+            Element lightPlanTimeOfSwitchElement = doc.createElement(RoadLoadingConstants.TIME_OF_SWITCH_TAG);
+            lightPlanElement.appendChild(lightPlanTimeOfSwitchElement);
+            lightPlanTimeOfSwitchElement.appendChild(doc.createTextNode(String.valueOf(lp[lane].getTimeOfSwitch())));
+            Element lightPlanStartWithGreenElement = doc.createElement(RoadLoadingConstants.START_WITH_GREEN_TAG);
+            lightPlanElement.appendChild(lightPlanStartWithGreenElement);
+            lightPlanStartWithGreenElement.appendChild(doc.createTextNode(String.valueOf(lp[lane].isBeginsOnGreen())));
 
             roadElement.appendChild(laneElement);
         }

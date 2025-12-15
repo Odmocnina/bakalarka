@@ -28,8 +28,40 @@ public class LightPlan {
         }
     }
 
+    public boolean isLegitimate() {
+        if (timeOfSwitch >= cycleTime) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public boolean isGreen() {
         return isGreen;
+    }
+
+    public int getCycleTime() {
+        return cycleTime;
+    }
+
+    public int getTimeOfSwitch() {
+        return timeOfSwitch;
+    }
+
+    public boolean isBeginsOnGreen() {
+        return beginsOnGreen;
+    }
+
+    public void setBeginsOnGreen(boolean beginsOnGreen) {
+        this.beginsOnGreen = beginsOnGreen;
+    }
+
+    public void setCycleTime(int cycleTime) {
+        this.cycleTime = cycleTime;
+    }
+
+    public void setTimeOfSwitch(int timeOfSwitch) {
+        this.timeOfSwitch = timeOfSwitch;
     }
 
 }
