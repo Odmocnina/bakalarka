@@ -59,7 +59,7 @@ public class CellularRoad extends Road {
         }
 
         // first test of occupied cells, DELETE LATER
-       cells[0][5].setOccupied(true);
+      /* cells[0][5].setOccupied(true);
         CarParams carParams = new CarParams();
         carParams.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
         carParams.setParameter(RequestConstants.MAX_SPEED_REQUEST, 1.0);
@@ -80,7 +80,7 @@ public class CellularRoad extends Road {
         carParams.setParameter(RequestConstants.LENGTH_REQUEST, 2);
         carParams.color = Constants.CAR_COLORS[0];
         cells[0][1].setCarParams(carParams);
-        cells[0][1].setHead(true);
+        cells[0][1].setHead(true);*/
 
     }
 
@@ -188,6 +188,10 @@ public class CellularRoad extends Road {
 
                     if (newSpeed > this.speedLimitInCells) {
                         newSpeed = this.speedLimitInCells;
+                    }
+
+                    if (AppContext.RUN_DETAILS.preventCollisions) {
+                        newSpeed = resolveCollisions(cells[lane][position].getCarParams(), (int) newSpeed);
                     }
 
                     if (isCarAtEnd(cells[lane][position].getCarParams(), (int) newSpeed)) {
@@ -476,7 +480,7 @@ public class CellularRoad extends Road {
      *
      * @param car CarParams of the car to be placed
      * @param length length of the car in cells (used to determine position of head and -1 because of zero indexing
-     *               shinanigans)
+     *               shenanigans)
      * @param lane lane number where the car is to be placed
      **/
     @Override
@@ -627,6 +631,13 @@ public class CellularRoad extends Road {
         return Direction.STRAIGHT;
     }
 
+    /**
+     * function to resolve collisions for a car given its new speed, if they happen
+     *
+     * @param car CarParams of the car to check for collisions
+     * @param newSpeed new speed of the car
+     * @return adjusted speed to avoid collisions
+     **/
     private int resolveCollisions(CarParams car, int newSpeed) {
         int lane = car.lane;
         int oldX = (int) car.xPosition;

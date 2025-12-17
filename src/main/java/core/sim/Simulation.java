@@ -15,7 +15,7 @@ import core.utils.ResultsRecorder;
 public class Simulation {
 
     /** array of roads in the simulation **/
-    private final Road[] roads;
+    private Road[] roads;
 
     /** current step count of the simulation **/
     private int stepCount = 0;
@@ -137,5 +137,9 @@ public class Simulation {
 
     public double getFlowRate() {
         return roads[0].getCarGenerator().getLambdaPerSec();
+    }
+
+    public void setRoads(Road[] roads) {
+        this.roads = roads;
     }
 }

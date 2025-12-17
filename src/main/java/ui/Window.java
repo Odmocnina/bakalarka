@@ -7,10 +7,12 @@ import core.model.cellular.Cell;
 import core.model.cellular.CellularRoad;
 import core.utils.*;
 import core.utils.constants.Constants;
+import core.utils.loading.RoadLoader;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
 import ui.render.IRoadRenderer;
 import core.sim.Simulation;
 
@@ -25,6 +27,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+
+import java.io.File;
 import java.util.LinkedList;
 
 /********************************************
@@ -63,6 +67,8 @@ public class Window extends Application {
         this.renderer = AppContext.RENDERER;
         this.configXml = AppContext.CONFIG_XML;
 
+        //set up stuff inf the window
+
         // canvas for drawing
         Canvas canvas = new Canvas();
         Pane canvasPane = new Pane(canvas);
@@ -72,6 +78,7 @@ public class Window extends Application {
         // Scrollbars for navigation
         hScroll = new ScrollBar();
         hScroll.setOrientation(Orientation.HORIZONTAL);
+        hScroll.prefWidthProperty().bind(canvasPane.widthProperty());
         vScroll = new ScrollBar();
         vScroll.setOrientation(Orientation.VERTICAL);
 
@@ -80,136 +87,10 @@ public class Window extends Application {
         infoLabel.setFont(Font.font("System", FontWeight.BOLD, 12));
         infoLabel.setPadding(new Insets(5, 10, 5, 10));
 
-        final String START_BUTTON_TEXT = "Start";
-        final String STOP_BUTTON_TEXT = "Stop";
-        final String NEXT_STEP_BUTTON_TEXT = "Next step";
-        final String EXPORT_BUTTON_TEXT = "Export results";
-        final String STATUS_RUNNING_BUTTON_TEXT = "State: running";
-        final String STATUS_STOPPED_BUTTON_TEXT = "State: stopped";
         final String WINDOW_TEXT = "Traffic simulator";
 
-        // panel with controls
-        Button btnStart = new Button(START_BUTTON_TEXT);
-        Button btnStop = new Button(STOP_BUTTON_TEXT);
-        Button btnStep = new Button(NEXT_STEP_BUTTON_TEXT);
-        Label statusLabel = new Label(STATUS_STOPPED_BUTTON_TEXT);
-        Button exportBtn = new Button(EXPORT_BUTTON_TEXT);
-
-        HBox controls = new HBox(10, btnStart, exportBtn, btnStop, btnStep, statusLabel);
-        controls.setPadding(new Insets(10));
-
         // VBox to hold scrollbar and controls at the bottom
-        VBox bottomLayout = new VBox(hScroll, controls);
-
-        // Configuration bar
-
-        MenuItem itemNewFile = new MenuItem("New map file", createMenuIcon("/icons/newMapFile.png"));
-        MenuItem itemEditFile = new MenuItem("Modify current map file", createMenuIcon("/icons/editMapFile.png"));
-        MenuItem itemOpenFile = new MenuItem("Open map file", createMenuIcon("/icons/openMapFile.png"));
-        MenuItem itemSaveFile = new MenuItem("Save map file", createMenuIcon("/icons/saveMapFile.png"));
-        MenuItem itemSaveAsFile = new MenuItem("Save map file as...", createMenuIcon("/icons/saveAsMapFile.png"));
-
-        itemNewFile.setOnAction(e -> {
-            MyLogger.log("Creating new map pressed...", Constants.INFO_FOR_LOGGING);
-            DialogMaker.newMapDialog(primaryStage);
-        });
-
-        itemEditFile.setOnAction(e -> {
-            MyLogger.log("Modifying map file...", Constants.INFO_FOR_LOGGING);
-
-        });
-
-        itemOpenFile.setOnAction(e -> {
-            MyLogger.log("Opening map file...", Constants.INFO_FOR_LOGGING);
-
-        });
-
-        itemSaveFile.setOnAction(e -> {
-            MyLogger.log("Saving map file...", Constants.INFO_FOR_LOGGING);
-
-        });
-
-        itemSaveAsFile.setOnAction(e -> {
-            MyLogger.log("Saving map file as...", Constants.INFO_FOR_LOGGING);
-
-        });
-
-        MenuButton fileMenuBtn = new MenuButton("Map file", null, itemNewFile, itemEditFile, itemOpenFile,
-                itemSaveFile, itemSaveAsFile);
-        fileMenuBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-
-        Button newMapFileBtn = createIconButton("/icons/newMapFile.png", "New map file");
-        Button editMapFileBtn = createIconButton("/icons/editMapFile.png", "Modify current map file");
-        Button openMapFileBtn = createIconButton("/icons/openMapFile.png", "Open map file");
-        Button saveMapFileBtn = createIconButton("/icons/saveMapFile.png", "Save map file");
-        Button saveAsMapFileBtn = createIconButton("/icons/saveAsMapFile.png", "Save map file as...");
-        Button changeLaneBtn = createIconButton("/icons/changeLane.png", "Lane change ban");
-        Button startStopBtn = createIconButton("/icons/run.png", "Start/Stop simulation");
-
-        fileMenuBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-        changeLaneBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-        editMapFileBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-        newMapFileBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-        openMapFileBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-        saveMapFileBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-        saveAsMapFileBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-        startStopBtn.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-
-        changeLaneBtn.setOnAction(e -> {
-            ConfigModificator.changeLaneChangeBan();
-            System.out.println("Change lane change clicked");
-        });
-
-        newMapFileBtn.setOnAction(e -> {
-            MyLogger.log("Creating new map pressed...", Constants.INFO_FOR_LOGGING);
-            DialogMaker.newMapDialog(primaryStage);
-        });
-
-        startStopBtn.setOnAction(e -> {
-            if (engine.getRunning()) {
-                setButtonImage("/icons/run.png", startStopBtn);
-                engine.stop();
-                statusLabel.setText(STATUS_STOPPED_BUTTON_TEXT);
-            } else {
-                setButtonImage("/icons/stop.png", startStopBtn);
-                engine.start();
-                statusLabel.setText(STATUS_RUNNING_BUTTON_TEXT);
-            }
-        });
-
-
-        ToolBar configToolbar = new ToolBar(
-                fileMenuBtn,
-                startStopBtn,
-                newMapFileBtn,
-                editMapFileBtn,
-                openMapFileBtn,
-                saveMapFileBtn,
-                saveAsMapFileBtn,
-                changeLaneBtn
-        );
-
-        // top: info label + toolbar
-        VBox topPane = new VBox(infoLabel, configToolbar);
-        topPane.setSpacing(5);
-        topPane.setPadding(new Insets(5, 10, 5, 10));
-
-
-        ////////////////////////////////////////
-
-
-        // main layout of gui
-        BorderPane root = new BorderPane();
-        root.setTop(topPane);
-       // root.setTop(infoLabel);      // Added info label to top
-        root.setCenter(canvasPane);  // Changed to Pane with Canvas
-        root.setRight(vScroll);      // Added vertical scrollbar
-        root.setBottom(bottomLayout);// Controls + Horizontal Scrollbar
-
-        Scene scene = new Scene(root, 1200, 700, Color.LIGHTGRAY);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle(WINDOW_TEXT);
-        primaryStage.show();
+        VBox bottomLayout = new VBox(hScroll, infoLabel);
 
         // part that repaints all roads
         Runnable paintAll = () -> {
@@ -239,9 +120,34 @@ public class Window extends Application {
             }
         };
 
+        MenuBar menuBar = createMenu(primaryStage, paintAll);
+        ToolBar toolBar = createToolBar(primaryStage, paintAll);
+
+
+        // top: info menu + toolbar
+        VBox topPane = new VBox(menuBar, toolBar);
+        topPane.setSpacing(5);
+        topPane.setPadding(new Insets(5, 10, 5, 10));
+
+        // main layout of gui
+        BorderPane root = new BorderPane();
+        root.setTop(topPane);
+       // root.setTop(infoLabel);      // Added info label to top
+        root.setCenter(canvasPane);  // Changed to Pane with Canvas
+        root.setRight(vScroll);      // Added vertical scrollbar
+        root.setBottom(bottomLayout);// Controls + Horizontal Scrollbar
+
+        Scene scene = new Scene(root, 1200, 700, Color.LIGHTGRAY);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle(WINDOW_TEXT);
+        primaryStage.show();
+
         // Listeners for scrollbars to repaint when scrolling
         hScroll.valueProperty().addListener(o -> paintAll.run());
         vScroll.valueProperty().addListener(o -> paintAll.run());
+
+        canvasPane.widthProperty().addListener(obs -> paintAll.run());
+        canvasPane.heightProperty().addListener(obs -> paintAll.run());
 
         // tick of engine - one simulation step and repaint
         Runnable tick = () -> {
@@ -250,28 +156,7 @@ public class Window extends Application {
         };
 
         // engine initialization
-        engine = new CoreEngine(tick, AppContext.RUN_DETAILS.timeBetweenSteps); // 1000 ms per step
-
-        // starting engine when start button is pressed, simulation runs
-        btnStart.setOnAction(e -> {
-            engine.start();
-            statusLabel.setText(STATUS_RUNNING_BUTTON_TEXT);
-        });
-
-        // stopping engine when stop button is pressed, simulation stops
-        btnStop.setOnAction(e -> {
-            engine.stop();
-            statusLabel.setText(STATUS_STOPPED_BUTTON_TEXT);
-        });
-
-        // one simulation step when step button is pressed, manual step
-        btnStep.setOnAction(e -> {
-            simulation.step();
-            paintAll.run();
-        });
-
-        // export results when export button is pressed
-        exportBtn.setOnAction(e -> ResultsRecorder.getResultsRecorder().writeResults());
+        engine = new CoreEngine(tick, AppContext.RUN_DETAILS.timeBetweenSteps);
 
         // first paint
         paintAll.run();
@@ -303,7 +188,7 @@ public class Window extends Application {
             }
 
             neededHeight += lanes * CELL_PIXEL_SIZE + GAP;
-            neededWidth = Math.max(neededWidth, cols * CELL_PIXEL_SIZE);
+            neededWidth = Math.max(neededWidth, (cols + 1) * CELL_PIXEL_SIZE);
         }
 
         this.drawRoads(canvas, gc, roads, GAP, CELL_PIXEL_SIZE, neededWidth, neededHeight);
@@ -361,10 +246,22 @@ public class Window extends Application {
         double maxScrollV = Math.max(0, neededHeight - viewportH);
 
         hScroll.setMax(maxScrollH);
-        hScroll.setVisibleAmount(viewportW);
-
         vScroll.setMax(maxScrollV);
-        vScroll.setVisibleAmount(viewportH);
+
+        // check so that the scroll bars arent funked up
+        if (neededWidth > viewportW) {
+            double visibleH = (viewportW / neededWidth) * maxScrollH;
+            hScroll.setVisibleAmount(visibleH);
+        } else {
+            hScroll.setVisibleAmount(0); // nothing is overflowing
+        }
+
+        if (neededHeight > viewportH) {
+            double visibleV = (viewportH / neededHeight) * maxScrollV;
+            vScroll.setVisibleAmount(visibleV);
+        } else {
+            vScroll.setVisibleAmount(0);
+        }
 
         // Get camera position
         double camX = hScroll.getValue();
@@ -393,7 +290,7 @@ public class Window extends Application {
             }
 
             // info string (kept per road)
-            String info = "Road: " + i + " | Lanes: " + lanes + " | Length: " + road.getLength() + " | Cars on road: " +
+            String info = "Road: " + (i + 1) + " | Lanes: " + lanes + " | Length: " + road.getLength() + " | Cars on road: " +
                     road.getNumberOfCarsOnRoad() + " | Cars passed: " +
                     ResultsRecorder.getResultsRecorder().getCarsPassedOnRoad(i);
             gc.setFill(Color.BLACK);
@@ -437,6 +334,36 @@ public class Window extends Application {
         return button;
     }
 
+    private ToggleButton createIconToggleButton(String resourcePath, String tooltipText) {
+        Image image = new Image(getClass().getResourceAsStream(resourcePath));
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(16);
+        imageView.setFitHeight(16);
+        imageView.setPreserveRatio(true);
+
+        ToggleButton button = new ToggleButton();
+        button.setGraphic(imageView);
+        button.setTooltip(new Tooltip(tooltipText));
+        button.setFocusTraversable(false);
+
+        // default and selected styles
+        String defaultStyle = "-fx-background-color: transparent; -fx-border-color: transparent;";
+        String selectedStyle = "-fx-background-color: #b3d9ff; -fx-border-color: #66a3ff; -fx-border-radius: 3;"; // Zvýraznění (světle modrá)
+
+        button.setStyle(defaultStyle);
+
+        // Listener, that cheges it if its selected or not
+        button.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+            if (isSelected) {
+                button.setStyle(selectedStyle);
+            } else {
+                button.setStyle(defaultStyle);
+            }
+        });
+
+        return button;
+    }
+
     private void setButtonImage(String resourcePath, Button button) {
         Image image = new Image(
                 getClass().getResourceAsStream(resourcePath)
@@ -462,6 +389,145 @@ public class Window extends Application {
         imageView.setFitHeight(16);
         imageView.setPreserveRatio(true);
         return imageView;
+    }
+
+    private ToolBar createToolBar(Stage primaryStage, Runnable paintAll) {
+        String defaultStyle = "-fx-background-color: transparent; -fx-border-color: transparent;";
+
+        Button newMapFileBtn = createIconButton("/icons/newMapFile.png", "New map file");
+        Button editMapFileBtn = createIconButton("/icons/editMapFile.png", "Modify current map file");
+        Button openMapFileBtn = createIconButton("/icons/openMapFile.png", "Open map file");
+        Button saveMapFileBtn = createIconButton("/icons/saveMapFile.png", "Save map file");
+        Button saveAsMapFileBtn = createIconButton("/icons/saveAsMapFile.png", "Save map file as...");
+        ToggleButton changeLaneBtn = createIconToggleButton("/icons/ban.png", "Toggle lane change ban");
+        Button startStopBtn = createIconButton("/icons/run.png", "Start/Stop simulation");
+        Button exportResultsBtn = createIconButton("/icons/export.png", "Export results " +
+                "(current state of simulation)");
+        Button nextStepBtn = createIconButton("/icons/nextStep.png", "Next simulation step");
+
+        changeLaneBtn.setStyle(defaultStyle);
+        editMapFileBtn.setStyle(defaultStyle);
+        newMapFileBtn.setStyle(defaultStyle);
+        openMapFileBtn.setStyle(defaultStyle);
+        saveMapFileBtn.setStyle(defaultStyle);
+        saveAsMapFileBtn.setStyle(defaultStyle);
+        startStopBtn.setStyle(defaultStyle);
+        exportResultsBtn.setStyle(defaultStyle);
+        nextStepBtn.setStyle(defaultStyle);
+
+        newMapFileBtn.setOnAction(e -> {
+            MyLogger.log("Creating new map pressed...", Constants.INFO_FOR_LOGGING);
+            DialogMaker.newMapDialog(primaryStage);
+        });
+
+        startStopBtn.setOnAction(e -> {
+            if (engine.getRunning()) {
+                setButtonImage("/icons/run.png", startStopBtn);
+                engine.stop();
+                MyLogger.log("Simulation stopped via toolbar button", Constants.INFO_FOR_LOGGING);
+            } else {
+                setButtonImage("/icons/stop.png", startStopBtn);
+                engine.start();
+                MyLogger.log("Simulation started via toolbar button", Constants.INFO_FOR_LOGGING);
+            }
+        });
+
+        exportResultsBtn.setOnAction(e -> {
+            ResultsRecorder.getResultsRecorder().writeResults();
+        });
+
+        nextStepBtn.setOnAction(e -> {
+            simulation.step();
+            paintAll.run();
+        });
+
+        changeLaneBtn.setOnAction(e -> {
+            ConfigModificator.changeLaneChangeBan();
+            MyLogger.log("Toggled lane change ban", Constants.INFO_FOR_LOGGING);
+            paintAll.run();
+        });
+
+        openMapFileBtn.setOnAction(e -> {
+            MyLogger.log("Opening map file...", Constants.INFO_FOR_LOGGING);
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Choose map file to open");
+
+            File currentDir = new File(System.getProperty("user.dir"));
+            fileChooser.setInitialDirectory(currentDir);
+
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Map files", "*.xml")
+            );
+
+            File selectedFile = fileChooser.showOpenDialog(primaryStage);
+
+            if (selectedFile != null) {
+                boolean success = RoadLoader.loadMap(selectedFile.getAbsolutePath());
+                if (success) {
+                    MyLogger.log("Map file loaded successfully: " + selectedFile.getAbsolutePath(),
+                            Constants.INFO_FOR_LOGGING);
+                    paintAll.run();
+                } else {
+                    MyLogger.log("Failed to load map file: " + selectedFile.getAbsolutePath(),
+                            Constants.ERROR_FOR_LOGGING);
+                }
+            } else {
+                MyLogger.log("Map file opening cancelled.", Constants.INFO_FOR_LOGGING);
+            }
+        });
+
+        return new ToolBar(
+                startStopBtn,
+                nextStepBtn,
+                newMapFileBtn,
+                editMapFileBtn,
+                openMapFileBtn,
+                saveMapFileBtn,
+                saveAsMapFileBtn,
+                changeLaneBtn,
+                exportResultsBtn
+        );
+    }
+
+    private MenuBar createMenu(Stage primaryStage, Runnable paintAll) {
+        MenuItem itemNewFile = new MenuItem("New map file", createMenuIcon("/icons/newMapFile.png"));
+        MenuItem itemEditFile = new MenuItem("Modify current map file", createMenuIcon("/icons/editMapFile.png"));
+        MenuItem itemOpenFile = new MenuItem("Open map file", createMenuIcon("/icons/openMapFile.png"));
+        MenuItem itemSaveFile = new MenuItem("Save map file", createMenuIcon("/icons/saveMapFile.png"));
+        MenuItem itemSaveAsFile = new MenuItem("Save map file as...", createMenuIcon("/icons/saveAsMapFile.png"));
+
+        itemNewFile.setOnAction(e -> {
+            MyLogger.log("Creating new map pressed...", Constants.INFO_FOR_LOGGING);
+            DialogMaker.newMapDialog(primaryStage);
+        });
+
+        itemEditFile.setOnAction(e -> {
+            MyLogger.log("Modifying map file...", Constants.INFO_FOR_LOGGING);
+
+        });
+
+        itemOpenFile.setOnAction(e -> {
+            MyLogger.log("Opening map file...", Constants.INFO_FOR_LOGGING);
+
+        });
+
+        itemSaveFile.setOnAction(e -> {
+            MyLogger.log("Saving map file...", Constants.INFO_FOR_LOGGING);
+
+        });
+
+        itemSaveAsFile.setOnAction(e -> {
+            MyLogger.log("Saving map file as...", Constants.INFO_FOR_LOGGING);
+
+        });
+
+        Menu fileMenu = new Menu("Map file");
+        fileMenu.getItems().addAll(itemNewFile, itemEditFile, itemOpenFile, itemSaveFile, itemSaveAsFile);
+
+        MenuBar menuBar = new MenuBar();
+        menuBar.getMenus().add(fileMenu);
+
+        return menuBar;
     }
 
 

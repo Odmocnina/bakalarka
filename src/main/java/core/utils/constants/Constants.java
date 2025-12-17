@@ -37,22 +37,4 @@ public class Constants {
     public static final String DEFAULT_OUTPUT_FILE = "output/output.txt";
     public static final String DEFAULT_CSV_SEPARATOR = ";";
 
-    // stock values for car generation
-    public static final double DEFAULT_MIN_LENGTH = 3.0;
-    public static final double DEFAULT_MAX_LENGTH = 5.0;
-    public static final double DEFAULT_MIN_MAX_SPEED = 15.0; // m/s
-    public static final double DEFAULT_MAX_MAX_SPEED = 60.0; // m/s
-    public static final double DEFAULT_MIN_ACCELERATION = 1.0; // m/s^2
-    public static final double DEFAULT_MAX_ACCELERATION = 3.0; // m/s^2
-    public static final double DEFAULT_MIN_DECELERATION = 2.0; // m/s^2
-    public static final double DEFAULT_MAX_DECELERATION = 5.0; // m/s^2
-    public static final double DEFAULT_MIN_DESIRED_TIME_HEADWAY = 1.0; // s
-    public static final double DEFAULT_MAX_DESIRED_TIME_HEADWAY = 2.5; // s
-    public static final double DEFAULT_MIN_MIN_GAP_TO_NEXT_CAR = 2.0; // m
-    public static final double DEFAULT_MAX_MIN_GAP_TO_NEXT_CAR = 5.0; // m
-    public static final double DEFAULT_MIN_REACTION = 1.0;
-    public static final double DEFAULT_MAX_REACTION = 0.2;
-    public static final double DEFAULT_MIN_POLITENESS_FACTOR = 0.0;
-    public static final double DEFAULT_MAX_POLITENESS_FACTOR = 1.0;
-
 }

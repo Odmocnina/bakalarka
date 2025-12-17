@@ -204,13 +204,17 @@ public class ContinuosRoad extends Road {
         while (it.hasPrevious()) {
             CarParams car = it.previous();
 
+            if (car == null) {
+                it.remove();
+                continue;
+            }
+
             if (car.processedInCurrentStep) {
                 continue;
             }
 
             // defensive check against broken car states
-            if (car == null || Double.isNaN(car.xPosition) ||
-                    Double.isNaN(car.getParameter(RequestConstants.CURRENT_SPEED_REQUEST))) {
+            if (Double.isNaN(car.xPosition) || Double.isNaN(car.getParameter(RequestConstants.CURRENT_SPEED_REQUEST))) {
                 it.remove();
                 continue;
             }
@@ -566,6 +570,14 @@ public class ContinuosRoad extends Road {
     }
 
 
+    /**
+     * method to create fake road structure for lane change calculation, where the car to be inspected is removed from
+     * its current lane and placed in the target lane, used for lane change models to calculate accelerations
+     *
+     * @param direction direction to place the car in (left or right)
+     * @param car car to place
+     * @return fake road structure with car placed in target lane, null if placement was not successful
+     **/
     private LinkedList<CarParams>[] createFakeRoad(Direction direction, CarParams car) {
         LinkedList<CarParams>[] fakeRoad = this.copyRoadStructureDeep();
         int lane = car.lane;
@@ -599,7 +611,6 @@ public class ContinuosRoad extends Road {
 
         return roadCopy;
     }
-/////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * getter for content of the road, in this case array of linked lists of cars, overriding abstract method in Road

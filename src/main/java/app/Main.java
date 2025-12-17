@@ -2,6 +2,7 @@ package app;
 
 import core.utils.*;
 import core.utils.constants.Constants;
+import core.utils.loading.ConfigLoader;
 import ui.Window;
 
 /*****************************
@@ -12,12 +13,12 @@ import ui.Window;
  *********************************/
 public class Main {
 
-    /*
+    /**
      * main function of application, loads configuration and starts gui if gui is supposed to be used, returns nothing
      *
      * @param args command line arguments, first argument is path to configuration file, if not provided default config
      *             file is used
-     */
+     **/
     public static void main(String[] args) {
         // load run details from configuration file
         boolean success = ConfigLoader.loadAllConfig(args);

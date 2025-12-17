@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <numberOfRoads>1</numberOfRoads>
+    <numberOfRoads>10</numberOfRoads>
     <roadFile>config/roads/road2.xml</roadFile>
 
     <models>

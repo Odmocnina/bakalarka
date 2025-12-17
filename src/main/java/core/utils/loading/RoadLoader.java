@@ -1,10 +1,11 @@
-package core.utils;
+package core.utils.loading;
 
 import app.AppContext;
 import core.model.LightPlan;
 import core.model.Road;
 import core.model.cellular.CellularRoad;
 import core.model.continous.ContinuosRoad;
+import core.utils.MyLogger;
 import core.utils.constants.Constants;
 import core.utils.constants.RoadLoadingConstants;
 import org.w3c.dom.Document;
@@ -17,46 +18,52 @@ import java.io.File;
 
 public class RoadLoader {
 
-  /*  public static void loadMap(String filePath) {
+    public static boolean loadMap(String filePath) {
         // Logic to read the configuration file for multiple roads
         File xmlFile;
         try {
             xmlFile = new File(filePath);
         } catch (NullPointerException e) {
-            MyLogger.logBeforeLoading("Map file not found, loading default config",
+            MyLogger.logBeforeLoading("Map file not found",
                     Constants.ERROR_FOR_LOGGING);
-            xmlFile = new File(Constants.MAP_CONFIG_FILE);
-            if (!xmlFile.exists()) {
-                MyLogger.logBeforeLoading("Default map file not found, exiting", Constants.FATAL_FOR_LOGGING);
-                return;
-            }
+            return false;
         }
+        Road[] map = null;
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlFile);
             doc.getDocumentElement().normalize();
-            int roadCount = doc.getElementsByTagName("road").getLength();
+            int roadCount = doc.getElementsByTagName(RoadLoadingConstants.ROAD_TAG).getLength();
             MyLogger.logBeforeLoading("Loading map from config: number of roads=" + roadCount
                     , Constants.INFO_FOR_LOGGING);
 
-            Road[] map = new Road[roadCount];
+            map = new Road[roadCount];
 
             for (int i = 0; i < roadCount; i++) {
-                Element roadElement = (Element) doc.getElementsByTagName("road").item(i);
-                Road road = loadRoad(roadFilePath);
+                Element roadElement = (Element) doc.getElementsByTagName(RoadLoadingConstants.ROAD_TAG).item(i);
+                Road road = loadRoad(roadElement);
                 if (road != null) {
                     map[i] = road;
                 } else {
-                    MyLogger.logBeforeLoading("Failed to load road from file: " + roadFilePath
-                            , Constants.ERROR_FOR_LOGGING);
+                    MyLogger.logBeforeLoading("Failed to load road: " + (i + 1) + " from file",
+                            Constants.ERROR_FOR_LOGGING);
+                    return false;
                 }
             }
 
         } catch (Exception e) {
-            MyLogger.logBeforeLoading("Error loading map file: " + e.getMessage()
-                    , Constants.FATAL_FOR_LOGGING);
+            MyLogger.logBeforeLoading("Error loading map file: " + e.getMessage(), Constants.ERROR_FOR_LOGGING);
+            return false;
         }
+
+        if (map == null) {
+            MyLogger.logBeforeLoading("No roads loaded from map file", Constants.ERROR_FOR_LOGGING);
+            return false;
+        }
+
+        AppContext.SIMULATION.setRoads(map);
+        return true;
     }
 
     /**
