@@ -14,6 +14,11 @@ public class RoadLoadingConstants {
     public static final String CYCLE_DURATION_TAG = "cycleDuration";
     public static final String TIME_OF_SWITCH_TAG = "timeOfSwitch";
     public static final String START_WITH_GREEN_TAG = "startWithGreen";
+    public static final String FLOW_RATE_TAG = "flowRate";
+    public static final String CAR_PARAMS_TAG = "carParams";
+    public static final String MIN_VALUE_TAG = "minValue";
+    public static final String MAX_VALUE_TAG = "maxValue";
+    public static final String NAME_TAG = "name";
 
 
 }

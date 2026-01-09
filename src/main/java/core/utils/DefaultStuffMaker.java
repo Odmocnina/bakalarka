@@ -1,0 +1,61 @@
+package core.utils;
+
+import app.AppContext;
+import core.model.CarGenerator;
+import core.model.LightPlan;
+import core.utils.constants.DefaultValues;
+import core.utils.constants.RequestConstants;
+
+public class DefaultStuffMaker {
+
+    /**
+     * create default light plan
+     *
+     * @return default light plan
+     **/
+    public static LightPlan createDefaultLightPlan() {
+        return new LightPlan(DefaultValues.DEFAULT_LIGHT_PLAN_CYCLE_DURATION,
+                DefaultValues.DEFAULT_LIGHT_PLAN_GREEN_DURATION,
+                DefaultValues.DEFAULT_LIGHT_PLAN_START_WITH_GREEN);
+    }
+
+    /**
+     * create default light plan array
+     *
+     * @param numberOfLanes number of lanes
+     * @return default light plan array
+     **/
+    public static LightPlan[] createDefaultLightPlan(int numberOfLanes) {
+        LightPlan[] lightPlan = new LightPlan[numberOfLanes];
+        for (int i = 0; i < numberOfLanes; i++) {
+            lightPlan[i] = createDefaultLightPlan();
+        }
+        return lightPlan;
+    }
+
+    public static CarGenerator createDefaultGenerator() {
+        CarGenerator generator = new CarGenerator(DefaultValues.DEFAULT_FLOW_RATE);
+        generator.addParameter(RequestConstants.MAX_SPEED_REQUEST, "Max speed", DefaultValues.DEFAULT_MAX_SPEED_MIN, DefaultValues.DEFAULT_MAX_SPEED_MAX);
+        generator.addParameter(RequestConstants.LENGTH_REQUEST, "Length of vehicle",DefaultValues.DEFAULT_LENGTH_MIN, DefaultValues.DEFAULT_LENGTH_MAX);
+        generator.addParameter(RequestConstants.MAX_ACCELERATION_REQUEST, "Max acceleration",DefaultValues.DEFAULT_ACCELERATION_MIN, DefaultValues.DEFAULT_ACCELERATION_MAX);
+        generator.addParameter(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST, "Minimum gap to the next car", DefaultValues.DEFAULT_MINIMUM_GAP_TO_NEXT_CAR_MIN,
+                DefaultValues.DEFAULT_MINIMUM_GAP_TO_NEXT_CAR_MAX);
+        generator.addParameter(RequestConstants.DECELERATION_COMFORT_REQUEST, "Max conferable deceleration", DefaultValues.DEFAULT_DECELERATION_COMFORT_MIN,
+                DefaultValues.DEFAULT_DECELERATION_COMFORT_MAX);
+        generator.addParameter(RequestConstants.DESIRED_TIME_HEADWAY_REQUEST, "Desired time headway", DefaultValues.DEFAULT_DESIRED_TIME_HEADWAY_MIN,
+                DefaultValues.DEFAULT_DESIRED_TIME_HEADWAY_MAX);
+        generator.addParameter(RequestConstants.SPEED_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, "Speed difference sensitivity",
+                DefaultValues.DEFAULT_SPEED_DIFFERENCE_SENSITIVITY_MIN, DefaultValues.DEFAULT_SPEED_DIFFERENCE_SENSITIVITY_MAX);
+        generator.addParameter(RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, "Distance difference sensitivity",
+                DefaultValues.DEFAULT_DISTANCE_DIFFERENCE_SENSITIVITY_MIN, DefaultValues.DEFAULT_DISTANCE_DIFFERENCE_SENSITIVITY_MAX);
+        return generator;
+    }
+
+    public static CarGenerator[] createDefaultGenerator(int numberOfLanes) {
+        CarGenerator[] generators = new CarGenerator[numberOfLanes];
+        for (int i = 0; i < numberOfLanes; i++) {
+            generators[i] = createDefaultGenerator();
+        }
+        return generators;
+    }
+}

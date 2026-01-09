@@ -4,11 +4,10 @@ import app.AppContext;
 import core.model.CarParams;
 import core.model.Road;
 import core.utils.constants.Constants;
-
 import core.utils.constants.RequestConstants;
+
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -110,8 +109,6 @@ public class ContinuousRoadRenderer implements IRoadRenderer {
 
                 gc.setFill(carColor);
                 gc.fillRect(carX - carW, carY, carW, carH);
-//                gc.setStroke(Color.BLACK);
-//                gc.strokeRect(carX - carW, carY, carW, carH);
             }
 
             // separating line between lanes

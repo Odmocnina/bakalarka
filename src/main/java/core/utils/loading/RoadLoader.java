@@ -1,11 +1,13 @@
 package core.utils.loading;
 
 import app.AppContext;
+import core.model.CarGenerator;
 import core.model.LightPlan;
 import core.model.Road;
 import core.model.cellular.CellularRoad;
 import core.model.continous.ContinuosRoad;
 import core.utils.MyLogger;
+import core.utils.StringEditor;
 import core.utils.constants.Constants;
 import core.utils.constants.RoadLoadingConstants;
 import org.w3c.dom.Document;
@@ -105,7 +107,40 @@ public class RoadLoader {
             road.setLightPlan(i, lp);
         }
 
+        // Load car generators for each lane
+        for (int i = 0; i < numberOfLanesValue; i++) {
+            Element laneElement = (Element) laneNodes.item(i);
+            Element generatorElement = (Element) laneElement.getElementsByTagName(RoadLoadingConstants.GENERATOR_TAG).item(0);
+            CarGenerator generator = createGenerator(generatorElement);
+            generator.setType(AppContext.SIMULATION.getRoads()[0]);
+            String carGenerationParameters = StringEditor.mergeRequestParameters(AppContext.CAR_FOLLOWING_MODEL.getParametersForGeneration(),
+                     AppContext.LANE_CHANGING_MODEL.getParametersForGeneration());
+            generator.setCarGenerationParameters(carGenerationParameters);
+            road.setRoadGenerator(i, generator);
+        }
+
         return road;
+    }
+
+    private static CarGenerator createGenerator(Element generatorElement) {
+        double flowRate = Double.parseDouble(generatorElement.getElementsByTagName(RoadLoadingConstants.FLOW_RATE_TAG).
+                item(0).getTextContent());
+        CarGenerator generator = new CarGenerator(flowRate);
+
+        // load all car parameters
+        Element carParamsElement = (Element) generatorElement.getElementsByTagName(RoadLoadingConstants.CAR_PARAMS_TAG).item(0);
+        NodeList paramNodes = carParamsElement.getChildNodes();
+        for (int i = 0; i < paramNodes.getLength(); i++) {
+            if (paramNodes.item(i) instanceof Element paramElement) {
+                String key = paramElement.getTagName();
+                String name = paramElement.getElementsByTagName(RoadLoadingConstants.NAME_TAG).item(0).getTextContent();
+                double minValue = Double.parseDouble(paramElement.getElementsByTagName(RoadLoadingConstants.MIN_VALUE_TAG).item(0).getTextContent());
+                double maxValue = Double.parseDouble(paramElement.getElementsByTagName(RoadLoadingConstants.MAX_VALUE_TAG).item(0).getTextContent());
+                generator.addParameter(key, name, minValue, maxValue);
+            }
+        }
+
+        return generator;
     }
 
 }

@@ -32,7 +32,7 @@ public class CarGenerator implements Cloneable {
     private String type;
 
     /** unique id for generated cars **/
-    private int id = 7; //its seven becouse if there are testing cars on the road, there will be cars with duplicate id, which is a propblem, delete later
+    private int id = 0;
 
     /** lambda parameter for exponential distribution of inter-arrival times **/
     private double lambdaPerSec;
@@ -48,8 +48,6 @@ public class CarGenerator implements Cloneable {
 
     /** available car colors **/
     private final Color[] COLORS = Constants.CAR_COLORS;
-
-    private Queue<CarParams> carQueue = null;
 
     /**
      * constructor for car generator
@@ -225,8 +223,8 @@ public class CarGenerator implements Cloneable {
      * @param minValue minimum value
      * @param maxValue maximum value
      **/
-    public void addParameter(String key, Double minValue, Double maxValue) {
-        Parameter param = new Parameter(minValue, maxValue);
+    public void addParameter(String key, String name, Double minValue, Double maxValue) {
+        Parameter param = new Parameter(name, minValue, maxValue);
         parameters.put(key, param);
     }
 
@@ -334,6 +332,22 @@ public class CarGenerator implements Cloneable {
         return true;
     }
 
+    public void removeParameter(String key) {
+        this.parameters.remove(key);
+    }
+
+    public double getFlowRate() {
+        return this.lambdaPerSec;
+    }
+
+    public void setFlowRate(double flowRate) {
+        this.lambdaPerSec = flowRate;
+    }
+
+    public HashMap<String, Parameter> getAllParameters() {
+        return this.parameters;
+    }
+
     /**
      * function to set parameters requested by car following model, needed for generation
      *
@@ -352,7 +366,7 @@ public class CarGenerator implements Cloneable {
         return this.carGenerationParameters;
     }
 
-/**
+    /**
      * function to check if generator is set to generate cars into queue
      *
      * @return boolean whether generator generates cars into queue
@@ -387,55 +401,31 @@ public class CarGenerator implements Cloneable {
         copy.carGenerationParameters = this.carGenerationParameters;
         for (String key : this.parameters.keySet()) {
             Parameter param = this.parameters.get(key);
-            copy.parameters.put(key, new Parameter(param.minValue, param.maxValue));
+            copy.parameters.put(key, new Parameter(param.name, param.minValue, param.maxValue));
         }
         return copy;
+    }
+
+    public boolean keyExists(String key) {
+        return parameters.containsKey(key);
     }
 
     public double getLambdaPerSec() {
         return this.lambdaPerSec;
     }
 
-    /*********************
-     * class representing a parameter with min and max values
-     *
-     * @author Michael Hladky
-     * @version 1.0
-     ********************/
-    private static class Parameter {
-
-        /** minimum value of parameter **/
-        double minValue;
-
-        /** maximum value of parameter **/
-        double maxValue;
-
-        /** range of parameter **/
-        double range;
-
-        /**
-         * constructor for parameter
-         *
-         * @param minValue minimum value of parameter
-         * @param maxValue maximum value of parameter
-         */
-        private Parameter(double minValue, double maxValue) {
-            this.maxValue = maxValue;
-            this.minValue = minValue;
-            this.range = maxValue - minValue;
+    public boolean areAllParametersOk() {
+        for (String key : parameters.keySet()) {
+            Parameter p = parameters.get(key);
+            if (!p.checkIfValid()) {
+                return false;
+            }
         }
 
-        /**
-         * function to check if parameter range is valid
-         *
-         * @return boolean whether parameter range is valid
-         */
-        private boolean checkIfValid() {
-            return minValue <= maxValue && range >= 0;
-        }
+        return true;
     }
 
     public void initCarQueue() {
-        this.carQueue = this.generateCarsInToQueue();
+        Queue<CarParams> carQueue = this.generateCarsInToQueue();
     }
 }

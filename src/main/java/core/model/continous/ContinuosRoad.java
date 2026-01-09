@@ -37,8 +37,9 @@ public class ContinuosRoad extends Road {
     /**
      * method to create road structure, initialize lanes (linked lists)
      **/
+    @SuppressWarnings("unchecked")
     private void createRoad() {
-        this.vehicles = new LinkedList[numberOfLanes];
+        this.vehicles = (LinkedList<CarParams>[]) new LinkedList[numberOfLanes];
         for (int lane = 0; lane < numberOfLanes; lane++) {
             this.vehicles[lane] = new LinkedList<>();
         }
@@ -286,6 +287,11 @@ public class ContinuosRoad extends Road {
         String[] roadSimulationParams = {RequestConstants.TIME_STEP_REQUEST, RequestConstants.MAX_ROAD_SPEED_REQUEST};
 
         CarParams car = this.getCarById(inspectedCar.id, road);
+        if (car == null) {
+            MyLogger.log("Car with ID " + inspectedCar.id + " not found on the road for parameter gathering.",
+                    Constants.ERROR_FOR_LOGGING);
+            return null;
+        }
         for (String param : params) {
             if (StringEditor.isInArray(carGeneratedParams, param) || param.equals(RequestConstants.X_POSITION_REQUEST)
                     || param.equals(RequestConstants.CURRENT_SPEED_REQUEST)) { //get directly from car we are inspecting
@@ -600,8 +606,9 @@ public class ContinuosRoad extends Road {
      *
      * @return deep copy of the road structure (array of linked lists of cars)
      */
+    @SuppressWarnings("unchecked")
     private LinkedList<CarParams>[] copyRoadStructureDeep() {
-        LinkedList<CarParams>[] roadCopy = new LinkedList[this.numberOfLanes];
+        LinkedList<CarParams>[] roadCopy = (LinkedList<CarParams>[]) new LinkedList[this.numberOfLanes];
         for (int lane = 0; lane < this.numberOfLanes; lane++) {
             roadCopy[lane] = new LinkedList<>();
             for (CarParams car : this.vehicles[lane]) {

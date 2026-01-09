@@ -8,6 +8,10 @@ public class ConfigModificator {
         AppContext.RUN_DETAILS.laneChange = !AppContext.RUN_DETAILS.laneChange;
     }
 
+    public static void setCollisionBan() {
+        AppContext.RUN_DETAILS.preventCollisions = true;
+    }
+
     public static void setTimeBetweenSteps(int timeBetweenSteps) {
         AppContext.RUN_DETAILS.timeBetweenSteps = timeBetweenSteps;
     }

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <config>
-    <numberOfRoads>2100</numberOfRoads>
+    <numberOfRoads>20</numberOfRoads>
     <roadFile>config/roads/road1.xml</roadFile>
     <models>
         <carFollowingModel>
-            <id>gipps</id>
+            <id>idm</id>
         </carFollowingModel>
         <laneChangingModel>
             <id>mobil</id>
@@ -13,7 +13,7 @@
     <generator>
         <flowRate>0.7</flowRate>
         <queue>
-            <use>true</use>
+            <use>false</use>
             <minValue>100</minValue>
             <maxValue>100</maxValue>
         </queue>
@@ -72,7 +72,7 @@
             <log>true</log>
             <info>true</info>
             <warn>true</warn>
-            <debug>false</debug>
+            <debug>true</debug>
             <error>true</error>
             <fatal>true</fatal>
         </logging>

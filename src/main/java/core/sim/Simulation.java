@@ -41,6 +41,9 @@ public class Simulation {
         }
 
         for (int i = 0; i < roads.length; i++) {
+            if (i == 2) {
+                int debug = 0;
+            }
             Road r = roads[i];
             if (r != null) {
                 int carsPassed = r.updateRoad();

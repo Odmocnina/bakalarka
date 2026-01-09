@@ -350,7 +350,7 @@ public class ConfigLoader {
                             MyLogger.logBeforeLoading("Invalid queue parameters in config file, it will be" +
                                             " ignored.", Constants.ERROR_FOR_LOGGING);
                         } else {
-                            loadedGenerator.addParameter(Constants.GENERATOR_QUEUE, (double) min, (double) max);
+                            loadedGenerator.addParameter(Constants.GENERATOR_QUEUE, "Test", (double) min, (double) max);
                         }
                     } catch (Exception e) {
                         MyLogger.logBeforeLoading("Error parsing queue parameters in config file, it will be" +
@@ -373,7 +373,7 @@ public class ConfigLoader {
                                 item(0).getTextContent());
                         double maxValue = Double.parseDouble(paramElement.getElementsByTagName(ConfigConstants.MAX_VALUE_TAG).
                                 item(0).getTextContent());
-                        loadedGenerator.addParameter(paramName, minValue, maxValue);
+                        loadedGenerator.addParameter(paramName, "Test", minValue, maxValue);
                     }
                 }
             }

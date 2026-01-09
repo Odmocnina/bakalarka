@@ -29,6 +29,7 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.LinkedList;
 
 /********************************************
@@ -48,12 +49,14 @@ public class Window extends Application {
     /** renderer for drawing roads **/
     private IRoadRenderer renderer;
 
-    // Scrollbars added to class scope to be accessible
+    /** horizontal scrollbar **/
     private ScrollBar hScroll;
-    private ScrollBar vScroll;
-    private Label infoLabel; // Label for top info text
 
-    private ConfigXml configXml;
+    /** vertical scrollbar **/
+    private ScrollBar vScroll;
+
+    /** info label at the bottom **/
+    private Label infoLabel;
 
     /**
      * start method for JavaFX application
@@ -65,7 +68,6 @@ public class Window extends Application {
         // get renderer and simulation from AppContext
         this.simulation = AppContext.SIMULATION;
         this.renderer = AppContext.RENDERER;
-        this.configXml = AppContext.CONFIG_XML;
 
         //set up stuff inf the window
 
@@ -162,14 +164,14 @@ public class Window extends Application {
         paintAll.run();
     }
 
-    /*
+    /**
      * handles drawing of cellular roads
      *
      * @param roads array of roads to draw
      * @param canvas place to draw on
      * @param gc graphics context to draw on
      * @param GAP space between roads when drawing
-     */
+     **/
     private void handleCellular(Road[] roads, Canvas canvas, GraphicsContext gc, final double GAP) {
         final double CELL_PIXEL_SIZE = 8.0; // size of cell for ONLY DRAWING, CELL SIZE IN MODEL MAY, AND LIKELY IS
         // DIFFERENT
@@ -194,14 +196,14 @@ public class Window extends Application {
         this.drawRoads(canvas, gc, roads, GAP, CELL_PIXEL_SIZE, neededWidth, neededHeight);
     }
 
-    /*
+    /**
      * handles drawing of continuous roads
      *
      * @param roads array of roads to draw
      * @param canvas place to draw on
      * @param gc graphics context to draw on
      * @param GAP space between roads when drawing
-     */
+     **/
     private void handleContinuous(Road[] roads, Canvas canvas, GraphicsContext gc, final double GAP) {
         final double LANE_WIDTH = 8.0; // size of lane
 
@@ -224,7 +226,7 @@ public class Window extends Application {
         this.drawRoads(canvas, gc, roads, GAP, LANE_WIDTH, neededWidth, neededHeight);
     }
 
-    /*
+    /**
      * draws all roads on the canvas
      *
      * @param canvas place to draw on
@@ -234,7 +236,7 @@ public class Window extends Application {
      * @param CELL_PIXEL_SIZE size of cell or lane for drawing
      * @param neededWidth needed width of canvas
      * @param neededHeight needed height of canvas
-     */
+     **/
     private void drawRoads(Canvas canvas, GraphicsContext gc, Road[] roads, final double GAP,
                            final double CELL_PIXEL_SIZE, double neededWidth, double neededHeight) {
 
@@ -248,7 +250,7 @@ public class Window extends Application {
         hScroll.setMax(maxScrollH);
         vScroll.setMax(maxScrollV);
 
-        // check so that the scroll bars arent funked up
+        // check so that the scroll bars aren't fucked up
         if (neededWidth > viewportW) {
             double visibleH = (viewportW / neededWidth) * maxScrollH;
             hScroll.setVisibleAmount(visibleH);
@@ -299,6 +301,7 @@ public class Window extends Application {
             gc.translate(0, y);
 
             // Use max of neededWidth to ensure renderer doesn't cut off drawing loop
+            //noinspection SynchronizationOnLocalVariableOrMethodParameter
             synchronized (road) {
                 renderer.draw(gc, road, Math.max(neededWidth, viewportW), roadHeight, CELL_PIXEL_SIZE);
             }
@@ -318,41 +321,50 @@ public class Window extends Application {
      * @return Button with icon
      */
     private Button createIconButton(String resourcePath, String tooltipText) {
-        Image image = new Image(
-                getClass().getResourceAsStream(resourcePath)
-        );
-        ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(16);
-        imageView.setFitHeight(16);
-        imageView.setPreserveRatio(true);
-
         Button button = new Button();
+        ImageView imageView = createMenuIcon(resourcePath);
+        if (imageView == null) {
+            MyLogger.log("Failed to create button, imageView is null for resource: " + resourcePath,
+                    Constants.ERROR_FOR_LOGGING);
+            button.setText("ERR");
+            return button;
+        }
+
         button.setGraphic(imageView);
+        // set tooltip and focus traversable
         button.setTooltip(new Tooltip(tooltipText));
-        button.setFocusTraversable(false);  // aby se to furt nefokusovalo tabem
+        button.setFocusTraversable(false);
 
         return button;
     }
 
+    /**
+     * helper method to create toggle (on/off) button with icon
+     *
+     * @param resourcePath path to icon in resources (e.g. "/icons/ban.png")
+     * @param tooltipText tooltip text for button
+     * @return ToggleButton with icon
+     */
     private ToggleButton createIconToggleButton(String resourcePath, String tooltipText) {
-        Image image = new Image(getClass().getResourceAsStream(resourcePath));
-        ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(16);
-        imageView.setFitHeight(16);
-        imageView.setPreserveRatio(true);
-
         ToggleButton button = new ToggleButton();
+        ImageView imageView = createMenuIcon(resourcePath);
+
+        if (imageView == null) {
+            MyLogger.log("Failed to create toggle button, imageView is null for resource: " + resourcePath,
+                    Constants.ERROR_FOR_LOGGING);
+            button.setText("ERR");
+            return button;
+        }
+
         button.setGraphic(imageView);
         button.setTooltip(new Tooltip(tooltipText));
         button.setFocusTraversable(false);
 
-        // default and selected styles
         String defaultStyle = "-fx-background-color: transparent; -fx-border-color: transparent;";
-        String selectedStyle = "-fx-background-color: #b3d9ff; -fx-border-color: #66a3ff; -fx-border-radius: 3;"; // Zvýraznění (světle modrá)
+        String selectedStyle = "-fx-background-color: #b3d9ff; -fx-border-color: #66a3ff; -fx-border-radius: 3;";
 
         button.setStyle(defaultStyle);
 
-        // Listener, that cheges it if its selected or not
         button.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
             if (isSelected) {
                 button.setStyle(selectedStyle);
@@ -364,33 +376,56 @@ public class Window extends Application {
         return button;
     }
 
+    /**
+     * helper method to set button image
+     *
+     * @param resourcePath path to icon in resources (e.g. "/icons/run.png")
+     * @param button button to set image on
+     */
     private void setButtonImage(String resourcePath, Button button) {
-        Image image = new Image(
-                getClass().getResourceAsStream(resourcePath)
-        );
-        ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(16);
-        imageView.setFitHeight(16);
-        imageView.setPreserveRatio(true);
-
+        ImageView imageView = createMenuIcon(resourcePath);
+        if (imageView == null) {
+            MyLogger.log("Failed to set button image, imageView is null for resource: " + resourcePath,
+                    Constants.ERROR_FOR_LOGGING);
+            button.setText("ERR");
+            return;
+        }
+        button.setText("");
         button.setGraphic(imageView);
     }
 
+    /**
+     * helper method to create menu icon (image at buttons/menu items and similar ui stuff)
+     *
+     * @param resourcePath path to icon in resources (e.g. "/icons/run.png")
+     * @return ImageView with icon
+     */
     private ImageView createMenuIcon(String resourcePath) {
-        // Ošetření pro případ, že obrázek neexistuje, aby program nespadl
-        if (getClass().getResourceAsStream(resourcePath) == null) {
+        InputStream stream = getClass().getResourceAsStream(resourcePath);
+
+        // check if resource was found
+        if (stream == null) {
             MyLogger.log("Icon resource not found: " + resourcePath, Constants.ERROR_FOR_LOGGING);
             return null;
         }
 
-        Image image = new Image(getClass().getResourceAsStream(resourcePath));
+        // create image and image view
+        Image image = new Image(stream);
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(16);
         imageView.setFitHeight(16);
         imageView.setPreserveRatio(true);
+
         return imageView;
     }
 
+    /**
+     * creates toolbar with buttons
+     *
+     * @param primaryStage primary stage for file choosers
+     * @param paintAll runnable to repaint all roads
+     * @return ToolBar with buttons
+     **/
     private ToolBar createToolBar(Stage primaryStage, Runnable paintAll) {
         String defaultStyle = "-fx-background-color: transparent; -fx-border-color: transparent;";
 
@@ -404,6 +439,8 @@ public class Window extends Application {
         Button exportResultsBtn = createIconButton("/icons/export.png", "Export results " +
                 "(current state of simulation)");
         Button nextStepBtn = createIconButton("/icons/nextStep.png", "Next simulation step");
+        ToggleButton collisionBanBtn = createIconToggleButton("/icons/collisionBan.png",
+                "Ban collisions (toggle)");
 
         changeLaneBtn.setStyle(defaultStyle);
         editMapFileBtn.setStyle(defaultStyle);
@@ -414,6 +451,7 @@ public class Window extends Application {
         startStopBtn.setStyle(defaultStyle);
         exportResultsBtn.setStyle(defaultStyle);
         nextStepBtn.setStyle(defaultStyle);
+        collisionBanBtn.setStyle(defaultStyle);
 
         newMapFileBtn.setOnAction(e -> {
             MyLogger.log("Creating new map pressed...", Constants.INFO_FOR_LOGGING);
@@ -476,6 +514,12 @@ public class Window extends Application {
             }
         });
 
+        collisionBanBtn.setOnAction(e -> {
+            ConfigModificator.changePreventCollision();
+            MyLogger.log("Toggled collision ban", Constants.INFO_FOR_LOGGING);
+            paintAll.run();
+        });
+
         return new ToolBar(
                 startStopBtn,
                 nextStepBtn,
@@ -485,10 +529,18 @@ public class Window extends Application {
                 saveMapFileBtn,
                 saveAsMapFileBtn,
                 changeLaneBtn,
+                collisionBanBtn,
                 exportResultsBtn
         );
     }
 
+    /**
+     * creates menu bar with menu items
+     *
+     * @param primaryStage primary stage for file choosers
+     * @param paintAll runnable to repaint all roads
+     * @return MenuBar with menu items
+     **/
     private MenuBar createMenu(Stage primaryStage, Runnable paintAll) {
         MenuItem itemNewFile = new MenuItem("New map file", createMenuIcon("/icons/newMapFile.png"));
         MenuItem itemEditFile = new MenuItem("Modify current map file", createMenuIcon("/icons/editMapFile.png"));
@@ -529,7 +581,6 @@ public class Window extends Application {
 
         return menuBar;
     }
-
 
     /**
      * stop method for JavaFX application

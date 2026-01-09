@@ -1,6 +1,7 @@
 package core.model;
 
 import app.AppContext;
+import core.utils.DefaultStuffMaker;
 import core.utils.constants.Constants;
 import core.utils.MyLogger;
 import core.utils.constants.RequestConstants;
@@ -36,10 +37,7 @@ public abstract class Road {
 
     public int id;
 
-    protected LightPlan[] lightPlansOnLanes = {
-            new LightPlan(90, 40, true),
-            new LightPlan(90, 40, true),
-    };
+    protected LightPlan[] lightPlansOnLanes;
 
     /**
      * constructor for road, initializing its basic properties, used in constructors of subclasses
@@ -54,6 +52,8 @@ public abstract class Road {
         this.numberOfLanes = numberOfLanes;
         this.speedLimit = speedLimit;
         this.type = type;
+        this.generators = DefaultStuffMaker.createDefaultGenerator(numberOfLanes);
+        this.lightPlansOnLanes = DefaultStuffMaker.createDefaultLightPlan(numberOfLanes);
     }
 
     /**
@@ -247,6 +247,12 @@ public abstract class Road {
     public void setLightPlan(int lane, LightPlan lightPlan) {
         if (lane >= 0 && lane < lightPlansOnLanes.length) {
             this.lightPlansOnLanes[lane] = lightPlan;
+        }
+    }
+
+    public void setRoadGenerator(int lane, CarGenerator generator) {
+        if (lane >= 0 && lane < generators.length) {
+            this.generators[lane] = generator;
         }
     }
 
