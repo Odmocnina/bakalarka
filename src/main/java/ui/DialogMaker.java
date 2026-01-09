@@ -289,10 +289,10 @@ public class DialogMaker {
         String speed;
         String length;
         int lanes;
-       // LightPlan[] lightPlan;
+        LightPlan[] lightPlan;
         CarGenerator[] generators;
         LinkedList<LightPlan> lightPlans = new LinkedList<>();
-        LinkedList<CarGenerator> generators = new LinkedList<>();
+        LinkedList<CarGenerator> generatorss = new LinkedList<>();
         if (!changingAll) {
             dialog.setTitle("Change selected road properties, road index: " + (index + 1));
             dialog.setHeaderText("Modify properties of the selected road: " + (index + 1));
@@ -307,12 +307,12 @@ public class DialogMaker {
             speed = STOCK_MAX_SPEED;
             length = STOCK_LENGTH;
             lanes = Integer.parseInt(STOCK_NUMBER_OF_LANES);
-           // lightPlan = new LightPlan[numberOfRoads];
+            lightPlan = new LightPlan[numberOfRoads];
             for (int i = 0; i < numberOfRoads; i++) {
                // lightPlan[i] = DefaultStuffMaker.createDefaultLightPlan();
                 lightPlans.add(DefaultStuffMaker.createDefaultLightPlan());
             }
-           // generators = new CarGenerator[numberOfRoads];
+            generators = new CarGenerator[numberOfRoads];
             for (int i = 0; i < numberOfRoads; i++) {
                 //generators[i] = DefaultStuffMaker.createDefaultGenerator();
                 generatorss.add(DefaultStuffMaker.createDefaultGenerator());
