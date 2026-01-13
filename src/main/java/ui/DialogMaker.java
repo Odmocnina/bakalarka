@@ -1,6 +1,5 @@
 package ui;
 
-import app.AppContext;
 import core.model.CarGenerator;
 import core.model.LightPlan;
 import core.model.Parameter;
@@ -11,7 +10,6 @@ import core.utils.RoadXml;
 import core.utils.constants.Constants;
 import core.utils.constants.DefaultValues;
 
-import core.utils.constants.RequestConstants;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -43,10 +41,10 @@ public class DialogMaker {
      * @param stage owner stage
      * @param lightPlan light plan to edit
      **/
-    private static void editLightPlanDialog(Stage stage, LightPlan lightPlan) {
+    private static void editLightPlanDialog(Stage stage, LightPlan lightPlan, int lane) {
         Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Edit light plan");
-        dialog.setHeaderText("Edit the light plan for the road(s)");
+        dialog.setTitle("Edit light plan on lane: " + lane);
+        dialog.setHeaderText("Edit the light plan on lane: " + lane);
         dialog.initOwner(stage);
 
         ButtonType applyButtonType = new ButtonType("Apply", ButtonBar.ButtonData.OK_DONE);
@@ -95,6 +93,12 @@ public class DialogMaker {
         });
     }
 
+    /**
+     * method for showing warning dialog
+     *
+     * @param stage owner stage
+     * @param message warning message
+     **/
     private static void warningDialog(Stage stage, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Warning");
@@ -104,10 +108,16 @@ public class DialogMaker {
         alert.showAndWait();
     }
 
-    private static void editGeneratorDialog(Stage stage, CarGenerator generator) {
+    /**
+     * show dialog to edit a car generator on lane
+     *
+     * @param stage owner stage
+     * @param generator car generator to edit
+     **/
+    private static void editGeneratorDialog(Stage stage, CarGenerator generator, int lane) {
         Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Edit car generator");
-        dialog.setHeaderText("Edit the car generator parameters");
+        dialog.setTitle("Edit car generator on lane: " + lane);
+        dialog.setHeaderText("Edit the car generator parameters ona lane: " + lane);
         dialog.initOwner(stage);
 
         ButtonType applyButtonType = new ButtonType("Apply", ButtonBar.ButtonData.OK_DONE);
@@ -141,17 +151,33 @@ public class DialogMaker {
 
                     Label paramLabel = new Label(param.name + " (" + paramKey + "):");
                     Label minValue = new Label("Minimum value: ");
-                    TextField minInput = new TextField(String.valueOf(param.minValue));
+                    //TextField minInput = new TextField(String.valueOf(param.minValue));
+                    Label minValueValue = new Label(String.valueOf(param.minValue));
                     Label maxValue = new Label("Maximum value: ");
-                    TextField maxInput = new TextField(String.valueOf(param.maxValue));
+                    //TextField maxInput = new TextField(String.valueOf(param.maxValue));
+                    Label maxValueValue = new Label(String.valueOf(param.maxValue));
                     Button deleteButton = new Button("Delete");
                     Button changeButton = new Button("Change");
 
+                    deleteButton.setOnAction(e -> {
+                        removeParameterFromGenerator(generator, param.name, paramKey, this, dialog);
+                    });
+
+                    changeButton.setOnAction(e -> {
+                        changeParameterDialog(stage, generator, paramKey, param);
+                        MyLogger.log("Change parameter button clicked for parameter: " + param.name
+                                + " (" + paramKey + ").", Constants.INFO_FOR_LOGGING);
+                        // refresh the grid to show the changed parameter
+                        this.run();
+                        // make window resize to fit new content
+                        dialog.getDialogPane().getScene().getWindow().sizeToScene();
+                    });
+
                     grid.add(paramLabel, 0, i);
                     grid.add(minValue, 1, i);
-                    grid.add(minInput, 2, i);
+                    grid.add(minValueValue, 2, i);
                     grid.add(maxValue, 3, i);
-                    grid.add(maxInput, 4, i);
+                    grid.add(maxValueValue, 4, i);
                     grid.add(changeButton, 5, i);
                     grid.add(deleteButton, 6, i);
                     i++;
@@ -183,6 +209,135 @@ public class DialogMaker {
                 MyLogger.log("Car generator updated via dialog.", Constants.INFO_FOR_LOGGING);
             } else {
                 MyLogger.log("Car generator dialog cancelled.", Constants.INFO_FOR_LOGGING);
+            }
+        });
+    }
+
+    private static void removeParameterFromGenerator(CarGenerator generator, String name, String paramKey,
+                                                     Runnable refreshGrid, Dialog<ButtonType> dialog) {
+        // pop up confirmation dialog
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete parameter");
+        alert.setHeaderText("Are you sure you want to delete parameter: " + name + "(" + paramKey + ")" + "?");
+        alert.initOwner(dialog.getDialogPane().getScene().getWindow());
+        alert.showAndWait().ifPresent(response -> {
+
+            if (response != ButtonType.OK) {
+                MyLogger.log("Parameter deletion cancelled for parameter: " + name + "(" + paramKey + ").",
+                        Constants.INFO_FOR_LOGGING);
+            } else {
+                MyLogger.log("Parameter deletion confirmed for parameter: " + name + "(" + paramKey + ").",
+                        Constants.INFO_FOR_LOGGING);
+                generator.removeParameter(paramKey);
+                MyLogger.log("Parameter " + paramKey + " deleted from car generator.", Constants.INFO_FOR_LOGGING);
+                refreshGrid.run();
+                dialog.getDialogPane().getScene().getWindow().sizeToScene();
+            }
+        });
+
+    }
+
+    private static void changeParameterDialog(Stage stage, CarGenerator generator, String oldKey, Parameter parameter) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Change parameter in car generator");
+        dialog.setHeaderText("Change parameter in car generator");
+        dialog.initOwner(stage);
+
+        ButtonType applyButtonType = new ButtonType("Apply", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(applyButtonType, ButtonType.CANCEL);
+
+        double minValueOld = parameter.minValue;
+        double maxValueOld = parameter.maxValue;
+        String name = parameter.name;
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 20, 10, 10));
+
+        Label paramNameLabel = new Label("Parameter name:");
+        TextField paramNameInput = new TextField();
+        paramNameInput.setText(name);
+        grid.add(paramNameLabel, 0, 0);
+        grid.add(paramNameInput, 1, 0);
+
+        Label paramKeyLabel = new Label("Parameter key:");
+        TextField paramKeyInput = new TextField();
+        paramKeyInput.setText(oldKey);
+        grid.add(paramKeyLabel, 0, 1);
+        grid.add(paramKeyInput, 1, 1);
+
+        Label minValueLabel = new Label("Minimum value:");
+        TextField minValueInput = new TextField();
+        minValueInput.setText(String.valueOf(minValueOld));
+        grid.add(minValueLabel, 0, 2);
+        grid.add(minValueInput, 1, 2);
+
+        Label maxValueLabel = new Label("Maximum value:");
+        TextField maxValueInput = new TextField();
+        maxValueInput.setText(String.valueOf(maxValueOld));
+        grid.add(maxValueLabel, 0, 3);
+        grid.add(maxValueInput, 1, 3);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // show the dialog and wait for user response
+        dialog.showAndWait().ifPresent(response -> {
+            if (response == applyButtonType) {
+                double minValue = 0;
+                double maxValue = 0;
+                String key = paramKeyInput.getText();
+                boolean ok = true;
+                // check if parameter key and values are legit
+
+                // min value
+                try {
+                    minValue = Double.parseDouble(minValueInput.getText());
+                } catch (NumberFormatException e) {
+                    MyLogger.log("Invalid minimum value for parameter: " + minValueInput.getText(),
+                            Constants.ERROR_FOR_LOGGING);
+                    warningDialog(stage, "Invalid minimum value for parameter: " + minValueInput.getText());
+                    ok = false;
+                }
+
+                // max value
+                try {
+                    maxValue = Double.parseDouble(maxValueInput.getText());
+                } catch (NumberFormatException e) {
+                    MyLogger.log("Invalid maximum value for parameter: " + maxValueInput.getText(),
+                            Constants.ERROR_FOR_LOGGING);
+                    warningDialog(stage, "Invalid maximum value for parameter: " + maxValueInput.getText());
+                    ok = false;
+                }
+
+                // if min < max
+                if (minValue > maxValue) {
+                    MyLogger.log("Minimum value must be less or equal than maximum value for parameter: "
+                            + minValue + " > " + maxValue, Constants.ERROR_FOR_LOGGING);
+                    warningDialog(stage, "Minimum value must be less or equal than maximum value for parameter: "
+                            + minValue + " > " + maxValue);
+                    ok = false;
+                }
+
+                // if key is ok
+                if (key == null || key.isEmpty()) {
+                    MyLogger.log("Parameter key cannot be empty .", Constants.ERROR_FOR_LOGGING);
+                    warningDialog(stage, "Parameter key cannot be empty.");
+                    ok = false;
+                } else if (!key.equals(oldKey) && generator.keyExists(key)) { // id key isn't already used
+                    MyLogger.log("Parameter key already exists: " + key, Constants.ERROR_FOR_LOGGING);
+                    warningDialog(stage, "Parameter key already exists: " + key);
+                    ok = false;
+                }
+                String nameOfParam = paramNameInput.getText();
+
+                if (ok) {
+                    generator.removeParameter(oldKey);
+                    generator.addParameter(key, nameOfParam, minValue, maxValue);
+                    MyLogger.log("Parameter changed via dialog.", Constants.INFO_FOR_LOGGING);
+                }
+            } else {
+                MyLogger.log("Old parameter dialog cancelled.", Constants.INFO_FOR_LOGGING);
             }
         });
     }
@@ -229,9 +384,9 @@ public class DialogMaker {
                 double minValue = 0;
                 double maxValue = 0;
                 String key = paramKeyInput.getText();
-                String name = paramNameInput.getText();
                 boolean ok = true;
                 // check if parameter key and values are legit
+
                 // min value
                 try {
                     minValue = Double.parseDouble(minValueInput.getText());
@@ -241,6 +396,7 @@ public class DialogMaker {
                     warningDialog(stage, "Invalid minimum value for new parameter: " + minValueInput.getText());
                     ok = false;
                 }
+
                 // max value
                 try {
                     maxValue = Double.parseDouble(maxValueInput.getText());
@@ -251,12 +407,23 @@ public class DialogMaker {
                     ok = false;
                 }
 
+                // if min < max
+                if (minValue > maxValue) {
+                    MyLogger.log("Minimum value must be less or equal than maximum value for new parameter: "
+                            + minValue + " > " + maxValue, Constants.ERROR_FOR_LOGGING);
+                    warningDialog(stage, "Minimum value must be less or equal than maximum value for new parameter: "
+                            + minValue + " > " + maxValue);
+                    ok = false;
+                }
+
+                // if key is ok
                 if (key == null || key.isEmpty()) {
                     MyLogger.log("Parameter key cannot be empty .", Constants.ERROR_FOR_LOGGING);
                     warningDialog(stage, "Parameter key cannot be empty.");
                     ok = false;
                 }
 
+                // id key isn't already used
                 if (generator.keyExists(key)) {
                     MyLogger.log("Parameter key already exists: " + key, Constants.ERROR_FOR_LOGGING);
                     warningDialog(stage, "Parameter key already exists: " + key);
@@ -289,10 +456,8 @@ public class DialogMaker {
         String speed;
         String length;
         int lanes;
-        LightPlan[] lightPlan;
-        CarGenerator[] generators;
-        LinkedList<LightPlan> lightPlans = new LinkedList<>();
-        LinkedList<CarGenerator> generatorss = new LinkedList<>();
+        LinkedList<LightPlan> lightPlan;
+        LinkedList<CarGenerator> generators;
         if (!changingAll) {
             dialog.setTitle("Change selected road properties, road index: " + (index + 1));
             dialog.setHeaderText("Modify properties of the selected road: " + (index + 1));
@@ -307,15 +472,13 @@ public class DialogMaker {
             speed = STOCK_MAX_SPEED;
             length = STOCK_LENGTH;
             lanes = Integer.parseInt(STOCK_NUMBER_OF_LANES);
-            lightPlan = new LightPlan[numberOfRoads];
-            for (int i = 0; i < numberOfRoads; i++) {
-               // lightPlan[i] = DefaultStuffMaker.createDefaultLightPlan();
-                lightPlans.add(DefaultStuffMaker.createDefaultLightPlan());
+            lightPlan = new LinkedList<>();
+            for (int i = 0; i < lanes; i++) {
+                lightPlan.add(DefaultStuffMaker.createDefaultLightPlan());
             }
-            generators = new CarGenerator[numberOfRoads];
-            for (int i = 0; i < numberOfRoads; i++) {
-                //generators[i] = DefaultStuffMaker.createDefaultGenerator();
-                generatorss.add(DefaultStuffMaker.createDefaultGenerator());
+            generators = new LinkedList<>();
+            for (int i = 0; i < lanes; i++) {
+                generators.add(DefaultStuffMaker.createDefaultGenerator());
             }
         }
         dialog.initOwner(stage);
@@ -345,7 +508,7 @@ public class DialogMaker {
         // listener to update lane index max value when number of lanes changes
         lanesSpinner.valueProperty().addListener((obs, oldVal, newVal) ->
                 //laneIndexSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, newVal, 1)));
-                updateNumberOfLanes(lightPlans, generatorss, newVal, laneIndexSpinner));
+                updateNumberOfLanes(lightPlan, generators, newVal, laneIndexSpinner));
 
         grid.add(new Label("Edit light plan on lane:"), 0, 3);
         grid.add(laneIndexSpinner, 1, 3);
@@ -357,10 +520,11 @@ public class DialogMaker {
         grid.add(generatorButton, 1, 5);
 
         lightPlanButton.setOnAction(e ->
-                editLightPlanDialog(stage, lightPlan[laneIndexSpinner.getValue() - 1]));
+                editLightPlanDialog(stage, lightPlan.get(laneIndexSpinner.getValue() - 1), laneIndexSpinner.getValue()));
 
         generatorButton.setOnAction(e ->
-                editGeneratorDialog(stage, generators[laneIndexSpinner.getValue() - 1]));
+                editGeneratorDialog(stage, generators.get(laneIndexSpinner.getValue() - 1),
+                        laneIndexSpinner.getValue()));
 
         dialog.getDialogPane().setContent(grid);
 
@@ -545,8 +709,9 @@ public class DialogMaker {
      * @param lightPlan light plan for the road
      * @param roadParameters list of road parameters
      **/
-    public static void addRoadParameters(int numberOfLanes, double maxSpeed, double length, LightPlan[] lightPlan,
-                                         CarGenerator[] generators, ArrayList<RoadParameters> roadParameters) {
+    public static void addRoadParameters(int numberOfLanes, double maxSpeed, double length,
+                                         LinkedList<LightPlan> lightPlan, LinkedList<CarGenerator> generators,
+                                         ArrayList<RoadParameters> roadParameters) {
         RoadParameters rp = new RoadParameters();
         rp.lanes = numberOfLanes;
         rp.maxSpeed = maxSpeed;
@@ -567,7 +732,7 @@ public class DialogMaker {
      * @param roadParameters list of road parameters
      **/
     public static void changeRoadParameters(int index, int numberOfLanes, double maxSpeed, double length,
-                                            LightPlan[] lightPlan, CarGenerator[] generators,
+                                            LinkedList<LightPlan> lightPlan, LinkedList<CarGenerator> generators,
                                             ArrayList<RoadParameters> roadParameters) {
         RoadParameters rp = new RoadParameters();
         rp.lanes = numberOfLanes;

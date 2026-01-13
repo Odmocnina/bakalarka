@@ -7,6 +7,7 @@ import core.utils.MyLogger;
 import core.utils.constants.RequestConstants;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Queue;
 
 /********************************
@@ -35,8 +36,10 @@ public abstract class Road {
     /** queues of cars per lane **/
     protected Queue<CarParams>[] carQueuesPerLane = null;
 
-    public int id;
+    /** id of cars **/
+    public int idOfCar = 0;
 
+    /** light plans on lanes **/
     protected LightPlan[] lightPlansOnLanes;
 
     /**
@@ -52,8 +55,16 @@ public abstract class Road {
         this.numberOfLanes = numberOfLanes;
         this.speedLimit = speedLimit;
         this.type = type;
-        this.generators = DefaultStuffMaker.createDefaultGenerator(numberOfLanes);
-        this.lightPlansOnLanes = DefaultStuffMaker.createDefaultLightPlan(numberOfLanes);
+        LinkedList<CarGenerator> carGenerators = DefaultStuffMaker.createDefaultGenerator(numberOfLanes);
+        this.generators = new CarGenerator[numberOfLanes];
+        for (int i = 0; i < numberOfLanes; i++) {
+            this.generators[i] = carGenerators.get(i);
+        }
+        LinkedList<LightPlan> lightPlans = DefaultStuffMaker.createDefaultLightPlan(numberOfLanes);
+        this.lightPlansOnLanes = new LightPlan[numberOfLanes];
+        for (int i = 0; i < numberOfLanes; i++) {
+            this.lightPlansOnLanes[i] = lightPlans.get(i);
+        }
     }
 
     /**
@@ -146,6 +157,13 @@ public abstract class Road {
         return true;
     }
 
+    /**
+     * method to get road simulation parameter connected to road, like max road speed, time step...
+     *
+     * @param parameters map to put parameter in
+     * @param param parameter to get
+     * @param car car parameters of car requesting parameter
+     **/
     protected void getRoadSimulationParameter(HashMap<String, Double> parameters, String param, CarParams car) {
         if (param.equals(RequestConstants.TIME_STEP_REQUEST)) {
             parameters.put(param, AppContext.RUN_DETAILS.timeStep);
@@ -161,6 +179,9 @@ public abstract class Road {
         }
     }
 
+    /**
+     * method to try to add car to road from generator or queue
+     **/
     protected void tryToAddCar() {
         for (int lane = 0; lane < numberOfLanes; lane++) {
             if (this.generators[lane].generatingToQueue()) {
@@ -171,8 +192,15 @@ public abstract class Road {
         }
     }
 
+    /**
+     * method to add car from queue to road if adding form queue is enabled and queue is not empty
+     *
+     * @param lane lane to add car to
+     */
     protected void addFromQueue(int lane) {
         CarParams cp = this.carQueuesPerLane[lane].peek();
+        //cp.id = idOfCar;
+        //idOfCar++;
 
         if (cp != null && this.okToPutCarAtStart(cp, lane)) {
             this.placeCarAtStart(cp, (int) (cp.getParameter(RequestConstants.LENGTH_REQUEST)), lane);
@@ -180,9 +208,16 @@ public abstract class Road {
         }
     }
 
+    /**
+     * method to add car from generator to road if adding from generator is enabled
+     *
+     * @param lane lane to add car to
+     */
     protected void addFromGenerator(int lane) {
         if (this.generators[lane].decideIfNewCar()) {
             CarParams newCar = generators[lane].generateCar();
+            //newCar.id = idOfCar;
+            //idOfCar++;
 
             if (newCar != null && this.okToPutCarAtStart(newCar, lane)) {
                 this.placeCarAtStart(newCar, (int) (newCar.getParameter(RequestConstants.LENGTH_REQUEST)), lane);
@@ -193,9 +228,23 @@ public abstract class Road {
         }
     }
 
+    /**
+     * abstract method to place car at start of road, implemented in subclasses
+     *
+     * @param car car parameters of car to place
+     * @param length length of car
+     * @param lane lane to place car in
+     **/
     protected abstract void placeCarAtStart(CarParams car, double length, int lane);
-    protected abstract boolean okToPutCarAtStart(CarParams car, int lane);
 
+    /**
+     * abstract method to check if it is ok to put car at start of road, implemented in subclasses
+     *
+     * @param car car parameters of car to check
+     * @param lane lane to check
+     * @return true if it is ok to put car at start, false otherwise
+     **/
+    protected abstract boolean okToPutCarAtStart(CarParams car, int lane);
 
     /**
      * abstract method to get content of road, implemented in subclasses
@@ -218,15 +267,30 @@ public abstract class Road {
      **/
     public abstract int getNumberOfCarsOnRoad();
 
-
+    /**
+     * method to check if the generator is generating to queue
+     *
+     * @return true if generating to queue, false otherwise
+     **/
     public boolean generatingToQueue() {
         return this.generators[0].generatingToQueue();
     }
 
+    /**
+     * getter for car generator
+     *
+     * @return car generator
+     **/
     public CarGenerator getCarGenerator() {
         return this.generators[0];
     }
 
+    /**
+     * method to check if the light on the given lane is green
+     *
+     * @param lane lane to check
+     * @return true if light is green, false otherwise
+     **/
     public boolean isLaneGreen(int lane) {
         if (lane < 0 || lane >= lightPlansOnLanes.length) {
             return true;
@@ -234,29 +298,47 @@ public abstract class Road {
         return lightPlansOnLanes[lane].isGreen();
     }
 
+    /**
+     * method to update lights on the road based on current time
+     *
+     * @param currentTime current simulation time
+     **/
     public void updateLights(int currentTime) {
         for (LightPlan lp : lightPlansOnLanes) {
             lp.tryToSwitchLight(currentTime);
         }
     }
 
+    /**
+     * setter for light plan on lane
+     *
+     * @param lightPlans light plans to set
+     **/
     public void setLightPlan(LightPlan[] lightPlans) {
         this.lightPlansOnLanes = lightPlans;
     }
 
+    /**
+     * setter for light plan on lane
+     *
+     * @param lane lane to set light plan on
+     * @param lightPlan light plan to set
+     **/
     public void setLightPlan(int lane, LightPlan lightPlan) {
         if (lane >= 0 && lane < lightPlansOnLanes.length) {
             this.lightPlansOnLanes[lane] = lightPlan;
         }
     }
 
+    /**
+     * setter for road generator
+     *
+     * @param generator car generator
+     **/
     public void setRoadGenerator(int lane, CarGenerator generator) {
         if (lane >= 0 && lane < generators.length) {
             this.generators[lane] = generator;
         }
     }
-
-
-
 
 }

@@ -11,6 +11,7 @@ public class Parameter {
     /** range of parameter **/
     double range;
 
+    /** name of parameter **/
     public String name;
 
     /**

@@ -72,7 +72,7 @@
             <log>true</log>
             <info>true</info>
             <warn>true</warn>
-            <debug>true</debug>
+            <debug>false</debug>
             <error>true</error>
             <fatal>true</fatal>
         </logging>

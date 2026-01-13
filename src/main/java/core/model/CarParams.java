@@ -73,6 +73,11 @@ public class CarParams implements Cloneable {
         return paramsString + "}}";
     }
 
+    /**
+     * clone method for CarParams
+     *
+     * @return cloned CarParams object
+     **/
     @Override
     public CarParams clone() {
         try {

@@ -332,18 +332,34 @@ public class CarGenerator implements Cloneable {
         return true;
     }
 
+    /** function to remove parameter from generator settings
+     *
+     * @param key parameter key
+     **/
     public void removeParameter(String key) {
         this.parameters.remove(key);
     }
 
+    /** getter for flow rate (lambda parameter)
+     *
+     * @return double flow rate (cars per second)
+     **/
     public double getFlowRate() {
         return this.lambdaPerSec;
     }
 
+    /** setter for flow rate (lambda parameter)
+     *
+     * @param flowRate flow rate (cars per second)
+     **/
     public void setFlowRate(double flowRate) {
         this.lambdaPerSec = flowRate;
     }
 
+    /** function to get all parameters in generator settings
+     *
+     * @return HashMap<String, Parameter> all parameters in generator settings
+     **/
     public HashMap<String, Parameter> getAllParameters() {
         return this.parameters;
     }
@@ -392,6 +408,11 @@ public class CarGenerator implements Cloneable {
         return string + "}";
     }
 
+    /**
+     * clone method for CarGenerator
+     *
+     * @return CarGenerator cloned CarGenerator object
+     **/
     @Override
     public CarGenerator clone() {
         CarGenerator copy = new CarGenerator(this.lambdaPerSec);
@@ -406,14 +427,30 @@ public class CarGenerator implements Cloneable {
         return copy;
     }
 
+    /**
+     * function to check if parameter exists in generator settings
+     *
+     * @param key parameter key
+     * @return boolean whether parameter exists
+     **/
     public boolean keyExists(String key) {
         return parameters.containsKey(key);
     }
 
+    /**
+     * getter for lambda parameter of generator
+     *
+     * @return double lambda parameter (cars per second)
+     **/
     public double getLambdaPerSec() {
         return this.lambdaPerSec;
     }
 
+    /**
+     * function to check if all parameters in generator settings are valid
+     *
+     * @return boolean whether all parameters are valid
+     **/
     public boolean areAllParametersOk() {
         for (String key : parameters.keySet()) {
             Parameter p = parameters.get(key);
@@ -425,6 +462,9 @@ public class CarGenerator implements Cloneable {
         return true;
     }
 
+    /**
+     * function to initialize car queue generation (for generators generating into queue)
+     */
     public void initCarQueue() {
         Queue<CarParams> carQueue = this.generateCarsInToQueue();
     }

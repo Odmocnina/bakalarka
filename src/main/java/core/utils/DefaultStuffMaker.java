@@ -6,6 +6,8 @@ import core.model.LightPlan;
 import core.utils.constants.DefaultValues;
 import core.utils.constants.RequestConstants;
 
+import java.util.LinkedList;
+
 public class DefaultStuffMaker {
 
     /**
@@ -25,11 +27,12 @@ public class DefaultStuffMaker {
      * @param numberOfLanes number of lanes
      * @return default light plan array
      **/
-    public static LightPlan[] createDefaultLightPlan(int numberOfLanes) {
-        LightPlan[] lightPlan = new LightPlan[numberOfLanes];
+    public static LinkedList<LightPlan> createDefaultLightPlan(int numberOfLanes) {
+        LinkedList<LightPlan> lightPlan = new LinkedList<>();
         for (int i = 0; i < numberOfLanes; i++) {
-            lightPlan[i] = createDefaultLightPlan();
+            lightPlan.add(createDefaultLightPlan());
         }
+
         return lightPlan;
     }
 
@@ -48,13 +51,19 @@ public class DefaultStuffMaker {
                 DefaultValues.DEFAULT_SPEED_DIFFERENCE_SENSITIVITY_MIN, DefaultValues.DEFAULT_SPEED_DIFFERENCE_SENSITIVITY_MAX);
         generator.addParameter(RequestConstants.DISTANCE_DIFFERENCE_SENSITIVITY_PARAMETER_REQUEST, "Distance difference sensitivity",
                 DefaultValues.DEFAULT_DISTANCE_DIFFERENCE_SENSITIVITY_MIN, DefaultValues.DEFAULT_DISTANCE_DIFFERENCE_SENSITIVITY_MAX);
+        generator.addParameter(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST, "Edge value for lane change",
+                DefaultValues.DEFAULT_EDGE_VALUE_FOR_LANE_CHANGE_MIN, DefaultValues.DEFAULT_EDGE_VALUE_FOR_LANE_CHANGE_MAX);
+        generator.addParameter(RequestConstants.POLITENESS_FACTOR_REQUEST, "Politeness factor", DefaultValues.POLITENESS_FACTOR_MIN,
+                DefaultValues.POLITENESS_FACTOR_MAX);
         return generator;
     }
 
-    public static CarGenerator[] createDefaultGenerator(int numberOfLanes) {
-        CarGenerator[] generators = new CarGenerator[numberOfLanes];
+    public static LinkedList<CarGenerator> createDefaultGenerator(int numberOfLanes) {
+        //CarGenerator[] generators = new CarGenerator[numberOfLanes];
+        LinkedList<CarGenerator> generators = new LinkedList<>();
         for (int i = 0; i < numberOfLanes; i++) {
-            generators[i] = createDefaultGenerator();
+            //generators[i] = createDefaultGenerator();
+            generators.add(createDefaultGenerator());
         }
         return generators;
     }

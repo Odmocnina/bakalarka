@@ -41,9 +41,6 @@ public class Simulation {
         }
 
         for (int i = 0; i < roads.length; i++) {
-            if (i == 2) {
-                int debug = 0;
-            }
             Road r = roads[i];
             if (r != null) {
                 int carsPassed = r.updateRoad();
@@ -105,6 +102,12 @@ public class Simulation {
         ResultsRecorder.getResultsRecorder().stopTimer();
     }
 
+    /**
+     * Checks if all roads and their queues are empty
+     *
+     * @param roads array of roads to check
+     * @return true if all roads and queues are empty, false otherwise
+     **/
     public boolean areAllRoadsAndQueuesEmpty(Road[] roads) {
         for (Road road : roads) {
             if (road.getNumberOfCarsOnRoad() > 0 || !road.areAllQueuesEmpty()) {
@@ -114,6 +117,12 @@ public class Simulation {
         return true;
     }
 
+    /**
+     * Checks if all queues on the given roads are empty
+     *
+     * @param roads array of roads to check
+     * @return true if all queues are empty, false otherwise
+     **/
     public boolean areAllQueuesEmpty(Road[] roads) {
         for (Road road : roads) {
             if (!road.areAllQueuesEmpty()) {
@@ -123,6 +132,12 @@ public class Simulation {
         return true;
     }
 
+    /**
+     * Checks if all roads are empty
+     *
+     * @param roads array of roads to check
+     * @return true if all roads are empty, false otherwise
+     **/
     public boolean areAllRoadsEmpty(Road[] roads) {
         for (Road road : roads) {
             if (road.getNumberOfCarsOnRoad() > 0) {
@@ -132,16 +147,29 @@ public class Simulation {
         return true;
     }
 
+    /**
+     * Updates the traffic lights on all roads based on the current step count
+     **/
     private void updateLights() {
         for (Road road : roads) {
             road.updateLights(this.stepCount);
         }
     }
 
+    /**
+     * Gets the flow rate of cars entering the simulation from the first road's car generator
+     *
+     * @return flow rate in cars per second
+     **/
     public double getFlowRate() {
         return roads[0].getCarGenerator().getLambdaPerSec();
     }
 
+    /**
+     * Setter for roads in the simulation
+     *
+     * @param roads array of roads to set
+     **/
     public void setRoads(Road[] roads) {
         this.roads = roads;
     }

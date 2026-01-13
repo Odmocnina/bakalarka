@@ -21,6 +21,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 public class RoadXml {
 
@@ -38,8 +39,8 @@ public class RoadXml {
                 int lanes = roadParameters.get(i).lanes;
                 String lengthText = String.valueOf(roadParameters.get(i).length);
                 String speedText = String.valueOf(roadParameters.get(i).maxSpeed);
-                LightPlan[] lp = roadParameters.get(i).lightPlan;
-                CarGenerator[] cg = roadParameters.get(i).carGenerators;
+                LinkedList<LightPlan> lp = roadParameters.get(i).lightPlan;
+                LinkedList<CarGenerator> cg = roadParameters.get(i).carGenerators;
 
                 processRoad(lanes, lengthText, speedText, lp, cg, doc, rootElement, i);
             }
@@ -64,8 +65,8 @@ public class RoadXml {
         }
     }
 
-    private static void processRoad(int lanes, String lengthText, String speedText, LightPlan[] lp, CarGenerator[] cg, Document doc,
-                                    Element rootElement, int i) {
+    private static void processRoad(int lanes, String lengthText, String speedText, LinkedList<LightPlan> lp,
+                                    LinkedList<CarGenerator> cg, Document doc, Element rootElement, int i) {
 
         double length = 0;
         double speed = 0;
@@ -80,7 +81,8 @@ public class RoadXml {
                 MyLogger.logBeforeLoading("Wrong input speed in road: " + (i + 1) + "(zero or smaller)," +
                         "setting to default value.", Constants.ERROR_FOR_LOGGING);
             } else {
-                speed = Math.ceil(Double.parseDouble(speedText) / 3.6); // km/h to m/s
+              //  speed = Math.ceil(Double.parseDouble(speedText) / 3.6); // km/h to m/s
+                speed = Math.ceil(Double.parseDouble(speedText));
             }
         } catch (NumberFormatException e) {
             speed = DefaultValues.DEFAULT_ROAD_MAX_SPEED;
@@ -107,44 +109,42 @@ public class RoadXml {
         }
 
         if (lp == null) {
-            lp = new LightPlan[lanes];
+            //lp = new LightPlan[lanes];
+            lp = new LinkedList<LightPlan>();
             for (int j = 0; j < lanes; j++) {
-                lp[j] = new LightPlan(DefaultValues.DEFAULT_LIGHT_PLAN_CYCLE_DURATION,
-                        DefaultValues.DEFAULT_LIGHT_PLAN_GREEN_DURATION,
-                        DefaultValues.DEFAULT_LIGHT_PLAN_START_WITH_GREEN);
+                lp.add(DefaultStuffMaker.createDefaultLightPlan());
             }
             MyLogger.logBeforeLoading("No light plan defined for road: " + (i + 1) + ", setting to default " +
                     "value.", Constants.ERROR_FOR_LOGGING);
         }
 
-        for (int lane = 0; lane < lp.length; lane++) {
-            if (lp[lane] == null) {
-                lp[lane] = new LightPlan(DefaultValues.DEFAULT_LIGHT_PLAN_CYCLE_DURATION,
-                        DefaultValues.DEFAULT_LIGHT_PLAN_GREEN_DURATION,
-                        DefaultValues.DEFAULT_LIGHT_PLAN_START_WITH_GREEN);
+        for (int lane = 0; lane < lp.size(); lane++) {
+            if (lp.get(lane) == null) {
+                lp.add(lane, DefaultStuffMaker.createDefaultLightPlan());
                 MyLogger.logBeforeLoading("No light plan defined for lane: " + (lane + 1) + " in road: " + (i + 1) +
                         ", setting to default value.", Constants.ERROR_FOR_LOGGING);
-            } else if (!lp[lane].isLegitimate()) {
-                lp[lane] = new LightPlan(DefaultValues.DEFAULT_LIGHT_PLAN_CYCLE_DURATION,
-                        DefaultValues.DEFAULT_LIGHT_PLAN_GREEN_DURATION,
-                        DefaultValues.DEFAULT_LIGHT_PLAN_START_WITH_GREEN);
+            } else if (!lp.get(lane).isLegitimate()) {
+                lp.add(lane, DefaultStuffMaker.createDefaultLightPlan());
                 MyLogger.logBeforeLoading("Wrong light plan defined for road: " + (i + 1) + ", setting to default " +
                         "value.", Constants.ERROR_FOR_LOGGING);
             }
         }
 
         if (cg == null) {
-            cg = new CarGenerator[lanes];
+            //cg = new CarGenerator[lanes];
+            cg = new LinkedList<CarGenerator>();
             for (int j = 0; j < lanes; j++) {
-                cg[j] = new CarGenerator(DefaultValues.DEFAULT_FLOW_RATE);
+                //cg[j] = new CarGenerator(DefaultValues.DEFAULT_FLOW_RATE);
+                cg.add(DefaultStuffMaker.createDefaultGenerator());
             }
             MyLogger.logBeforeLoading("No car generator defined for road: " + (i + 1) + ", setting to default " +
                     "value.", Constants.ERROR_FOR_LOGGING);
         }
 
-        for (int lane = 0; lane < cg.length; lane++) {
-            if (cg[lane] == null) {
-                cg[lane] = new CarGenerator(DefaultValues.DEFAULT_FLOW_RATE);
+        for (int lane = 0; lane < cg.size(); lane++) {
+            if (cg.get(lane) == null) {
+                //cg[lane] = new CarGenerator(DefaultValues.DEFAULT_FLOW_RATE);
+                cg.add(lane, DefaultStuffMaker.createDefaultGenerator());
                 MyLogger.logBeforeLoading("No car generator defined for lane: " + (lane + 1) + " in road: " + (i + 1) +
                         ", setting to default value.", Constants.ERROR_FOR_LOGGING);
             } /*else if (!cg[lane].isLegitimate()) {
@@ -157,8 +157,8 @@ public class RoadXml {
         addRoadToXml(lanes, length, speed, lp, cg, doc, rootElement, i);
     }
 
-    private static void addRoadToXml(int numberOfLanes, double length, double speed, LightPlan[] lp, CarGenerator[] cg,
-                                     Document doc, Element rootElement, int index) {
+    private static void addRoadToXml(int numberOfLanes, double length, double speed, LinkedList<LightPlan> lp,
+                                     LinkedList<CarGenerator> cg, Document doc, Element rootElement, int index) {
         Element roadElement = doc.createElement(RoadLoadingConstants.ROAD_TAG);
         rootElement.appendChild(roadElement);
 
@@ -189,21 +189,22 @@ public class RoadXml {
             // write light plan to XML
             Element lightPlanCycleDurationElement = doc.createElement(RoadLoadingConstants.CYCLE_DURATION_TAG);
             lightPlanElement.appendChild(lightPlanCycleDurationElement);
-            lightPlanCycleDurationElement.appendChild(doc.createTextNode(String.valueOf(lp[lane].getCycleTime())));
+            lightPlanCycleDurationElement.appendChild(doc.createTextNode(String.valueOf(lp.get(lane).getCycleTime())));
             Element lightPlanTimeOfSwitchElement = doc.createElement(RoadLoadingConstants.TIME_OF_SWITCH_TAG);
             lightPlanElement.appendChild(lightPlanTimeOfSwitchElement);
-            lightPlanTimeOfSwitchElement.appendChild(doc.createTextNode(String.valueOf(lp[lane].getTimeOfSwitch())));
+            lightPlanTimeOfSwitchElement.appendChild(doc.createTextNode(String.valueOf(lp.get(lane).getTimeOfSwitch())));
             Element lightPlanStartWithGreenElement = doc.createElement(RoadLoadingConstants.START_WITH_GREEN_TAG);
             lightPlanElement.appendChild(lightPlanStartWithGreenElement);
-            lightPlanStartWithGreenElement.appendChild(doc.createTextNode(String.valueOf(lp[lane].isBeginsOnGreen())));
+            lightPlanStartWithGreenElement.appendChild(doc.createTextNode(String.valueOf(lp.get(lane).isBeginsOnGreen())));
 
             //write generator to XML
+            CarGenerator generator = cg.get(lane);
             Element flowRateElement = doc.createElement(RoadLoadingConstants.FLOW_RATE_TAG);
             generatorElement.appendChild(flowRateElement);
-            flowRateElement.appendChild(doc.createTextNode(String.valueOf(cg[lane].getFlowRate())));
+            flowRateElement.appendChild(doc.createTextNode(String.valueOf(generator.getFlowRate())));
             Element paramElement = doc.createElement(RoadLoadingConstants.CAR_PARAMS_TAG);
             generatorElement.appendChild(paramElement);
-            HashMap<String, Parameter> carParams = cg[lane].getAllParameters();
+            HashMap<String, Parameter> carParams = generator.getAllParameters();
             for (String paramKey : carParams.keySet()) {
                 Parameter parameter = carParams.get(paramKey);
                 Element parameterElement = doc.createElement(paramKey);
