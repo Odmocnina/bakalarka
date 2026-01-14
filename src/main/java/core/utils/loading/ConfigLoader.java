@@ -456,7 +456,7 @@ public class ConfigLoader {
             }
 
             if (debug != null) {
-                detailsFromConfig.debug = Boolean.parseBoolean(drawCells.getTextContent());
+                detailsFromConfig.debug = Boolean.parseBoolean(debug.getTextContent());
             } else {
                 detailsFromConfig.debug = false;
             }

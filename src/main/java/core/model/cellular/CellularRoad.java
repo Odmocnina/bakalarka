@@ -364,7 +364,7 @@ public class CellularRoad extends Road {
                 }
             } else {
                 if (position > 0) {
-                    return this.getPreviousCarInLane(lane, position);
+                    return this.getPreviousCarInLane(lane, position, car);
                 } else {
                     return null;
                 }
@@ -377,7 +377,7 @@ public class CellularRoad extends Road {
             if (orientation == Orientation.FORWARD) {
                 return this.getNextCarInLane(lane - 1, position);
             } else {
-                return this.getPreviousCarInLane(lane - 1, position);
+                return this.getPreviousCarInLane(lane - 1, position, car);
             }
         } else if (direction == Direction.RIGHT) {
             if (lane == numberOfLanes - 1) {
@@ -387,7 +387,7 @@ public class CellularRoad extends Road {
             if (orientation == Orientation.FORWARD) {
                 return this.getNextCarInLane(lane + 1, position);
             } else {
-                return this.getPreviousCarInLane(lane + 1, position);
+                return this.getPreviousCarInLane(lane + 1, position, car);
             }
         }
 
@@ -416,11 +416,13 @@ public class CellularRoad extends Road {
      *
      * @param lane lane number to search in
      * @param position position to start searching from
+     * @param car CarParams of the car for which we are searching the previous car, this is so that function doesn't
+     *            return the same car when straight backward is requested
      * @return CarParams of the previous car behind, or null if no car is found
      **/
-    private CarParams getPreviousCarInLane(int lane, int position) {
-        for (int pos = position - 1; pos >= 0; pos--) {
-            if (cells[lane][pos].isOccupied() && cells[lane][pos].isHead()) {
+    private CarParams getPreviousCarInLane(int lane, int position, CarParams car) {
+        for (int pos = position; pos >= 0; pos--) {
+            if (cells[lane][pos].isOccupied() && cells[lane][pos].isHead() && cells[lane][pos].getCarParams() != car) {
                 return cells[lane][pos].getCarParams();
             }
         }

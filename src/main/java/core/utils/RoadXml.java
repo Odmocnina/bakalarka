@@ -25,7 +25,7 @@ import java.util.LinkedList;
 
 public class RoadXml {
 
-    public static void writeMapToXml(ArrayList<RoadParameters> roadParameters, int numberOfRoads, String mapFileName) {
+    public static boolean writeMapToXml(ArrayList<RoadParameters> roadParameters, int numberOfRoads, String mapFileName) {
 
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -58,10 +58,12 @@ public class RoadXml {
 
             // wriring the content into xml file
             transformer.transform(source, result);
+            return true;
 
         } catch (Exception e) {
             MyLogger.logBeforeLoading("Error while writing map to XML: " + e.getMessage(),
                     Constants.ERROR_FOR_LOGGING);
+            return false;
         }
     }
 

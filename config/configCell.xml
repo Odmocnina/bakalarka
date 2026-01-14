@@ -5,7 +5,7 @@
 
     <models>
         <carFollowingModel>
-            <id>nagelschreckenberg</id>
+            <id>head-leading</id>
         </carFollowingModel>
         <laneChangingModel>
             <id>stca</id>
@@ -26,7 +26,7 @@
             </maxSpeed>
             <length>
                 <minValue>3</minValue>
-                <maxValue>9</maxValue>
+                <maxValue>20</maxValue>
             </length>
             <maxAcceleration>
                 <minValue>1</minValue>
@@ -69,6 +69,7 @@
         <drawCells>false</drawCells>
         <timeStep>1</timeStep>
         <duration>1200</duration>
+        <debug>true</debug>
         <logging>
             <log>true</log>
             <info>true</info>
@@ -82,6 +83,6 @@
             <file>output/simulationKKWQ.csv</file>
             <type>csv</type>
         </output>
-        <timeBetweenSteps>1000</timeBetweenSteps>
+    <timeBetweenSteps>1</timeBetweenSteps>
     </runDetails>
 </config>

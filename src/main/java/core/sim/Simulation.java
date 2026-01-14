@@ -173,4 +173,8 @@ public class Simulation {
     public void setRoads(Road[] roads) {
         this.roads = roads;
     }
+
+    public boolean isStepCountEven() {
+        return this.stepCount % 2 == 0;
+    }
 }

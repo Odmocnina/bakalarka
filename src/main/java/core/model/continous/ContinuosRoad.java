@@ -182,6 +182,7 @@ public class ContinuosRoad extends Road {
         if (AppContext.RUN_DETAILS.debug) {
             this.checkForCollisions();
             this.checkForDuplicates();
+           // this.checkForDuplicatesInRoad();
         }
 
         return this.checkRelevancyOfCars();
@@ -741,6 +742,25 @@ public class ContinuosRoad extends Road {
                     if (carA.id == carB.id) {
                         MyLogger.log("Duplicate car found in lane " + lane + " with ID: " + carA.id,
                                 Constants.ERROR_FOR_LOGGING);
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void checkForDuplicatesInRoad() {
+        for (int lane = 0; lane < numberOfLanes; lane++) {
+            LinkedList<CarParams> laneList = vehicles[lane];
+            for (int car = 0; car < laneList.size(); car++) {
+                CarParams carA = laneList.get(car);
+                for (int lane2 = 0; lane < numberOfLanes; lane2++) {
+                    for (int diffCar = 0; diffCar < laneList.size(); diffCar++) {
+                        CarParams carB = laneList.get(diffCar);
+                        if (carA != carB && carA.id == carB.id) {
+                            MyLogger.log("Duplicate car found in lane " + lane + " with ID: " + carA.id,
+                                    Constants.ERROR_FOR_LOGGING);
+                        }
                     }
                 }
             }

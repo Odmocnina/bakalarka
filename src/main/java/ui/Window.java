@@ -455,7 +455,12 @@ public class Window extends Application {
 
         newMapFileBtn.setOnAction(e -> {
             MyLogger.log("Creating new map pressed...", Constants.INFO_FOR_LOGGING);
-            DialogMaker.newMapDialog(primaryStage);
+            DialogMaker.newMapDialog(primaryStage, paintAll);
+        });
+
+        editMapFileBtn.setOnAction(e -> {
+            MyLogger.log("Modifying map file...", Constants.INFO_FOR_LOGGING);
+            //DialogMaker.modifyMapDialog(primaryStage, , paintAll);
         });
 
         startStopBtn.setOnAction(e -> {
@@ -550,7 +555,7 @@ public class Window extends Application {
 
         itemNewFile.setOnAction(e -> {
             MyLogger.log("Creating new map pressed...", Constants.INFO_FOR_LOGGING);
-            DialogMaker.newMapDialog(primaryStage);
+            DialogMaker.newMapDialog(primaryStage, paintAll);
         });
 
         itemEditFile.setOnAction(e -> {

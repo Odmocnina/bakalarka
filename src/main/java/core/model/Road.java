@@ -199,11 +199,14 @@ public abstract class Road {
      */
     protected void addFromQueue(int lane) {
         CarParams cp = this.carQueuesPerLane[lane].peek();
-        //cp.id = idOfCar;
-        //idOfCar++;
 
         if (cp != null && this.okToPutCarAtStart(cp, lane)) {
+            cp.id = idOfCar;
+            idOfCar++;
             this.placeCarAtStart(cp, (int) (cp.getParameter(RequestConstants.LENGTH_REQUEST)), lane);
+            MyLogger.log("New car placed at lane " + lane + " position: " +
+                            cp.getParameter(RequestConstants.LENGTH_REQUEST) + ", carParams: " + cp,
+                    Constants.DEBUG_FOR_LOGGING);
             this.carQueuesPerLane[lane].poll();
         }
     }
@@ -216,10 +219,10 @@ public abstract class Road {
     protected void addFromGenerator(int lane) {
         if (this.generators[lane].decideIfNewCar()) {
             CarParams newCar = generators[lane].generateCar();
-            //newCar.id = idOfCar;
-            //idOfCar++;
 
             if (newCar != null && this.okToPutCarAtStart(newCar, lane)) {
+                newCar.id = idOfCar;
+                idOfCar++;
                 this.placeCarAtStart(newCar, (int) (newCar.getParameter(RequestConstants.LENGTH_REQUEST)), lane);
                 MyLogger.log("New car placed at lane " + lane + " position: " +
                                 newCar.getParameter(RequestConstants.LENGTH_REQUEST) + ", carParams: " + newCar,
