@@ -1,5 +1,6 @@
 package core.utils;
 
+import app.AppContext;
 import core.model.CarGenerator;
 import core.model.LightPlan;
 import core.model.Parameter;
@@ -224,7 +225,18 @@ public class RoadXml {
 
             roadElement.appendChild(laneElement);
         }
-        
+    }
+
+    public void saveCurrentMap() {
+        ArrayList<RoadParameters> currentRoadParameters =
+                RoadParameters.existingRoadsToRoadParameters(AppContext.SIMULATION.getRoads());
+        writeMapToXml(currentRoadParameters, currentRoadParameters.size(), AppContext.CURRENT_OPENED_FILE);
+    }
+
+    public void saveCurrentMap(String path) {
+        ArrayList<RoadParameters> currentRoadParameters =
+                RoadParameters.existingRoadsToRoadParameters(AppContext.SIMULATION.getRoads());
+        writeMapToXml(currentRoadParameters, currentRoadParameters.size(), path);
     }
 
 }

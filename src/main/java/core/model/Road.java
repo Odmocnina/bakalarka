@@ -344,4 +344,31 @@ public abstract class Road {
         }
     }
 
+    public void setTypesOfGenerators() {
+        for (CarGenerator generator : generators) {
+            generator.setType(this);
+        }
+    }
+
+    public void setParametersForGeneration(String parametersForGeneration) {
+        for (CarGenerator generator : generators) {
+            generator.setCarGenerationParameters(parametersForGeneration);
+        }
+    }
+
+    public void setTypeAndParametersOfGenerators(String parametersForGeneration) {
+        for (CarGenerator generator : generators) {
+            generator.setType(this);
+            generator.setCarGenerationParameters(parametersForGeneration);
+        }
+    }
+
+    public CarGenerator[] getCarGenerators() {
+        return this.generators;
+    }
+
+    public LightPlan[] getLightPlans() {
+        return this.lightPlansOnLanes;
+    }
+
 }

@@ -6,12 +6,11 @@ import core.model.Parameter;
 import core.utils.DefaultStuffMaker;
 import core.utils.MyLogger;
 import core.utils.RoadParameters;
-import core.utils.RoadXml;
 import core.utils.constants.Constants;
 import core.utils.constants.DefaultValues;
 
-import core.utils.loading.RoadLoader;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -42,7 +41,7 @@ public class DialogMaker {
      * @param stage owner stage
      * @param lightPlan light plan to edit
      **/
-    private static void editLightPlanDialog(Stage stage, LightPlan lightPlan, int lane) {
+    protected static void editLightPlanDialog(Stage stage, LightPlan lightPlan, int lane) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Edit light plan on lane: " + lane);
         dialog.setHeaderText("Edit the light plan on lane: " + lane);
@@ -100,7 +99,7 @@ public class DialogMaker {
      * @param stage owner stage
      * @param message warning message
      **/
-    private static void warningDialog(Stage stage, String message) {
+    protected static void warningDialog(Stage stage, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Warning");
         alert.setHeaderText("Warning");
@@ -115,7 +114,7 @@ public class DialogMaker {
      * @param stage owner stage
      * @param generator car generator to edit
      **/
-    private static void editGeneratorDialog(Stage stage, CarGenerator generator, int lane) {
+    protected static void editGeneratorDialog(Stage stage, CarGenerator generator, int lane) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Edit car generator on lane: " + lane);
         dialog.setHeaderText("Edit the car generator parameters ona lane: " + lane);
@@ -235,7 +234,40 @@ public class DialogMaker {
                 dialog.getDialogPane().getScene().getWindow().sizeToScene();
             }
         });
+    }
 
+    protected static void removeRoadFormMap(ArrayList<RoadParameters> roadParameters, int index,
+                                            Stage stage, Dialog<ButtonType> dialog) {
+        //sanity check
+        if (roadParameters.isEmpty()) {
+            MyLogger.log("No roads available to delete.", Constants.ERROR_FOR_LOGGING);
+            warningDialog(stage, "No roads available to delete.");
+            return;
+        }
+
+        if (index < 0 || index >= roadParameters.size()) {
+            MyLogger.log("Invalid road index to delete: " + index, Constants.ERROR_FOR_LOGGING);
+            warningDialog(stage, "Invalid road index to delete: " + (index + 1));
+            return;
+        }
+
+        // pop up confirmation dialog
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        int roadNumber = index + 1;
+        alert.setTitle("Delete road");
+        alert.setHeaderText("Are you sure you want to delete road: " + roadNumber + "?");
+        alert.initOwner(stage);
+        alert.showAndWait().ifPresent(response -> {
+            if (response != ButtonType.OK) {
+                MyLogger.log("Road deletion cancelled for road index: " + roadNumber + ".",
+                        Constants.INFO_FOR_LOGGING);
+            } else {
+                MyLogger.log("Road deletion confirmed for road index: " + roadNumber + ".",
+                        Constants.INFO_FOR_LOGGING);
+                roadParameters.remove(index);
+                MyLogger.log("Road " + roadNumber + " deleted from map.", Constants.INFO_FOR_LOGGING);
+            }
+        });
     }
 
     private static void changeParameterDialog(Stage stage, CarGenerator generator, String oldKey, Parameter parameter) {
@@ -451,103 +483,121 @@ public class DialogMaker {
      * @param changingAll boolean if changing all roads
      * @param index index of road to change if not changing all
      **/
-    public static void changeRoadsDialog(Stage stage, ArrayList<RoadParameters> roadParameters, int numberOfRoads,
+     protected static void changeRoadsDialog(Stage stage, ArrayList<RoadParameters> roadParameters, int numberOfRoads,
                                          boolean changingAll, int index) {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        String speed;
-        String length;
-        int lanes;
-        LinkedList<LightPlan> lightPlan;
-        LinkedList<CarGenerator> generators;
-        if (!changingAll) {
-            dialog.setTitle("Change selected road properties, road index: " + (index + 1));
-            dialog.setHeaderText("Modify properties of the selected road: " + (index + 1));
-            speed = String.valueOf(roadParameters.get(index).maxSpeed);
-            length = String.valueOf(roadParameters.get(index).length);
-            lanes = roadParameters.get(index).lanes;
-            lightPlan = roadParameters.get(index).lightPlan;
-            generators = roadParameters.get(index).carGenerators;
-        } else {
-            dialog.setTitle("Change all roads properties");
-            dialog.setHeaderText("Modify properties of the all roads");
-            speed = STOCK_MAX_SPEED;
-            length = STOCK_LENGTH;
-            lanes = Integer.parseInt(STOCK_NUMBER_OF_LANES);
-            lightPlan = new LinkedList<>();
-            for (int i = 0; i < lanes; i++) {
-                lightPlan.add(DefaultStuffMaker.createDefaultLightPlan());
-            }
-            generators = new LinkedList<>();
-            for (int i = 0; i < lanes; i++) {
-                generators.add(DefaultStuffMaker.createDefaultGenerator());
-            }
-        }
-        dialog.initOwner(stage);
+         Dialog<ButtonType> dialog = new Dialog<>();
+         String speed;
+         String length;
+         int lanes;
+         LinkedList<LightPlan> lightPlan;
+         LinkedList<CarGenerator> generators;
+         if (!changingAll) {
+             dialog.setTitle("Change selected road properties, road index: " + (index + 1));
+             dialog.setHeaderText("Modify properties of the selected road: " + (index + 1));
+             speed = String.valueOf(roadParameters.get(index).maxSpeed);
+             length = String.valueOf(roadParameters.get(index).length);
+             lanes = roadParameters.get(index).lanes;
+             lightPlan = roadParameters.get(index).lightPlan;
+             generators = roadParameters.get(index).carGenerators;
+         } else {
+             dialog.setTitle("Change all roads properties");
+             dialog.setHeaderText("Modify properties of the all roads");
+             speed = STOCK_MAX_SPEED;
+             length = STOCK_LENGTH;
+             lanes = Integer.parseInt(STOCK_NUMBER_OF_LANES);
+             lightPlan = new LinkedList<>();
+             for (int i = 0; i < lanes; i++) {
+                 lightPlan.add(DefaultStuffMaker.createDefaultLightPlan());
+             }
+             generators = new LinkedList<>();
+             for (int i = 0; i < lanes; i++) {
+                 generators.add(DefaultStuffMaker.createDefaultGenerator());
+             }
+         }
+         dialog.initOwner(stage);
 
-        ButtonType applyButtonType = new ButtonType("Apply", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(applyButtonType, ButtonType.CANCEL);
+         ButtonType applyButtonType = new ButtonType("Apply", ButtonBar.ButtonData.OK_DONE);
+         ButtonType deleteButtonType = new ButtonType("Delete Road", ButtonBar.ButtonData.NO);
+         if (!changingAll) { // if one road is being changed, give option to delete
+             dialog.getDialogPane().getButtonTypes().addAll(applyButtonType, deleteButtonType, ButtonType.CANCEL);
+             Node deleteButton = dialog.getDialogPane().lookupButton(deleteButtonType);
+             if (deleteButton != null) {
+                 deleteButton.setStyle("-fx-background-color: #d32f2f; -fx-text-fill: white; -fx-font-weight: bold;");
+             }
+         } else {
+             dialog.getDialogPane().getButtonTypes().addAll(applyButtonType, ButtonType.CANCEL);
+         }
 
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 20, 10, 10));
+         GridPane grid = new GridPane();
+         grid.setHgap(10);
+         grid.setVgap(10);
+         grid.setPadding(new Insets(20, 20, 10, 10));
 
-        TextField lengthField = new TextField(length);
-        TextField speedLimitField = new TextField(speed);
-        Spinner<Integer> lanesSpinner = new Spinner<>(1, 10, lanes);
-        Spinner<Integer> laneIndexSpinner = new Spinner<>(1, lanes, 1);
+         TextField lengthField = new TextField(length);
+         TextField speedLimitField = new TextField(speed);
+         Spinner<Integer> lanesSpinner = new Spinner<>(1, 10, lanes);
+         Spinner<Integer> laneIndexSpinner = new Spinner<>(1, lanes, 1);
 
-        grid.add(new Label("Length (m):"), 0, 0);
-        grid.add(lengthField, 1, 0);
+         grid.add(new Label("Length (m):"), 0, 0);
+         grid.add(lengthField, 1, 0);
 
-        grid.add(new Label("Speed limit (km/h):"), 0, 1);
-        grid.add(speedLimitField, 1, 1);
+         grid.add(new Label("Speed limit (km/h):"), 0, 1);
+         grid.add(speedLimitField, 1, 1);
 
-        grid.add(new Label("Number of lanes:"), 0, 2);
-        grid.add(lanesSpinner, 1, 2);
+         grid.add(new Label("Number of lanes:"), 0, 2);
+         grid.add(lanesSpinner, 1, 2);
 
-        // listener to update lane index max value when number of lanes changes
-        lanesSpinner.valueProperty().addListener((obs, oldVal, newVal) ->
-                //laneIndexSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, newVal, 1)));
-                updateNumberOfLanes(lightPlan, generators, newVal, laneIndexSpinner));
+         // listener to update lane index max value when number of lanes changes
+         lanesSpinner.valueProperty().addListener((obs, oldVal, newVal) ->
+                 //laneIndexSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, newVal, 1)));
+                 updateNumberOfLanes(lightPlan, generators, newVal, laneIndexSpinner));
 
-        grid.add(new Label("Edit light plan on lane:"), 0, 3);
-        grid.add(laneIndexSpinner, 1, 3);
+         grid.add(new Label("Edit light plan or generator on lane:"), 0, 3);
+         grid.add(laneIndexSpinner, 1, 3);
 
-        Button lightPlanButton = new Button("Edit light plan...");
-        grid.add(lightPlanButton, 1, 4);
+         Button lightPlanButton = new Button("Edit light plan...");
+         grid.add(lightPlanButton, 1, 4);
 
-        Button generatorButton = new Button("Edit car generator...");
-        grid.add(generatorButton, 1, 5);
+         Button generatorButton = new Button("Edit car generator...");
+         grid.add(generatorButton, 1, 5);
 
-        lightPlanButton.setOnAction(e ->
-                editLightPlanDialog(stage, lightPlan.get(laneIndexSpinner.getValue() - 1), laneIndexSpinner.getValue()));
+         lightPlanButton.setOnAction(e ->
+                 editLightPlanDialog(stage, lightPlan.get(laneIndexSpinner.getValue() - 1), laneIndexSpinner.getValue()));
 
-        generatorButton.setOnAction(e ->
-                editGeneratorDialog(stage, generators.get(laneIndexSpinner.getValue() - 1),
-                        laneIndexSpinner.getValue()));
+         generatorButton.setOnAction(e ->
+                 editGeneratorDialog(stage, generators.get(laneIndexSpinner.getValue() - 1),
+                         laneIndexSpinner.getValue()));
 
-        dialog.getDialogPane().setContent(grid);
+         dialog.getDialogPane().setContent(grid);
 
-        // show the dialog and wait for user response
-        dialog.showAndWait().ifPresent(response -> {
-            if (response == applyButtonType) {
-                if (!changingAll) {
-                    MyLogger.log("Selected road properties updated via dialog.", Constants.INFO_FOR_LOGGING);
-                    changeRoadParameters(index, lanesSpinner.getValue(), Double.parseDouble(speedLimitField.getText()),
-                            Double.parseDouble(lengthField.getText()), lightPlan, generators, roadParameters);
-                    return;
-                }
-                MyLogger.log("All road properties updated via dialog.", Constants.INFO_FOR_LOGGING);
-                for (int i = 0; i < numberOfRoads; i++) {
-                    changeRoadParameters(i, lanesSpinner.getValue(), Double.parseDouble(speedLimitField.getText()),
-                            Double.parseDouble(lengthField.getText()), lightPlan, generators, roadParameters);
-                }
-            } else {
-                MyLogger.log("Dialog cancelled.", Constants.INFO_FOR_LOGGING);
-            }
-        });
-    }
+         // show the dialog and wait for user response
+         dialog.showAndWait().ifPresent(response -> {
+             if (response == applyButtonType) {
+                 if (checkRoadInputs(lanesSpinner.getValue(), speedLimitField.getText(), lengthField.getText(), generators, lightPlan)) {
+                     if (!changingAll) {
+                         MyLogger.log("Selected road properties updated via dialog.", Constants.INFO_FOR_LOGGING);
+                         changeRoadParameters(index, lanesSpinner.getValue(), Double.parseDouble(speedLimitField.getText()),
+                                 Double.parseDouble(lengthField.getText()), lightPlan, generators, roadParameters);
+                         return;
+                     }
+                     MyLogger.log("All road properties updated via dialog.", Constants.INFO_FOR_LOGGING);
+                     for (int i = 0; i < numberOfRoads; i++) {
+                         changeRoadParameters(i, lanesSpinner.getValue(), Double.parseDouble(speedLimitField.getText()),
+                                 Double.parseDouble(lengthField.getText()), lightPlan, generators, roadParameters);
+                     }
+                 } else {
+                     MyLogger.log("Invalid road inputs provided in dialog.", Constants.ERROR_FOR_LOGGING);
+                     warningDialog(stage, "Invalid road inputs provided. Please check number of lanes, max speed and length.");
+                 }
+             } else if (response == deleteButtonType) {
+                 if (!changingAll) {
+                     removeRoadFormMap(roadParameters, index, stage, dialog);
+                 }
+             } else {
+                 MyLogger.log("Dialog cancelled.", Constants.INFO_FOR_LOGGING);
+             }
+         });
+     }
 
     /**
      * show dialog to select a road to edit
@@ -556,7 +606,7 @@ public class DialogMaker {
      * @param roadParameters list of road parameters
      * @param numberOfRoads number of roads
      **/
-    public static void selectRoadDialog(Stage stage, ArrayList<RoadParameters> roadParameters, int numberOfRoads) {
+    protected static void selectRoadDialog(Stage stage, ArrayList<RoadParameters> roadParameters, int numberOfRoads) {
         if (numberOfRoads <= 0) {
             MyLogger.log("No roads available to select.", Constants.ERROR_FOR_LOGGING);
             return;
@@ -600,7 +650,7 @@ public class DialogMaker {
         });
     }
 
-    private static void updateNumberOfLanes(LinkedList<LightPlan> lightPlans, LinkedList<CarGenerator> generators,
+    protected static void updateNumberOfLanes(LinkedList<LightPlan> lightPlans, LinkedList<CarGenerator> generators,
                                             int newNumberOfLanes, Spinner<Integer> lanesSpinner) {
         if (newNumberOfLanes > lightPlans.size()) {
             for (int i = lightPlans.size(); i < newNumberOfLanes; i++) {
@@ -621,206 +671,6 @@ public class DialogMaker {
     }
 
     /**
-     * show dialog to create a new map
-     *
-     * @param primaryStage owner stage
-     **/
-    public static void newMapDialog(Stage primaryStage, Runnable paintAll) {
-        // Create main dialog window
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Create new map");
-        dialog.setHeaderText("New map creation");
-        dialog.initOwner(primaryStage);
-        dialog.setWidth(420);
-
-        ArrayList<RoadParameters> roadParameters = new ArrayList<>();
-
-        // Buttons (Create / Cancel)
-        ButtonType createButtonType = new ButtonType("Create", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(createButtonType, ButtonType.CANCEL);
-
-        // Spinner for number of roads
-        Spinner<Integer> roadsSpinner = new Spinner<>(1, 20000, 1);
-
-        // Main layout panel
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 20, 10, 10));
-
-        // File name field for map file
-        grid.add(new Label("Map file:"), 0, 0);
-        TextField mapFileNameField = new TextField("map.xml");
-        grid.add(mapFileNameField, 1, 0);
-
-        grid.add(new Label("Number of roads:"), 0, 1);
-        grid.add(roadsSpinner, 1, 1);
-
-        Button changeAllRoadsButton = new Button("Change all roads...");
-        Button changeOneRoadButton = new Button("Change one road...");
-        grid.add(changeAllRoadsButton, 0, 2);
-        grid.add(changeOneRoadButton, 1, 2);
-
-        changeAllRoadsButton.setOnAction(e ->
-                changeRoadsDialog(primaryStage, roadParameters, roadsSpinner.getValue(), true, -1));
-
-        changeOneRoadButton.setOnAction(e -> selectRoadDialog(primaryStage, roadParameters, roadsSpinner.getValue()));
-
-        int numberOfRoads = roadsSpinner.getValue();
-
-        for (int i = 0; i < numberOfRoads; i++) {
-            addRoadParameters(Integer.parseInt(STOCK_NUMBER_OF_LANES), Double.parseDouble(STOCK_MAX_SPEED),
-                    Double.parseDouble(STOCK_LENGTH), DefaultStuffMaker.createDefaultLightPlan(Integer.parseInt(STOCK_NUMBER_OF_LANES)),
-                    DefaultStuffMaker.createDefaultGenerator(Integer.parseInt(STOCK_NUMBER_OF_LANES)), roadParameters);
-        }
-
-        // if number of roads changes, update the lists
-        roadsSpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
-            int newNumberOfRoads = newVal;
-            if (newNumberOfRoads > roadParameters.size()) {
-                for (int i = roadParameters.size(); i < newNumberOfRoads; i++) {
-                    addRoadParameters(Integer.parseInt(STOCK_NUMBER_OF_LANES),
-                            Double.parseDouble(STOCK_MAX_SPEED), Double.parseDouble(STOCK_LENGTH),
-                            DefaultStuffMaker.createDefaultLightPlan(Integer.parseInt(STOCK_NUMBER_OF_LANES)),
-                            DefaultStuffMaker.createDefaultGenerator(Integer.parseInt(STOCK_NUMBER_OF_LANES)), roadParameters);
-                }
-            } else if (newNumberOfRoads < roadParameters.size()) {
-                roadParameters.subList(newNumberOfRoads, roadParameters.size()).clear();
-            }
-        });
-
-        dialog.getDialogPane().setContent(grid);
-
-        // Handle Create button click
-        dialog.showAndWait().ifPresent(result -> {
-            if (result == createButtonType) {
-                String mapFileName = mapFileNameField.getText();
-                boolean success = RoadXml.writeMapToXml(roadParameters, roadParameters.size(), mapFileName);
-                MyLogger.log("Creating new map: " + mapFileName, Constants.INFO_FOR_LOGGING);
-                if (success) {
-                    MyLogger.log("New map created successfully: " + mapFileName, Constants.INFO_FOR_LOGGING);
-                    openNewRoadDialog(primaryStage, mapFileName, paintAll);
-                } else {
-                    MyLogger.log("Failed to create new map: " + mapFileName, Constants.ERROR_FOR_LOGGING);
-                }
-            }
-        });
-    }
-
-    public static void modifyMapDialog(Stage primaryStage, Runnable paintAll, ArrayList<RoadParameters> roadParameters) {
-        // Create main dialog window
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Modify map");
-        dialog.setHeaderText("Map modification");
-        dialog.initOwner(primaryStage);
-        dialog.setWidth(420);
-
-        // Buttons (Create / Cancel)
-        ButtonType createButtonType = new ButtonType("Modify", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(createButtonType, ButtonType.CANCEL);
-
-        // Spinner for number of roads
-        Spinner<Integer> roadsSpinner = new Spinner<>(1, 20000, 1);
-
-        // Main layout panel
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 20, 10, 10));
-
-        // File name field for map file
-        grid.add(new Label("Map file:"), 0, 0);
-        TextField mapFileNameField = new TextField("map.xml");
-        grid.add(mapFileNameField, 1, 0);
-
-        grid.add(new Label("Number of roads:"), 0, 1);
-        grid.add(roadsSpinner, 1, 1);
-
-        grid.add(new Label("Delete road: "), 0, 2);
-        Spinner<Integer> deleteRoadSpinner = new Spinner<>(1, roadsSpinner.getValue(), 1);
-        grid.add(deleteRoadSpinner, 1, 2);
-
-
-
-        Button changeAllRoadsButton = new Button("Change all roads...");
-        Button changeOneRoadButton = new Button("Change one road...");
-        grid.add(changeAllRoadsButton, 0, 2);
-        grid.add(changeOneRoadButton, 1, 2);
-
-        changeAllRoadsButton.setOnAction(e ->
-                changeRoadsDialog(primaryStage, roadParameters, roadsSpinner.getValue(), true, -1));
-
-        changeOneRoadButton.setOnAction(e -> selectRoadDialog(primaryStage, roadParameters, roadsSpinner.getValue()));
-
-        int numberOfRoads = roadsSpinner.getValue();
-
-        for (int i = 0; i < numberOfRoads; i++) {
-            addRoadParameters(Integer.parseInt(STOCK_NUMBER_OF_LANES), Double.parseDouble(STOCK_MAX_SPEED),
-                    Double.parseDouble(STOCK_LENGTH), DefaultStuffMaker.createDefaultLightPlan(Integer.parseInt(STOCK_NUMBER_OF_LANES)),
-                    DefaultStuffMaker.createDefaultGenerator(Integer.parseInt(STOCK_NUMBER_OF_LANES)), roadParameters);
-        }
-
-        // if number of roads changes, update the lists
-        roadsSpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
-            int newNumberOfRoads = newVal;
-            if (newNumberOfRoads > roadParameters.size()) {
-                for (int i = roadParameters.size(); i < newNumberOfRoads; i++) {
-                    addRoadParameters(Integer.parseInt(STOCK_NUMBER_OF_LANES),
-                            Double.parseDouble(STOCK_MAX_SPEED), Double.parseDouble(STOCK_LENGTH),
-                            DefaultStuffMaker.createDefaultLightPlan(Integer.parseInt(STOCK_NUMBER_OF_LANES)),
-                            DefaultStuffMaker.createDefaultGenerator(Integer.parseInt(STOCK_NUMBER_OF_LANES)), roadParameters);
-                }
-            } else if (newNumberOfRoads < roadParameters.size()) {
-                roadParameters.subList(newNumberOfRoads, roadParameters.size()).clear();
-            }
-        });
-
-        dialog.getDialogPane().setContent(grid);
-
-        // Handle Create button click
-        dialog.showAndWait().ifPresent(result -> {
-            if (result == createButtonType) {
-                String mapFileName = mapFileNameField.getText();
-                boolean success = RoadXml.writeMapToXml(roadParameters, roadParameters.size(), mapFileName);
-                MyLogger.log("Creating new map: " + mapFileName, Constants.INFO_FOR_LOGGING);
-                if (success) {
-                    MyLogger.log("New map created successfully: " + mapFileName, Constants.INFO_FOR_LOGGING);
-                    //openNewRoadDialog(primaryStage, mapFileName, paintAll);
-
-                } else {
-                    MyLogger.log("Failed to create new map: " + mapFileName, Constants.ERROR_FOR_LOGGING);
-                }
-            }
-        });
-    }
-
-    private static void openNewRoadDialog(Stage primaryStage, String mapFileName, Runnable paintAll) {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Open new map");
-        dialog.setHeaderText("Do you wish to open the new map?");
-        dialog.initOwner(primaryStage);
-        dialog.setWidth(420);
-
-        ButtonType openButtonType = new ButtonType("Yes", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(openButtonType, ButtonType.CANCEL);
-        dialog.showAndWait().ifPresent(result -> {
-            if (result == openButtonType) {
-                MyLogger.log("Opening new map.", Constants.INFO_FOR_LOGGING);
-                boolean ok = RoadLoader.loadMap(mapFileName);
-                if (ok) {
-                    MyLogger.log("New map opened successfully.", Constants.INFO_FOR_LOGGING);
-                    paintAll.run();
-                } else {
-                    MyLogger.log("Failed to open new map.", Constants.ERROR_FOR_LOGGING);
-                }
-            }
-        });
-
-        ButtonType cancelButtonType = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
-        dialog.getDialogPane().getButtonTypes().addAll(cancelButtonType);
-    }
-
-    /**
      * add road parameters to list
      *
      * @param numberOfLanes number of lanes
@@ -829,7 +679,7 @@ public class DialogMaker {
      * @param lightPlan light plan for the road
      * @param roadParameters list of road parameters
      **/
-    public static void addRoadParameters(int numberOfLanes, double maxSpeed, double length,
+    protected static void addRoadParameters(int numberOfLanes, double maxSpeed, double length,
                                          LinkedList<LightPlan> lightPlan, LinkedList<CarGenerator> generators,
                                          ArrayList<RoadParameters> roadParameters) {
         RoadParameters rp = new RoadParameters();
@@ -851,7 +701,7 @@ public class DialogMaker {
      * @param lightPlan light plan for the road
      * @param roadParameters list of road parameters
      **/
-    public static void changeRoadParameters(int index, int numberOfLanes, double maxSpeed, double length,
+    protected static void changeRoadParameters(int index, int numberOfLanes, double maxSpeed, double length,
                                             LinkedList<LightPlan> lightPlan, LinkedList<CarGenerator> generators,
                                             ArrayList<RoadParameters> roadParameters) {
         RoadParameters rp = new RoadParameters();
@@ -861,5 +711,44 @@ public class DialogMaker {
         rp.lightPlan = lightPlan;
         rp.carGenerators = generators;
         roadParameters.set(index, rp);
+    }
+
+    protected static boolean checkRoadInputs(Integer numberOfLanes, String maxSpeed, String length, LinkedList<CarGenerator> generator,
+                                             LinkedList<LightPlan> lightPlan) {
+        if (numberOfLanes <= 0) {
+            return false;
+        }
+
+        try {
+            double speed = Double.parseDouble(maxSpeed);
+            if (speed <= 0) {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
+        try {
+            double len = Double.parseDouble(length);
+            if (len <= 0) {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
+        for (CarGenerator cg : generator) {
+            if (!cg.isLegitimate()) {
+                return false;
+            }
+        }
+
+        for (LightPlan lp : lightPlan) {
+            if (!lp.isLegitimate()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

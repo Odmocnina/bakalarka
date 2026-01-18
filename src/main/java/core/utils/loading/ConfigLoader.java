@@ -89,17 +89,19 @@ public class ConfigLoader {
             String roadFile = doc.getElementsByTagName(ConfigConstants.ROAD_FILE_TAG).item(0).getTextContent();
 
             if (roadFile == null || roadFile.isEmpty()) {
+                // to - do open without road file
                 MyLogger.logBeforeLoading("Road file path is empty, exiting", Constants.FATAL_FOR_LOGGING);
                 return null;
             }
 
             if (!new File(roadFile).exists()) {
+                // to - do open without road file
                 MyLogger.logBeforeLoading("Road file does not exist: " + roadFile + ", exiting"
                         , Constants.FATAL_FOR_LOGGING);
                 return null;
             }
 
-            roads = new Road[numberOfRoads];
+            /*roads = new Road[numberOfRoads];
             for (int i = 0; i < numberOfRoads; i++) {
                 Road road = loadRoad(roadFile);
                 if (road == null) {
@@ -108,8 +110,10 @@ public class ConfigLoader {
                     return null;
                 }
                 roads[i] = road;
-            }
+            }*/
 
+            RoadLoader.loadMap(roadFile);
+            roads = AppContext.SIMULATION.getRoads();
             return roads;
         } catch (Exception e) {
             MyLogger.logBeforeLoading("Error loading config file: " + e.getMessage()

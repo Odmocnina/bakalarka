@@ -177,4 +177,10 @@ public class Simulation {
     public boolean isStepCountEven() {
         return this.stepCount % 2 == 0;
     }
+
+    public void resetSimulationWithNewRoads(Road[] roads) {
+        this.stepCount = 0;
+        this.running = false;
+        this.roads = roads;
+    }
 }

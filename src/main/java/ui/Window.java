@@ -455,7 +455,7 @@ public class Window extends Application {
 
         newMapFileBtn.setOnAction(e -> {
             MyLogger.log("Creating new map pressed...", Constants.INFO_FOR_LOGGING);
-            DialogMaker.newMapDialog(primaryStage, paintAll);
+            NewMapDialogMaker.newMapDialog(primaryStage, paintAll);
         });
 
         editMapFileBtn.setOnAction(e -> {
@@ -555,12 +555,13 @@ public class Window extends Application {
 
         itemNewFile.setOnAction(e -> {
             MyLogger.log("Creating new map pressed...", Constants.INFO_FOR_LOGGING);
-            DialogMaker.newMapDialog(primaryStage, paintAll);
+            NewMapDialogMaker.newMapDialog(primaryStage, paintAll);
         });
 
         itemEditFile.setOnAction(e -> {
             MyLogger.log("Modifying map file...", Constants.INFO_FOR_LOGGING);
-
+            ModifyMapDialogMaker.modifyMapDialog(primaryStage,
+                    RoadParameters.existingRoadsToRoadParameters(AppContext.SIMULATION.getRoads()), paintAll);
         });
 
         itemOpenFile.setOnAction(e -> {

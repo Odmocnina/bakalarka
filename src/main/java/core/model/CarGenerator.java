@@ -242,6 +242,13 @@ public class CarGenerator implements Cloneable {
         }
     }
 
+    public void setType(String type, double cellSize) {
+        this.type = type;
+        if (type.equals(Constants.CELLULAR)) {
+            translateParametersToCellular(cellSize);
+        }
+    }
+
     /**
      * function to set whether multiple cars can be generated per tick
      *
@@ -467,5 +474,16 @@ public class CarGenerator implements Cloneable {
      */
     public void initCarQueue() {
         Queue<CarParams> carQueue = this.generateCarsInToQueue();
+    }
+
+    public boolean isLegitimate() {
+        for (String key : parameters.keySet()) {
+            Parameter p = parameters.get(key);
+            if (!p.checkIfValid()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

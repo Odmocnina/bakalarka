@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <numberOfRoads>10</numberOfRoads>
-    <roadFile>config/roads/road2.xml</roadFile>
+    <roadFile>mapDiff.xml</roadFile>
 
     <models>
         <carFollowingModel>
@@ -83,6 +83,6 @@
             <file>output/simulationKKWQ.csv</file>
             <type>csv</type>
         </output>
-    <timeBetweenSteps>1</timeBetweenSteps>
+    <timeBetweenSteps>100</timeBetweenSteps>
     </runDetails>
 </config>

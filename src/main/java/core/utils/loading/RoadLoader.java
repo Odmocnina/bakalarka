@@ -112,7 +112,9 @@ public class RoadLoader {
             Element laneElement = (Element) laneNodes.item(i);
             Element generatorElement = (Element) laneElement.getElementsByTagName(RoadLoadingConstants.GENERATOR_TAG).item(0);
             CarGenerator generator = createGenerator(generatorElement);
-            generator.setType(AppContext.SIMULATION.getRoads()[0]);
+            String type = AppContext.CAR_FOLLOWING_MODEL.getType();
+            double cellSize = AppContext.CAR_FOLLOWING_MODEL.getCellSize();
+            generator.setType(type, cellSize);
             String carGenerationParameters = StringEditor.mergeRequestParameters(AppContext.CAR_FOLLOWING_MODEL.getParametersForGeneration(),
                      AppContext.LANE_CHANGING_MODEL.getParametersForGeneration());
             generator.setCarGenerationParameters(carGenerationParameters);

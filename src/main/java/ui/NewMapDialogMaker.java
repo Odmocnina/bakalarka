@@ -59,7 +59,15 @@ public class NewMapDialogMaker extends DialogMaker {
         changeAllRoadsButton.setOnAction(e ->
                 changeRoadsDialog(primaryStage, roadParameters, roadsSpinner.getValue(), true, -1));
 
-        changeOneRoadButton.setOnAction(e -> selectRoadDialog(primaryStage, roadParameters, roadsSpinner.getValue()));
+        changeOneRoadButton.setOnAction(e -> {
+            // open dialog to select and modify one road
+            selectRoadDialog(primaryStage, roadParameters, roadsSpinner.getValue());
+
+            // when dialog is closed, look if road was deleted and update spinner if needed
+            if (roadParameters.size() != roadsSpinner.getValue()) {
+                roadsSpinner.getValueFactory().setValue(roadParameters.size());
+            }
+        });
 
         int numberOfRoads = roadsSpinner.getValue();
 
