@@ -2,6 +2,13 @@ package core.utils.constants;
 
 import core.model.CarGenerator;
 
+/***************************
+ * Class holding default values for various parameters in the simulation, for example when new roads or car generators
+ * are created and aren't given modified, this is supposed to be used
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ***************************/
 public class DefaultValues {
 
     //default parameters for car generator

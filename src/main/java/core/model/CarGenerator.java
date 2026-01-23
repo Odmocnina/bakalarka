@@ -234,14 +234,25 @@ public class CarGenerator implements Cloneable {
      * @param road road the generator is assigned to
      **/
     public void setType(Road road) {
-        String type = road.getType();
-        this.type = type;
-        if (type.equals(Constants.CELLULAR)) {
+        String newType = road.getType();
+        // check if type is already cellular, if so no need to translate again, because it would make everything smaller
+        if (this.type != null && this.type.equals(Constants.CELLULAR) && newType.equals(Constants.CELLULAR)) {
+            return;
+        }
+
+        this.type = newType;
+        if (newType.equals(Constants.CELLULAR)) {
             double cellSize = ((CellularRoad) road).getCellSize();
             translateParametersToCellular(cellSize);
         }
     }
 
+    /**
+     * function to set road type for generator, used to translate parameters if necessary
+     *
+     * @param type type of road the generator is assigned to
+     * @param cellSize size of cell in cellular road
+     **/
     public void setType(String type, double cellSize) {
         this.type = type;
         if (type.equals(Constants.CELLULAR)) {
@@ -476,6 +487,11 @@ public class CarGenerator implements Cloneable {
         Queue<CarParams> carQueue = this.generateCarsInToQueue();
     }
 
+    /**
+     * function to check if generator is legitimate (all parameters valid)
+     *
+     * @return boolean whether generator is legitimate
+     **/
     public boolean isLegitimate() {
         for (String key : parameters.keySet()) {
             Parameter p = parameters.get(key);

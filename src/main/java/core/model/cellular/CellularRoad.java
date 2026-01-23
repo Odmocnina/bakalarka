@@ -29,6 +29,7 @@ public class CellularRoad extends Road {
     /** size of each cell in meters, used to translate length given in config to length in cells **/
     private double cellSize;
 
+    /** speed limit in cells per time step (max speed of the road divided by cell size, the rounded up) **/
     private int speedLimitInCells;
 
     /**

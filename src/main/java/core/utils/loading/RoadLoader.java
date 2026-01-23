@@ -21,6 +21,18 @@ import java.io.File;
 public class RoadLoader {
 
     public static boolean loadMap(String filePath) {
+        Road[] map = loadMapStart(filePath);
+
+        if (map == null) {
+            MyLogger.logBeforeLoading("No roads loaded from map file", Constants.ERROR_FOR_LOGGING);
+            return false;
+        }
+
+        AppContext.SIMULATION.setRoads(map);
+        return true;
+    }
+
+    public static Road[] loadMapStart(String filePath) {
         // Logic to read the configuration file for multiple roads
         File xmlFile;
         try {
@@ -28,7 +40,7 @@ public class RoadLoader {
         } catch (NullPointerException e) {
             MyLogger.logBeforeLoading("Map file not found",
                     Constants.ERROR_FOR_LOGGING);
-            return false;
+            return null;
         }
         Road[] map = null;
         try {
@@ -50,22 +62,16 @@ public class RoadLoader {
                 } else {
                     MyLogger.logBeforeLoading("Failed to load road: " + (i + 1) + " from file",
                             Constants.ERROR_FOR_LOGGING);
-                    return false;
+                    return null;
                 }
             }
 
         } catch (Exception e) {
             MyLogger.logBeforeLoading("Error loading map file: " + e.getMessage(), Constants.ERROR_FOR_LOGGING);
-            return false;
+            return null;
         }
 
-        if (map == null) {
-            MyLogger.logBeforeLoading("No roads loaded from map file", Constants.ERROR_FOR_LOGGING);
-            return false;
-        }
-
-        AppContext.SIMULATION.setRoads(map);
-        return true;
+        return map;
     }
 
     /**

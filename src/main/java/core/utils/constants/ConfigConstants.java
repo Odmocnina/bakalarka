@@ -1,5 +1,11 @@
 package core.utils.constants;
 
+/***************************
+ * Class holding configuration constants for simulation setup, string tags used in configuration file when loading
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ***************************/
 public class ConfigConstants {
     public static final String CONFIG_REQUEST_SEPARATOR = "/";
     public static final String ROAD_FILE_TAG = "roadFile";

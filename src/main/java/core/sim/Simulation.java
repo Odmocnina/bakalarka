@@ -174,10 +174,21 @@ public class Simulation {
         this.roads = roads;
     }
 
+    /**
+     * Checks if the current step count is even, can be used by some models for deciding actions, like lane changes
+     *
+     * @return true if step count is even, false otherwise
+     **/
     public boolean isStepCountEven() {
         return this.stepCount % 2 == 0;
     }
 
+    /**
+     * Resets the simulation with new roads and resets the step count and running state, used when new roads are loaded,
+     * or current roads are modified.
+     *
+     * @param roads array of new roads for the simulation
+     **/
     public void resetSimulationWithNewRoads(Road[] roads) {
         this.stepCount = 0;
         this.running = false;

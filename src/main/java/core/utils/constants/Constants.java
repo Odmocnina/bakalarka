@@ -2,6 +2,13 @@ package core.utils.constants;
 
 import javafx.scene.paint.Color;
 
+/********************************************
+ * Class containing constant values/stuff that did not fit in the other constant classes, stuff like colors, tags of
+ * road/model types, canvas sizes, logging tags, etc.
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ********************************************/
 public class Constants {
 
     public static final int CANVAS_WIDTH = 600;

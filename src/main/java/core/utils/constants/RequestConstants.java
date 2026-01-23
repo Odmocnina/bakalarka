@@ -1,5 +1,14 @@
 package core.utils.constants;
 
+/***************************
+ * Class holding constants for request strings used in the model, this is used for communication between model and cars
+ * model needs to get certain parameters for its calculations from the road, so it sends requests using these constants
+ * model sends string of these divided by REQUEST_SEPARATOR and road responds with the values in hash map of double
+ * values (even when they are integers, road or model will convert them as needed)
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ***************************/
 public class RequestConstants {
 
     // directions

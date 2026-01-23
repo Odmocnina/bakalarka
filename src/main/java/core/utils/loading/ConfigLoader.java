@@ -112,9 +112,9 @@ public class ConfigLoader {
                 roads[i] = road;
             }*/
 
-            RoadLoader.loadMap(roadFile);
-            roads = AppContext.SIMULATION.getRoads();
-            return roads;
+           // RoadLoader.loadMap(roadFile);
+           // roads = AppContext.SIMULATION.getRoads();
+            return RoadLoader.loadMapStart(roadFile);
         } catch (Exception e) {
             MyLogger.logBeforeLoading("Error loading config file: " + e.getMessage()
                     , Constants.FATAL_FOR_LOGGING);

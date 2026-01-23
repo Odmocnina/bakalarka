@@ -126,6 +126,11 @@ public abstract class Road {
         }
     }
 
+    /**
+     * setter for car generators
+     *
+     * @param generators array of car generators to be used by the road
+     **/
     public void setCarGenerators(CarGenerator[] generators) {
         this.generators = generators;
     }
@@ -302,7 +307,7 @@ public abstract class Road {
     }
 
     /**
-     * method to update lights on the road based on current time
+     * method to update lights on the road-based on current time
      *
      * @param currentTime current simulation time
      **/
@@ -344,18 +349,33 @@ public abstract class Road {
         }
     }
 
+    /**
+     * method to set types of generators (cellular, continuous...)
+     **/
     public void setTypesOfGenerators() {
         for (CarGenerator generator : generators) {
             generator.setType(this);
         }
     }
 
+    /**
+     * method to set parameters for generation of generators
+     *
+     * @param parametersForGeneration parameters for generation (when cars need to have certain parameters in generated
+     *                                for model to be working)
+     **/
     public void setParametersForGeneration(String parametersForGeneration) {
         for (CarGenerator generator : generators) {
             generator.setCarGenerationParameters(parametersForGeneration);
         }
     }
 
+    /**
+     * method to set types and parameters for generation of generators
+     *
+     * @param parametersForGeneration parameters for generation (when cars need to have certain parameters in generated
+     *                                for model to be working)
+     **/
     public void setTypeAndParametersOfGenerators(String parametersForGeneration) {
         for (CarGenerator generator : generators) {
             generator.setType(this);
@@ -363,10 +383,20 @@ public abstract class Road {
         }
     }
 
+    /**
+     * getter for car generators
+     *
+     * @return array of car generators
+     **/
     public CarGenerator[] getCarGenerators() {
         return this.generators;
     }
 
+    /**
+     * getter for light plans on lanes
+     *
+     * @return array of light plans on lanes
+     **/
     public LightPlan[] getLightPlans() {
         return this.lightPlansOnLanes;
     }
