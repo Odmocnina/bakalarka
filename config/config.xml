@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <config>
     <numberOfRoads>10</numberOfRoads>
-    <roadFile>mapDiff.xml</roadFile>
+    <roadFile>map.xml</roadFile>
 
     <models>
         <carFollowingModel>

@@ -1,11 +1,13 @@
 package ui;
 
+import app.AppContext;
 import core.model.CarGenerator;
 import core.model.LightPlan;
 import core.model.Parameter;
 import core.utils.DefaultStuffMaker;
 import core.utils.MyLogger;
 import core.utils.RoadParameters;
+import core.utils.RoadXml;
 import core.utils.constants.Constants;
 import core.utils.constants.DefaultValues;
 
@@ -13,10 +15,14 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Optional;
 
 /********************************************
  * class to create various dialogs for the UI
@@ -585,6 +591,7 @@ public class DialogMaker {
                          changeRoadParameters(i, lanesSpinner.getValue(), Double.parseDouble(speedLimitField.getText()),
                                  Double.parseDouble(lengthField.getText()), lightPlan, generators, roadParameters);
                      }
+                     AppContext.RUN_DETAILS.mapChanged = true;
                  } else {
                      MyLogger.log("Invalid road inputs provided in dialog.", Constants.ERROR_FOR_LOGGING);
                      warningDialog(stage, "Invalid road inputs provided. Please check number of lanes, max speed and length.");
@@ -648,6 +655,41 @@ public class DialogMaker {
                 MyLogger.log("Dialog cancelled.", Constants.INFO_FOR_LOGGING);
             }
         });
+    }
+
+    public static void saveAsDialog(Stage stage) {
+        FileChooser fileChooser = new FileChooser(); // the thing that has save as in stuff like ps pad and word
+        fileChooser.setTitle("Save map as..."); // title of the dialog
+
+        // filter for xml files, so only xml files are shown
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml"),
+                new FileChooser.ExtensionFilter("All files (*.*)", "*.*")
+        );
+
+        // set the initial directory to current working directory
+        File currentDir = new File(System.getProperty("user.dir"));
+        if (currentDir.exists()) {
+            fileChooser.setInitialDirectory(currentDir);
+        }
+
+        // default file name
+        fileChooser.setInitialFileName(Constants.newMapFileName);
+
+        // Opens the save dialog and blocks until the user selects a file or cancels
+        File file = fileChooser.showSaveDialog(stage);
+
+        if (file != null) {
+            // file was selected
+            String filePath = file.getAbsolutePath();
+
+            MyLogger.log("User saved map as: " + filePath, Constants.INFO_FOR_LOGGING);
+
+            RoadXml.saveAs(filePath);
+        } else {
+            // user cancelled the dialog
+            MyLogger.log("Save as canceled by user.", Constants.INFO_FOR_LOGGING);
+        }
     }
 
     protected static void updateNumberOfLanes(LinkedList<LightPlan> lightPlans, LinkedList<CarGenerator> generators,

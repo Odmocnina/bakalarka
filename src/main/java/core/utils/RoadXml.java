@@ -227,16 +227,24 @@ public class RoadXml {
         }
     }
 
-    public void saveCurrentMap() {
+    public static boolean saveCurrentMap() {
         ArrayList<RoadParameters> currentRoadParameters =
                 RoadParameters.existingRoadsToRoadParameters(AppContext.SIMULATION.getRoads());
-        writeMapToXml(currentRoadParameters, currentRoadParameters.size(), AppContext.CURRENT_OPENED_FILE);
+        boolean success = writeMapToXml(currentRoadParameters, currentRoadParameters.size(), AppContext.RUN_DETAILS.mapFile);
+        if (!success) {
+            MyLogger.logBeforeLoading("Error while saving current map to XML file: " + AppContext.RUN_DETAILS.mapFile,
+                    Constants.ERROR_FOR_LOGGING);
+            return false;
+        } else {
+            MyLogger.logBeforeLoading("Current map saved to XML file: " + AppContext.RUN_DETAILS.mapFile,
+                    Constants.INFO_FOR_LOGGING);
+            return true;
+        }
     }
 
-    public void saveCurrentMap(String path) {
-        ArrayList<RoadParameters> currentRoadParameters =
-                RoadParameters.existingRoadsToRoadParameters(AppContext.SIMULATION.getRoads());
-        writeMapToXml(currentRoadParameters, currentRoadParameters.size(), path);
+    public static boolean saveAs(String fileName) {
+        AppContext.RUN_DETAILS.mapFile = fileName;
+        return saveCurrentMap();
     }
 
 }

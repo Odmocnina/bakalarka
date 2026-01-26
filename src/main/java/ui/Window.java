@@ -13,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
+import org.w3c.dom.events.Event;
 import ui.render.IRoadRenderer;
 import core.sim.Simulation;
 
@@ -30,6 +31,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 /********************************************
@@ -157,11 +159,60 @@ public class Window extends Application {
             Platform.runLater(paintAll);
         };
 
+        canvasPane.setOnMouseClicked(event -> {
+            // get roads
+            Road[] roads = simulation.getRoads();
+            if (roads == null || roads.length == 0) return;
+
+            // get y position with scroll offset
+            double absoluteY = event.getY() + vScroll.getValue();
+
+            int clickedRoadIndex = getClickedRoadIndex(absoluteY, roads, 20.0, 8.0);
+
+            if (clickedRoadIndex != -1) {
+                Road clickedRoad = roads[clickedRoadIndex];
+                MyLogger.log("Clicked on road index: " + clickedRoadIndex + ", Road details: " +
+                        "Lanes: " + clickedRoad.getNumberOfLanes() + ", Length: " + clickedRoad.getLength(),
+                        Constants.INFO_FOR_LOGGING);
+                ArrayList<RoadParameters> roadParams = RoadParameters.existingRoadsToRoadParameters(roads);
+                DialogMaker.changeRoadsDialog(primaryStage, roadParams, 1, false,
+                        clickedRoadIndex);
+                Road[] newRoads = RoadParameters.roadParametersToRoads(roadParams);
+                AppContext.SIMULATION.resetSimulationWithNewRoads(newRoads);
+                paintAll.run();
+            } else {
+                MyLogger.log("Clicked outside of any road.", Constants.INFO_FOR_LOGGING);
+            }
+
+
+        });
+
         // engine initialization
         engine = new CoreEngine(tick, AppContext.RUN_DETAILS.timeBetweenSteps);
 
         // first paint
         paintAll.run();
+    }
+
+    private int getClickedRoadIndex(double absoluteY, Road[] roads, final double GAP, final double LANE_HEIGHT) {
+        double currentY = GAP; // První silnice začíná s odsazením GAP
+
+        for (int i = 0; i < roads.length; i++) {
+            Road road = roads[i];
+
+            // Výška silnice v pixelech = počet pruhů * výška jednoho pruhu
+            double roadHeight = road.getNumberOfLanes() * LANE_HEIGHT;
+
+            // Pokud absolutní Y kliknutí spadá do intervalu této silnice
+            if (absoluteY >= currentY && absoluteY <= (currentY + roadHeight)) {
+                return i; // Našli jsme silnici
+            }
+
+            // Posuneme se o výšku této silnice a mezeru pro další iteraci
+            currentY += roadHeight + GAP;
+        }
+
+        return -1; // Kliknutí padlo mimo silnice (např. do mezery)
     }
 
     /**
@@ -460,7 +511,8 @@ public class Window extends Application {
 
         editMapFileBtn.setOnAction(e -> {
             MyLogger.log("Modifying map file...", Constants.INFO_FOR_LOGGING);
-            //DialogMaker.modifyMapDialog(primaryStage, , paintAll);
+            ModifyMapDialogMaker.modifyMapDialog(primaryStage,
+                    RoadParameters.existingRoadsToRoadParameters(AppContext.SIMULATION.getRoads()), paintAll);
         });
 
         startStopBtn.setOnAction(e -> {
@@ -488,6 +540,16 @@ public class Window extends Application {
             ConfigModificator.changeLaneChangeBan();
             MyLogger.log("Toggled lane change ban", Constants.INFO_FOR_LOGGING);
             paintAll.run();
+        });
+
+        saveMapFileBtn.setOnAction(e -> {
+            RoadXml.saveCurrentMap();
+            MyLogger.log("Saving map file...", Constants.INFO_FOR_LOGGING);
+        });
+
+        saveAsMapFileBtn.setOnAction(e -> {
+            DialogMaker.saveAsDialog(primaryStage);
+            MyLogger.log("Saving map file as...", Constants.INFO_FOR_LOGGING);
         });
 
         openMapFileBtn.setOnAction(e -> {

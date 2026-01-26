@@ -44,4 +44,6 @@ public class Constants {
     public static final String DEFAULT_OUTPUT_FILE = "output/output.txt";
     public static final String DEFAULT_CSV_SEPARATOR = ";";
 
+    public static final String newMapFileName = "newMap.xml";
+
 }

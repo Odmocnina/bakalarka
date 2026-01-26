@@ -20,9 +20,6 @@ public class RunDetails {
 
     /** Output file name for writing simulation results **/
     public OutputDetails outputDetails = null;
-    /*public String outputFile;
-
-    public boolean[] output;*/
 
     /** Whether to draw cells in the GUI if cellular model **/
     public boolean drawCells;
@@ -36,7 +33,16 @@ public class RunDetails {
     /** Time between steps for GUI updates in milliseconds **/
     public int timeBetweenSteps;
 
+    /** Whether to prevent collisions during the simulation **/
     public boolean preventCollisions = true;
+
+    public String mapFile = null;
+    public boolean mapChanged = false;
+    public String configFile = null;
+    public boolean configChanged = false;
+
+    /** Enable debug mode, writing id of cars, controlling if cars aren't duplicated or in collision **/
+    public boolean debug = false;
 
     /**
      * Checks if the simulation results should be written to an output file (null or empty output file/details
@@ -48,9 +54,6 @@ public class RunDetails {
         return this.outputDetails != null && outputDetails.outputFile != null && !outputDetails.outputFile.isEmpty();
     }
 
-    /** Enable debug mode, writing id of cars, controlling if cars aren't duplicated or in collision **/
-    public boolean debug = false;
-
     @Override
     public String toString() {
         return "RunDetails{" +
@@ -61,5 +64,10 @@ public class RunDetails {
                 ", drawCells=" + drawCells +
                 ", timeBetweenSteps=" + timeBetweenSteps +
                 '}';
+    }
+
+    public void setNewMapFile(String mapFile) {
+        this.mapChanged = false;
+        this.mapFile = mapFile;
     }
 }

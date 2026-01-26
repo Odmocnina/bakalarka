@@ -149,6 +149,7 @@ public class ModifyMapDialogMaker extends DialogMaker {
                     rp.carGenerators = generators;
                     roadParameters.add(positionSpinner.getValue() - 1, rp);
                     MyLogger.log("Added new road.", Constants.INFO_FOR_LOGGING);
+                    AppContext.RUN_DETAILS.mapChanged = true;
                     paintAll.run();
                 }
             } else {

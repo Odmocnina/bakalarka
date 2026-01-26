@@ -123,6 +123,36 @@ public class ConfigLoader {
         return null;
     }
 
+    private static String getMapFileName() {
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(configFile);
+
+            String roadFile = doc.getElementsByTagName(ConfigConstants.ROAD_FILE_TAG).item(0).getTextContent();
+
+            if (roadFile == null || roadFile.isEmpty()) {
+                // to - do open without road file
+                MyLogger.logBeforeLoading("Road file path is empty, exiting", Constants.FATAL_FOR_LOGGING);
+                return null;
+            }
+
+            if (!new File(roadFile).exists()) {
+                // to - do open without road file
+                MyLogger.logBeforeLoading("Road file does not exist: " + roadFile + ", exiting"
+                        , Constants.FATAL_FOR_LOGGING);
+                return null;
+            }
+
+            return roadFile;
+        } catch (Exception e) {
+            MyLogger.logBeforeLoading("Error loading config file: " + e.getMessage()
+                    , Constants.FATAL_FOR_LOGGING);
+        }
+
+        return null;
+    }
+
     /**
      * Method to load a single road from the specified file path
      *
@@ -707,7 +737,6 @@ public class ConfigLoader {
 
         // load roads from config
         Road[] roads = ConfigLoader.loadRoads();
-
         if (roads == null) {
             MyLogger.logBeforeLoading("Failed to load road configuration, exiting."
                     , Constants.FATAL_FOR_LOGGING);
@@ -716,6 +745,7 @@ public class ConfigLoader {
             MyLogger.logBeforeLoading("Loaded road: " + roads[0].toString() + ", number of roads: "
                     + roads.length, Constants.INFO_FOR_LOGGING);
         }
+        String mapFileName = ConfigLoader.getMapFileName();
 
         // check if type of road matches type of car following model
         if (!roads[0].getType().equals(carFollowingModel.getType())) {
@@ -763,6 +793,7 @@ public class ConfigLoader {
                     runDetails.timeStep + ", showGui=" + runDetails.showGui + ", outputFile=" + runDetails.outputDetails
                     .outputFile + ", drawCells=" + runDetails.drawCells, Constants.INFO_FOR_LOGGING);
         }
+        runDetails.setNewMapFile(mapFileName);
         AppContext.RUN_DETAILS = runDetails;
 
         ResultsRecorder.getResultsRecorder().initialize(roads.length, runDetails.outputDetails.outputFile);
