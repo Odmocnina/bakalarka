@@ -527,14 +527,11 @@ public class Window extends Application {
         collisionBanBtn.setStyle(defaultStyle);
 
         newMapFileBtn.setOnAction(e -> {
-            MyLogger.log("Creating new map pressed...", Constants.INFO_FOR_LOGGING);
-            NewMapDialogMaker.newMapDialog(primaryStage, paintAll);
+            Actions.newMapAction(primaryStage, paintAll);
         });
 
         editMapFileBtn.setOnAction(e -> {
-            MyLogger.log("Modifying map file...", Constants.INFO_FOR_LOGGING);
-            ModifyMapDialogMaker.modifyMapDialog(primaryStage,
-                    RoadParameters.existingRoadsToRoadParameters(AppContext.SIMULATION.getRoads()), paintAll);
+            Actions.editMapFile(primaryStage, paintAll);
         });
 
         startStopBtn.setOnAction(e -> {
@@ -550,7 +547,7 @@ public class Window extends Application {
         });
 
         exportResultsBtn.setOnAction(e -> {
-            ResultsRecorder.getResultsRecorder().writeResults();
+            Actions.exportResultsAction(primaryStage);
         });
 
         nextStepBtn.setOnAction(e -> {
@@ -559,55 +556,23 @@ public class Window extends Application {
         });
 
         changeLaneBtn.setOnAction(e -> {
-            ConfigModificator.changeLaneChangeBan();
-            MyLogger.log("Toggled lane change ban", Constants.INFO_FOR_LOGGING);
-            paintAll.run();
+            Actions.changeLaneChangingAction(paintAll);
         });
 
         saveMapFileBtn.setOnAction(e -> {
-            RoadXml.saveCurrentMap();
-            MyLogger.log("Saving map file...", Constants.INFO_FOR_LOGGING);
+            Actions.saveMapAction();
         });
 
         saveAsMapFileBtn.setOnAction(e -> {
-            DialogMaker.saveAsDialog(primaryStage);
-            MyLogger.log("Saving map file as...", Constants.INFO_FOR_LOGGING);
+            Actions.saveMapAsAction(primaryStage);
         });
 
         openMapFileBtn.setOnAction(e -> {
-            MyLogger.log("Opening map file...", Constants.INFO_FOR_LOGGING);
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Choose map file to open");
-
-            File currentDir = new File(System.getProperty("user.dir"));
-            fileChooser.setInitialDirectory(currentDir);
-
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Map files", "*.xml")
-            );
-
-            File selectedFile = fileChooser.showOpenDialog(primaryStage);
-
-            if (selectedFile != null) {
-                boolean success = RoadLoader.loadMap(selectedFile.getAbsolutePath());
-                if (success) {
-                    AppContext.RUN_DETAILS.setNewMapFile(selectedFile.getAbsolutePath());
-                    MyLogger.log("Map file loaded successfully: " + selectedFile.getAbsolutePath(),
-                            Constants.INFO_FOR_LOGGING);
-                    paintAll.run();
-                } else {
-                    MyLogger.log("Failed to load map file: " + selectedFile.getAbsolutePath(),
-                            Constants.ERROR_FOR_LOGGING);
-                }
-            } else {
-                MyLogger.log("Map file opening cancelled.", Constants.INFO_FOR_LOGGING);
-            }
+            Actions.openMapAction(primaryStage, paintAll);
         });
 
         collisionBanBtn.setOnAction(e -> {
-            ConfigModificator.changePreventCollision();
-            MyLogger.log("Toggled collision ban", Constants.INFO_FOR_LOGGING);
-            paintAll.run();
+            Actions.collisionBanAction(paintAll);
         });
 
         return new ToolBar(
@@ -639,29 +604,23 @@ public class Window extends Application {
         MenuItem itemSaveAsFile = new MenuItem("Save map file as...", createMenuIcon("/icons/saveAsMapFile.png"));
 
         itemNewFile.setOnAction(e -> {
-            MyLogger.log("Creating new map pressed...", Constants.INFO_FOR_LOGGING);
-            NewMapDialogMaker.newMapDialog(primaryStage, paintAll);
+            Actions.newMapAction(primaryStage, paintAll);
         });
 
         itemEditFile.setOnAction(e -> {
-            MyLogger.log("Modifying map file...", Constants.INFO_FOR_LOGGING);
-            ModifyMapDialogMaker.modifyMapDialog(primaryStage,
-                    RoadParameters.existingRoadsToRoadParameters(AppContext.SIMULATION.getRoads()), paintAll);
+            Actions.editMapFile(primaryStage, paintAll);
         });
 
         itemOpenFile.setOnAction(e -> {
-            MyLogger.log("Opening map file...", Constants.INFO_FOR_LOGGING);
-
+            Actions.openMapAction(primaryStage, paintAll);
         });
 
         itemSaveFile.setOnAction(e -> {
-            MyLogger.log("Saving map file...", Constants.INFO_FOR_LOGGING);
-
+            Actions.saveMapAction();
         });
 
         itemSaveAsFile.setOnAction(e -> {
-            MyLogger.log("Saving map file as...", Constants.INFO_FOR_LOGGING);
-
+            Actions.saveMapAsAction(primaryStage);
         });
 
         Menu fileMenu = new Menu("Map file");
