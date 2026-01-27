@@ -123,17 +123,39 @@ public class ModifyMapDialogMaker extends DialogMaker {
         grid.add(new Label("Edit light plan or generator on lane:"), 0, 4);
         grid.add(laneIndexSpinner, 1, 4);
 
-        Button lightPlanButton = new Button("Edit light plan...");
+        Button lightPlanButton = new Button("Edit one light plan...");
         grid.add(lightPlanButton, 1, 5);
 
-        Button generatorButton = new Button("Edit car generator...");
+        Button generatorButton = new Button("Edit one car generator...");
         grid.add(generatorButton, 1, 6);
+
+        Button editAllLightPlansButton = new Button("Edit all light plans...");
+        grid.add(editAllLightPlansButton, 0, 5);
+
+        Button editAllGeneratorsButton = new Button("Edit all car generators...");
+        grid.add(editAllGeneratorsButton, 0, 6);
 
         lightPlanButton.setOnAction(e ->
                 editLightPlanDialog(stage, lightPlan.get(laneIndexSpinner.getValue() - 1), laneIndexSpinner.getValue()));
 
         generatorButton.setOnAction(e ->
                 editGeneratorDialog(stage, generators.get(laneIndexSpinner.getValue() - 1), laneIndexSpinner.getValue()));
+
+        editAllLightPlansButton.setOnAction(e -> {
+            LightPlan lp = DefaultStuffMaker.createDefaultLightPlan();
+            editLightPlanDialog(stage, lp, 0);
+            for (int i = 0; i < lightPlan.size(); i++) {
+                lightPlan.set(i, lp.clone());
+            }
+        });
+
+        editAllGeneratorsButton.setOnAction(e -> {
+            CarGenerator cg = DefaultStuffMaker.createDefaultGenerator();
+            editGeneratorDialog(stage, cg, 0);
+            for (int i = 0; i < generators.size(); i++) {
+                generators.set(i, cg.clone());
+            }
+        });
 
         dialog.getDialogPane().setContent(grid);
 

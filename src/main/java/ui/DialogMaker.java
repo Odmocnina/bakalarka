@@ -265,6 +265,7 @@ public class DialogMaker {
         alert.initOwner(stage);
         alert.showAndWait().ifPresent(response -> {
             if (response != ButtonType.OK) {
+                AppContext.RUN_DETAILS.mapChanged = true;
                 MyLogger.log("Road deletion cancelled for road index: " + roadNumber + ".",
                         Constants.INFO_FOR_LOGGING);
             } else {
@@ -561,11 +562,17 @@ public class DialogMaker {
          grid.add(new Label("Edit light plan or generator on lane:"), 0, 3);
          grid.add(laneIndexSpinner, 1, 3);
 
-         Button lightPlanButton = new Button("Edit light plan...");
+         Button lightPlanButton = new Button("Edit one light plan...");
          grid.add(lightPlanButton, 1, 4);
 
-         Button generatorButton = new Button("Edit car generator...");
+         Button generatorButton = new Button("Edit one car generator...");
          grid.add(generatorButton, 1, 5);
+
+         Button editAllLightPlansButton = new Button("Edit all light plans...");
+         grid.add(editAllLightPlansButton, 0, 4);
+
+         Button editAllGeneratorsButton = new Button("Edit all car generators...");
+         grid.add(editAllGeneratorsButton, 0, 5);
 
          lightPlanButton.setOnAction(e ->
                  editLightPlanDialog(stage, lightPlan.get(laneIndexSpinner.getValue() - 1), laneIndexSpinner.getValue()));
@@ -574,12 +581,29 @@ public class DialogMaker {
                  editGeneratorDialog(stage, generators.get(laneIndexSpinner.getValue() - 1),
                          laneIndexSpinner.getValue()));
 
+         editAllLightPlansButton.setOnAction(e -> {
+             LightPlan lp = DefaultStuffMaker.createDefaultLightPlan();
+             editLightPlanDialog(stage, lp, 0);
+             for (int i = 0; i < lightPlan.size(); i++) {
+                 lightPlan.set(i, lp.clone());
+             }
+         });
+
+         editAllGeneratorsButton.setOnAction(e -> {
+             CarGenerator cg = DefaultStuffMaker.createDefaultGenerator();
+             editGeneratorDialog(stage, cg, 0);
+             for (int i = 0; i < generators.size(); i++) {
+                 generators.set(i, cg.clone());
+             }
+         });
+
          dialog.getDialogPane().setContent(grid);
 
          // show the dialog and wait for user response
          dialog.showAndWait().ifPresent(response -> {
              if (response == applyButtonType) {
                  if (checkRoadInputs(lanesSpinner.getValue(), speedLimitField.getText(), lengthField.getText(), generators, lightPlan)) {
+                     AppContext.RUN_DETAILS.mapChanged = true;
                      if (!changingAll) {
                          MyLogger.log("Selected road properties updated via dialog.", Constants.INFO_FOR_LOGGING);
                          changeRoadParameters(index, lanesSpinner.getValue(), Double.parseDouble(speedLimitField.getText()),
@@ -591,7 +615,7 @@ public class DialogMaker {
                          changeRoadParameters(i, lanesSpinner.getValue(), Double.parseDouble(speedLimitField.getText()),
                                  Double.parseDouble(lengthField.getText()), lightPlan, generators, roadParameters);
                      }
-                     AppContext.RUN_DETAILS.mapChanged = true;
+
                  } else {
                      MyLogger.log("Invalid road inputs provided in dialog.", Constants.ERROR_FOR_LOGGING);
                      warningDialog(stage, "Invalid road inputs provided. Please check number of lanes, max speed and length.");
@@ -599,6 +623,7 @@ public class DialogMaker {
              } else if (response == deleteButtonType) {
                  if (!changingAll) {
                      removeRoadFormMap(roadParameters, index, stage, dialog);
+                     AppContext.RUN_DETAILS.mapChanged = true;
                  }
              } else {
                  MyLogger.log("Dialog cancelled.", Constants.INFO_FOR_LOGGING);
@@ -792,5 +817,45 @@ public class DialogMaker {
         }
 
         return true;
+    }
+
+    public static boolean onCloseUnsavedChangesDialog(Stage stage) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Unsaved Changes");
+        alert.setHeaderText("You have unsaved changes.");
+        alert.setContentText("Do you want to save your changes before exiting?");
+        alert.initOwner(stage);
+
+        ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
+        ButtonType dontSaveButton = new ButtonType("Don't Save", ButtonBar.ButtonData.NO);
+        ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(saveButton, dontSaveButton, cancelButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent()) {
+            if (result.get() == saveButton) {
+                MyLogger.log("User chose to save changes before exiting.", Constants.INFO_FOR_LOGGING);
+                RoadXml.saveAs(AppContext.RUN_DETAILS.mapFile);
+                return true;
+            } else if (result.get() == dontSaveButton) {
+                MyLogger.log("User chose not to save changes before exiting.", Constants.INFO_FOR_LOGGING);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean showExitConfirmation(Stage stage) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Exit Application");
+        alert.setHeaderText("Are you sure you want to exit?");
+        alert.setContentText("Any unsaved progress might be lost.");
+        alert.initOwner(stage);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        // return true if user clicked OK
+        return result.isPresent() && result.get() == ButtonType.OK;
     }
 }

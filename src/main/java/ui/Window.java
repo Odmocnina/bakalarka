@@ -104,7 +104,7 @@ public class Window extends Application {
             // Update info string in the top label instead of drawing on canvas
             String infoString = "Forward model used: " + AppContext.CAR_FOLLOWING_MODEL.getName() +
                     " | lane changing model used: " + AppContext.LANE_CHANGING_MODEL.getName() + " | time steps: " +
-                    simulation.getStepCount();
+                    simulation.getStepCount() + " | Opened map file: " + AppContext.RUN_DETAILS.mapFile;
             Platform.runLater(() -> infoLabel.setText(infoString));
 
             if (roads == null || roads.length == 0) {
@@ -158,6 +158,28 @@ public class Window extends Application {
             simulation.step();
             Platform.runLater(paintAll);
         };
+
+        primaryStage.setOnCloseRequest(event -> {
+            boolean canClose = true;
+
+            if (AppContext.RUN_DETAILS.mapChanged) { // confirm if unsaved changes
+                canClose = DialogMaker.onCloseUnsavedChangesDialog(primaryStage);
+            } else { // confirm if nothing is changed
+                canClose = DialogMaker.showExitConfirmation(primaryStage);
+            }
+
+            // decide based on user input to close application or not
+            if (!canClose) {
+                event.consume();
+            } else {
+                // close confirmed, stop engine and exit
+                if (engine != null && engine.getRunning()) {
+                    engine.stop();
+                }
+                Platform.exit();
+                System.exit(0);
+            }
+        });
 
         canvasPane.setOnMouseClicked(event -> {
             // get roads
@@ -569,6 +591,7 @@ public class Window extends Application {
             if (selectedFile != null) {
                 boolean success = RoadLoader.loadMap(selectedFile.getAbsolutePath());
                 if (success) {
+                    AppContext.RUN_DETAILS.setNewMapFile(selectedFile.getAbsolutePath());
                     MyLogger.log("Map file loaded successfully: " + selectedFile.getAbsolutePath(),
                             Constants.INFO_FOR_LOGGING);
                     paintAll.run();

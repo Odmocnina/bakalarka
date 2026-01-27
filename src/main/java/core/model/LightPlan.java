@@ -113,4 +113,8 @@ public class LightPlan {
         this.timeOfSwitch = timeOfSwitch;
     }
 
+    public LightPlan clone() {
+        return new LightPlan(cycleTime, timeOfSwitch, beginsOnGreen);
+    }
+
 }

@@ -711,7 +711,7 @@ public class ConfigLoader {
         AppContext.LANE_CHANGING_MODEL = laneChangingModel; // store model in app context for later use
 
         // load car generator, thing that decides when cars are generated and what params do they have
-        CarGenerator carGenerator = ConfigLoader.loadCarGenerator();
+        /*CarGenerator carGenerator = ConfigLoader.loadCarGenerator();
         if (carGenerator == null) {
             MyLogger.logBeforeLoading("Failed to load car generator, exiting.", Constants.FATAL_FOR_LOGGING);
             return false;
@@ -733,7 +733,7 @@ public class ConfigLoader {
             MyLogger.logBeforeLoading("Car generator parameters are NOT valid for the selected " +
                     "car-following model/lane-changing model, exiting.", Constants.FATAL_FOR_LOGGING);
             return false;
-        }
+        }*/
 
         // load roads from config
         Road[] roads = ConfigLoader.loadRoads();
@@ -758,7 +758,7 @@ public class ConfigLoader {
         }
 
         // set type of road for generator and store roads in road instance
-        carGenerator.setType(roads[0]);
+        /*carGenerator.setType(roads[0]);
         for (Road road : roads) {
             road.setCarGenerators(carGenerator.clone());
 
@@ -770,7 +770,7 @@ public class ConfigLoader {
                 MyLogger.logBeforeLoading("Car generator is generating cars directly on road."
                         , Constants.INFO_FOR_LOGGING);
             }
-        }
+        }*/
 
         IRoadRenderer renderer; // renderer for drawing roads in gui, depends on road type, because different road types
         // have different content

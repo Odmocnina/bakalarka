@@ -25,6 +25,8 @@ public class CarGenerator implements Cloneable {
      be generated **/
     private HashMap<String, Parameter> parameters = new HashMap<>();
 
+    private HashMap<String, Parameter> parametersForComunication = new HashMap<>();
+
     /** parameters requested by car following model, needed for generation **/
     private String[] carGenerationParameters;
 
@@ -501,5 +503,29 @@ public class CarGenerator implements Cloneable {
         }
 
         return true;
+    }
+
+    public void copyComParametersToRealParameters(String type, double cellSize) {
+        for (String key : parametersForComunication.keySet()) {
+            Parameter param = parametersForComunication.get(key);
+            parameters.put(key, new Parameter(param.name, param.minValue, param.maxValue));
+        }
+
+        if (type.equals(Constants.CELLULAR)) {
+            translateParametersToCellular(cellSize);
+        }
+    }
+
+    public void addComParameter(String key, String name, Double minValue, Double maxValue) {
+        Parameter param = new Parameter(name, minValue, maxValue);
+        parametersForComunication.put(key, param);
+    }
+
+    public void removeComParameter(String key) {
+        this.parametersForComunication.remove(key);
+    }
+
+    public HashMap<String, Parameter> getAllComParameters() {
+        return this.parametersForComunication;
     }
 }

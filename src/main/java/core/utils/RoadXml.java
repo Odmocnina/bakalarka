@@ -236,6 +236,7 @@ public class RoadXml {
                     Constants.ERROR_FOR_LOGGING);
             return false;
         } else {
+            AppContext.RUN_DETAILS.mapChanged = false;
             MyLogger.logBeforeLoading("Current map saved to XML file: " + AppContext.RUN_DETAILS.mapFile,
                     Constants.INFO_FOR_LOGGING);
             return true;
