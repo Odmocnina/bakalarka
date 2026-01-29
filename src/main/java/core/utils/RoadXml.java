@@ -207,7 +207,7 @@ public class RoadXml {
             flowRateElement.appendChild(doc.createTextNode(String.valueOf(generator.getFlowRate())));
             Element paramElement = doc.createElement(RoadLoadingConstants.CAR_PARAMS_TAG);
             generatorElement.appendChild(paramElement);
-            HashMap<String, Parameter> carParams = generator.getAllParameters();
+            HashMap<String, Parameter> carParams = generator.getAllComParameters();
             for (String paramKey : carParams.keySet()) {
                 Parameter parameter = carParams.get(paramKey);
                 Element parameterElement = doc.createElement(paramKey);

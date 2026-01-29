@@ -293,7 +293,7 @@ public class Window extends Application {
             }
 
             neededHeight += lanes * LANE_WIDTH + GAP;
-            neededWidth = Math.max(neededWidth, length);
+            neededWidth = Math.max(neededWidth, length + LANE_WIDTH);
         }
 
         this.drawRoads(canvas, gc, roads, GAP, LANE_WIDTH, neededWidth, neededHeight);

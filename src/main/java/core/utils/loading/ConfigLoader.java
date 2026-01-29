@@ -267,6 +267,8 @@ public class ConfigLoader {
                 modelFromConfig = new KKW_Linear();
             } else if (id.equals("kkw-quadratic")) {
                 modelFromConfig = new KKW_Quadratic();
+            } else if (id.equals("test-model")) {
+                modelFromConfig = new TestModel();
             } else {
                 MyLogger.logBeforeLoading("Unknown car-following model id in config file: " + id + ", exiting"
                         , Constants.FATAL_FOR_LOGGING);
@@ -384,7 +386,7 @@ public class ConfigLoader {
                             MyLogger.logBeforeLoading("Invalid queue parameters in config file, it will be" +
                                             " ignored.", Constants.ERROR_FOR_LOGGING);
                         } else {
-                            loadedGenerator.addParameter(Constants.GENERATOR_QUEUE, "Test", (double) min, (double) max);
+                            loadedGenerator.addComParameter(Constants.GENERATOR_QUEUE, "Test", (double) min, (double) max);
                         }
                     } catch (Exception e) {
                         MyLogger.logBeforeLoading("Error parsing queue parameters in config file, it will be" +
@@ -407,10 +409,12 @@ public class ConfigLoader {
                                 item(0).getTextContent());
                         double maxValue = Double.parseDouble(paramElement.getElementsByTagName(ConfigConstants.MAX_VALUE_TAG).
                                 item(0).getTextContent());
-                        loadedGenerator.addParameter(paramName, "Test", minValue, maxValue);
+                        loadedGenerator.addComParameter(paramName, "Test", minValue, maxValue);
                     }
                 }
             }
+
+            loadedGenerator.copyComParametersToRealParameters(AppContext.CAR_FOLLOWING_MODEL.getType(), AppContext.CAR_FOLLOWING_MODEL.getCellSize());
 
             return loadedGenerator;
         } catch (Exception e) {

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <config>
     <numberOfRoads>10</numberOfRoads>
-    <roadFile>map.xml</roadFile>
+    <roadFile>map10.xml</roadFile>
 
     <models>
         <carFollowingModel>
-            <id>idm</id>
+            <id>test-model</id>
         </carFollowingModel>
         <laneChangingModel>
             <id>mobil</id>

@@ -444,6 +444,10 @@ public class CarGenerator implements Cloneable {
             Parameter param = this.parameters.get(key);
             copy.parameters.put(key, new Parameter(param.name, param.minValue, param.maxValue));
         }
+        for (String key : this.parametersForComunication.keySet()) {
+            Parameter param = this.parametersForComunication.get(key);
+            copy.parametersForComunication.put(key, new Parameter(param.name, param.minValue, param.maxValue));
+        }
         return copy;
     }
 

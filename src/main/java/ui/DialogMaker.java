@@ -150,7 +150,7 @@ public class DialogMaker {
                 grid.add(flowRateInput, 1, 0);
 
                 // parameters
-                HashMap<String, Parameter> parameters = generator.getAllParameters();
+                HashMap<String, Parameter> parameters = generator.getAllComParameters();
                 int i = 1;
                 for (String paramKey : parameters.keySet()) {
                     Parameter param = parameters.get(paramKey);
@@ -212,12 +212,14 @@ public class DialogMaker {
         dialog.showAndWait().ifPresent(response -> {
             if (response == applyButtonType) {
                 // to-do logic to update the generator
+                generator.copyComParametersToRealParameters(AppContext.CAR_FOLLOWING_MODEL.getType(), AppContext.CAR_FOLLOWING_MODEL.getCellSize());
                 MyLogger.log("Car generator updated via dialog.", Constants.INFO_FOR_LOGGING);
             } else {
                 MyLogger.log("Car generator dialog cancelled.", Constants.INFO_FOR_LOGGING);
             }
         });
     }
+
 
     private static void removeParameterFromGenerator(CarGenerator generator, String name, String paramKey,
                                                      Runnable refreshGrid, Dialog<ButtonType> dialog) {
@@ -234,7 +236,7 @@ public class DialogMaker {
             } else {
                 MyLogger.log("Parameter deletion confirmed for parameter: " + name + "(" + paramKey + ").",
                         Constants.INFO_FOR_LOGGING);
-                generator.removeParameter(paramKey);
+                generator.removeComParameter(paramKey);
                 MyLogger.log("Parameter " + paramKey + " deleted from car generator.", Constants.INFO_FOR_LOGGING);
                 refreshGrid.run();
                 dialog.getDialogPane().getScene().getWindow().sizeToScene();
@@ -372,8 +374,8 @@ public class DialogMaker {
                 String nameOfParam = paramNameInput.getText();
 
                 if (ok) {
-                    generator.removeParameter(oldKey);
-                    generator.addParameter(key, nameOfParam, minValue, maxValue);
+                    generator.removeComParameter(oldKey);
+                    generator.addComParameter(key, nameOfParam, minValue, maxValue);
                     MyLogger.log("Parameter changed via dialog.", Constants.INFO_FOR_LOGGING);
                 }
             } else {
@@ -472,7 +474,7 @@ public class DialogMaker {
                 String nameOfParam = paramNameInput.getText();
 
                 if (ok) {
-                    generator.addParameter(key, nameOfParam, minValue, maxValue);
+                    generator.addComParameter(key, nameOfParam, minValue, maxValue);
                     MyLogger.log("New parameter added via dialog.", Constants.INFO_FOR_LOGGING);
                 }
             } else {

@@ -144,9 +144,11 @@ public class RoadLoader {
                 String name = paramElement.getElementsByTagName(RoadLoadingConstants.NAME_TAG).item(0).getTextContent();
                 double minValue = Double.parseDouble(paramElement.getElementsByTagName(RoadLoadingConstants.MIN_VALUE_TAG).item(0).getTextContent());
                 double maxValue = Double.parseDouble(paramElement.getElementsByTagName(RoadLoadingConstants.MAX_VALUE_TAG).item(0).getTextContent());
-                generator.addParameter(key, name, minValue, maxValue);
+                generator.addComParameter(key, name, minValue, maxValue);
             }
         }
+
+        generator.copyComParametersToRealParameters(AppContext.CAR_FOLLOWING_MODEL.getType(), AppContext.CAR_FOLLOWING_MODEL.getCellSize());
 
         return generator;
     }
