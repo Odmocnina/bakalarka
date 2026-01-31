@@ -51,6 +51,10 @@ public class CarGenerator implements Cloneable {
     /** available car colors **/
     private final Color[] COLORS = Constants.CAR_COLORS;
 
+    private boolean useQueue = false;
+    private int minQueueSize = 0;
+    private int maxQueueSize = 0;
+
     /**
      * constructor for car generator
      *
@@ -536,5 +540,11 @@ public class CarGenerator implements Cloneable {
 
     public HashMap<String, Parameter> getAllComParameters() {
         return this.parametersForComunication;
+    }
+
+    public void setQueueSize(int minSize, int maxSize) {
+        this.useQueue = true;
+        this.minQueueSize = minSize;
+        this.maxQueueSize = maxSize;
     }
 }

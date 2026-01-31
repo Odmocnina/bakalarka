@@ -88,4 +88,9 @@ public class Actions {
         MyLogger.log("Exporting results...", Constants.INFO_FOR_LOGGING);
         ResultsRecorder.getResultsRecorder().writeResults();
     }
+
+    public static void setLoggingAction(int logIndex) {
+        MyLogger.log("Toggling logging index " + logIndex, Constants.INFO_FOR_LOGGING);
+        ConfigModificator.changeLogging(logIndex);
+    }
 }

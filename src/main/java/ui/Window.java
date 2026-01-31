@@ -627,16 +627,44 @@ public class Window extends Application {
         fileMenu.getItems().addAll(itemNewFile, itemEditFile, itemOpenFile, itemSaveFile, itemSaveAsFile);
 
         Menu loggingMenu = new Menu("Logging");
-        MenuItem toggleAllLogItem = new MenuItem("Toggle all logging", createMenuIcon("/icons/log.png"));
-        MenuItem toggleInfoLogItem = new MenuItem("Toggle info logging", createMenuIcon("/icons/logInfo.png"));
-        MenuItem toggleWarnLogItem = new MenuItem("Toggle warning logging", createMenuIcon("/icons/logWarn.png"));
-        MenuItem toggleDebugLogItem = new MenuItem("Toggle debug logging", createMenuIcon("/icons/logDebug.png"));
-        MenuItem toggleErrorLogItem = new MenuItem("Toggle error logging", createMenuIcon("/icons/logError.png"));
-        MenuItem toggleFatalLogItem = new MenuItem("Toggle fatal logging", createMenuIcon("/icons/logFatal.png"));
+        CheckMenuItem toggleAllLogItem = new CheckMenuItem("Toggle all logging");
+        toggleAllLogItem.setSelected(AppContext.RUN_DETAILS.log[0]);
+        CheckMenuItem toggleInfoLogItem = new CheckMenuItem("Toggle info logging");
+        toggleInfoLogItem.setSelected(AppContext.RUN_DETAILS.log[1]);
+        CheckMenuItem toggleWarnLogItem = new CheckMenuItem("Toggle warning logging");
+        toggleWarnLogItem.setSelected(AppContext.RUN_DETAILS.log[2]);
+        CheckMenuItem toggleErrorLogItem = new CheckMenuItem("Toggle error logging");
+        toggleErrorLogItem.setSelected(AppContext.RUN_DETAILS.log[3]);
+        CheckMenuItem toggleFatalLogItem = new CheckMenuItem("Toggle fatal logging");
+        toggleFatalLogItem.setSelected(AppContext.RUN_DETAILS.log[4]);
+        CheckMenuItem toggleDebugLogItem = new CheckMenuItem("Toggle debug logging");
+        toggleDebugLogItem.setSelected(AppContext.RUN_DETAILS.log[5]);
         loggingMenu.getItems().addAll(toggleAllLogItem, toggleInfoLogItem, toggleWarnLogItem,
                 toggleDebugLogItem, toggleErrorLogItem, toggleFatalLogItem);
 
+        toggleAllLogItem.setOnAction(e -> {
+            ConfigModificator.changeLogging(0);
+        });
 
+        toggleInfoLogItem.setOnAction(e -> {
+            ConfigModificator.changeLogging(1);
+        });
+
+        toggleWarnLogItem.setOnAction(e -> {
+            ConfigModificator.changeLogging(2);
+        });
+
+        toggleErrorLogItem.setOnAction(e -> {
+            ConfigModificator.changeLogging(3);
+        });
+
+        toggleFatalLogItem.setOnAction(e -> {
+            ConfigModificator.changeLogging(4);
+        });
+
+        toggleDebugLogItem.setOnAction(e -> {
+            ConfigModificator.changeLogging(5);
+        });
 
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().add(fileMenu);

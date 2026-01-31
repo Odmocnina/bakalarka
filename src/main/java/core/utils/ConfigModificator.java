@@ -24,6 +24,10 @@ public class ConfigModificator {
         AppContext.RUN_DETAILS.preventCollisions = !AppContext.RUN_DETAILS.preventCollisions;
     }
 
+    public static void changeLogging(int index) {
+        AppContext.RUN_DETAILS.log[index] = !AppContext.RUN_DETAILS.log[index];
+    }
+
 
 
 

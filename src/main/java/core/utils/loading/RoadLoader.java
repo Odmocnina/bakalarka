@@ -9,6 +9,7 @@ import core.model.continous.ContinuosRoad;
 import core.utils.MyLogger;
 import core.utils.StringEditor;
 import core.utils.constants.Constants;
+import core.utils.constants.RequestConstants;
 import core.utils.constants.RoadLoadingConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -135,6 +136,19 @@ public class RoadLoader {
         double flowRate = Double.parseDouble(generatorElement.getElementsByTagName(RoadLoadingConstants.FLOW_RATE_TAG).
                 item(0).getTextContent());
         CarGenerator generator = new CarGenerator(flowRate);
+
+        //queue
+        /*Element queueElement = (Element) generatorElement.getElementsByTagName(RoadLoadingConstants.QUEUE_TAG).item(0);
+
+        if (queueElement != null) {
+            boolean useQueue = Boolean.parseBoolean(queueElement.getElementsByTagName(RoadLoadingConstants.USE_TAG).item(0).getTextContent());
+
+            if (useQueue) {
+                int minValue = Integer.parseInt(queueElement.getElementsByTagName(RoadLoadingConstants.MIN_VALUE_TAG).item(0).getTextContent());
+                int maxValue = Integer.parseInt(queueElement.getElementsByTagName(RoadLoadingConstants.MAX_VALUE_TAG).item(0).getTextContent());
+                generator.addParameter(, "Queue Size", minValue, maxValue);
+            }
+        }*/
 
         // load all car parameters
         Element carParamsElement = (Element) generatorElement.getElementsByTagName(RoadLoadingConstants.CAR_PARAMS_TAG).item(0);
