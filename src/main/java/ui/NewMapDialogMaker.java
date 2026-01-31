@@ -1,5 +1,6 @@
 package ui;
 
+import app.AppContext;
 import core.utils.DefaultStuffMaker;
 import core.utils.MyLogger;
 import core.utils.RoadParameters;
@@ -98,6 +99,7 @@ public class NewMapDialogMaker extends DialogMaker {
         dialog.showAndWait().ifPresent(result -> {
             if (result == createButtonType) {
                 String mapFileName = mapFileNameField.getText();
+                AppContext.RUN_DETAILS.mapFile = mapFileName;
                 boolean success = RoadXml.writeMapToXml(roadParameters, roadParameters.size(), mapFileName);
                 MyLogger.log("Creating new map: " + mapFileName, Constants.INFO_FOR_LOGGING);
                 if (success) {

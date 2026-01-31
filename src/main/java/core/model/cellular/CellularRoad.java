@@ -60,7 +60,7 @@ public class CellularRoad extends Road {
         }
 
         // first test of occupied cells, DELETE LATER
-      /* cells[0][5].setOccupied(true);
+      /*cells[0][5].setOccupied(true);
         CarParams carParams = new CarParams();
         carParams.setParameter(RequestConstants.CURRENT_SPEED_REQUEST, 0);
         carParams.setParameter(RequestConstants.MAX_SPEED_REQUEST, 1.0);
@@ -138,7 +138,29 @@ public class CellularRoad extends Road {
         for (LaneChangeResult lcr : changedCars) {
             Direction direction = lcr.direction;
             CarParams carParams = lcr.carParams;
+            //// changed part
+            int targetLane = -1;
+
             if (direction == Direction.LEFT && AppContext.SIMULATION.getStepCount() % 2 == 0) {
+                if (carParams.lane > 0) {
+                    targetLane = carParams.lane - 1;
+                }
+            } else if (direction == Direction.RIGHT && AppContext.SIMULATION.getStepCount() % 2 == 1) {
+                if (carParams.lane < numberOfLanes - 1) {
+                    targetLane = carParams.lane + 1;
+                }
+            }
+
+            if (targetLane != -1) {
+                if (isSpaceFree(targetLane, (int)carParams.xPosition, (int)carParams.getParameter(RequestConstants.LENGTH_REQUEST))) {
+                    int currentLane = carParams.lane;
+                    carParams.lane = targetLane;
+                    this.placeCar(carParams, (int) carParams.xPosition, targetLane);
+                    this.removeCar(currentLane, (int) carParams.xPosition);
+                }
+            }
+            ////////////
+            /*if (direction == Direction.LEFT && AppContext.SIMULATION.getStepCount() % 2 == 0) {
                 int currentLane = carParams.lane;
                 if (currentLane > 0) {
                     int targetLane = currentLane - 1;
@@ -154,7 +176,7 @@ public class CellularRoad extends Road {
                     this.placeCar(carParams, (int) carParams.xPosition, targetLane);
                     this.removeCar(currentLane, (int) carParams.xPosition);
                 }
-            }
+            }*/
         }
     }
 
@@ -428,6 +450,19 @@ public class CellularRoad extends Road {
             }
         }
         return null;
+    }
+
+    private boolean isSpaceFree(int lane, int headPosition, int length) {
+        for (int i = 0; i < length; i++) {
+            int posToCheck = headPosition - i;
+            if (posToCheck < 0 || posToCheck >= numberOfCells) {
+                return false;
+            }
+            if (cells[lane][posToCheck].isOccupied()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

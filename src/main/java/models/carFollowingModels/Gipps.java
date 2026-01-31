@@ -69,7 +69,8 @@ public class Gipps implements ICarFollowingModel {
         double timeStep = parameters.get(RequestConstants.TIME_STEP_REQUEST);
         double minGap = parameters.get(RequestConstants.MINIMUM_GAP_TO_NEXT_CAR_REQUEST);
         double maxDeceleration = -parameters.get(RequestConstants.DECELERATION_COMFORT_REQUEST);
-        double maxDecelerationFront = -parameters.get(RequestConstants.DECELERATION_COMFORT_REQUEST_STRAIGHT_FORWARD);
+        //double maxDecelerationFront = -parameters.get(RequestConstants.DECELERATION_COMFORT_REQUEST_STRAIGHT_FORWARD);
+        double maxDecelerationFront = Math.min(-3.0, (maxDeceleration - 3.0) / 2);
         double xPosition = parameters.get(RequestConstants.X_POSITION_REQUEST);
         double leadingXPosition = parameters.get(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST);
         if (leadingXPosition == Constants.NO_CAR_THERE) {

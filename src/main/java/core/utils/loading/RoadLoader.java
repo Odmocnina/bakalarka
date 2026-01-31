@@ -120,7 +120,8 @@ public class RoadLoader {
             CarGenerator generator = createGenerator(generatorElement);
             String type = AppContext.CAR_FOLLOWING_MODEL.getType();
             double cellSize = AppContext.CAR_FOLLOWING_MODEL.getCellSize();
-            generator.setType(type, cellSize);
+            //generator.setType(type, cellSize);
+            generator.setType(type);
             String carGenerationParameters = StringEditor.mergeRequestParameters(AppContext.CAR_FOLLOWING_MODEL.getParametersForGeneration(),
                      AppContext.LANE_CHANGING_MODEL.getParametersForGeneration());
             generator.setCarGenerationParameters(carGenerationParameters);

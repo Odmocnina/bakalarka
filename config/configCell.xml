@@ -5,10 +5,10 @@
 
     <models>
         <carFollowingModel>
-            <id>head-leading</id>
+            <id>kkw-linear</id>
         </carFollowingModel>
         <laneChangingModel>
-            <id>stca</id>
+            <id>rickert</id>
         </laneChangingModel>
     </models>
 

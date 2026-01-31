@@ -262,6 +262,10 @@ public class CarGenerator implements Cloneable {
         }
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
     /**
      * function to set whether multiple cars can be generated per tick
      *
@@ -440,6 +444,7 @@ public class CarGenerator implements Cloneable {
         copy.id = this.id;
         copy.allowMultiplePerTick = this.allowMultiplePerTick;
         copy.carGenerationParameters = this.carGenerationParameters;
+        copy.setFlowRate(this.getFlowRate());
         for (String key : this.parameters.keySet()) {
             Parameter param = this.parameters.get(key);
             copy.parameters.put(key, new Parameter(param.name, param.minValue, param.maxValue));

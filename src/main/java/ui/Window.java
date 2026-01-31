@@ -626,8 +626,21 @@ public class Window extends Application {
         Menu fileMenu = new Menu("Map file");
         fileMenu.getItems().addAll(itemNewFile, itemEditFile, itemOpenFile, itemSaveFile, itemSaveAsFile);
 
+        Menu loggingMenu = new Menu("Logging");
+        MenuItem toggleAllLogItem = new MenuItem("Toggle all logging", createMenuIcon("/icons/log.png"));
+        MenuItem toggleInfoLogItem = new MenuItem("Toggle info logging", createMenuIcon("/icons/logInfo.png"));
+        MenuItem toggleWarnLogItem = new MenuItem("Toggle warning logging", createMenuIcon("/icons/logWarn.png"));
+        MenuItem toggleDebugLogItem = new MenuItem("Toggle debug logging", createMenuIcon("/icons/logDebug.png"));
+        MenuItem toggleErrorLogItem = new MenuItem("Toggle error logging", createMenuIcon("/icons/logError.png"));
+        MenuItem toggleFatalLogItem = new MenuItem("Toggle fatal logging", createMenuIcon("/icons/logFatal.png"));
+        loggingMenu.getItems().addAll(toggleAllLogItem, toggleInfoLogItem, toggleWarnLogItem,
+                toggleDebugLogItem, toggleErrorLogItem, toggleFatalLogItem);
+
+
+
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().add(fileMenu);
+        menuBar.getMenus().add(loggingMenu);
 
         return menuBar;
     }

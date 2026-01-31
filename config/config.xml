@@ -5,10 +5,10 @@
 
     <models>
         <carFollowingModel>
-            <id>test-model</id>
+            <id>gipps</id>
         </carFollowingModel>
         <laneChangingModel>
-            <id>mobil</id>
+            <id>mobil-simple</id>
         </laneChangingModel>
     </models>
     <generator>

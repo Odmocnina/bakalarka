@@ -378,7 +378,8 @@ public abstract class Road {
      **/
     public void setTypeAndParametersOfGenerators(String parametersForGeneration) {
         for (CarGenerator generator : generators) {
-            generator.setType(this);
+            //generator.setType(this);
+            generator.setType(this.getType());
             generator.setCarGenerationParameters(parametersForGeneration);
         }
     }
@@ -399,6 +400,15 @@ public abstract class Road {
      **/
     public LightPlan[] getLightPlans() {
         return this.lightPlansOnLanes;
+    }
+
+    public boolean doAllGeneratorsHaveNeededParameters() {
+        for (CarGenerator generator : generators) {
+            if (!generator.checkIfAllParametersAreLoaded()) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

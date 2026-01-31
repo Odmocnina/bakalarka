@@ -11,13 +11,13 @@ import core.utils.RoadXml;
 import core.utils.constants.Constants;
 import core.utils.constants.DefaultValues;
 
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -136,6 +136,8 @@ public class DialogMaker {
 
         dialog.getDialogPane().setContent(grid);
 
+        TextField flowRateInput = new TextField(String.valueOf(generator.getFlowRate()));
+
         // runnable to refresh the grid content, when changed
         Runnable refreshGrid = new Runnable() {
             @Override
@@ -145,7 +147,7 @@ public class DialogMaker {
 
                 // flow rate
                 Label flowRateLabel = new Label("Flow rate (cars/s):");
-                TextField flowRateInput = new TextField(String.valueOf(generator.getFlowRate()));
+                //TextField flowRateInput = new TextField(String.valueOf(generator.getFlowRate()));
                 grid.add(flowRateLabel, 0, 0);
                 grid.add(flowRateInput, 1, 0);
 
@@ -209,9 +211,34 @@ public class DialogMaker {
         // fill the grid for the first time
         refreshGrid.run();
 
+        final Button btApply = (Button) dialog.getDialogPane().lookupButton(applyButtonType);
+        btApply.addEventFilter(ActionEvent.ACTION, event -> {
+            String input = flowRateInput.getText();
+            try {
+                // is it number
+                double newFlowRate = Double.parseDouble(input);
+
+                // is it positive
+                if (newFlowRate <= 0) {
+                    throw new NumberFormatException("Value must be positive");
+                }
+
+                // set value
+                generator.setFlowRate(newFlowRate);
+
+            } catch (NumberFormatException e) {
+                // value is not valid
+                MyLogger.log("Invalid flow rate value: " + input, Constants.ERROR_FOR_LOGGING);
+
+                warningDialog(stage, "Invalid flow rate value: " + input);
+
+                // kill event, do not close dialog
+                event.consume();
+            }
+        });
+
         dialog.showAndWait().ifPresent(response -> {
             if (response == applyButtonType) {
-                // to-do logic to update the generator
                 generator.copyComParametersToRealParameters(AppContext.CAR_FOLLOWING_MODEL.getType(), AppContext.CAR_FOLLOWING_MODEL.getCellSize());
                 MyLogger.log("Car generator updated via dialog.", Constants.INFO_FOR_LOGGING);
             } else {
