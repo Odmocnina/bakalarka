@@ -18,6 +18,12 @@ import org.w3c.dom.Element;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import ui.render.CellularRoadRenderer;
@@ -73,18 +79,17 @@ public class ConfigLoader {
         Road[] roads;
 
         try {
-            int numberOfRoads;
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(configFile);
-            Element numberOfRoadsElement = (Element) doc.getElementsByTagName(ConfigConstants.NUMBER_OF_ROADS_TAG).item(0);
+            /*Element numberOfRoadsElement = (Element) doc.getElementsByTagName(ConfigConstants.NUMBER_OF_ROADS_TAG).item(0);
             numberOfRoads = Integer.parseInt(numberOfRoadsElement.getTextContent());
 
             if (numberOfRoads <= 0) {
                 MyLogger.logBeforeLoading("Invalid number of roads in config file: " + numberOfRoads
                                 + ", exiting", Constants.FATAL_FOR_LOGGING);
                 return null;
-            }
+            }*/
 
             String roadFile = doc.getElementsByTagName(ConfigConstants.ROAD_FILE_TAG).item(0).getTextContent();
 
@@ -231,7 +236,7 @@ public class ConfigLoader {
      *
      * @return loaded ICarFollowingModel object, or null if loading failed
      **/
-    public static ICarFollowingModel loadCarFollowingModel() {
+    public static ICarFollowingModel loadCarFollowingModelOld() {
         ICarFollowingModel modelFromConfig;
         // Logic to load and return the appropriate car-following model based on modelId
         try {
@@ -294,6 +299,66 @@ public class ConfigLoader {
         return null;
     }
 
+    public static ICarFollowingModel loadCarFollowingModel() {
+        try {
+            // 1. Načtení ID z XML (tvůj původní kód)
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(configFile);
+            doc.getDocumentElement().normalize();
+            Element models = (Element) doc.getElementsByTagName(ConfigConstants.MODELS_TAG).item(0);
+            Element model = (Element) models.getElementsByTagName(ConfigConstants.CAR_FOLLOWING_MODEL_TAG).item(0);
+
+            String configIdRaw = model.getElementsByTagName(ConfigConstants.ID_TAG).item(0).getTextContent();
+            final String targetId = configIdRaw.toLowerCase().trim();
+
+            // 2. Reflexe: Najdi všechny třídy v balíčku, kde jsou modely
+            // POZOR: Změň "cz.tvoje.package.models" na skutečný název balíčku, kde máš třídy modelů!
+            String packageName = "models.carFollowingModels";
+            List<Class<?>> classes = getClasses(packageName);
+
+            ICarFollowingModel modelFromConfig = null;
+
+            // 3. Proiteruj nalezené třídy a najdi tu se správnou anotací
+            for (Class<?> clazz : classes) {
+                // Kontrola, zda třída implementuje interface a má naši anotaci
+                if (ICarFollowingModel.class.isAssignableFrom(clazz) && clazz.isAnnotationPresent(CarFollowingModelId.class)) {
+                    CarFollowingModelId annotation = clazz.getAnnotation(CarFollowingModelId.class);
+
+                    // Porovnání ID z configu s ID v anotaci
+                    if (annotation.value().equals(targetId)) {
+                        // Našli jsme shodu! Vytvoříme instanci.
+                        MyLogger.logBeforeLoading("Found model class via reflection: " + clazz.getSimpleName(), Constants.INFO_FOR_LOGGING);
+                        modelFromConfig = (ICarFollowingModel) clazz.getDeclaredConstructor().newInstance();
+                        break;
+                    }
+                }
+            }
+
+            if (modelFromConfig == null) {
+                MyLogger.logBeforeLoading("Unknown car-following model id in config file: " + targetId + ", exiting", Constants.FATAL_FOR_LOGGING);
+                return null;
+            }
+
+            // 4. Validace (tvůj původní kód)
+            if (modelFromConfig.getType().equals(Constants.CELLULAR)) {
+                double cellSize = modelFromConfig.getCellSize();
+                if (cellSize <= 0) {
+                    MyLogger.logBeforeLoading("Cell size must be greater than 0, exiting", Constants.FATAL_FOR_LOGGING);
+                    return null;
+                }
+            }
+
+            return modelFromConfig;
+
+        } catch (Exception e) {
+            MyLogger.logBeforeLoading("Error loading config file or instantiating model: " + e.getMessage(), Constants.FATAL_FOR_LOGGING);
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     /**
      * Method to load the lane-changing model from the configuration file
      *
@@ -337,6 +402,44 @@ public class ConfigLoader {
         }
 
         return null;
+    }
+
+    private static List<Class<?>> getClasses(String packageName) throws ClassNotFoundException, IOException {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        assert classLoader != null;
+        String path = packageName.replace('.', '/');
+        Enumeration<URL> resources = classLoader.getResources(path);
+        List<File> dirs = new ArrayList<>();
+
+        while (resources.hasMoreElements()) {
+            URL resource = resources.nextElement();
+            dirs.add(new File(resource.getFile()));
+        }
+
+        ArrayList<Class<?>> classes = new ArrayList<>();
+        for (File directory : dirs) {
+            classes.addAll(findClasses(directory, packageName));
+        }
+        return classes;
+    }
+
+    private static List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException {
+        List<Class<?>> classes = new ArrayList<>();
+        if (!directory.exists()) {
+            return classes;
+        }
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    assert !file.getName().contains(".");
+                    classes.addAll(findClasses(file, packageName + "." + file.getName()));
+                } else if (file.getName().endsWith(".class")) {
+                    classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
+                }
+            }
+        }
+        return classes;
     }
 
     /**
@@ -746,8 +849,9 @@ public class ConfigLoader {
                     , Constants.FATAL_FOR_LOGGING);
             return false;
         } else {
-            MyLogger.logBeforeLoading("Loaded road: " + roads[0].toString() + ", number of roads: "
-                    + roads.length, Constants.INFO_FOR_LOGGING);
+            for (int i = 0; i < roads.length; i++) {
+                MyLogger.logBeforeLoading("Loaded road(" + i + "): " + roads[i].toString(), Constants.INFO_FOR_LOGGING);
+            }
         }
         String mapFileName = ConfigLoader.getMapFileName();
 

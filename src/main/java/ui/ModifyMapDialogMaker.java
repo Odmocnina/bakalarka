@@ -60,6 +60,9 @@ public class ModifyMapDialogMaker extends DialogMaker {
         dialog.showAndWait().ifPresent(result -> {
             if (result == createButtonType) {
                 Road[] roads = RoadParameters.roadParametersToRoads(roadParameters);
+                for (Road road : roads) {
+                    road.setUpQueuesIfNeeded();
+                }
                 AppContext.SIMULATION.resetSimulationWithNewRoads(roads);
                 MyLogger.log("Modified map with " + roads.length + " roads.", Constants.INFO_FOR_LOGGING);
                 paintAll.run();

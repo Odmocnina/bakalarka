@@ -193,5 +193,6 @@ public class Simulation {
         this.stepCount = 0;
         this.running = false;
         this.roads = roads;
+        ResultsRecorder.getResultsRecorder().resetCarNumbers();
     }
 }

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <numberOfRoads>10</numberOfRoads>
     <roadFile>mapDiff.xml</roadFile>
 
     <models>
@@ -11,57 +10,6 @@
             <id>rickert</id>
         </laneChangingModel>
     </models>
-
-    <generator>
-        <queue>
-            <use>false</use>
-            <minValue>1</minValue>
-            <maxValue>1</maxValue>
-        </queue>
-        <flowRate>0.2</flowRate>
-        <carParams>
-            <maxSpeed>
-                <minValue>5</minValue>
-                <maxValue>20</maxValue>
-            </maxSpeed>
-            <length>
-                <minValue>3</minValue>
-                <maxValue>20</maxValue>
-            </length>
-            <maxAcceleration>
-                <minValue>1</minValue>
-                <maxValue>1.5</maxValue>
-            </maxAcceleration>
-            <minimumGapToNextCar>
-                <minValue>10</minValue>
-                <maxValue>10</maxValue>
-            </minimumGapToNextCar>
-            <decelerationComfort>
-                <minValue>2</minValue>
-                <maxValue>3</maxValue>
-            </decelerationComfort>
-            <desiredTimeHeadway>
-                <minValue>1</minValue>
-                <maxValue>3</maxValue>
-            </desiredTimeHeadway>
-            <speedDifferenceSensitivity>
-                <minValue>0.5</minValue>
-                <maxValue>0.5</maxValue>
-            </speedDifferenceSensitivity>
-            <distanceDifferenceSensitivity>
-                <minValue>1.5</minValue>
-                <maxValue>2.2</maxValue>
-            </distanceDifferenceSensitivity>
-            <edgeValueForLaneChange>
-                <minValue>0.1</minValue>
-                <maxValue>0.3</maxValue>
-            </edgeValueForLaneChange>
-            <politenessFactor>
-                <minValue>0.0</minValue>
-                <maxValue>1.0</maxValue>
-            </politenessFactor>
-        </carParams>
-    </generator>
 
     <runDetails>
         <showGui>true</showGui>

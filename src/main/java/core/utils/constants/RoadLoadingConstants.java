@@ -19,6 +19,8 @@ public class RoadLoadingConstants {
     public static final String MIN_VALUE_TAG = "minValue";
     public static final String MAX_VALUE_TAG = "maxValue";
     public static final String NAME_TAG = "name";
+    public static final String QUEUE_TAG = "queue";
+    public static final String USE_TAG = "use";
 
 
 }

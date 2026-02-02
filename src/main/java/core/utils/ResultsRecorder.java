@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Arrays;
 
 /********************************
  * Singleton class responsible for recording and writing simulation results such as the number of cars passed on each
@@ -166,6 +167,12 @@ public class ResultsRecorder {
         return bw;
     }
 
+    /**
+     * Writes detailed information about each road to the BufferedWriter.
+     *
+     * @param bw The BufferedWriter to write to.
+     * @throws IOException If an I/O error occurs.
+     **/
     private void writeRoadDetails(BufferedWriter bw) throws IOException {
         bw.write("=== Road Details ===\n");
         Road[] roads = AppContext.SIMULATION.getRoads();
@@ -175,6 +182,12 @@ public class ResultsRecorder {
         bw.write("\n");
     }
 
+    /**
+     * Writes simulation details to the BufferedWriter.
+     *
+     * @param bw The BufferedWriter to write to.
+     * @throws IOException If an I/O error occurs.
+     **/
     private void writeSimulationDetails(BufferedWriter bw) throws IOException {
         bw.write("=== Simulation details ===\n"); // simulation details
         bw.write("Forward model used: " + AppContext.CAR_FOLLOWING_MODEL.getName() + "(" +
@@ -197,6 +210,12 @@ public class ResultsRecorder {
         }
     }
 
+    /**
+     * Writes the total simulation time results to the BufferedWriter.
+     *
+     * @param bw The BufferedWriter to write to.
+     * @throws IOException If an I/O error occurs.
+     **/
     private void writeSimulationTimeResults(BufferedWriter bw) throws IOException {
         bw.write("=== Simulation Time Results ===\n");
         BigInteger elapsedTime = getElapsedTimeNs();
@@ -204,6 +223,12 @@ public class ResultsRecorder {
         bw.write("Total Simulation Time: " + timeMillis + " ms\n\n");
     }
 
+    /**
+     * Writes the number of cars passed results to the BufferedWriter.
+     *
+     * @param bw The BufferedWriter to write to.
+     * @throws IOException If an I/O error occurs.
+     **/
     private void writeCarsPassedResults(BufferedWriter bw) throws IOException {
         bw.write("=== Cars Passed Results ===\n");
         for (int i = 0; i < carsPassedPerRoad.length; i++) {
@@ -212,6 +237,12 @@ public class ResultsRecorder {
         bw.write("\n");
     }
 
+    /**
+     * Writes the car generation parameters for each road to the BufferedWriter.
+     *
+     * @param bw The BufferedWriter to write to.
+     * @throws IOException If an I/O error occurs.
+     **/
     private void writeGenerationParams(BufferedWriter bw) throws IOException {
         bw.write("=== Car Generation Parameters ===\n");
         Road[] roads = AppContext.SIMULATION.getRoads();
@@ -328,6 +359,14 @@ public class ResultsRecorder {
 
     public void setOutputType(String outputType) {
         this.outputType = outputType;
+    }
+
+    public void resetCarNumbers() {
+        if (this.carsPassedPerRoad != null) {
+            Arrays.fill(this.carsPassedPerRoad, 0);
+        }
+
+        this.collisionsCount = 0;
     }
 
 }

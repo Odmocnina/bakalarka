@@ -12,6 +12,7 @@ import java.util.HashMap;
  * @author Michael Hladky
  * @version 1.0
  ********************************************/
+@CarFollowingModelId("helly")
 public class Helly implements ICarFollowingModel {
 
     /**

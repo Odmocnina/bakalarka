@@ -136,7 +136,12 @@ public class DialogMaker {
 
         dialog.getDialogPane().setContent(grid);
 
+        CheckBox useQueueCheck = new CheckBox("Use queue");
+
         TextField flowRateInput = new TextField(String.valueOf(generator.getFlowRate()));
+        TextField minQueueInput = new TextField(String.valueOf(generator.getMinQueueSize()));
+        TextField maxQueueInput = new TextField(String.valueOf(generator.getMaxQueueSize()));
+        useQueueCheck.setSelected(generator.generatingToQueue());
 
         // runnable to refresh the grid content, when changed
         Runnable refreshGrid = new Runnable() {
@@ -145,15 +150,25 @@ public class DialogMaker {
                 // clear the grid
                 grid.getChildren().clear();
 
-                // flow rate
-                Label flowRateLabel = new Label("Flow rate (cars/s):");
-                //TextField flowRateInput = new TextField(String.valueOf(generator.getFlowRate()));
-                grid.add(flowRateLabel, 0, 0);
-                grid.add(flowRateInput, 1, 0);
+                // check box queue/flow rate
+                grid.add(useQueueCheck, 0, 0);
+
+                if (useQueueCheck.isSelected()) {
+                    grid.add(new Label("Min size of queue input:"), 0, 1);
+                    grid.add(minQueueInput, 1, 1);
+
+                    grid.add(new Label("Max size of queue input:"), 2, 1);
+                    grid.add(maxQueueInput, 3, 1);
+                } else {
+                    Label flowRateLabel = new Label("Flow rate (cars/s):");
+                    grid.add(flowRateLabel, 0, 1);
+                    grid.add(flowRateInput, 1, 1);
+                }
+
 
                 // parameters
                 HashMap<String, Parameter> parameters = generator.getAllComParameters();
-                int i = 1;
+                int i = 2;
                 for (String paramKey : parameters.keySet()) {
                     Parameter param = parameters.get(paramKey);
 
@@ -208,29 +223,53 @@ public class DialogMaker {
             }
         };
 
+        // refresh grid when queue/flow rate checkbox is changed
+        useQueueCheck.setOnAction(event -> {
+            refreshGrid.run();
+            dialog.getDialogPane().getScene().getWindow().sizeToScene();
+        });
+
         // fill the grid for the first time
         refreshGrid.run();
 
         final Button btApply = (Button) dialog.getDialogPane().lookupButton(applyButtonType);
         btApply.addEventFilter(ActionEvent.ACTION, event -> {
-            String input = flowRateInput.getText();
             try {
-                // is it number
-                double newFlowRate = Double.parseDouble(input);
+                if (useQueueCheck.isSelected()) {
+                    // queue selected
+                    int minQueue = Integer.parseInt(minQueueInput.getText());
+                    int maxQueue = Integer.parseInt(maxQueueInput.getText());
 
-                // is it positive
-                if (newFlowRate <= 0) {
-                    throw new NumberFormatException("Value must be positive");
+                    if (minQueue <= 0 || maxQueue <= 0) {
+                        throw new NumberFormatException("Queue sizes must be positive");
+                    }
+
+                    if (minQueue > maxQueue) {
+                        throw new NumberFormatException("Min queue size must be less or equal than max queue size");
+                    }
+
+                    // set queue values
+                    generator.setQueueSize(minQueue, maxQueue);
+                } else {
+                    // is it number
+                    String input = flowRateInput.getText();
+                    double newFlowRate = Double.parseDouble(input);
+
+                    // is it positive
+                    if (newFlowRate <= 0) {
+                        throw new NumberFormatException("Value must be positive");
+                    }
+
+                    // set value
+                    generator.setFlowRate(newFlowRate);
+                    // disable queue
+                    generator.disableQueue();
                 }
-
-                // set value
-                generator.setFlowRate(newFlowRate);
-
             } catch (NumberFormatException e) {
                 // value is not valid
-                MyLogger.log("Invalid flow rate value: " + input, Constants.ERROR_FOR_LOGGING);
+                MyLogger.log("Invalid flow rate or queue size value: " + e, Constants.ERROR_FOR_LOGGING);
 
-                warningDialog(stage, "Invalid flow rate value: " + input);
+                warningDialog(stage, "Invalid flow rate or queue size value: " + e);
 
                 // kill event, do not close dialog
                 event.consume();

@@ -200,6 +200,9 @@ public class Window extends Application {
                 DialogMaker.changeRoadsDialog(primaryStage, roadParams, 1, false,
                         clickedRoadIndex);
                 Road[] newRoads = RoadParameters.roadParametersToRoads(roadParams);
+                for (Road newRoad : newRoads) { // check if some generator needs to set up queues
+                    newRoad.setUpQueuesIfNeeded();
+                }
                 AppContext.SIMULATION.resetSimulationWithNewRoads(newRoads);
                 paintAll.run();
             } else {
@@ -217,24 +220,24 @@ public class Window extends Application {
     }
 
     private int getClickedRoadIndex(double absoluteY, Road[] roads, final double GAP, final double LANE_HEIGHT) {
-        double currentY = GAP; // První silnice začíná s odsazením GAP
+        double currentY = GAP; // first road starts after initial gap
 
         for (int i = 0; i < roads.length; i++) {
             Road road = roads[i];
 
-            // Výška silnice v pixelech = počet pruhů * výška jednoho pruhu
+            // height of the road in pixels = number of lanes * height of one lane
             double roadHeight = road.getNumberOfLanes() * LANE_HEIGHT;
 
-            // Pokud absolutní Y kliknutí spadá do intervalu této silnice
+            // if y coordinate is within the current road
             if (absoluteY >= currentY && absoluteY <= (currentY + roadHeight)) {
-                return i; // Našli jsme silnici
+                return i; // we have found the clicked road index
             }
 
-            // Posuneme se o výšku této silnice a mezeru pro další iteraci
+            // shift currentY to the next road position
             currentY += roadHeight + GAP;
         }
 
-        return -1; // Kliknutí padlo mimo silnice (např. do mezery)
+        return -1; // no road was clicked, click was outside any road
     }
 
     /**
@@ -515,7 +518,10 @@ public class Window extends Application {
         ToggleButton collisionBanBtn = createIconToggleButton("/icons/collisionBan.png",
                 "Ban collisions (toggle)");
 
-        changeLaneBtn.setStyle(defaultStyle);
+        changeLaneBtn.setSelected(!AppContext.RUN_DETAILS.laneChange);
+        collisionBanBtn.setSelected(AppContext.RUN_DETAILS.preventCollisions);
+
+        //changeLaneBtn.setStyle(defaultStyle);
         editMapFileBtn.setStyle(defaultStyle);
         newMapFileBtn.setStyle(defaultStyle);
         openMapFileBtn.setStyle(defaultStyle);
@@ -524,7 +530,7 @@ public class Window extends Application {
         startStopBtn.setStyle(defaultStyle);
         exportResultsBtn.setStyle(defaultStyle);
         nextStepBtn.setStyle(defaultStyle);
-        collisionBanBtn.setStyle(defaultStyle);
+        //collisionBanBtn.setStyle(defaultStyle);
 
         newMapFileBtn.setOnAction(e -> {
             Actions.newMapAction(primaryStage, paintAll);

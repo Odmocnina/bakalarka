@@ -117,4 +117,8 @@ public class LightPlan {
         return new LightPlan(cycleTime, timeOfSwitch, beginsOnGreen);
     }
 
+    public String toString() {
+        return "LightPlan(cycleTime=" + cycleTime + ", timeOfSwitch=" + timeOfSwitch + ", beginsOnGreen=" + beginsOnGreen + ")";
+    }
+
 }

@@ -1,5 +1,6 @@
 package models.carFollowingModels;
 
+@CarFollowingModelId("kkw-quadratic")
 public class KKW_Quadratic extends KKW_Linear {
 
     private double beta = 0.5;

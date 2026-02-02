@@ -10,6 +10,8 @@ import models.ICarFollowingModel;
  * @author Michael Hladky
  * @version 1.0
  ********************************************/
+
+@CarFollowingModelId("ovm-original")
 public class OVM_Original implements ICarFollowingModel {
 
     /**

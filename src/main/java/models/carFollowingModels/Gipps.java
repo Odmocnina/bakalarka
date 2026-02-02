@@ -6,6 +6,7 @@ import models.ICarFollowingModel;
 
 import java.util.HashMap;
 
+@CarFollowingModelId("gipps")
 public class Gipps implements ICarFollowingModel {
 
 

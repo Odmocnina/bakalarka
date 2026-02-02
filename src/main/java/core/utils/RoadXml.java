@@ -201,10 +201,24 @@ public class RoadXml {
             lightPlanStartWithGreenElement.appendChild(doc.createTextNode(String.valueOf(lp.get(lane).isBeginsOnGreen())));
 
             //write generator to XML
+            //flow rate
             CarGenerator generator = cg.get(lane);
             Element flowRateElement = doc.createElement(RoadLoadingConstants.FLOW_RATE_TAG);
             generatorElement.appendChild(flowRateElement);
             flowRateElement.appendChild(doc.createTextNode(String.valueOf(generator.getFlowRate())));
+            //queue
+            Element queueElement = doc.createElement(RoadLoadingConstants.QUEUE_TAG);
+            generatorElement.appendChild(queueElement);
+            Element useQueueElement = doc.createElement(RoadLoadingConstants.USE_TAG);
+            queueElement.appendChild(useQueueElement);
+            useQueueElement.appendChild(doc.createTextNode(String.valueOf(generator.generatingToQueue())));
+            Element minSizeElement = doc.createElement(RoadLoadingConstants.MIN_VALUE_TAG);
+            queueElement.appendChild(minSizeElement);
+            minSizeElement.appendChild(doc.createTextNode(String.valueOf(generator.getMinQueueSize())));
+            Element maxSizeElement = doc.createElement(RoadLoadingConstants.MAX_VALUE_TAG);
+            queueElement.appendChild(maxSizeElement);
+            maxSizeElement.appendChild(doc.createTextNode(String.valueOf(generator.getMaxQueueSize())));
+            // car parameters
             Element paramElement = doc.createElement(RoadLoadingConstants.CAR_PARAMS_TAG);
             generatorElement.appendChild(paramElement);
             HashMap<String, Parameter> carParams = generator.getAllComParameters();

@@ -6,8 +6,8 @@ import models.ICarFollowingModel;
 
 import java.util.HashMap;
 
-@CarFollowingModelId("test-model")
-public class TestModel implements ICarFollowingModel {
+@CarFollowingModelId("test-model-2")
+public class TestModel2 implements ICarFollowingModel {
 
     /** type of the model **/
     private final String type;
@@ -15,7 +15,7 @@ public class TestModel implements ICarFollowingModel {
     /**
      * constructor for test model
      **/
-    public TestModel() {
+    public TestModel2() {
         this.type = Constants.CONTINOUS;
     }
 

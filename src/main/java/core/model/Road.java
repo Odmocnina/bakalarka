@@ -101,8 +101,18 @@ public abstract class Road {
      **/
     @Override
     public String toString() {
-        return "Road[length=" + length + ", numberOfLanes=" + numberOfLanes + ", speedLimit=" + speedLimit +
-                ", type=" + type + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Road[length=").append(length)
+                .append(", numberOfLanes=").append(numberOfLanes)
+                .append(", speedLimit=").append(speedLimit)
+                .append(", type=").append(type)
+                .append("]");
+        for (int i = 0; i < numberOfLanes; i++) {
+            sb.append("\n  Lane ").append(i).append(": ");
+            sb.append("Generator: ").append(generators[i].toString()).append(", ");
+            sb.append("LightPlan: ").append(lightPlansOnLanes[i].toString());
+        }
+        return sb.toString();
     }
 
     /**
@@ -293,6 +303,8 @@ public abstract class Road {
         return this.generators[0];
     }
 
+
+
     /**
      * method to check if the light on the given lane is green
      *
@@ -409,6 +421,17 @@ public abstract class Road {
             }
         }
         return true;
+    }
+
+    public void setUpQueuesIfNeeded() {
+        carQueuesPerLane = new Queue[numberOfLanes];
+        for (int i = 0; i < numberOfLanes; i++) {
+            if (this.generators[i].generatingToQueue()) {
+                this.carQueuesPerLane[i] = this.generators[i].generateCarsInToQueue();
+            } else {
+                this.carQueuesPerLane[i] = null;
+            }
+        }
     }
 
 }

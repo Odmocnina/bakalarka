@@ -10,6 +10,8 @@ import models.ICarFollowingModel;
  * @author Michael Hladky
  * @version 1.0
  ********************************************/
+
+@CarFollowingModelId("rule-184")
 public class Rule184 implements ICarFollowingModel {
 
     /** type of the model **/

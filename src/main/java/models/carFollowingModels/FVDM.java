@@ -11,6 +11,7 @@ import java.util.HashMap;
  * @author Michael Hladky
  * @version 1.0
  ********************************************/
+@CarFollowingModelId("fvdm")
 public class FVDM extends OVM_Different {
 
     /**

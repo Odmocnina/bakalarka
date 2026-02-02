@@ -35,5 +35,4 @@ public final class AppContext {
     /** run detail such as if gui is to be shown, if results are to be written... **/
     public static RunDetails RUN_DETAILS;
     public static ConfigXml CONFIG_XML;
-    public static String CURRENT_OPENED_FILE;
 }

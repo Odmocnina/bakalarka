@@ -13,6 +13,7 @@ import java.util.Random;
  * @author Michael Hladky
  * @version 1.0
  ********************************************/
+@CarFollowingModelId("nagel-schreckenberg")
 public class NagelSchreckenberg implements ICarFollowingModel {
 
     /** size of one cell in meters **/

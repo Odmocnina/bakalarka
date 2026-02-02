@@ -38,6 +38,8 @@ public class DefaultStuffMaker {
 
     public static CarGenerator createDefaultGenerator() {
         CarGenerator generator = new CarGenerator(DefaultValues.DEFAULT_FLOW_RATE);
+        generator.setQueueSize(DefaultValues.DEFAULT_QUEUE_MIN_SIZE, DefaultValues.DEFAULT_QUEUE_MAX_SIZE);
+        generator.disableQueue();
         generator.addComParameter(RequestConstants.MAX_SPEED_REQUEST, "Max speed", DefaultValues.DEFAULT_MAX_SPEED_MIN, DefaultValues.DEFAULT_MAX_SPEED_MAX);
         generator.addComParameter(RequestConstants.LENGTH_REQUEST, "Length of vehicle",DefaultValues.DEFAULT_LENGTH_MIN, DefaultValues.DEFAULT_LENGTH_MAX);
         generator.addComParameter(RequestConstants.MAX_ACCELERATION_REQUEST, "Max acceleration",DefaultValues.DEFAULT_ACCELERATION_MIN, DefaultValues.DEFAULT_ACCELERATION_MAX);

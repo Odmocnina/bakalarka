@@ -42,6 +42,8 @@ public class DefaultValues {
     public static final boolean DEFAULT_LIGHT_PLAN_START_WITH_GREEN = true;
 
     public static final double DEFAULT_FLOW_RATE = 0.7;
+    public static final int DEFAULT_QUEUE_MIN_SIZE = 5;
+    public static final int DEFAULT_QUEUE_MAX_SIZE = 10;
     public static final CarGenerator DEFAULT_CAR_GENERATOR = new CarGenerator(DEFAULT_FLOW_RATE) {{
 
     }};

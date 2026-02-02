@@ -12,6 +12,7 @@ import java.util.HashMap;
  * @author Michael Hladky
  * @version 1.0
  ********************************************/
+@CarFollowingModelId("idm")
 public class IDM implements ICarFollowingModel {
 
     /** type of the model **/

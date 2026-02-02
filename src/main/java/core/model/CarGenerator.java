@@ -312,10 +312,8 @@ public class CarGenerator implements Cloneable {
     public Queue<CarParams> generateCarsInToQueue() {
         Queue<CarParams> queue = new java.util.LinkedList<>();
         Random rand = new Random();
-        Parameter p = parameters.get(Constants.GENERATOR_QUEUE);
-        int minNumberOfCars = (int) p.minValue;
-        int range = (int) p.range;
-        int numberOfCars = rand.nextInt(range + 1) + minNumberOfCars;
+        int range = maxQueueSize - minQueueSize;
+        int numberOfCars = rand.nextInt(range + 1) + minQueueSize;
 
         while (queue.size() < numberOfCars) {
             CarParams car = generateCar();
@@ -416,8 +414,9 @@ public class CarGenerator implements Cloneable {
      * @return boolean whether generator generates cars into queue
      **/
     public boolean generatingToQueue() {
-        Parameter p = parameters.get(Constants.GENERATOR_QUEUE);
-        return p != null;
+        /*Parameter p = parameters.get(Constants.GENERATOR_QUEUE);
+        return p != null;*/
+        return this.useQueue;
     }
 
     /**
@@ -427,7 +426,9 @@ public class CarGenerator implements Cloneable {
      **/
     @Override
     public String toString() {
-        StringBuilder string = new StringBuilder("CarGenerator{type=" + type + ", lambdaPerSec=" + lambdaPerSec + ", parameters=");
+        StringBuilder string = new StringBuilder("CarGenerator{type=" + type + ", lambdaPerSec=" + lambdaPerSec +
+                ", useQueue=" + useQueue + ", minQueueSize=" + minQueueSize + ", maxQueueSize=" + maxQueueSize +
+                ", parameters=");
         for (String key : parameters.keySet()) {
             Parameter param = parameters.get(key);
             string.append(key).append("=[min=").append(param.minValue).append(", max=").append(param.maxValue).append("], ");
@@ -449,6 +450,10 @@ public class CarGenerator implements Cloneable {
         copy.allowMultiplePerTick = this.allowMultiplePerTick;
         copy.carGenerationParameters = this.carGenerationParameters;
         copy.setFlowRate(this.getFlowRate());
+        copy.setQueueSize(this.minQueueSize, this.maxQueueSize);
+        if (!this.useQueue) {
+            copy.disableQueue();
+        }
         for (String key : this.parameters.keySet()) {
             Parameter param = this.parameters.get(key);
             copy.parameters.put(key, new Parameter(param.name, param.minValue, param.maxValue));
@@ -546,5 +551,17 @@ public class CarGenerator implements Cloneable {
         this.useQueue = true;
         this.minQueueSize = minSize;
         this.maxQueueSize = maxSize;
+    }
+
+    public void disableQueue() {
+        this.useQueue = false;
+    }
+
+    public int getMinQueueSize() {
+        return this.minQueueSize;
+    }
+
+    public int getMaxQueueSize() {
+        return this.maxQueueSize;
     }
 }

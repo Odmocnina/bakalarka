@@ -129,6 +129,7 @@ public class RoadLoader {
             road.setRoadGenerator(i, generator);
         }
 
+        road.setUpQueuesIfNeeded();
         return road;
     }
 
@@ -138,7 +139,7 @@ public class RoadLoader {
         CarGenerator generator = new CarGenerator(flowRate);
 
         //queue
-        /*Element queueElement = (Element) generatorElement.getElementsByTagName(RoadLoadingConstants.QUEUE_TAG).item(0);
+        Element queueElement = (Element) generatorElement.getElementsByTagName(RoadLoadingConstants.QUEUE_TAG).item(0);
 
         if (queueElement != null) {
             boolean useQueue = Boolean.parseBoolean(queueElement.getElementsByTagName(RoadLoadingConstants.USE_TAG).item(0).getTextContent());
@@ -146,9 +147,9 @@ public class RoadLoader {
             if (useQueue) {
                 int minValue = Integer.parseInt(queueElement.getElementsByTagName(RoadLoadingConstants.MIN_VALUE_TAG).item(0).getTextContent());
                 int maxValue = Integer.parseInt(queueElement.getElementsByTagName(RoadLoadingConstants.MAX_VALUE_TAG).item(0).getTextContent());
-                generator.addParameter(, "Queue Size", minValue, maxValue);
+                generator.setQueueSize(minValue, maxValue);
             }
-        }*/
+        }
 
         // load all car parameters
         Element carParamsElement = (Element) generatorElement.getElementsByTagName(RoadLoadingConstants.CAR_PARAMS_TAG).item(0);

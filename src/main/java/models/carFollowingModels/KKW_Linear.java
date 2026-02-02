@@ -13,6 +13,7 @@ import java.util.Random;
  * @author Michael Hladky
  * @version 1.0
  ********************************************/
+@CarFollowingModelId("kkw-linear")
 public class KKW_Linear implements ICarFollowingModel {
 
     /** Random number generator **/
