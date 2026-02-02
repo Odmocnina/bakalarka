@@ -3,10 +3,11 @@ package models.carFollowingModels;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
 import models.ICarFollowingModel;
+import models.ModelId;
 
 import java.util.HashMap;
 
-@CarFollowingModelId("test-model")
+@ModelId("test-model")
 public class TestModel implements ICarFollowingModel {
 
     /** type of the model **/

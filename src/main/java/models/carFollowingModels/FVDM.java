@@ -2,6 +2,7 @@ package models.carFollowingModels;
 
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
+import models.ModelId;
 
 import java.util.HashMap;
 
@@ -11,7 +12,7 @@ import java.util.HashMap;
  * @author Michael Hladky
  * @version 1.0
  ********************************************/
-@CarFollowingModelId("fvdm")
+@ModelId("fvdm")
 public class FVDM extends OVM_Different {
 
     /**

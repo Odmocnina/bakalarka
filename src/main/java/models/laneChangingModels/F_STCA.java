@@ -15,6 +15,7 @@ import static core.model.Direction.*;
  * @author Michael Hladky
  * @version 1.0
  *****************************************************/
+@models.ModelId("f-stca")
 public class F_STCA implements ILaneChangingModel {
 
     /**

@@ -3,10 +3,11 @@ package models.carFollowingModels;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
 import models.ICarFollowingModel;
+import models.ModelId;
 
 import java.util.HashMap;
 
-@CarFollowingModelId("gipps")
+@ModelId("gipps")
 public class Gipps implements ICarFollowingModel {
 
 

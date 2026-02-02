@@ -93,4 +93,9 @@ public class Actions {
         MyLogger.log("Toggling logging index " + logIndex, Constants.INFO_FOR_LOGGING);
         ConfigModificator.changeLogging(logIndex);
     }
+
+    public static void setTimeBetweenStepsAction(Stage stage) {
+        MyLogger.log("Set time between steps was pressed", Constants.INFO_FOR_LOGGING);
+        DialogMaker.changeTimeBetweenSteps(stage);
+    }
 }

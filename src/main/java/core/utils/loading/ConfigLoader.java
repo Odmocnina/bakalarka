@@ -10,6 +10,7 @@ import core.utils.constants.ConfigConstants;
 import core.utils.constants.Constants;
 import models.ICarFollowingModel;
 import models.ILaneChangingModel;
+import models.ModelId;
 import models.carFollowingModels.*;
 import models.laneChangingModels.*;
 
@@ -301,7 +302,7 @@ public class ConfigLoader {
 
     public static ICarFollowingModel loadCarFollowingModel() {
         try {
-            // 1. Načtení ID z XML (tvůj původní kód)
+            // get id from config file
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(configFile);
@@ -312,22 +313,22 @@ public class ConfigLoader {
             String configIdRaw = model.getElementsByTagName(ConfigConstants.ID_TAG).item(0).getTextContent();
             final String targetId = configIdRaw.toLowerCase().trim();
 
-            // 2. Reflexe: Najdi všechny třídy v balíčku, kde jsou modely
-            // POZOR: Změň "cz.tvoje.package.models" na skutečný název balíčku, kde máš třídy modelů!
+            // reflection to get all classes in package models.carFollowingModels
+            // get package name
             String packageName = "models.carFollowingModels";
             List<Class<?>> classes = getClasses(packageName);
 
             ICarFollowingModel modelFromConfig = null;
 
-            // 3. Proiteruj nalezené třídy a najdi tu se správnou anotací
+            // go through all classes and find the one with matching CarFollowingModelId annotation
             for (Class<?> clazz : classes) {
-                // Kontrola, zda třída implementuje interface a má naši anotaci
-                if (ICarFollowingModel.class.isAssignableFrom(clazz) && clazz.isAnnotationPresent(CarFollowingModelId.class)) {
-                    CarFollowingModelId annotation = clazz.getAnnotation(CarFollowingModelId.class);
+                // check if class implements ICarFollowingModel and has CarFollowingModelId annotation
+                if (ICarFollowingModel.class.isAssignableFrom(clazz) && clazz.isAnnotationPresent(ModelId.class)) {
+                    ModelId annotation = clazz.getAnnotation(ModelId.class);
 
-                    // Porovnání ID z configu s ID v anotaci
+                    // get id of the model from annotation and compare with targetId
                     if (annotation.value().equals(targetId)) {
-                        // Našli jsme shodu! Vytvoříme instanci.
+                        // model with id found
                         MyLogger.logBeforeLoading("Found model class via reflection: " + clazz.getSimpleName(), Constants.INFO_FOR_LOGGING);
                         modelFromConfig = (ICarFollowingModel) clazz.getDeclaredConstructor().newInstance();
                         break;
@@ -340,7 +341,7 @@ public class ConfigLoader {
                 return null;
             }
 
-            // 4. Validace (tvůj původní kód)
+            // validation of model parameters
             if (modelFromConfig.getType().equals(Constants.CELLULAR)) {
                 double cellSize = modelFromConfig.getCellSize();
                 if (cellSize <= 0) {
@@ -353,7 +354,55 @@ public class ConfigLoader {
 
         } catch (Exception e) {
             MyLogger.logBeforeLoading("Error loading config file or instantiating model: " + e.getMessage(), Constants.FATAL_FOR_LOGGING);
-            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static ILaneChangingModel loadLaneChangingModel() {
+        try {
+            // get id of lane changing model from config file
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(configFile);
+            doc.getDocumentElement().normalize();
+            Element models = (Element) doc.getElementsByTagName(ConfigConstants.MODELS_TAG).item(0);
+            Element model = (Element) models.getElementsByTagName(ConfigConstants.LANE_CHANGING_MODEL_TAG).item(0);
+
+            String configIdRaw = model.getElementsByTagName(ConfigConstants.ID_TAG).item(0).getTextContent();
+            final String targetId = configIdRaw.toLowerCase().trim();
+
+            // reflexion - get all classes in package models.laneChangingModel
+            String packageName = "models.laneChangingModels";
+            List<Class<?>> classes = getClasses(packageName);
+
+            ILaneChangingModel modelFromConfig = null;
+
+            for (Class<?> clazz : classes) {
+                // check if class implements ILaneChangingModel and has ModelId annotation
+                if (ILaneChangingModel.class.isAssignableFrom(clazz) && clazz.isAnnotationPresent(ModelId.class)) {
+                    ModelId annotation = clazz.getAnnotation(ModelId.class);
+
+                    if (annotation.value().equals(targetId)) {
+                        MyLogger.logBeforeLoading("Found lane changing model via reflection: " +
+                                clazz.getSimpleName(), Constants.INFO_FOR_LOGGING);
+                        modelFromConfig = (ILaneChangingModel) clazz.getDeclaredConstructor().newInstance();
+                        break;
+                    }
+                }
+            }
+
+            if (modelFromConfig == null) {
+                MyLogger.logBeforeLoading("Unknown lane changing model id in config file: " + targetId +
+                        ", exiting", Constants.FATAL_FOR_LOGGING);
+                return null;
+            }
+
+            return modelFromConfig;
+
+        } catch (Exception e) {
+            MyLogger.logBeforeLoading("Error loading config file for lane changing model: " + e.getMessage(),
+                    Constants.FATAL_FOR_LOGGING);
         }
 
         return null;
@@ -364,7 +413,7 @@ public class ConfigLoader {
      *
      * @return loaded ILaneChangingModel object, or null if loading failed
      **/
-    public static ILaneChangingModel loadLaneChangingModel() {
+    public static ILaneChangingModel loadLaneChangingModelOld() {
         ILaneChangingModel modelFromConfig;
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();

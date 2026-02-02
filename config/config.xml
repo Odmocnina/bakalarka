@@ -4,7 +4,7 @@
 
     <models>
         <carFollowingModel>
-            <id>test-model-2</id>
+            <id>idm</id>
         </carFollowingModel>
         <laneChangingModel>
             <id>mobil-simple</id>

@@ -3,6 +3,7 @@ package models.carFollowingModels;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
 import models.ICarFollowingModel;
+import models.ModelId;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -13,7 +14,7 @@ import java.util.Random;
  * @author Michael Hladky
  * @version 1.0
  ********************************************/
-@CarFollowingModelId("kkw-linear")
+@ModelId("kkw-linear")
 public class KKW_Linear implements ICarFollowingModel {
 
     /** Random number generator **/

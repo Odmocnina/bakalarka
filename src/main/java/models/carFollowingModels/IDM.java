@@ -3,6 +3,7 @@ package models.carFollowingModels;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
 import models.ICarFollowingModel;
+import models.ModelId;
 
 import java.util.HashMap;
 
@@ -12,7 +13,7 @@ import java.util.HashMap;
  * @author Michael Hladky
  * @version 1.0
  ********************************************/
-@CarFollowingModelId("idm")
+@ModelId("idm")
 public class IDM implements ICarFollowingModel {
 
     /** type of the model **/

@@ -4,6 +4,7 @@ import core.model.Direction;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
 import models.ILaneChangingModel;
+import models.ModelId;
 
 import java.util.HashMap;
 import static core.model.Direction.*;
@@ -14,6 +15,7 @@ import static core.model.Direction.*;
  * @author Michael Hladky
  * @version 1.0
  *****************************************************/
+@ModelId("rickert-transsims")
 public class RickertTranssims implements ILaneChangingModel {
 
     /**

@@ -4,9 +4,18 @@ import core.model.Direction;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
 import models.ILaneChangingModel;
+import models.ModelId;
 
 import java.util.HashMap;
 
+/********************************************
+ * MOBIL lane changing model class for deciding lane changes, simplified version. It the now lane, and doesn't consider
+ * gain of the car behind in lane where the car is before changing lane.
+ *
+ * @author
+ * @version 1.0
+ *********************************************/
+@ModelId("mobil-simple")
 public class MobilSimple implements ILaneChangingModel {
 
     /**

@@ -3,6 +3,7 @@ package models.carFollowingModels;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
 import models.ICarFollowingModel;
+import models.ModelId;
 
 /********************************************
  * Optimal Velocity Model (OVM) car following model implementation (continuous)
@@ -11,7 +12,7 @@ import models.ICarFollowingModel;
  * @version 1.0
  ********************************************/
 
-@CarFollowingModelId("ovm-original")
+@ModelId("ovm-original")
 public class OVM_Original implements ICarFollowingModel {
 
     /**

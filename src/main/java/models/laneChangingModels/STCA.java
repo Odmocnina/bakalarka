@@ -5,6 +5,7 @@ import core.model.Direction;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
 import models.ILaneChangingModel;
+import models.ModelId;
 
 import java.util.HashMap;
 
@@ -16,8 +17,10 @@ import static core.model.Direction.*;
  * @author Michael Hladky
  * @version 1.0
  *****************************************************/
+@ModelId("stca")
 public class STCA implements ILaneChangingModel {
 
+    /** probability to change lane when conditions are met **/
     private double chance = 0.9;
 
     /**

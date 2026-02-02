@@ -1,4 +1,4 @@
-package models.carFollowingModels;
+package models;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -10,10 +10,10 @@ import java.lang.annotation.RetentionPolicy;
  * @version 1.0
  ***************************************************/
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CarFollowingModelId {
+public @interface ModelId {
 
     /**
      * ID of the car following model, used for identification when starting application
-     */
+     **/
     String value();
 }

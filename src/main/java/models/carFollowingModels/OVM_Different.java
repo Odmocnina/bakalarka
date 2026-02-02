@@ -1,6 +1,8 @@
 package models.carFollowingModels;
 
-@CarFollowingModelId("ovm-different")
+import models.ModelId;
+
+@ModelId("ovm-different")
 public class OVM_Different extends OVM_Original {
 
     private static final double DELTA = 5.0;

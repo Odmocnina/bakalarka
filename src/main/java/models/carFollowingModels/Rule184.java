@@ -3,6 +3,7 @@ package models.carFollowingModels;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
 import models.ICarFollowingModel;
+import models.ModelId;
 
 /********************************************
  * Rule 184 car following model implementation (cellular)
@@ -11,7 +12,7 @@ import models.ICarFollowingModel;
  * @version 1.0
  ********************************************/
 
-@CarFollowingModelId("rule-184")
+@ModelId("rule-184")
 public class Rule184 implements ICarFollowingModel {
 
     /** type of the model **/

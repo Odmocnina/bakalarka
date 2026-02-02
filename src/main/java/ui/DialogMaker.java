@@ -926,4 +926,45 @@ public class DialogMaker {
         // return true if user clicked OK
         return result.isPresent() && result.get() == ButtonType.OK;
     }
+
+    public static void changeTimeBetweenSteps(Stage stage) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Change time between simulation steps");
+        dialog.setHeaderText("Change the time (in seconds) between each simulation step.");
+        dialog.initOwner(stage);
+
+        ButtonType applyButtonType = new ButtonType("Apply", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(applyButtonType, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 20, 10, 10));
+
+        TextField timeInput = new TextField(String.valueOf(AppContext.RUN_DETAILS.timeBetweenSteps));
+        grid.add(new Label("Time between steps (s):"), 0, 0);
+        grid.add(timeInput, 1, 0);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // show the dialog and wait for user response
+        dialog.showAndWait().ifPresent(response -> {
+            if (response == applyButtonType) {
+                try {
+                    int timeBetweenSteps = Integer.parseInt(timeInput.getText());
+                    if (timeBetweenSteps <= 0) {
+                        throw new NumberFormatException("Value must be positive");
+                    }
+
+                    AppContext.RUN_DETAILS.timeBetweenSteps = timeBetweenSteps;
+                    MyLogger.log("Time between simulation steps updated via dialog.", Constants.INFO_FOR_LOGGING);
+                } catch (NumberFormatException e) {
+                    MyLogger.log("Invalid time between steps value: " + e, Constants.ERROR_FOR_LOGGING);
+                    warningDialog(stage, "Invalid time between steps value: " + e);
+                }
+            } else {
+                MyLogger.log("Time between steps dialog cancelled.", Constants.INFO_FOR_LOGGING);
+            }
+        });
+    }
 }

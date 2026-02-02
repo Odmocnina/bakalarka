@@ -4,6 +4,7 @@ import core.model.Direction;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
 import models.ILaneChangingModel;
+import models.ModelId;
 
 import java.util.HashMap;
 
@@ -13,6 +14,7 @@ import java.util.HashMap;
  * @author
  * @version 1.0
  *********************************************/
+@ModelId("mobil")
 public class Mobil implements ILaneChangingModel {
 
     /**

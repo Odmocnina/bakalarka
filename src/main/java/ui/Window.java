@@ -517,6 +517,8 @@ public class Window extends Application {
         Button nextStepBtn = createIconButton("/icons/nextStep.png", "Next simulation step");
         ToggleButton collisionBanBtn = createIconToggleButton("/icons/collisionBan.png",
                 "Ban collisions (toggle)");
+        Button setTimeBetweenStepsBtn = createIconButton("/icons/time.png",
+                "Set time between simulation steps (ms)");
 
         changeLaneBtn.setSelected(!AppContext.RUN_DETAILS.laneChange);
         collisionBanBtn.setSelected(AppContext.RUN_DETAILS.preventCollisions);
@@ -531,6 +533,7 @@ public class Window extends Application {
         exportResultsBtn.setStyle(defaultStyle);
         nextStepBtn.setStyle(defaultStyle);
         //collisionBanBtn.setStyle(defaultStyle);
+        setTimeBetweenStepsBtn.setStyle(defaultStyle);
 
         newMapFileBtn.setOnAction(e -> {
             Actions.newMapAction(primaryStage, paintAll);
@@ -581,6 +584,10 @@ public class Window extends Application {
             Actions.collisionBanAction(paintAll);
         });
 
+        setTimeBetweenStepsBtn.setOnAction(e -> {
+            Actions.setTimeBetweenStepsAction(primaryStage);
+        });
+
         return new ToolBar(
                 startStopBtn,
                 nextStepBtn,
@@ -591,7 +598,8 @@ public class Window extends Application {
                 saveAsMapFileBtn,
                 changeLaneBtn,
                 collisionBanBtn,
-                exportResultsBtn
+                exportResultsBtn,
+                setTimeBetweenStepsBtn
         );
     }
 
