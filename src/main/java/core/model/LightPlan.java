@@ -121,4 +121,8 @@ public class LightPlan {
         return "LightPlan(cycleTime=" + cycleTime + ", timeOfSwitch=" + timeOfSwitch + ", beginsOnGreen=" + beginsOnGreen + ")";
     }
 
+    public void reset() {
+        this.isGreen = beginsOnGreen;
+    }
+
 }

@@ -57,6 +57,9 @@ public class DefaultStuffMaker {
                 DefaultValues.DEFAULT_EDGE_VALUE_FOR_LANE_CHANGE_MIN, DefaultValues.DEFAULT_EDGE_VALUE_FOR_LANE_CHANGE_MAX);
         generator.addComParameter(RequestConstants.POLITENESS_FACTOR_REQUEST, "Politeness factor", DefaultValues.POLITENESS_FACTOR_MIN,
                 DefaultValues.POLITENESS_FACTOR_MAX);
+        String neededParameters = StringEditor.mergeRequestParameters(AppContext.CAR_FOLLOWING_MODEL.getParametersForGeneration(),
+                AppContext.LANE_CHANGING_MODEL.getParametersForGeneration());
+        generator.setCarGenerationParameters(neededParameters);
 
         generator.copyComParametersToRealParameters(AppContext.CAR_FOLLOWING_MODEL.getType(), AppContext.CAR_FOLLOWING_MODEL.getCellSize());
         return generator;

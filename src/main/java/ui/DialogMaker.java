@@ -11,6 +11,7 @@ import core.utils.RoadXml;
 import core.utils.constants.Constants;
 import core.utils.constants.DefaultValues;
 
+import core.utils.constants.RequestConstants;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -47,7 +48,7 @@ public class DialogMaker {
      * @param stage owner stage
      * @param lightPlan light plan to edit
      **/
-    protected static void editLightPlanDialog(Stage stage, LightPlan lightPlan, int lane) {
+    protected static boolean editLightPlanDialog(Stage stage, LightPlan lightPlan, int lane) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Edit light plan on lane: " + lane);
         dialog.setHeaderText("Edit the light plan on lane: " + lane);
@@ -81,22 +82,24 @@ public class DialogMaker {
 
         dialog.getDialogPane().setContent(grid);
 
-        // show the dialog and wait for user response
-        dialog.showAndWait().ifPresent(response -> {
-            if (response == applyButtonType) {
-                lightPlan.setCycleTime(cycleTimeSpinner.getValue());
-                lightPlan.setTimeOfSwitch(switchTimeSpinner.getValue());
-                lightPlan.setBeginsOnGreen(beginOnGreenBox.isSelected());
-                if (lightPlan.isLegitimate()) {
-                    MyLogger.log("Light plan updated via dialog.", Constants.INFO_FOR_LOGGING);
-                } else {
-                    MyLogger.log("Light plan updated via dialog for all roads.", Constants.INFO_FOR_LOGGING);
-                    warningDialog(stage, "The light plan is not legitimate! Make sure that the switch time is less than the cycle time.");
-                }
+        Optional<ButtonType> result = dialog.showAndWait();
+
+        if (result.isPresent() && result.get() == applyButtonType) {
+            lightPlan.setCycleTime(cycleTimeSpinner.getValue());
+            lightPlan.setTimeOfSwitch(switchTimeSpinner.getValue());
+            lightPlan.setBeginsOnGreen(beginOnGreenBox.isSelected());
+            if (lightPlan.isLegitimate()) {
+                MyLogger.log("Light plan updated via dialog.", Constants.INFO_FOR_LOGGING);
+                return true; // Changes applied
             } else {
-                MyLogger.log("Light plan dialog cancelled.", Constants.INFO_FOR_LOGGING);
+                MyLogger.log("Light plan is not legitimate after dialog update.", Constants.ERROR_FOR_LOGGING);
+                warningDialog(stage, "The light plan is not legitimate! Make sure that the switch time is less than the cycle time.");
+                return false; // Invalid logic, treating as cancelled for safety or you could keep loop
             }
-        });
+        } else {
+            MyLogger.log("Light plan dialog cancelled.", Constants.INFO_FOR_LOGGING);
+            return false; // Cancelled
+        }
     }
 
     /**
@@ -265,11 +268,29 @@ public class DialogMaker {
                     // disable queue
                     generator.disableQueue();
                 }
+
             } catch (NumberFormatException e) {
                 // value is not valid
                 MyLogger.log("Invalid flow rate or queue size value: " + e, Constants.ERROR_FOR_LOGGING);
 
                 warningDialog(stage, "Invalid flow rate or queue size value: " + e);
+
+                // kill event, do not close dialog
+                event.consume();
+            }
+
+            String missingParameters = generator.getMissingParameters();
+            if (!missingParameters.isEmpty()) {
+                // value is not valid
+                String[] missingParamsArray = missingParameters.split(RequestConstants.REQUEST_SEPARATOR);
+                StringBuilder message = new StringBuilder("The generator is missing the following parameters needed for generation: ");
+                for (String param : missingParamsArray) {
+                    message.append(param).append(", ");
+                }
+                message.setLength(message.length() - 2); // remove last comma and space
+                MyLogger.log(message.toString(), Constants.ERROR_FOR_LOGGING);
+
+                warningDialog(stage, message.toString());
 
                 // kill event, do not close dialog
                 event.consume();
@@ -642,8 +663,14 @@ public class DialogMaker {
          Button editAllGeneratorsButton = new Button("Edit all car generators...");
          grid.add(editAllGeneratorsButton, 0, 5);
 
-         lightPlanButton.setOnAction(e ->
-                 editLightPlanDialog(stage, lightPlan.get(laneIndexSpinner.getValue() - 1), laneIndexSpinner.getValue()));
+         lightPlanButton.setOnAction(e -> {
+             int listIndex = laneIndexSpinner.getValue() - 1;
+             LightPlan clone = lightPlan.get(listIndex).clone();
+             if (editLightPlanDialog(stage, clone, laneIndexSpinner.getValue())) {
+                 // replace light plan with edited clone
+                 lightPlan.set(listIndex, clone);
+             }
+         });
 
          generatorButton.setOnAction(e ->
                  editGeneratorDialog(stage, generators.get(laneIndexSpinner.getValue() - 1),
@@ -652,17 +679,13 @@ public class DialogMaker {
          editAllLightPlansButton.setOnAction(e -> {
              LightPlan lp = DefaultStuffMaker.createDefaultLightPlan();
              editLightPlanDialog(stage, lp, 0);
-             for (int i = 0; i < lightPlan.size(); i++) {
-                 lightPlan.set(i, lp.clone());
-             }
+             lightPlan.replaceAll(ignored -> lp.clone());
          });
 
          editAllGeneratorsButton.setOnAction(e -> {
              CarGenerator cg = DefaultStuffMaker.createDefaultGenerator();
              editGeneratorDialog(stage, cg, 0);
-             for (int i = 0; i < generators.size(); i++) {
-                 generators.set(i, cg.clone());
-             }
+             generators.replaceAll(ignored -> cg.clone());
          });
 
          dialog.getDialogPane().setContent(grid);

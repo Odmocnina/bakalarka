@@ -358,6 +358,34 @@ public class CarGenerator implements Cloneable {
         return true;
     }
 
+    public String getMissingParameters() {
+        String[] requiredParams = this.carGenerationParameters;
+        StringBuilder missingParameters = new StringBuilder();
+
+        if (requiredParams.length == 0) {
+            MyLogger.logBeforeLoading("CarGenerator: No parameters requested by the car following model."
+                    , Constants.FATAL_FOR_LOGGING);
+            return missingParameters.toString();
+        }
+
+        for (String param : requiredParams) {
+            Parameter p = parametersForComunication.get(param);
+
+            if (p == null) {
+                MyLogger.logBeforeLoading("CarGenerator: Parameter " + param + " not set in car generator."
+                        , Constants.FATAL_FOR_LOGGING);
+                missingParameters.append(param).append(RequestConstants.REQUEST_SEPARATOR);
+            } else if (!p.checkIfValid()) {
+                MyLogger.logBeforeLoading("CarGenerator: Parameter " + param + " has invalid range: min=" + p.minValue +
+                        ", max=" + p.maxValue, Constants.FATAL_FOR_LOGGING);
+                missingParameters.append(param).append(RequestConstants.REQUEST_SEPARATOR);
+            }
+
+        }
+
+        return missingParameters.toString();
+    }
+
     /** function to remove parameter from generator settings
      *
      * @param key parameter key

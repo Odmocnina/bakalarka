@@ -692,6 +692,11 @@ public class ContinuosRoad extends Road {
             car.setParameter(RequestConstants.LENGTH_REQUEST, length - overflow);
             car.xPosition = super.length;
         }
+        /*if (car.xPosition > super.length) {
+            MyLogger.log("Car passed the end of the road and is being removed, carParams: " + car,
+                    Constants.DEBUG_FOR_LOGGING);
+            return false;
+        }*/
 
         return true;
     }

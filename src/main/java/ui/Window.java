@@ -680,9 +680,33 @@ public class Window extends Application {
             ConfigModificator.changeLogging(5);
         });
 
+        Menu outputMenu = new Menu("Output");
+
+        MenuItem exportResultsItem = new MenuItem("Export results (current state of simulation)",
+                createMenuIcon("/icons/export.png"));
+        MenuItem setOutputFileNameItem = new MenuItem("Set output file name",
+                createMenuIcon("/icons/exportFileName.png"));
+        CheckMenuItem exportToCSVItem = new CheckMenuItem("Export to CSV");
+        MenuItem setCsvSepartorItem = new MenuItem("Set CSV separator",
+                createMenuIcon("/icons/csvSeparator.png"));
+        Menu whatToExportSubMenu = new Menu("What to export",
+                createMenuIcon("/icons/whatToExport.png"));
+        CheckMenuItem simulationDetailsItem = new CheckMenuItem("Simulation details");
+        CheckMenuItem simulationTimeItem = new CheckMenuItem("Simulation time");
+        CheckMenuItem carsPassedItem = new CheckMenuItem("Cars passed");
+        CheckMenuItem carsOnRoadItem = new CheckMenuItem("Cars on road");
+        CheckMenuItem collisionsItem = new CheckMenuItem("Collisions");
+        CheckMenuItem roadDetailsItem = new CheckMenuItem("Road details");
+        whatToExportSubMenu.getItems().addAll(simulationDetailsItem, simulationTimeItem, carsPassedItem, carsOnRoadItem,
+                collisionsItem, roadDetailsItem);
+
+        outputMenu.getItems().addAll(exportResultsItem, setOutputFileNameItem, exportToCSVItem, setCsvSepartorItem,
+                whatToExportSubMenu);
+
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().add(fileMenu);
         menuBar.getMenus().add(loggingMenu);
+        menuBar.getMenus().add(outputMenu);
 
         return menuBar;
     }

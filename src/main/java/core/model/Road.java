@@ -434,4 +434,10 @@ public abstract class Road {
         }
     }
 
+    public void resetLightPlans() {
+        for (LightPlan lp : lightPlansOnLanes) {
+            lp.reset();
+        }
+    }
+
 }

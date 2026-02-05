@@ -129,6 +129,18 @@ public class RoadLoader {
             road.setRoadGenerator(i, generator);
         }
 
+        if (road.getLength() == 0) {
+            MyLogger.logBeforeLoading("No roads loaded from map file", Constants.FATAL_FOR_LOGGING);
+            return null;
+        }
+
+        boolean allParametersInGenerators = road.doAllGeneratorsHaveNeededParameters();
+        if (!allParametersInGenerators) {
+            MyLogger.logBeforeLoading("Not all car generators have necessary parameters for models, exiting"
+                    , Constants.FATAL_FOR_LOGGING);
+            return null;
+        }
+
         road.setUpQueuesIfNeeded();
         return road;
     }

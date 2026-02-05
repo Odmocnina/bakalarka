@@ -77,20 +77,11 @@ public class ConfigLoader {
      * @return array of loaded roads, or null if loading failed
      **/
     public static Road[] loadRoads() {
-        Road[] roads;
 
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(configFile);
-            /*Element numberOfRoadsElement = (Element) doc.getElementsByTagName(ConfigConstants.NUMBER_OF_ROADS_TAG).item(0);
-            numberOfRoads = Integer.parseInt(numberOfRoadsElement.getTextContent());
-
-            if (numberOfRoads <= 0) {
-                MyLogger.logBeforeLoading("Invalid number of roads in config file: " + numberOfRoads
-                                + ", exiting", Constants.FATAL_FOR_LOGGING);
-                return null;
-            }*/
 
             String roadFile = doc.getElementsByTagName(ConfigConstants.ROAD_FILE_TAG).item(0).getTextContent();
 
@@ -107,19 +98,6 @@ public class ConfigLoader {
                 return null;
             }
 
-            /*roads = new Road[numberOfRoads];
-            for (int i = 0; i < numberOfRoads; i++) {
-                Road road = loadRoad(roadFile);
-                if (road == null) {
-                    MyLogger.logBeforeLoading("Failed to load road from file: " + roadFile + ", exiting"
-                            , Constants.FATAL_FOR_LOGGING);
-                    return null;
-                }
-                roads[i] = road;
-            }*/
-
-           // RoadLoader.loadMap(roadFile);
-           // roads = AppContext.SIMULATION.getRoads();
             return RoadLoader.loadMapStart(roadFile);
         } catch (Exception e) {
             MyLogger.logBeforeLoading("Error loading config file: " + e.getMessage()
@@ -192,8 +170,6 @@ public class ConfigLoader {
                         , Constants.FATAL_FOR_LOGGING);
                 return null;
             }
-
-
 
             int getMaxSpeed = Integer.parseInt(road.getElementsByTagName("maxSpeed").item(0).getTextContent());
             if (getMaxSpeed <= 0) {
@@ -958,14 +934,6 @@ public class ConfigLoader {
         // create simulation and store it in app context, simulation is the thing that updates all roads and cars
         AppContext.SIMULATION = new Simulation(roads);
         return true;
-    }
-
-    public static File getConfigFile() {
-        return configFile;
-    }
-
-    public void writeIntoConfig(String path, String content) {
-
     }
 
 }

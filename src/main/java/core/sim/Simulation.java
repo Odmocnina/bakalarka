@@ -191,8 +191,15 @@ public class Simulation {
      **/
     public void resetSimulationWithNewRoads(Road[] roads) {
         this.stepCount = 0;
+        resetAllLightPlans(roads);
         this.running = false;
         this.roads = roads;
         ResultsRecorder.getResultsRecorder().resetCarNumbers();
+    }
+
+    private void resetAllLightPlans(Road[] roads) {
+        for (Road road : roads) {
+            road.resetLightPlans();
+        }
     }
 }

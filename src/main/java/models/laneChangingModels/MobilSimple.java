@@ -12,7 +12,7 @@ import java.util.HashMap;
  * MOBIL lane changing model class for deciding lane changes, simplified version. It the now lane, and doesn't consider
  * gain of the car behind in lane where the car is before changing lane.
  *
- * @author
+ * @author Michael Hladky
  * @version 1.0
  *********************************************/
 @ModelId("mobil-simple")

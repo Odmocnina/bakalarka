@@ -14,10 +14,10 @@
     <runDetails>
         <showGui>true</showGui>
         <drawCells>false</drawCells>
-        <laneChange>true</laneChange>
+        <laneChange>false</laneChange>
         <timeStep>1</timeStep>
         <duration>5000</duration>
-        <debug>true</debug>
+        <debug>false</debug>
         <preventCollision>true</preventCollision>
         <logging>
             <log>true</log>
