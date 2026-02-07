@@ -38,8 +38,6 @@ public class RunDetails {
 
     public String mapFile = null;
     public boolean mapChanged = false;
-    public String configFile = null;
-    public boolean configChanged = false;
 
     /** Enable debug mode, writing id of cars, controlling if cars aren't duplicated or in collision **/
     public boolean debug = false;

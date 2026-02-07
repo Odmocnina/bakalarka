@@ -46,4 +46,11 @@ public class Constants {
 
     public static final String newMapFileName = "newMap.xml";
 
+    public static final int GENERAL_LOGGING_INDEX = 0;
+    public static final int INFO_LOGGING_INDEX = 1;
+    public static final int WARN_LOGGING_INDEX = 2;
+    public static final int ERROR_LOGGING_INDEX = 3;
+    public static final int FATAL_LOGGING_INDEX = 4;
+    public static final int DEBUG_LOGGING_INDEX = 5;
+
 }

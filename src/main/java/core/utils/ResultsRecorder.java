@@ -146,6 +146,16 @@ public class ResultsRecorder {
         }
     }
 
+    public void writeResultsTxt() {
+        this.outputType = Constants.RESULTS_OUTPUT_TXT;
+        write();
+    }
+
+     public void writeResultsCsv() {
+        this.outputType = Constants.RESULTS_OUTPUT_CSV;
+        write();
+    }
+
     /**
      * Creates a BufferedWriter and writes the simulation time and cars passed results to it.
      *
@@ -291,9 +301,6 @@ public class ResultsRecorder {
         if (outputDetails.writePart("roadDetails")) {
             this.writeRoadDetails(bw);
         }
-        if (outputDetails.writePart("generationDetails")) {
-            this.writeGenerationParams(bw);
-        }
     }
 
     private void writeCSV(BufferedWriter bw) throws IOException {
@@ -367,6 +374,10 @@ public class ResultsRecorder {
         }
 
         this.collisionsCount = 0;
+    }
+
+    public void setOutFileName(String fileName) {
+        this.fileName = fileName;
     }
 
 }

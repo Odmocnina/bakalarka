@@ -108,7 +108,7 @@ public abstract class Road {
                 .append(", type=").append(type)
                 .append("]");
         for (int i = 0; i < numberOfLanes; i++) {
-            sb.append("\n  Lane ").append(i).append(": ");
+            sb.append("Lane ").append(i).append(": ");
             sb.append("Generator: ").append(generators[i].toString()).append(", ");
             sb.append("LightPlan: ").append(lightPlansOnLanes[i].toString());
         }

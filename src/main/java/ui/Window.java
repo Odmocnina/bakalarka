@@ -8,6 +8,7 @@ import core.model.cellular.CellularRoad;
 import core.utils.*;
 import core.utils.constants.Constants;
 import core.utils.loading.RoadLoader;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -470,6 +471,17 @@ public class Window extends Application {
         button.setGraphic(imageView);
     }
 
+    private void setButtonImage(String resourcePath, MenuItem menuItem) {
+        ImageView imageView = createMenuIcon(resourcePath);
+        if (imageView == null) {
+            MyLogger.log("Failed to set menu item image, imageView is null for resource: " + resourcePath,
+                    Constants.ERROR_FOR_LOGGING);
+            menuItem.setText(menuItem.getText() + " ERR");
+            return;
+        }
+        menuItem.setGraphic(imageView);
+    }
+
     /**
      * helper method to create menu icon (image at buttons/menu items and similar ui stuff)
      *
@@ -505,35 +517,103 @@ public class Window extends Application {
     private ToolBar createToolBar(Stage primaryStage, Runnable paintAll) {
         String defaultStyle = "-fx-background-color: transparent; -fx-border-color: transparent;";
 
+        // map file buttons
         Button newMapFileBtn = createIconButton("/icons/newMapFile.png", "New map file");
         Button editMapFileBtn = createIconButton("/icons/editMapFile.png", "Modify current map file");
         Button openMapFileBtn = createIconButton("/icons/openMapFile.png", "Open map file");
         Button saveMapFileBtn = createIconButton("/icons/saveMapFile.png", "Save map file");
         Button saveAsMapFileBtn = createIconButton("/icons/saveAsMapFile.png", "Save map file as...");
         ToggleButton changeLaneBtn = createIconToggleButton("/icons/ban.png", "Toggle lane change ban");
-        Button startStopBtn = createIconButton("/icons/run.png", "Start/Stop simulation");
-        Button exportResultsBtn = createIconButton("/icons/export.png", "Export results " +
-                "(current state of simulation)");
-        Button nextStepBtn = createIconButton("/icons/nextStep.png", "Next simulation step");
-        ToggleButton collisionBanBtn = createIconToggleButton("/icons/collisionBan.png",
-                "Ban collisions (toggle)");
-        Button setTimeBetweenStepsBtn = createIconButton("/icons/time.png",
-                "Set time between simulation steps (ms)");
-
-        changeLaneBtn.setSelected(!AppContext.RUN_DETAILS.laneChange);
-        collisionBanBtn.setSelected(AppContext.RUN_DETAILS.preventCollisions);
-
-        //changeLaneBtn.setStyle(defaultStyle);
         editMapFileBtn.setStyle(defaultStyle);
         newMapFileBtn.setStyle(defaultStyle);
         openMapFileBtn.setStyle(defaultStyle);
         saveMapFileBtn.setStyle(defaultStyle);
         saveAsMapFileBtn.setStyle(defaultStyle);
+
+        // simulation control buttons
+        Button startStopBtn = createIconButton("/icons/run.png", "Start/Stop simulation");
+        Button nextStepBtn = createIconButton("/icons/nextStep.png", "Next simulation step");
+        ToggleButton collisionBanBtn = createIconToggleButton("/icons/collisionBan.png",
+                "Ban collisions (toggle)");
+        Button setTimeBetweenStepsBtn = createIconButton("/icons/time.png",
+                "Set time between simulation steps (ms)");
         startStopBtn.setStyle(defaultStyle);
-        exportResultsBtn.setStyle(defaultStyle);
         nextStepBtn.setStyle(defaultStyle);
-        //collisionBanBtn.setStyle(defaultStyle);
         setTimeBetweenStepsBtn.setStyle(defaultStyle);
+        changeLaneBtn.setSelected(!AppContext.RUN_DETAILS.laneChange);
+        collisionBanBtn.setSelected(AppContext.RUN_DETAILS.preventCollisions);
+
+        // out file buttons
+        Button exportResultsToTxtBtn = createIconButton("/icons/export.png", "Export results to TXT");
+        Button exportToCsvBtn = createIconButton("/icons/csvSeparator.png", "Export results to CSV");
+        Button setOutputFileNameBtn = createIconButton("/icons/exportFileName.png", "Set output file name");
+        Button setCsvSeparatorBtn = createIconButton("/icons/csvSeparator.png", "Set CSV separator");
+        Button whatToExportBtn = createIconButton("/icons/whatToExport.png", "What to export");
+        whatToExportBtn.setOnAction(e -> {
+            ContextMenu contextMenu = new ContextMenu();
+
+            CheckMenuItem simulationDetailsItem = new CheckMenuItem("Simulation details");
+            CheckMenuItem simulationTimeItem = new CheckMenuItem("Simulation time");
+            CheckMenuItem carsPassedItem = new CheckMenuItem("Cars passed");
+            CheckMenuItem carsOnRoadItem = new CheckMenuItem("Cars on road");
+            CheckMenuItem collisionsItem = new CheckMenuItem("Collisions");
+            CheckMenuItem roadDetailsItem = new CheckMenuItem("Road details");
+
+
+            contextMenu.getItems().addAll(
+                    simulationDetailsItem,
+                    simulationTimeItem,
+                    carsPassedItem,
+                    carsOnRoadItem,
+                    collisionsItem,
+                    roadDetailsItem
+            );
+
+            contextMenu.show(whatToExportBtn, Side.BOTTOM, 0, 0);
+        });
+        exportResultsToTxtBtn.setStyle(defaultStyle);
+        setOutputFileNameBtn.setStyle(defaultStyle);
+        exportToCsvBtn.setStyle(defaultStyle);
+        setCsvSeparatorBtn.setStyle(defaultStyle);
+        whatToExportBtn.setStyle(defaultStyle);
+
+        ToggleButton toggleAllLoggingBtn = createIconToggleButton("/icons/log.png", "Toggle all logging");
+        Button whatToLogBtn = createIconButton("/icons/whatToExport.png", "What to log");
+        whatToLogBtn.setOnAction(e -> {
+            ContextMenu contextMenu = new ContextMenu();
+
+            CheckMenuItem infoItem = new CheckMenuItem("Log info");
+            CheckMenuItem warnItem = new CheckMenuItem("Log warnings");
+            CheckMenuItem errorItem = new CheckMenuItem("Log errors");
+            CheckMenuItem fatalItem = new CheckMenuItem("Log fatal problems");
+            CheckMenuItem debugItem = new CheckMenuItem("Log debug info");
+
+            infoItem.setSelected(AppContext.RUN_DETAILS.log[Constants.INFO_LOGGING_INDEX]);
+            warnItem.setSelected(AppContext.RUN_DETAILS.log[Constants.WARN_LOGGING_INDEX]);
+            errorItem.setSelected(AppContext.RUN_DETAILS.log[Constants.ERROR_LOGGING_INDEX]);
+            fatalItem.setSelected(AppContext.RUN_DETAILS.log[Constants.FATAL_LOGGING_INDEX]);
+            debugItem.setSelected(AppContext.RUN_DETAILS.log[Constants.DEBUG_LOGGING_INDEX]);
+
+            infoItem.setOnAction(ev -> Actions.setLoggingAction(Constants.INFO_LOGGING_INDEX));
+            warnItem.setOnAction(ev -> Actions.setLoggingAction(Constants.WARN_LOGGING_INDEX));
+            errorItem.setOnAction(ev -> Actions.setLoggingAction(Constants.ERROR_LOGGING_INDEX));
+            fatalItem.setOnAction(ev -> Actions.setLoggingAction(Constants.FATAL_LOGGING_INDEX));
+            debugItem.setOnAction(ev -> Actions.setLoggingAction(Constants.DEBUG_LOGGING_INDEX));
+
+            contextMenu.getItems().addAll(
+                    infoItem,
+                    warnItem,
+                    errorItem,
+                    fatalItem,
+                    debugItem
+            );
+
+            contextMenu.show(whatToLogBtn, Side.BOTTOM, 0, 0);
+        });
+        toggleAllLoggingBtn.setSelected(AppContext.RUN_DETAILS.log[0]);
+        //toggleAllLoggingBtn.setStyle(defaultStyle);
+        whatToLogBtn.setStyle(defaultStyle);
+
 
         newMapFileBtn.setOnAction(e -> {
             Actions.newMapAction(primaryStage, paintAll);
@@ -555,13 +635,16 @@ public class Window extends Application {
             }
         });
 
-        exportResultsBtn.setOnAction(e -> {
-            Actions.exportResultsAction(primaryStage);
+        exportResultsToTxtBtn.setOnAction(e -> {
+            Actions.exportResultsToTxtAction();
+        });
+
+        exportToCsvBtn.setOnAction(e -> {
+            Actions.exportResultsToCsvAction();
         });
 
         nextStepBtn.setOnAction(e -> {
-            simulation.step();
-            paintAll.run();
+            Actions.nextStepAction(simulation, paintAll);
         });
 
         changeLaneBtn.setOnAction(e -> {
@@ -585,21 +668,39 @@ public class Window extends Application {
         });
 
         setTimeBetweenStepsBtn.setOnAction(e -> {
-            Actions.setTimeBetweenStepsAction(primaryStage);
+            Actions.setTimeBetweenStepsAction(primaryStage, engine);
+        });
+
+        setOutputFileNameBtn.setOnAction(e -> {
+            Actions.setOutputFileAction();
+        });
+
+        setCsvSeparatorBtn.setOnAction(e -> {
+            Actions.setCsvSeparatorAction(primaryStage);
+        });
+
+        toggleAllLoggingBtn.setOnAction(e -> {
+            Actions.setLoggingAction(Constants.GENERAL_LOGGING_INDEX);
         });
 
         return new ToolBar(
-                startStopBtn,
-                nextStepBtn,
                 newMapFileBtn,
                 editMapFileBtn,
                 openMapFileBtn,
                 saveMapFileBtn,
                 saveAsMapFileBtn,
+                startStopBtn,
+                nextStepBtn,
                 changeLaneBtn,
                 collisionBanBtn,
-                exportResultsBtn,
-                setTimeBetweenStepsBtn
+                setTimeBetweenStepsBtn,
+                exportResultsToTxtBtn,
+                exportToCsvBtn,
+                setOutputFileNameBtn,
+                setCsvSeparatorBtn,
+                whatToExportBtn,
+                toggleAllLoggingBtn,
+                whatToLogBtn
         );
     }
 
@@ -611,6 +712,21 @@ public class Window extends Application {
      * @return MenuBar with menu items
      **/
     private MenuBar createMenu(Stage primaryStage, Runnable paintAll) {
+        Menu fileMenu = createMapFileMenu(primaryStage, paintAll);
+        Menu simulationMenu = createSimulationMenu(primaryStage, paintAll);
+        Menu loggingMenu = createLoggingMenu();
+        Menu outputMenu = createOutputMenu(primaryStage);
+
+        MenuBar menuBar = new MenuBar();
+        menuBar.getMenus().add(fileMenu);
+        menuBar.getMenus().add(simulationMenu);
+        menuBar.getMenus().add(outputMenu);
+        menuBar.getMenus().add(loggingMenu);
+
+        return menuBar;
+    }
+
+    private Menu createMapFileMenu(Stage primaryStage, Runnable paintAll) {
         MenuItem itemNewFile = new MenuItem("New map file", createMenuIcon("/icons/newMapFile.png"));
         MenuItem itemEditFile = new MenuItem("Modify current map file", createMenuIcon("/icons/editMapFile.png"));
         MenuItem itemOpenFile = new MenuItem("Open map file", createMenuIcon("/icons/openMapFile.png"));
@@ -640,53 +756,63 @@ public class Window extends Application {
         Menu fileMenu = new Menu("Map file");
         fileMenu.getItems().addAll(itemNewFile, itemEditFile, itemOpenFile, itemSaveFile, itemSaveAsFile);
 
-        Menu loggingMenu = new Menu("Logging");
-        CheckMenuItem toggleAllLogItem = new CheckMenuItem("Toggle all logging");
-        toggleAllLogItem.setSelected(AppContext.RUN_DETAILS.log[0]);
-        CheckMenuItem toggleInfoLogItem = new CheckMenuItem("Toggle info logging");
-        toggleInfoLogItem.setSelected(AppContext.RUN_DETAILS.log[1]);
-        CheckMenuItem toggleWarnLogItem = new CheckMenuItem("Toggle warning logging");
-        toggleWarnLogItem.setSelected(AppContext.RUN_DETAILS.log[2]);
-        CheckMenuItem toggleErrorLogItem = new CheckMenuItem("Toggle error logging");
-        toggleErrorLogItem.setSelected(AppContext.RUN_DETAILS.log[3]);
-        CheckMenuItem toggleFatalLogItem = new CheckMenuItem("Toggle fatal logging");
-        toggleFatalLogItem.setSelected(AppContext.RUN_DETAILS.log[4]);
-        CheckMenuItem toggleDebugLogItem = new CheckMenuItem("Toggle debug logging");
-        toggleDebugLogItem.setSelected(AppContext.RUN_DETAILS.log[5]);
-        loggingMenu.getItems().addAll(toggleAllLogItem, toggleInfoLogItem, toggleWarnLogItem,
-                toggleDebugLogItem, toggleErrorLogItem, toggleFatalLogItem);
+        return fileMenu;
+    }
 
-        toggleAllLogItem.setOnAction(e -> {
-            ConfigModificator.changeLogging(0);
+    private Menu createSimulationMenu(Stage primaryStage, Runnable paintAll) {
+        Menu simulationMenu = new Menu("Simulation");
+        MenuItem startStopItem = new MenuItem("Start/Stop simulation", createMenuIcon("/icons/run.png"));
+        MenuItem nextStepItem = new MenuItem("Next simulation step", createMenuIcon("/icons/nextStep.png"));
+        CheckMenuItem changeLaneToggleItem = new CheckMenuItem("Toggle lane change ban", createMenuIcon("/icons/ban.png"));
+        CheckMenuItem collisionBanToggleItem = new CheckMenuItem("Ban collisions (toggle)",
+                createMenuIcon("/icons/collisionBan.png"));
+        MenuItem setTimeBetweenStepsItem = new MenuItem("Set time between simulation steps (ms)",
+                createMenuIcon("/icons/time.png"));
+
+        changeLaneToggleItem.setSelected(!AppContext.RUN_DETAILS.laneChange);
+        collisionBanToggleItem.setSelected(AppContext.RUN_DETAILS.preventCollisions);
+
+        startStopItem.setOnAction(e -> {
+            if (engine.getRunning()) {
+                setButtonImage("/icons/run.png", startStopItem);
+                engine.stop();
+                MyLogger.log("Simulation stopped via toolbar button", Constants.INFO_FOR_LOGGING);
+            } else {
+                setButtonImage("/icons/stop.png", startStopItem);
+                engine.start();
+                MyLogger.log("Simulation started via toolbar button", Constants.INFO_FOR_LOGGING);
+            }
         });
 
-        toggleInfoLogItem.setOnAction(e -> {
-            ConfigModificator.changeLogging(1);
+        nextStepItem.setOnAction(e -> {
+            Actions.nextStepAction(simulation, paintAll);
         });
 
-        toggleWarnLogItem.setOnAction(e -> {
-            ConfigModificator.changeLogging(2);
+        changeLaneToggleItem.setOnAction(e -> {
+            Actions.changeLaneChangingAction(paintAll);
         });
 
-        toggleErrorLogItem.setOnAction(e -> {
-            ConfigModificator.changeLogging(3);
+        collisionBanToggleItem.setOnAction(e -> {
+            Actions.collisionBanAction(paintAll);
         });
 
-        toggleFatalLogItem.setOnAction(e -> {
-            ConfigModificator.changeLogging(4);
+        setTimeBetweenStepsItem.setOnAction(e -> {
+            Actions.setTimeBetweenStepsAction(primaryStage, engine);
         });
 
-        toggleDebugLogItem.setOnAction(e -> {
-            ConfigModificator.changeLogging(5);
-        });
+        simulationMenu.getItems().addAll(startStopItem, nextStepItem, changeLaneToggleItem, collisionBanToggleItem,
+                setTimeBetweenStepsItem);
 
+        return simulationMenu;
+    }
+
+    private Menu createOutputMenu(Stage primaryStage) {
         Menu outputMenu = new Menu("Output");
-
-        MenuItem exportResultsItem = new MenuItem("Export results (current state of simulation)",
+        MenuItem exportResultsItem = new MenuItem("Export results to TXT",
                 createMenuIcon("/icons/export.png"));
         MenuItem setOutputFileNameItem = new MenuItem("Set output file name",
                 createMenuIcon("/icons/exportFileName.png"));
-        CheckMenuItem exportToCSVItem = new CheckMenuItem("Export to CSV");
+        MenuItem exportToCSVItem = new CheckMenuItem("Export to CSV");
         MenuItem setCsvSepartorItem = new MenuItem("Set CSV separator",
                 createMenuIcon("/icons/csvSeparator.png"));
         Menu whatToExportSubMenu = new Menu("What to export",
@@ -700,15 +826,70 @@ public class Window extends Application {
         whatToExportSubMenu.getItems().addAll(simulationDetailsItem, simulationTimeItem, carsPassedItem, carsOnRoadItem,
                 collisionsItem, roadDetailsItem);
 
-        outputMenu.getItems().addAll(exportResultsItem, setOutputFileNameItem, exportToCSVItem, setCsvSepartorItem,
+        setOutputFileNameItem.setOnAction(e -> {
+            Actions.setOutputFileAction();
+        });
+
+        setCsvSepartorItem.setOnAction(e -> {
+            Actions.setCsvSeparatorAction(primaryStage);
+        });
+
+        exportResultsItem.setOnAction(e -> {
+            Actions.exportResultsToTxtAction();
+        });
+
+        exportToCSVItem.setOnAction(e -> {
+            Actions.exportResultsToCsvAction();
+        });
+
+        outputMenu.getItems().addAll(exportResultsItem, exportToCSVItem, setOutputFileNameItem, setCsvSepartorItem,
                 whatToExportSubMenu);
 
-        MenuBar menuBar = new MenuBar();
-        menuBar.getMenus().add(fileMenu);
-        menuBar.getMenus().add(loggingMenu);
-        menuBar.getMenus().add(outputMenu);
+        return outputMenu;
+    }
 
-        return menuBar;
+    private Menu createLoggingMenu() {
+        Menu loggingMenu = new Menu("Logging");
+        CheckMenuItem toggleAllLogItem = new CheckMenuItem("Toggle all logging");
+        toggleAllLogItem.setSelected(AppContext.RUN_DETAILS.log[Constants.GENERAL_LOGGING_INDEX]);
+        CheckMenuItem toggleInfoLogItem = new CheckMenuItem("Toggle info logging");
+        toggleInfoLogItem.setSelected(AppContext.RUN_DETAILS.log[Constants.INFO_LOGGING_INDEX]);
+        CheckMenuItem toggleWarnLogItem = new CheckMenuItem("Toggle warning logging");
+        toggleWarnLogItem.setSelected(AppContext.RUN_DETAILS.log[Constants.WARN_LOGGING_INDEX]);
+        CheckMenuItem toggleErrorLogItem = new CheckMenuItem("Toggle error logging");
+        toggleErrorLogItem.setSelected(AppContext.RUN_DETAILS.log[Constants.ERROR_LOGGING_INDEX]);
+        CheckMenuItem toggleFatalLogItem = new CheckMenuItem("Toggle fatal logging");
+        toggleFatalLogItem.setSelected(AppContext.RUN_DETAILS.log[Constants.FATAL_LOGGING_INDEX]);
+        CheckMenuItem toggleDebugLogItem = new CheckMenuItem("Toggle debug logging");
+        toggleDebugLogItem.setSelected(AppContext.RUN_DETAILS.log[Constants.DEBUG_LOGGING_INDEX]);
+        loggingMenu.getItems().addAll(toggleAllLogItem, toggleInfoLogItem, toggleWarnLogItem,
+                toggleDebugLogItem, toggleErrorLogItem, toggleFatalLogItem);
+
+        toggleAllLogItem.setOnAction(e -> {
+            Actions.setLoggingAction(Constants.GENERAL_LOGGING_INDEX);
+        });
+
+        toggleInfoLogItem.setOnAction(e -> {
+            Actions.setLoggingAction(Constants.INFO_LOGGING_INDEX);
+        });
+
+        toggleWarnLogItem.setOnAction(e -> {
+            Actions.setLoggingAction(Constants.WARN_LOGGING_INDEX);
+        });
+
+        toggleErrorLogItem.setOnAction(e -> {
+            Actions.setLoggingAction(Constants.ERROR_LOGGING_INDEX);
+        });
+
+        toggleFatalLogItem.setOnAction(e -> {
+            Actions.setLoggingAction(Constants.FATAL_LOGGING_INDEX);
+        });
+
+        toggleDebugLogItem.setOnAction(e -> {
+            Actions.setLoggingAction(Constants.DEBUG_LOGGING_INDEX);
+        });
+
+        return loggingMenu;
     }
 
     /**

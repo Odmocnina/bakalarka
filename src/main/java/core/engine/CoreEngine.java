@@ -83,7 +83,9 @@ public class CoreEngine {
      * @param newPeriod new period in milliseconds
      **/
     public synchronized void setPeriodMs(long newPeriod) {
-        if (newPeriod <= 0) return;
+        if (newPeriod <= 0) {
+            return;
+        }
         this.periodMs = newPeriod;
         if (getRunning()) {
             stop();

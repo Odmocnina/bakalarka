@@ -1,6 +1,8 @@
 package ui;
 
 import app.AppContext;
+import core.engine.CoreEngine;
+import core.sim.Simulation;
 import core.utils.*;
 import core.utils.constants.Constants;
 import core.utils.loading.RoadLoader;
@@ -84,9 +86,16 @@ public class Actions {
                 RoadParameters.existingRoadsToRoadParameters(AppContext.SIMULATION.getRoads()), paintAll);
     }
 
-    public static void exportResultsAction(Stage primaryStage) {
-        MyLogger.log("Exporting results...", Constants.INFO_FOR_LOGGING);
-        ResultsRecorder.getResultsRecorder().writeResults();
+    public static void exportResultsToTxtAction() {
+        MyLogger.log("Exporting results to txt...", Constants.INFO_FOR_LOGGING);
+        ResultsRecorder.getResultsRecorder().writeResultsTxt();
+        MyLogger.log("Results exporting to txt finished.", Constants.INFO_FOR_LOGGING);
+    }
+
+    public static void exportResultsToCsvAction() {
+        MyLogger.log("Exporting results to csv...", Constants.INFO_FOR_LOGGING);
+        ResultsRecorder.getResultsRecorder().writeResultsCsv();
+        MyLogger.log("Results exporting to csv finished.", Constants.INFO_FOR_LOGGING);
     }
 
     public static void setLoggingAction(int logIndex) {
@@ -94,8 +103,24 @@ public class Actions {
         ConfigModificator.changeLogging(logIndex);
     }
 
-    public static void setTimeBetweenStepsAction(Stage stage) {
+    public static void setTimeBetweenStepsAction(Stage stage, CoreEngine engine) {
         MyLogger.log("Set time between steps was pressed", Constants.INFO_FOR_LOGGING);
-        DialogMaker.changeTimeBetweenSteps(stage);
+        DialogMaker.changeTimeBetweenSteps(stage, engine);
+    }
+
+    public static void nextStepAction(Simulation simulation, Runnable paintAll) {
+        MyLogger.log("Next step action triggered", Constants.INFO_FOR_LOGGING);
+        simulation.step();
+        paintAll.run();
+    }
+
+    public static void setOutputFileAction() {
+        MyLogger.log("Set output file action triggered", Constants.INFO_FOR_LOGGING);
+        DialogMaker.setOutFileDialog();
+    }
+
+    public static void setCsvSeparatorAction(Stage primaryStage) {
+        MyLogger.log("Set CSV separator action triggered", Constants.INFO_FOR_LOGGING);
+        DialogMaker.setCsvSeparatorDialog(primaryStage);
     }
 }

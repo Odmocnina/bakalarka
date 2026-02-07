@@ -26,12 +26,12 @@ public class MyLogger {
      * @param level The log4j level at which to log the message (INFO, DEBUG, ERROR, WARN, FATAL).
      **/
     public static void log(String message, String level) {
-        final int GENERAL_INDEX = 0;
-        final int INFO_INDEX = 1;
-        final int WARN_INDEX = 2;
-        final int ERROR_INDEX = 3;
-        final int FATAL_INDEX = 4;
-        final int DEBUG_INDEX = 5;
+        final int GENERAL_INDEX = Constants.GENERAL_LOGGING_INDEX;
+        final int INFO_INDEX = Constants.INFO_LOGGING_INDEX;
+        final int WARN_INDEX = Constants.WARN_LOGGING_INDEX;
+        final int ERROR_INDEX = Constants.ERROR_LOGGING_INDEX;
+        final int FATAL_INDEX = Constants.FATAL_LOGGING_INDEX;
+        final int DEBUG_INDEX = Constants.DEBUG_LOGGING_INDEX;
         boolean[] logSettings = AppContext.RUN_DETAILS.log;
 
         if ((logSettings[GENERAL_INDEX])) {

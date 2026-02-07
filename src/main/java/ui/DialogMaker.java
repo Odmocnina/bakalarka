@@ -1,13 +1,11 @@
 package ui;
 
 import app.AppContext;
+import core.engine.CoreEngine;
 import core.model.CarGenerator;
 import core.model.LightPlan;
 import core.model.Parameter;
-import core.utils.DefaultStuffMaker;
-import core.utils.MyLogger;
-import core.utils.RoadParameters;
-import core.utils.RoadXml;
+import core.utils.*;
 import core.utils.constants.Constants;
 import core.utils.constants.DefaultValues;
 
@@ -950,7 +948,7 @@ public class DialogMaker {
         return result.isPresent() && result.get() == ButtonType.OK;
     }
 
-    public static void changeTimeBetweenSteps(Stage stage) {
+    public static void changeTimeBetweenSteps(Stage stage, CoreEngine engine) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Change time between simulation steps");
         dialog.setHeaderText("Change the time (in seconds) between each simulation step.");
@@ -974,19 +972,74 @@ public class DialogMaker {
         dialog.showAndWait().ifPresent(response -> {
             if (response == applyButtonType) {
                 try {
-                    int timeBetweenSteps = Integer.parseInt(timeInput.getText());
+                    long timeBetweenSteps = Integer.parseInt(timeInput.getText());
                     if (timeBetweenSteps <= 0) {
                         throw new NumberFormatException("Value must be positive");
                     }
 
-                    AppContext.RUN_DETAILS.timeBetweenSteps = timeBetweenSteps;
+                    AppContext.RUN_DETAILS.timeBetweenSteps = (int)timeBetweenSteps;
+                    engine.setPeriodMs(timeBetweenSteps);
                     MyLogger.log("Time between simulation steps updated via dialog.", Constants.INFO_FOR_LOGGING);
                 } catch (NumberFormatException e) {
-                    MyLogger.log("Invalid time between steps value: " + e, Constants.ERROR_FOR_LOGGING);
-                    warningDialog(stage, "Invalid time between steps value: " + e);
+                    String errorMessage = "Invalid time between steps value: " + e.getMessage();
+                    MyLogger.log(errorMessage, Constants.ERROR_FOR_LOGGING);
+                    warningDialog(stage, errorMessage);
+
                 }
             } else {
                 MyLogger.log("Time between steps dialog cancelled.", Constants.INFO_FOR_LOGGING);
+            }
+        });
+    }
+
+    public static void setOutFileDialog() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select output file for simulation results");
+
+        // filter for csv files, so only csv files are shown
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"),
+            new FileChooser.ExtensionFilter("All files (*.*)", "*.*")
+        );
+
+        // set the initial directory to current working directory
+        File currentDir = new File(System.getProperty("user.dir"));
+        if (currentDir.exists()) {
+            fileChooser.setInitialDirectory(currentDir);
+        }
+
+        // default file name
+        fileChooser.setInitialFileName("output.csv");
+
+        // Opens the save dialog and blocks until the user selects a file or cancels
+        File file = fileChooser.showSaveDialog(null);
+
+        if (file != null) {
+            String filePath = file.getAbsolutePath();
+            AppContext.RUN_DETAILS.outputDetails.outputFile = filePath;
+            ResultsRecorder.getResultsRecorder().setOutFileName(filePath);
+            MyLogger.log("User selected output file: " + filePath, Constants.INFO_FOR_LOGGING);
+        } else {
+            MyLogger.log("Output file selection canceled by user.", Constants.INFO_FOR_LOGGING);
+        }
+    }
+
+    public static void setCsvSeparatorDialog(Stage primaryStage) {
+        TextInputDialog dialog = new TextInputDialog(AppContext.RUN_DETAILS.outputDetails.csvSeparator);
+        dialog.setTitle("Set CSV Separator");
+        dialog.setHeaderText("Set the separator character for CSV output files.");
+        dialog.setContentText("CSV Separator:");
+        dialog.initOwner(primaryStage);
+
+        // show the dialog and wait for user response
+        dialog.showAndWait().ifPresent(separator -> {
+            if (separator.length() != 1) {
+                String errorMessage = "CSV separator must be a single character.";
+                MyLogger.log(errorMessage, Constants.ERROR_FOR_LOGGING);
+                warningDialog(null, errorMessage);
+            } else {
+                AppContext.RUN_DETAILS.outputDetails.csvSeparator = separator;
+                MyLogger.log("CSV separator updated to '" + separator + "' via dialog.", Constants.INFO_FOR_LOGGING);
             }
         });
     }

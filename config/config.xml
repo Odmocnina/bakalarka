@@ -30,7 +30,7 @@
         <output>
             <writeOutput>true</writeOutput>
             <file>output/hellyModelTest.csv</file>
-            <type>txt</type>
+            <type>csv</type>
             <csvSeparator>;</csvSeparator>
             <whatToWrite>
                 <simulationDetails>true</simulationDetails>
