@@ -7,14 +7,11 @@ import core.model.cellular.Cell;
 import core.model.cellular.CellularRoad;
 import core.utils.*;
 import core.utils.constants.Constants;
-import core.utils.loading.RoadLoader;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.stage.FileChooser;
-import org.w3c.dom.events.Event;
 import ui.render.IRoadRenderer;
 import core.sim.Simulation;
 
@@ -29,8 +26,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-
-import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -161,7 +156,7 @@ public class Window extends Application {
         };
 
         primaryStage.setOnCloseRequest(event -> {
-            boolean canClose = true;
+            boolean canClose;
 
             if (AppContext.RUN_DETAILS.mapChanged) { // confirm if unsaved changes
                 canClose = DialogMaker.onCloseUnsavedChangesDialog(primaryStage);
@@ -615,13 +610,9 @@ public class Window extends Application {
         whatToLogBtn.setStyle(defaultStyle);
 
 
-        newMapFileBtn.setOnAction(e -> {
-            Actions.newMapAction(primaryStage, paintAll);
-        });
+        newMapFileBtn.setOnAction(e -> Actions.newMapAction(primaryStage, paintAll));
 
-        editMapFileBtn.setOnAction(e -> {
-            Actions.editMapFile(primaryStage, paintAll);
-        });
+        editMapFileBtn.setOnAction(e -> Actions.editMapFile(primaryStage, paintAll));
 
         startStopBtn.setOnAction(e -> {
             if (engine.getRunning()) {
@@ -635,53 +626,29 @@ public class Window extends Application {
             }
         });
 
-        exportResultsToTxtBtn.setOnAction(e -> {
-            Actions.exportResultsToTxtAction();
-        });
+        exportResultsToTxtBtn.setOnAction(e -> Actions.exportResultsToTxtAction());
 
-        exportToCsvBtn.setOnAction(e -> {
-            Actions.exportResultsToCsvAction();
-        });
+        exportToCsvBtn.setOnAction(e -> Actions.exportResultsToCsvAction());
 
-        nextStepBtn.setOnAction(e -> {
-            Actions.nextStepAction(simulation, paintAll);
-        });
+        nextStepBtn.setOnAction(e -> Actions.nextStepAction(simulation, paintAll));
 
-        changeLaneBtn.setOnAction(e -> {
-            Actions.changeLaneChangingAction(paintAll);
-        });
+        changeLaneBtn.setOnAction(e -> Actions.changeLaneChangingAction(paintAll));
 
-        saveMapFileBtn.setOnAction(e -> {
-            Actions.saveMapAction();
-        });
+        saveMapFileBtn.setOnAction(e -> Actions.saveMapAction());
 
-        saveAsMapFileBtn.setOnAction(e -> {
-            Actions.saveMapAsAction(primaryStage);
-        });
+        saveAsMapFileBtn.setOnAction(e -> Actions.saveMapAsAction(primaryStage));
 
-        openMapFileBtn.setOnAction(e -> {
-            Actions.openMapAction(primaryStage, paintAll);
-        });
+        openMapFileBtn.setOnAction(e -> Actions.openMapAction(primaryStage, paintAll));
 
-        collisionBanBtn.setOnAction(e -> {
-            Actions.collisionBanAction(paintAll);
-        });
+        collisionBanBtn.setOnAction(e -> Actions.collisionBanAction(paintAll));
 
-        setTimeBetweenStepsBtn.setOnAction(e -> {
-            Actions.setTimeBetweenStepsAction(primaryStage, engine);
-        });
+        setTimeBetweenStepsBtn.setOnAction(e -> Actions.setTimeBetweenStepsAction(primaryStage, engine));
 
-        setOutputFileNameBtn.setOnAction(e -> {
-            Actions.setOutputFileAction();
-        });
+        setOutputFileNameBtn.setOnAction(e -> Actions.setOutputFileAction());
 
-        setCsvSeparatorBtn.setOnAction(e -> {
-            Actions.setCsvSeparatorAction(primaryStage);
-        });
+        setCsvSeparatorBtn.setOnAction(e -> Actions.setCsvSeparatorAction(primaryStage));
 
-        toggleAllLoggingBtn.setOnAction(e -> {
-            Actions.setLoggingAction(Constants.GENERAL_LOGGING_INDEX);
-        });
+        toggleAllLoggingBtn.setOnAction(e -> Actions.setLoggingAction(Constants.GENERAL_LOGGING_INDEX));
 
         return new ToolBar(
                 newMapFileBtn,
@@ -733,25 +700,15 @@ public class Window extends Application {
         MenuItem itemSaveFile = new MenuItem("Save map file", createMenuIcon("/icons/saveMapFile.png"));
         MenuItem itemSaveAsFile = new MenuItem("Save map file as...", createMenuIcon("/icons/saveAsMapFile.png"));
 
-        itemNewFile.setOnAction(e -> {
-            Actions.newMapAction(primaryStage, paintAll);
-        });
+        itemNewFile.setOnAction(e -> Actions.newMapAction(primaryStage, paintAll));
 
-        itemEditFile.setOnAction(e -> {
-            Actions.editMapFile(primaryStage, paintAll);
-        });
+        itemEditFile.setOnAction(e -> Actions.editMapFile(primaryStage, paintAll));
 
-        itemOpenFile.setOnAction(e -> {
-            Actions.openMapAction(primaryStage, paintAll);
-        });
+        itemOpenFile.setOnAction(e -> Actions.openMapAction(primaryStage, paintAll));
 
-        itemSaveFile.setOnAction(e -> {
-            Actions.saveMapAction();
-        });
+        itemSaveFile.setOnAction(e -> Actions.saveMapAction());
 
-        itemSaveAsFile.setOnAction(e -> {
-            Actions.saveMapAsAction(primaryStage);
-        });
+        itemSaveAsFile.setOnAction(e -> Actions.saveMapAsAction(primaryStage));
 
         Menu fileMenu = new Menu("Map file");
         fileMenu.getItems().addAll(itemNewFile, itemEditFile, itemOpenFile, itemSaveFile, itemSaveAsFile);
@@ -784,21 +741,13 @@ public class Window extends Application {
             }
         });
 
-        nextStepItem.setOnAction(e -> {
-            Actions.nextStepAction(simulation, paintAll);
-        });
+        nextStepItem.setOnAction(e -> Actions.nextStepAction(simulation, paintAll));
 
-        changeLaneToggleItem.setOnAction(e -> {
-            Actions.changeLaneChangingAction(paintAll);
-        });
+        changeLaneToggleItem.setOnAction(e -> Actions.changeLaneChangingAction(paintAll));
 
-        collisionBanToggleItem.setOnAction(e -> {
-            Actions.collisionBanAction(paintAll);
-        });
+        collisionBanToggleItem.setOnAction(e -> Actions.collisionBanAction(paintAll));
 
-        setTimeBetweenStepsItem.setOnAction(e -> {
-            Actions.setTimeBetweenStepsAction(primaryStage, engine);
-        });
+        setTimeBetweenStepsItem.setOnAction(e -> Actions.setTimeBetweenStepsAction(primaryStage, engine));
 
         simulationMenu.getItems().addAll(startStopItem, nextStepItem, changeLaneToggleItem, collisionBanToggleItem,
                 setTimeBetweenStepsItem);
@@ -813,7 +762,7 @@ public class Window extends Application {
         MenuItem setOutputFileNameItem = new MenuItem("Set output file name",
                 createMenuIcon("/icons/exportFileName.png"));
         MenuItem exportToCSVItem = new CheckMenuItem("Export to CSV");
-        MenuItem setCsvSepartorItem = new MenuItem("Set CSV separator",
+        MenuItem setCsvSeparator = new MenuItem("Set CSV separator",
                 createMenuIcon("/icons/csvSeparator.png"));
         Menu whatToExportSubMenu = new Menu("What to export",
                 createMenuIcon("/icons/whatToExport.png"));
@@ -826,23 +775,15 @@ public class Window extends Application {
         whatToExportSubMenu.getItems().addAll(simulationDetailsItem, simulationTimeItem, carsPassedItem, carsOnRoadItem,
                 collisionsItem, roadDetailsItem);
 
-        setOutputFileNameItem.setOnAction(e -> {
-            Actions.setOutputFileAction();
-        });
+        setOutputFileNameItem.setOnAction(e -> Actions.setOutputFileAction());
 
-        setCsvSepartorItem.setOnAction(e -> {
-            Actions.setCsvSeparatorAction(primaryStage);
-        });
+        setCsvSeparator.setOnAction(e -> Actions.setCsvSeparatorAction(primaryStage));
 
-        exportResultsItem.setOnAction(e -> {
-            Actions.exportResultsToTxtAction();
-        });
+        exportResultsItem.setOnAction(e -> Actions.exportResultsToTxtAction());
 
-        exportToCSVItem.setOnAction(e -> {
-            Actions.exportResultsToCsvAction();
-        });
+        exportToCSVItem.setOnAction(e -> Actions.exportResultsToCsvAction());
 
-        outputMenu.getItems().addAll(exportResultsItem, exportToCSVItem, setOutputFileNameItem, setCsvSepartorItem,
+        outputMenu.getItems().addAll(exportResultsItem, exportToCSVItem, setOutputFileNameItem, setCsvSeparator,
                 whatToExportSubMenu);
 
         return outputMenu;
@@ -865,29 +806,17 @@ public class Window extends Application {
         loggingMenu.getItems().addAll(toggleAllLogItem, toggleInfoLogItem, toggleWarnLogItem,
                 toggleDebugLogItem, toggleErrorLogItem, toggleFatalLogItem);
 
-        toggleAllLogItem.setOnAction(e -> {
-            Actions.setLoggingAction(Constants.GENERAL_LOGGING_INDEX);
-        });
+        toggleAllLogItem.setOnAction(e -> Actions.setLoggingAction(Constants.GENERAL_LOGGING_INDEX));
 
-        toggleInfoLogItem.setOnAction(e -> {
-            Actions.setLoggingAction(Constants.INFO_LOGGING_INDEX);
-        });
+        toggleInfoLogItem.setOnAction(e -> Actions.setLoggingAction(Constants.INFO_LOGGING_INDEX));
 
-        toggleWarnLogItem.setOnAction(e -> {
-            Actions.setLoggingAction(Constants.WARN_LOGGING_INDEX);
-        });
+        toggleWarnLogItem.setOnAction(e -> Actions.setLoggingAction(Constants.WARN_LOGGING_INDEX));
 
-        toggleErrorLogItem.setOnAction(e -> {
-            Actions.setLoggingAction(Constants.ERROR_LOGGING_INDEX);
-        });
+        toggleErrorLogItem.setOnAction(e -> Actions.setLoggingAction(Constants.ERROR_LOGGING_INDEX));
 
-        toggleFatalLogItem.setOnAction(e -> {
-            Actions.setLoggingAction(Constants.FATAL_LOGGING_INDEX);
-        });
+        toggleFatalLogItem.setOnAction(e -> Actions.setLoggingAction(Constants.FATAL_LOGGING_INDEX));
 
-        toggleDebugLogItem.setOnAction(e -> {
-            Actions.setLoggingAction(Constants.DEBUG_LOGGING_INDEX);
-        });
+        toggleDebugLogItem.setOnAction(e -> Actions.setLoggingAction(Constants.DEBUG_LOGGING_INDEX));
 
         return loggingMenu;
     }

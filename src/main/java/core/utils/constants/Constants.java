@@ -53,4 +53,7 @@ public class Constants {
     public static final int FATAL_LOGGING_INDEX = 4;
     public static final int DEBUG_LOGGING_INDEX = 5;
 
+    public static final int NO_DURATION_PROVIDED = -1;
+    public static final int INVALID_INPUT_PARAMETERS = -2;
+
 }

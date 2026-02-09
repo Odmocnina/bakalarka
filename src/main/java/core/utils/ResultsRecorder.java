@@ -26,6 +26,8 @@ public class ResultsRecorder {
     /** Array to store the number of cars passed per road **/
     private int[] carsPassedPerRoad;
 
+    private int[] whenWasRoadEmpty;
+
     /** BigInt value used as a start of timer when simulation starts **/
     private BigInteger timeStart;
 
@@ -117,7 +119,9 @@ public class ResultsRecorder {
         if (timeStart == null) {
             return BigInteger.ZERO;
         }
-        return timeEnd.subtract(timeStart);
+        BigInteger currentEnd = (timeEnd == null) ? BigInteger.valueOf(System.nanoTime()) : timeEnd;
+        return currentEnd.subtract(timeStart);
+        //return timeEnd.subtract(timeStart);
     }
 
     /**

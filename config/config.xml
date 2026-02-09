@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <config>
-    <roadFile>newMap.xml</roadFile>
+    <roadFile>map.xml</roadFile>
 
     <models>
         <carFollowingModel>
@@ -12,11 +12,11 @@
     </models>
 
     <runDetails>
-        <showGui>true</showGui>
+        <showGui>false</showGui>
         <drawCells>false</drawCells>
         <laneChange>false</laneChange>
         <timeStep>1</timeStep>
-        <duration>5000</duration>
+        <duration>50000</duration>
         <debug>false</debug>
         <preventCollision>true</preventCollision>
         <logging>
@@ -29,8 +29,8 @@
         </logging>
         <output>
             <writeOutput>true</writeOutput>
-            <file>output/hellyModelTest.csv</file>
-            <type>csv</type>
+            <file>output/queueTest.csv</file>
+            <type>txt</type>
             <csvSeparator>;</csvSeparator>
             <whatToWrite>
                 <simulationDetails>true</simulationDetails>
