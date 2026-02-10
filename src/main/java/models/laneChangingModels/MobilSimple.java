@@ -10,7 +10,8 @@ import java.util.HashMap;
 
 /********************************************
  * MOBIL lane changing model class for deciding lane changes, simplified version. It the now lane, and doesn't consider
- * gain of the car behind in lane where the car is before changing lane.
+ * gain of the car behind in lane where the car is before changing lane. Annotated with @ModelId("mobil-simple") for
+ * identification during reflexive loading
  *
  * @author Michael Hladky
  * @version 1.0
@@ -51,6 +52,12 @@ public class MobilSimple implements ILaneChangingModel {
         return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
     }
 
+    /**
+     * gives the list of parameters that the MOBIL model needs to make a decision for a specific direction
+     *
+     * @param direction the direction for which the parameters are requested
+     * @return the list of parameters that the MOBIL model needs to make a decision for a specific direction
+     **/
     @Override
     public String requestParameters(Direction direction) {
         String[] requests;
@@ -121,29 +128,36 @@ public class MobilSimple implements ILaneChangingModel {
         return Direction.STRAIGHT;
     }
 
+    /**
+     * decides whether to change lane or not based on the MOBIL model for a specific direction, simplified version of
+     * mobil model
+     *
+     * @param parameters the parameters needed to make a decision in hashmap form, where key is the parameter name and
+     *                   value is the parameter value in double
+     * @param direction the direction for which the decision is made
+     * @return the direction to change lane or go straight
+     **/
     public Direction changeLaneIfDesired(HashMap<String, Double> parameters, Direction direction) {
         double edgeValueForLaneChange = parameters.get(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST);
         double politenessFactor = parameters.get(RequestConstants.POLITENESS_FACTOR_REQUEST);
         double nowAcceleration = parameters.get(RequestConstants.NOW_ACCELERATION_REQUEST);
         double theoreticalAcceleration = parameters.get(RequestConstants.THEORETICAL_ACCELERATION_REQUEST);
 
-        double decelerarion;
+        double deceleration;
         if (direction == Direction.LEFT) {
-            decelerarion = parameters.get(RequestConstants.DECELERATION_COMFORT_LEFT_BACKWARD_REQUEST);
+            deceleration = parameters.get(RequestConstants.DECELERATION_COMFORT_LEFT_BACKWARD_REQUEST);
         } else if (direction == Direction.RIGHT) {
-            decelerarion = parameters.get(RequestConstants.DECELERATION_COMFORT_RIGHT_BACKWARD_REQUEST);
+            deceleration = parameters.get(RequestConstants.DECELERATION_COMFORT_RIGHT_BACKWARD_REQUEST);
         } else {
             return Direction.STRAIGHT;
         }
-        double deacelarationForSaftey = Math.abs(theoreticalAcceleration);
-        if (decelerarion == Constants.NO_CAR_THERE) {
-            decelerarion = Double.MAX_VALUE;
+        double decelerationForSafety = Math.abs(theoreticalAcceleration);
+        if (deceleration == Constants.NO_CAR_THERE) {
+            deceleration = Double.MAX_VALUE;
         }
-        if (deacelarationForSaftey > decelerarion) { // safety check
+        if (decelerationForSafety > deceleration) { // safety check
             return Direction.STRAIGHT;
         }
-
-        //return direction;
 
         double nowAccelerationNeighborBackward = 0;
         double theoreticalAccelerationNeighborBackward = 0;

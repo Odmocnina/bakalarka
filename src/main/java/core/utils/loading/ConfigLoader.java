@@ -2,8 +2,6 @@ package core.utils.loading;
 
 import app.AppContext;
 import core.model.*;
-import core.model.cellular.CellularRoad;
-import core.model.continous.ContinuosRoad;
 import core.sim.Simulation;
 import core.utils.*;
 import core.utils.constants.ConfigConstants;
@@ -11,8 +9,6 @@ import core.utils.constants.Constants;
 import models.ICarFollowingModel;
 import models.ILaneChangingModel;
 import models.ModelId;
-import models.carFollowingModels.*;
-import models.laneChangingModels.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -24,7 +20,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import ui.render.CellularRoadRenderer;
@@ -43,7 +38,7 @@ public class ConfigLoader {
     private static File configFile;
 
     /**
-     * Method to set the configuration file path, if null or invalid, defaults to Constants.CONFIG_FILE
+     * method to set the configuration file path, if null or invalid, defaults to Constants.CONFIG_FILE
      *
      * @param filePath path to the configuration file
      * @return true if the file was set successfully, false otherwise
@@ -62,17 +57,11 @@ public class ConfigLoader {
             }
         }
 
-        try {
-            AppContext.CONFIG_XML = new ConfigXml(configFile);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
         return true;
     }
 
     /**
-     * Method to load what file is road file and how many roads to load from the configuration file
+     * method to load what file is road file and how many roads to load from the configuration file
      *
      * @return array of loaded roads, or null if loading failed
      **/
@@ -107,6 +96,12 @@ public class ConfigLoader {
         return null;
     }
 
+    /**
+     * function to get the road file name from the config file, this is used in the map editor when saving a new map,
+     * to save it to the same file as the one that was loaded
+     *
+     * @return the road file name from the config file, or null if loading failed
+     */
     private static String getMapFileName() {
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -138,144 +133,11 @@ public class ConfigLoader {
     }
 
     /**
-     * Method to load a single road from the specified file path
+     * function to load car following model from config file, uses reflection to find the class with the matching id
+     * annotation and instantiate it, also validates the model parameters
      *
-     * @param filePath path to the road configuration file
-     * @return loaded Road object, or null if loading failed
-     **/
-    public static Road loadRoad(String filePath) {
-        Road roadFormConfig;
-        // Logic to read the configuration file for road parameters
-        File xmlFile;
-        try {
-            xmlFile = new File(filePath);
-        } catch (NullPointerException e) {
-            MyLogger.logBeforeLoading("Road file not found, loading default config"
-                    , Constants.ERROR_FOR_LOGGING);
-            xmlFile = new File(Constants.CONFIG_FILE);
-            if (!xmlFile.exists()) {
-                MyLogger.logBeforeLoading("Default road file not found, exiting", Constants.FATAL_FOR_LOGGING);
-                return null;
-            }
-        }
-        try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(xmlFile);
-            doc.getDocumentElement().normalize();
-            Element road = (Element) doc.getElementsByTagName("road").item(0);
-            int numberOfLanes = Integer.parseInt(road.getElementsByTagName("lanes").item(0).getTextContent());
-            if (numberOfLanes <= 0) {
-                MyLogger.logBeforeLoading("Number of lanes must be greater than 0, exiting"
-                        , Constants.FATAL_FOR_LOGGING);
-                return null;
-            }
-
-            int getMaxSpeed = Integer.parseInt(road.getElementsByTagName("maxSpeed").item(0).getTextContent());
-            if (getMaxSpeed <= 0) {
-                MyLogger.logBeforeLoading("Max speed must be greater than 0, exiting"
-                        , Constants.FATAL_FOR_LOGGING);
-                return null;
-            }
-            int roadLength = Integer.parseInt(road.getElementsByTagName("roadLength").item(0).getTextContent());
-            if (roadLength <= 0) {
-                MyLogger.logBeforeLoading("Road length must be greater than 0, exiting"
-                        , Constants.FATAL_FOR_LOGGING);
-                return null;
-            }
-            String type = AppContext.CAR_FOLLOWING_MODEL.getType();
-            MyLogger.logBeforeLoading("Loading road from config: lanes=" + numberOfLanes + ", maxSpeed="
-                    + getMaxSpeed + ", roadLength=" + roadLength + ", type=" + type, Constants.INFO_FOR_LOGGING);
-
-
-            if (type.equals(Constants.CELLULAR)) {
-                double cellSize = AppContext.CAR_FOLLOWING_MODEL.getCellSize();
-                roadFormConfig = new CellularRoad(roadLength, numberOfLanes, getMaxSpeed, cellSize);
-            } else if (type.equals(Constants.CONTINOUS)) {
-                roadFormConfig = new ContinuosRoad(roadLength, numberOfLanes, getMaxSpeed);
-            } else {
-                MyLogger.logBeforeLoading("Unknown road type in config file: " + type + ", exiting"
-                        , Constants.FATAL_FOR_LOGGING);
-                return null;
-            }
-
-            return roadFormConfig;
-        } catch (Exception e) {
-            MyLogger.logBeforeLoading("Error loading road file: " + e.getMessage()
-                    , Constants.FATAL_FOR_LOGGING);
-        }
-
-        return null;
-    }
-
-    /**
-     * Method to load the car-following model from the configuration file
-     *
-     * @return loaded ICarFollowingModel object, or null if loading failed
-     **/
-    public static ICarFollowingModel loadCarFollowingModelOld() {
-        ICarFollowingModel modelFromConfig;
-        // Logic to load and return the appropriate car-following model based on modelId
-        try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(configFile);
-            doc.getDocumentElement().normalize();
-            Element models = (Element) doc.getElementsByTagName(ConfigConstants.MODELS_TAG).item(0);
-            Element model = (Element) models.getElementsByTagName(ConfigConstants.CAR_FOLLOWING_MODEL_TAG).item(0);
-            String id = model.getElementsByTagName(ConfigConstants.ID_TAG).item(0).getTextContent();
-            id = id.toLowerCase().trim();
-
-            //TODO add reflexion for dynamic loading of models
-            if (id.equals("nagelschreckenberg")) {
-                modelFromConfig = new NagelSchreckenberg();
-            } else if (id.equals("idm")) {
-                modelFromConfig = new IDM();
-            } else if (id.equals("rule184")) {
-                modelFromConfig = new Rule184();
-            } else if (id.equals("ovm-original")) {
-                modelFromConfig = new OVM_Original();
-            } else if (id.equals("ovm-different")) {
-                modelFromConfig = new OVM_Different();
-            } else if (id.equals("fvdm")) {
-                modelFromConfig = new FVDM();
-            } else if (id.equals("helly")) {
-                modelFromConfig = new Helly();
-            } else if (id.equals("head-leading")) {
-                modelFromConfig = new HeadLeading();
-            } else if (id.equals("gipps")) {
-                modelFromConfig = new Gipps();
-            } else if (id.equals("kkw-linear")) {
-                modelFromConfig = new KKW_Linear();
-            } else if (id.equals("kkw-quadratic")) {
-                modelFromConfig = new KKW_Quadratic();
-            } else if (id.equals("test-model")) {
-                modelFromConfig = new TestModel();
-            } else {
-                MyLogger.logBeforeLoading("Unknown car-following model id in config file: " + id + ", exiting"
-                        , Constants.FATAL_FOR_LOGGING);
-                return null;
-            }
-
-
-            if (modelFromConfig.getType().equals(Constants.CELLULAR)) {
-                double cellSize = modelFromConfig.getCellSize();
-                if (cellSize <= 0) {
-                    MyLogger.logBeforeLoading("Cell size must be greater than 0, exiting"
-                            , Constants.FATAL_FOR_LOGGING);
-                    return null;
-                }
-            }
-
-            return modelFromConfig;
-        } catch (Exception e) {
-            MyLogger.logBeforeLoading("Error loading config file: " + e.getMessage()
-                    , Constants.FATAL_FOR_LOGGING);
-        }
-
-        return null;
-    }
-
+     * @return loaded car following model, or null if loading failed
+     */
     public static ICarFollowingModel loadCarFollowingModel() {
         try {
             // get id from config file
@@ -335,6 +197,12 @@ public class ConfigLoader {
         return null;
     }
 
+    /**
+     * function to load lane changing model from config file, similar to loading car following model but with different
+     * package and annotation
+     *
+     * @return loaded lane changing model, or null if loading failed
+     */
     public static ILaneChangingModel loadLaneChangingModel() {
         try {
             // get id of lane changing model from config file
@@ -385,50 +253,14 @@ public class ConfigLoader {
     }
 
     /**
-     * Method to load the lane-changing model from the configuration file
+     * function to get all classes in a package, used for reflection to find the model class with the matching id
+     * annotation
      *
-     * @return loaded ILaneChangingModel object, or null if loading failed
-     **/
-    public static ILaneChangingModel loadLaneChangingModelOld() {
-        ILaneChangingModel modelFromConfig;
-        try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(configFile);
-            doc.getDocumentElement().normalize();
-            Element models = (Element) doc.getElementsByTagName(ConfigConstants.MODELS_TAG).item(0);
-            Element model = (Element) models.getElementsByTagName(ConfigConstants.LANE_CHANGING_MODEL_TAG).item(0);
-            String id = model.getElementsByTagName(ConfigConstants.ID_TAG).item(0).getTextContent();
-            id = id.toLowerCase().trim();
-
-            //TODO add reflexion for dynamic loading of models
-            if (id.equals("rickert-transsims")) {
-                modelFromConfig = new RickertTranssims();
-            } else if (id.equals("rickert")) {
-                modelFromConfig = new Rickert();
-            } else if (id.equals("f-stca")) {
-                modelFromConfig = new F_STCA();
-            } else if (id.equals("stca")) {
-                modelFromConfig = new STCA();
-            } else if (id.equals("mobil")) {
-                modelFromConfig = new Mobil();
-            } else if (id.equals("mobil-simple")) {
-                modelFromConfig = new MobilSimple();
-            } else {
-                MyLogger.logBeforeLoading("Unknown lane changing model id in config file: " + id + ", exiting"
-                        , Constants.FATAL_FOR_LOGGING);
-                return null;
-            }
-
-            return modelFromConfig;
-        } catch (Exception e) {
-            MyLogger.logBeforeLoading("Error loading config file: " + e.getMessage()
-                    , Constants.FATAL_FOR_LOGGING);
-        }
-
-        return null;
-    }
-
+     * @param packageName the name of the package to get classes from
+     * @return list of classes in the package
+     * @throws ClassNotFoundException if a class in the package cannot be found
+     * @throws IOException if there is an error reading from the package resources
+     */
     private static List<Class<?>> getClasses(String packageName) throws ClassNotFoundException, IOException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         assert classLoader != null;
@@ -448,6 +280,14 @@ public class ConfigLoader {
         return classes;
     }
 
+    /**
+     * Recursive method used by getClasses to find all classes in a given directory and subdirectories
+     *
+     * @param directory the directory to search for classes
+     * @param packageName the package name corresponding to the directory
+     * @return list of classes found in the directory and subdirectories
+     * @throws ClassNotFoundException if a class cannot be found while loading
+     */
     private static List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException {
         List<Class<?>> classes = new ArrayList<>();
         if (!directory.exists()) {
@@ -465,92 +305,6 @@ public class ConfigLoader {
             }
         }
         return classes;
-    }
-
-    /**
-     * Method to load the car generator from the configuration file
-     *
-     * @return loaded CarGenerator object, or null if loading failed
-     **/
-    public static CarGenerator loadCarGenerator() {
-        CarGenerator loadedGenerator;
-        try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(configFile);
-            doc.getDocumentElement().normalize();
-
-            Element generator = (Element) doc.getElementsByTagName(ConfigConstants.GENERATOR_TAG).item(0);
-            Element flowRate = (Element) generator.getElementsByTagName(ConfigConstants.FLOW_RATE_TAG).item(0);
-
-            Element carParams = (Element) generator.getElementsByTagName(ConfigConstants.CAR_PARAMS_TAG).item(0);
-            Element queue = (Element) generator.getElementsByTagName(ConfigConstants.QUEUE_TAG).item(0);
-
-
-            if (flowRate == null) {
-                MyLogger.logBeforeLoading("Missing generator parameters in config file, exiting"
-                        , Constants.FATAL_FOR_LOGGING);
-                return null;
-            }
-
-            double flow = Double.parseDouble(flowRate.getTextContent());
-            if (flow < 0) {
-                MyLogger.logBeforeLoading("Invalid flow rate in config file, exiting"
-                        , Constants.FATAL_FOR_LOGGING);
-                return null;
-            }
-
-            loadedGenerator = new CarGenerator(flow);
-
-            if (queue != null) {
-                Element useQueue = (Element) queue.getElementsByTagName(ConfigConstants.USE_TAG).item(0);
-
-                if (useQueue != null && Boolean.parseBoolean(useQueue.getTextContent())) {
-                    try {
-                        int min = Integer.parseInt(queue.getElementsByTagName(ConfigConstants.MIN_VALUE_TAG).item(0).getTextContent());
-                        int max = Integer.parseInt(queue.getElementsByTagName(ConfigConstants.MAX_VALUE_TAG).item(0).getTextContent());
-
-                        if (min < 0 || max < 0 || min > max) {
-                            MyLogger.logBeforeLoading("Invalid queue parameters in config file, it will be" +
-                                            " ignored.", Constants.ERROR_FOR_LOGGING);
-                        } else {
-                            loadedGenerator.addComParameter(Constants.GENERATOR_QUEUE, "Test", (double) min, (double) max);
-                        }
-                    } catch (Exception e) {
-                        MyLogger.logBeforeLoading("Error parsing queue parameters in config file, it will be" +
-                                        " ignored.", Constants.ERROR_FOR_LOGGING);
-                    }
-
-                }
-
-            }
-
-            if (carParams != null) {
-                NodeList children = carParams.getChildNodes();
-                for (int i = 0; i < children.getLength(); i++) {
-                    Node param = children.item(i);
-                    String paramName = param.getNodeName();
-
-                    if (param.getNodeType() == Node.ELEMENT_NODE) {
-                        Element paramElement = (Element) param;
-                        double minValue = Double.parseDouble(paramElement.getElementsByTagName(ConfigConstants.MIN_VALUE_TAG).
-                                item(0).getTextContent());
-                        double maxValue = Double.parseDouble(paramElement.getElementsByTagName(ConfigConstants.MAX_VALUE_TAG).
-                                item(0).getTextContent());
-                        loadedGenerator.addComParameter(paramName, "Test", minValue, maxValue);
-                    }
-                }
-            }
-
-            loadedGenerator.copyComParametersToRealParameters(AppContext.CAR_FOLLOWING_MODEL.getType(), AppContext.CAR_FOLLOWING_MODEL.getCellSize());
-
-            return loadedGenerator;
-        } catch (Exception e) {
-            MyLogger.logBeforeLoading("Error loading config file: " + e.getMessage()
-                    , Constants.FATAL_FOR_LOGGING);
-        }
-
-        return null;
     }
 
     /**
@@ -746,6 +500,18 @@ public class ConfigLoader {
         }
     }
 
+    /**
+     * method to load output settings from the configuration file into RunDetails, similar to loadLoggingFromConfig,
+     * checks if output writing is enabled, if output file is specified, if output type is specified, and what to write
+     * in the output, if writing is disabled or output file is not specified, defaults to no output, if output type is
+     * not specified, defaults to txt, if what to write is not specified, defaults to writing simulation time, cars
+     * passed, and cars on road
+     *
+     * @param detailsFromConfig RunDetails object to populate with output settings
+     * @param outputElements XML Element containing output settings
+     * @return true if output writing is enabled and settings were loaded successfully, false if output writing is
+     *          disabled or loading failed
+     */
     private static boolean loadOutput(RunDetails detailsFromConfig, Element outputElements) {
         if (outputElements == null) {
             MyLogger.logBeforeLoading("Missing output details in run details, defaulting to no output"
@@ -798,6 +564,13 @@ public class ConfigLoader {
 
     }
 
+    /**
+     * method to load all configuration from the config file, including car following model, lane changing model, roads,
+     *
+     * @param args command line arguments, if args[0] is present, it is used as the config file path, otherwise default
+     *             config file is used
+     * @return true if all configuration was loaded successfully, false if any part of the configuration failed to load
+     */
     public static boolean loadAllConfig(String[] args) {
         String configFile;
         if (args.length == 0) { // use default config file if none provided
@@ -842,31 +615,6 @@ public class ConfigLoader {
         }
         AppContext.LANE_CHANGING_MODEL = laneChangingModel; // store model in app context for later use
 
-        // load car generator, thing that decides when cars are generated and what params do they have
-        /*CarGenerator carGenerator = ConfigLoader.loadCarGenerator();
-        if (carGenerator == null) {
-            MyLogger.logBeforeLoading("Failed to load car generator, exiting.", Constants.FATAL_FOR_LOGGING);
-            return false;
-        } else {
-            MyLogger.logBeforeLoading("Loaded car generator: " + carGenerator, Constants.INFO_FOR_LOGGING);
-        }
-
-        String requestedParams = StringEditor.mergeRequestParameters(carFollowingModel.getParametersForGeneration(),
-                laneChangingModel.getParametersForGeneration());
-        carGenerator.setCarGenerationParameters(requestedParams);
-
-        // check if car generator has all parameters needed for the selected car following model, for example person
-        // loads car following model which need max speed, the model needs those parameters to work
-        // so generator gives needs to generate cars with max speed parameter, otherwise model won't work properly, lol
-        if (carGenerator.checkIfAllParametersAreLoaded()) {
-            MyLogger.logBeforeLoading("Car generator parameters are valid for the selected car following model.",
-                    Constants.INFO_FOR_LOGGING);
-        } else { // missing some parameters, exit
-            MyLogger.logBeforeLoading("Car generator parameters are NOT valid for the selected " +
-                    "car-following model/lane-changing model, exiting.", Constants.FATAL_FOR_LOGGING);
-            return false;
-        }*/
-
         // load roads from config
         Road[] roads = ConfigLoader.loadRoads();
         if (roads == null) {
@@ -890,26 +638,11 @@ public class ConfigLoader {
                     Constants.INFO_FOR_LOGGING);
         }
 
-        // set type of road for generator and store roads in road instance
-        /*carGenerator.setType(roads[0]);
-        for (Road road : roads) {
-            road.setCarGenerators(carGenerator.clone());
-
-            if (carGenerator.generatingToQueue()) {
-                MyLogger.logBeforeLoading("Car generator is generating cars to queue."
-                        , Constants.INFO_FOR_LOGGING);
-                road.initializeCarQueues();
-            } else {
-                MyLogger.logBeforeLoading("Car generator is generating cars directly on road."
-                        , Constants.INFO_FOR_LOGGING);
-            }
-        }*/
-
         IRoadRenderer renderer; // renderer for drawing roads in gui, depends on road type, because different road types
         // have different content
         if (roads[0].getType().equals(Constants.CELLULAR)) {
             renderer = new CellularRoadRenderer();
-        } else if (roads[0].getType().equals(Constants.CONTINOUS)) {
+        } else if (roads[0].getType().equals(Constants.CONTINUOUS)) {
             renderer = new ContinuousRoadRenderer();
         } else {
             MyLogger.logBeforeLoading("Unknown road type: " + roads[0].getType(), Constants.FATAL_FOR_LOGGING);

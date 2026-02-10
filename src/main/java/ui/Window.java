@@ -7,14 +7,14 @@ import core.model.cellular.Cell;
 import core.model.cellular.CellularRoad;
 import core.utils.*;
 import core.utils.constants.Constants;
+import ui.render.IRoadRenderer;
+import core.sim.Simulation;
+
 import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import ui.render.IRoadRenderer;
-import core.sim.Simulation;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -215,6 +215,16 @@ public class Window extends Application {
         paintAll.run();
     }
 
+    /**
+     * helper method to get index of clicked road-based on y coordinate of click, roads and drawing parameters, used for
+     * modification of roads by clicking on them in the GUI
+     *
+     * @param absoluteY y coordinate of click with scroll offset
+     * @param roads array of roads to check against
+     * @param GAP space between roads when drawing
+     * @param LANE_HEIGHT height of one lane when drawing
+     * @return index of clicked road, or -1 if click was outside any road
+     **/
     private int getClickedRoadIndex(double absoluteY, Road[] roads, final double GAP, final double LANE_HEIGHT) {
         double currentY = GAP; // first road starts after initial gap
 
@@ -466,6 +476,12 @@ public class Window extends Application {
         button.setGraphic(imageView);
     }
 
+    /**
+     * helper method to set menu item image
+     *
+     * @param resourcePath path to icon in resources (e.g. "/icons/run.png")
+     * @param menuItem menu item to set image on
+     */
     private void setButtonImage(String resourcePath, MenuItem menuItem) {
         ImageView imageView = createMenuIcon(resourcePath);
         if (imageView == null) {
@@ -716,6 +732,13 @@ public class Window extends Application {
         return fileMenu;
     }
 
+    /**
+     * creates simulation menu with items for controlling the simulation
+     *
+     * @param primaryStage primary stage for file choosers
+     * @param paintAll runnable to repaint all roads
+     * @return Menu with items for controlling the simulation
+     **/
     private Menu createSimulationMenu(Stage primaryStage, Runnable paintAll) {
         Menu simulationMenu = new Menu("Simulation");
         MenuItem startStopItem = new MenuItem("Start/Stop simulation", createMenuIcon("/icons/run.png"));
@@ -755,6 +778,12 @@ public class Window extends Application {
         return simulationMenu;
     }
 
+    /**
+     * creates output menu with items for exporting results and setting output options
+     *
+     * @param primaryStage primary stage for file choosers
+     * @return Menu with items for exporting results and setting output options
+     **/
     private Menu createOutputMenu(Stage primaryStage) {
         Menu outputMenu = new Menu("Output");
         MenuItem exportResultsItem = new MenuItem("Export results to TXT",
@@ -789,6 +818,11 @@ public class Window extends Application {
         return outputMenu;
     }
 
+    /**
+     * creates logging menu with items for toggling logging options
+     *
+     * @return Menu with items for toggling logging options
+     **/
     private Menu createLoggingMenu() {
         Menu loggingMenu = new Menu("Logging");
         CheckMenuItem toggleAllLogItem = new CheckMenuItem("Toggle all logging");

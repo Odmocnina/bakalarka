@@ -12,7 +12,7 @@
     </models>
 
     <runDetails>
-        <showGui>false</showGui>
+        <showGui>true</showGui>
         <drawCells>false</drawCells>
         <laneChange>false</laneChange>
         <timeStep>1</timeStep>

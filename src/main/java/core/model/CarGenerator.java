@@ -25,7 +25,11 @@ public class CarGenerator implements Cloneable {
      be generated **/
     private HashMap<String, Parameter> parameters = new HashMap<>();
 
-    private HashMap<String, Parameter> parametersForComunication = new HashMap<>();
+    /** parameters for communication with ui, user, map file... these parameters are not used for generation, but they
+     * are used for communication with ui, user, map file... they are copied to real parameters (and translated if
+     * cellular models are used) used for generation when necessary, is here so that the translation is not happening
+     * multiple times **/
+    private HashMap<String, Parameter> parametersForCommunication = new HashMap<>();
 
     /** parameters requested by car following model, needed for generation **/
     private String[] carGenerationParameters;
@@ -51,8 +55,13 @@ public class CarGenerator implements Cloneable {
     /** available car colors **/
     private final Color[] COLORS = Constants.CAR_COLORS;
 
+    /** whether to generate cars into queue or one by one **/
     private boolean useQueue = false;
+
+    /** minimum queue size for queue generation **/
     private int minQueueSize = 0;
+
+    /** maximum queue size for queue generation **/
     private int maxQueueSize = 0;
 
     /**
@@ -131,7 +140,7 @@ public class CarGenerator implements Cloneable {
 
         if (this.type.equals(Constants.CELLULAR)) {
             car = generateCarCellular();
-        } else if (this.type.equals(Constants.CONTINOUS)) {
+        } else if (this.type.equals(Constants.CONTINUOUS)) {
             car = generateCarContinuous();
         } else {
             MyLogger.logBeforeLoading("Unknown car generator type: " + this.type, Constants.WARN_FOR_LOGGING);
@@ -223,7 +232,7 @@ public class CarGenerator implements Cloneable {
     }
 
     /**
-     * function to add parameter range to generator settings
+     * function to add parameter to real parameters used for generation
      *
      * @param key parameter key
      * @param minValue minimum value
@@ -266,6 +275,11 @@ public class CarGenerator implements Cloneable {
         }
     }
 
+    /**
+     * function to set road type for generator, used to translate parameters if necessary
+     *
+     * @param type type of road the generator is assigned to
+     **/
     public void setType(String type) {
         this.type = type;
     }
@@ -358,6 +372,12 @@ public class CarGenerator implements Cloneable {
         return true;
     }
 
+    /**
+     * function to get missing parameters that are required for generation, used for logging purposes to inform user
+     * about missing parameters in generator settings
+     *
+     * @return String of missing parameters separated by Constants.REQUEST_SEPARATOR
+     **/
     public String getMissingParameters() {
         String[] requiredParams = this.carGenerationParameters;
         StringBuilder missingParameters = new StringBuilder();
@@ -369,7 +389,7 @@ public class CarGenerator implements Cloneable {
         }
 
         for (String param : requiredParams) {
-            Parameter p = parametersForComunication.get(param);
+            Parameter p = parametersForCommunication.get(param);
 
             if (p == null) {
                 MyLogger.logBeforeLoading("CarGenerator: Parameter " + param + " not set in car generator."
@@ -386,7 +406,8 @@ public class CarGenerator implements Cloneable {
         return missingParameters.toString();
     }
 
-    /** function to remove parameter from generator settings
+    /**
+     * function to remove parameter from generator settings (real parameters used for generation)
      *
      * @param key parameter key
      **/
@@ -442,8 +463,6 @@ public class CarGenerator implements Cloneable {
      * @return boolean whether generator generates cars into queue
      **/
     public boolean generatingToQueue() {
-        /*Parameter p = parameters.get(Constants.GENERATOR_QUEUE);
-        return p != null;*/
         return this.useQueue;
     }
 
@@ -486,9 +505,9 @@ public class CarGenerator implements Cloneable {
             Parameter param = this.parameters.get(key);
             copy.parameters.put(key, new Parameter(param.name, param.minValue, param.maxValue));
         }
-        for (String key : this.parametersForComunication.keySet()) {
-            Parameter param = this.parametersForComunication.get(key);
-            copy.parametersForComunication.put(key, new Parameter(param.name, param.minValue, param.maxValue));
+        for (String key : this.parametersForCommunication.keySet()) {
+            Parameter param = this.parametersForCommunication.get(key);
+            copy.parametersForCommunication.put(key, new Parameter(param.name, param.minValue, param.maxValue));
         }
         return copy;
     }
@@ -529,13 +548,6 @@ public class CarGenerator implements Cloneable {
     }
 
     /**
-     * function to initialize car queue generation (for generators generating into queue)
-     */
-    public void initCarQueue() {
-        Queue<CarParams> carQueue = this.generateCarsInToQueue();
-    }
-
-    /**
      * function to check if generator is legitimate (all parameters valid)
      *
      * @return boolean whether generator is legitimate
@@ -552,8 +564,8 @@ public class CarGenerator implements Cloneable {
     }
 
     public void copyComParametersToRealParameters(String type, double cellSize) {
-        for (String key : parametersForComunication.keySet()) {
-            Parameter param = parametersForComunication.get(key);
+        for (String key : parametersForCommunication.keySet()) {
+            Parameter param = parametersForCommunication.get(key);
             parameters.put(key, new Parameter(param.name, param.minValue, param.maxValue));
         }
 
@@ -564,31 +576,62 @@ public class CarGenerator implements Cloneable {
 
     public void addComParameter(String key, String name, Double minValue, Double maxValue) {
         Parameter param = new Parameter(name, minValue, maxValue);
-        parametersForComunication.put(key, param);
+        parametersForCommunication.put(key, param);
     }
 
+    /**
+     *  function to remove parameter from communication parameters (parameters used for communication with ui, user,
+     *  map file...)
+     *
+     * @param key parameter key
+     **/
     public void removeComParameter(String key) {
-        this.parametersForComunication.remove(key);
+        this.parametersForCommunication.remove(key);
     }
 
+    /**
+     * function to get all communication parameters (parameters used for communication with ui, user, map file...)
+     *
+     * @return HashMap<String, Parameter> all communication parameters
+     **/
     public HashMap<String, Parameter> getAllComParameters() {
-        return this.parametersForComunication;
+        return this.parametersForCommunication;
     }
 
+    /**
+     * function to set queue generation settings for generator if generation in queue is desired, if not, generation
+     * will be one by one
+     *
+     * @param minSize minimum queue size
+     * @param maxSize maximum queue size
+     **/
     public void setQueueSize(int minSize, int maxSize) {
         this.useQueue = true;
         this.minQueueSize = minSize;
         this.maxQueueSize = maxSize;
     }
 
+    /**
+     * function to disable queue generation and set generation to one by one
+     **/
     public void disableQueue() {
         this.useQueue = false;
     }
 
+    /**
+     * getter for minimum queue size for queue generation
+     *
+     * @return int minimum queue size
+     **/
     public int getMinQueueSize() {
         return this.minQueueSize;
     }
 
+    /**
+     * getter for maximum queue size for queue generation
+     *
+     * @return int maximum queue size
+     **/
     public int getMaxQueueSize() {
         return this.maxQueueSize;
     }

@@ -6,7 +6,8 @@ import models.ICarFollowingModel;
 import models.ModelId;
 
 /********************************************
- * Optimal Velocity Model (OVM) car following model implementation (continuous)
+ * Optimal Velocity Model (OVM) car following model implementation (continuous), annotated with @ModelId("ovm-original")
+ * for identification during reflexive loading
  *
  * @author Michael Hladky
  * @version 1.0
@@ -111,7 +112,7 @@ public class OVM_Original implements ICarFollowingModel {
      **/
     @Override
     public String getType() {
-        return Constants.CONTINOUS;
+        return Constants.CONTINUOUS;
     }
 
     /**

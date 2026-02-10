@@ -59,7 +59,7 @@ class IDMTest {
     void getType_shouldReturnContinuousTypeConstant() {
         IDM idm = createIDM();
 
-        assertEquals(Constants.CONTINOUS, idm.getType(),
+        assertEquals(Constants.CONTINUOUS, idm.getType(),
                 "Model type should match Constants.CONTINOUS.");
     }
 

@@ -9,18 +9,31 @@ import core.model.continous.ContinuosRoad;
 import core.utils.MyLogger;
 import core.utils.StringEditor;
 import core.utils.constants.Constants;
-import core.utils.constants.RequestConstants;
 import core.utils.constants.RoadLoadingConstants;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 
+/******************************************************
+ * Class for loading roads from XML files, it reads the map file and creates Road objects based on the parameters
+ * specified in the file
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ******************************************************/
 public class RoadLoader {
 
+    /**
+     * method to load the map from the specified file path, it calls loadMapStart to read the file and create Road
+     * objects, then sets the loaded roads in the simulation context
+     *
+     * @param filePath path to the map configuration XML file
+     * @return true if the map was loaded successfully, false otherwise
+     **/
     public static boolean loadMap(String filePath) {
         Road[] map = loadMapStart(filePath);
 
@@ -33,6 +46,13 @@ public class RoadLoader {
         return true;
     }
 
+    /**
+     * method to load the map from the specified file path, it reads the XML file and creates Road objects based on the
+     * parameters specified in the file
+     *
+     * @param filePath path to the map configuration XML file
+     * @return array of loaded Road objects, or null if loading failed
+     **/
     public static Road[] loadMapStart(String filePath) {
         // Logic to read the configuration file for multiple roads
         File xmlFile;
@@ -43,7 +63,7 @@ public class RoadLoader {
                     Constants.ERROR_FOR_LOGGING);
             return null;
         }
-        Road[] map = null;
+        Road[] map;
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -76,7 +96,7 @@ public class RoadLoader {
     }
 
     /**
-     * Method to load a single road from the specified file path
+     * method to load a single road from the specified file path
      *
      * @param roadElement XML Element containing road configuration
      * @return loaded Road object, or null if loading failed
@@ -85,7 +105,6 @@ public class RoadLoader {
         Element length = (Element) roadElement.getElementsByTagName(RoadLoadingConstants.ROAD_LENGTH_TAG).item(0);
         Element maxSpeed = (Element) roadElement.getElementsByTagName(RoadLoadingConstants.ROAD_MAX_SPEED_TAG).item(0);
         Element numberOfLanes = (Element) roadElement.getElementsByTagName(RoadLoadingConstants.NUMBER_OF_LANES_TAG).item(0);
-        Element lightPlan = (Element) roadElement.getElementsByTagName(RoadLoadingConstants.LIGHT_PLAN_TAG).item(0);
         // get lane elements in array
         NodeList laneNodes = roadElement.getElementsByTagName(RoadLoadingConstants.ROAD_LANE_TAG);
 
@@ -93,10 +112,10 @@ public class RoadLoader {
         double maxSpeedValue = Double.parseDouble(maxSpeed.getTextContent());
         int numberOfLanesValue = Integer.parseInt(numberOfLanes.getTextContent());
 
-        Road road = null;
+        Road road;
         if (AppContext.CAR_FOLLOWING_MODEL.getType().equals(Constants.CELLULAR)) {
             road = new CellularRoad(lengthValue, numberOfLanesValue, maxSpeedValue, AppContext.CAR_FOLLOWING_MODEL.getCellSize());
-        } else if (AppContext.CAR_FOLLOWING_MODEL.getType().equals(Constants.CONTINOUS)) {
+        } else if (AppContext.CAR_FOLLOWING_MODEL.getType().equals(Constants.CONTINUOUS)) {
             road = new ContinuosRoad(lengthValue, numberOfLanesValue, maxSpeedValue);
         } else {
             MyLogger.logBeforeLoading("Unknown car following model type: " + AppContext.CAR_FOLLOWING_MODEL.getType()
@@ -120,7 +139,6 @@ public class RoadLoader {
             Element generatorElement = (Element) laneElement.getElementsByTagName(RoadLoadingConstants.GENERATOR_TAG).item(0);
             CarGenerator generator = createGenerator(generatorElement);
             String type = AppContext.CAR_FOLLOWING_MODEL.getType();
-            double cellSize = AppContext.CAR_FOLLOWING_MODEL.getCellSize();
             //generator.setType(type, cellSize);
             generator.setType(type);
             String carGenerationParameters = StringEditor.mergeRequestParameters(AppContext.CAR_FOLLOWING_MODEL.getParametersForGeneration(),
@@ -145,6 +163,12 @@ public class RoadLoader {
         return road;
     }
 
+    /**
+     * method to create a CarGenerator object from the specified XML element
+     *
+     * @param generatorElement XML Element containing generator configuration
+     * @return created CarGenerator object
+     **/
     private static CarGenerator createGenerator(Element generatorElement) {
         double flowRate = Double.parseDouble(generatorElement.getElementsByTagName(RoadLoadingConstants.FLOW_RATE_TAG).
                 item(0).getTextContent());

@@ -10,7 +10,8 @@ import java.util.HashMap;
 import static core.model.Direction.*;
 
 /****************************************************
- * Rickert lane changing model (transsims version) class for deciding lane changes
+ * Rickert lane changing model (transsims version) class for deciding lane changes, annotated with @ModelId
+ * ("rickert/-transsims") for identification during reflexive loading
  *
  * @author Michael Hladky
  * @version 1.0
@@ -51,6 +52,15 @@ public class RickertTranssims implements ILaneChangingModel {
         return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
     }
 
+    /**
+     * function to request parameters needed for rickert model (transsims version) for a specific direction, if the
+     * direction is left, it requests parameters for left lane change, if the direction is right, it requests parameters
+     * for right lane change, if the direction is straight, it returns an empty string
+     *
+     * @param direction the direction for which the parameters are requested
+     * @return the list of parameters that the rickert model (transsims version) needs to make a decision for a specific
+     *         direction
+     **/
     public String requestParameters(Direction direction) {
         if (direction == LEFT) {
             String[] requests = {
@@ -167,6 +177,15 @@ public class RickertTranssims implements ILaneChangingModel {
         return STRAIGHT;
     }
 
+    /**
+     * decides whether to change lane or not based on the rickert model (transsims version) model for a specific
+     * direction
+     *
+     * @param parameters the parameters needed to make a decision in hashmap form, where key is the parameter name and
+     *                   value is the parameter value in double
+     * @param direction the direction for which the decision is made
+     * @return the direction to change lane or go straight
+     **/
     public Direction changeLaneIfDesired(HashMap<String, Double> parameters, Direction direction) {
         int distanceToNextCar = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST).intValue();
         int maxSpeed = parameters.get(RequestConstants.MAX_SPEED_REQUEST).intValue();

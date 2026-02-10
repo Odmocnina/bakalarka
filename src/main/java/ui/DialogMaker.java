@@ -24,7 +24,7 @@ import java.util.LinkedList;
 import java.util.Optional;
 
 /********************************************
- * class to create various dialogs for the UI
+ * class to create various dialogs for the UI, like new map, map editing and similar stuff
  *
  * @author Michael Hladky
  * @version 1.0
@@ -92,7 +92,7 @@ public class DialogMaker {
             } else {
                 MyLogger.log("Light plan is not legitimate after dialog update.", Constants.ERROR_FOR_LOGGING);
                 warningDialog(stage, "The light plan is not legitimate! Make sure that the switch time is less than the cycle time.");
-                return false; // Invalid logic, treating as cancelled for safety or you could keep loop
+                return false; // Invalid logic, treating as cancelled for safety, or you could keep loop
             }
         } else {
             MyLogger.log("Light plan dialog cancelled.", Constants.INFO_FOR_LOGGING);
@@ -183,9 +183,8 @@ public class DialogMaker {
                     Button deleteButton = new Button("Delete");
                     Button changeButton = new Button("Change");
 
-                    deleteButton.setOnAction(e -> {
-                        removeParameterFromGenerator(generator, param.name, paramKey, this, dialog);
-                    });
+                    deleteButton.setOnAction(e -> removeParameterFromGenerator(generator, param.name, paramKey,
+                            this, dialog));
 
                     changeButton.setOnAction(e -> {
                         changeParameterDialog(stage, generator, paramKey, param);
@@ -305,7 +304,15 @@ public class DialogMaker {
         });
     }
 
-
+    /**
+     * method to remove parameter from car generator with confirmation dialog
+     *
+     * @param generator car generator to remove parameter from
+     * @param name name of the parameter to remove (for logging and dialog purposes)
+     * @param paramKey key of the parameter to remove
+     * @param refreshGrid runnable to refresh the grid after removing the parameter
+     * @param dialog dialog to get owner for confirmation dialog and to resize after removing the parameter
+     **/
     private static void removeParameterFromGenerator(CarGenerator generator, String name, String paramKey,
                                                      Runnable refreshGrid, Dialog<ButtonType> dialog) {
         // pop up confirmation dialog
@@ -329,8 +336,15 @@ public class DialogMaker {
         });
     }
 
+    /**
+     * method to remove road from map with confirmation dialog
+     *
+     * @param roadParameters list of road parameters to remove road from
+     * @param index index of the road to remove
+     * @param stage owner stage for confirmation dialog
+     **/
     protected static void removeRoadFormMap(ArrayList<RoadParameters> roadParameters, int index,
-                                            Stage stage, Dialog<ButtonType> dialog) {
+                                            Stage stage) {
         //sanity check
         if (roadParameters.isEmpty()) {
             MyLogger.log("No roads available to delete.", Constants.ERROR_FOR_LOGGING);
@@ -364,6 +378,14 @@ public class DialogMaker {
         });
     }
 
+    /**
+     * show dialog to change parameter of car generator
+     *
+     * @param stage owner stage
+     * @param generator car generator to change parameter in
+     * @param oldKey old key of the parameter to change
+     * @param parameter parameter to change
+     **/
     private static void changeParameterDialog(Stage stage, CarGenerator generator, String oldKey, Parameter parameter) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Change parameter in car generator");
@@ -469,6 +491,12 @@ public class DialogMaker {
         });
     }
 
+    /**
+     * show dialog to add new parameter to car generator
+     *
+     * @param stage owner stage
+     * @param generator car generator to add parameter to
+     **/
     private static void newParameterDialog(Stage stage, CarGenerator generator) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Add new parameter to car generator");
@@ -711,7 +739,7 @@ public class DialogMaker {
                  }
              } else if (response == deleteButtonType) {
                  if (!changingAll) {
-                     removeRoadFormMap(roadParameters, index, stage, dialog);
+                     removeRoadFormMap(roadParameters, index, stage);
                      AppContext.RUN_DETAILS.mapChanged = true;
                  }
              } else {
@@ -771,6 +799,11 @@ public class DialogMaker {
         });
     }
 
+    /**
+     * show save as dialog to save map (save map into a now file)
+     *
+     * @param stage owner stage
+     **/
     public static void saveAsDialog(Stage stage) {
         FileChooser fileChooser = new FileChooser(); // the thing that has save as in stuff like ps pad and word
         fileChooser.setTitle("Save map as..."); // title of the dialog
@@ -799,13 +832,24 @@ public class DialogMaker {
 
             MyLogger.log("User saved map as: " + filePath, Constants.INFO_FOR_LOGGING);
 
-            RoadXml.saveAs(filePath);
+            if (RoadXml.saveAs(filePath)) {
+                MyLogger.log("Map successfully saved to: " + filePath, Constants.INFO_FOR_LOGGING);
+            }
         } else {
             // user cancelled the dialog
             MyLogger.log("Save as canceled by user.", Constants.INFO_FOR_LOGGING);
         }
     }
 
+    /**
+     * update number of lanes in light plans and generators lists when number of lanes changes, helper method for
+     * modification of road, stuff like number of generators and light plans needs to be updated
+     *
+     * @param lightPlans list of light plans to update
+     * @param generators list of car generators to update
+     * @param newNumberOfLanes new number of lanes
+     * @param lanesSpinner spinner for lane index to update its max value
+     **/
     protected static void updateNumberOfLanes(LinkedList<LightPlan> lightPlans, LinkedList<CarGenerator> generators,
                                             int newNumberOfLanes, Spinner<Integer> lanesSpinner) {
         if (newNumberOfLanes > lightPlans.size()) {
@@ -869,6 +913,15 @@ public class DialogMaker {
         roadParameters.set(index, rp);
     }
 
+    /**
+     * check if road inputs are valid (non-negative numbers, valid light plans and generators and similar stuff)
+     *
+     * @param numberOfLanes number of lanes
+     * @param maxSpeed max speed
+     * @param length length of road
+     * @param lightPlan light plan for the road
+     * @return true if inputs are valid, false otherwise
+     **/
     protected static boolean checkRoadInputs(Integer numberOfLanes, String maxSpeed, String length, LinkedList<CarGenerator> generator,
                                              LinkedList<LightPlan> lightPlan) {
         if (numberOfLanes <= 0) {
@@ -908,6 +961,14 @@ public class DialogMaker {
         return true;
     }
 
+    /**
+     * confirmation dialog for unsaved changes when closing the application, gives option to save changes, discard
+     * changes or cancel closing
+     *
+     * @param stage owner stage for the dialog
+     * @return true if user wants to close the application (either by saving or discarding changes), false if user
+     *         cancels closing
+     **/
     public static boolean onCloseUnsavedChangesDialog(Stage stage) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Unsaved Changes");
@@ -936,6 +997,12 @@ public class DialogMaker {
         return false;
     }
 
+    /**
+     * confirmation dialog if no unsaved changes
+     *
+     * @param stage owner stage for the dialog
+     * @return true if user confirms exiting, false if user cancels
+     **/
     public static boolean showExitConfirmation(Stage stage) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Exit Application");
@@ -948,6 +1015,12 @@ public class DialogMaker {
         return result.isPresent() && result.get() == ButtonType.OK;
     }
 
+    /**
+     * dialog for changing time between steps
+     *
+     * @param stage owner stage for the dialog
+     * @param engine core engine to set the new time between steps in case of valid input
+     **/
     public static void changeTimeBetweenSteps(Stage stage, CoreEngine engine) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Change time between simulation steps");
@@ -992,6 +1065,10 @@ public class DialogMaker {
         });
     }
 
+    /**
+     * dialog for selecting output file for simulation results, sets the selected file in results recorder and run
+     * details
+     **/
     public static void setOutFileDialog() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select output file for simulation results");
@@ -1024,6 +1101,11 @@ public class DialogMaker {
         }
     }
 
+    /**
+     * dialog for setting csv separator for output files, sets the separator in run details
+     *
+     * @param primaryStage owner stage for the dialog
+     **/
     public static void setCsvSeparatorDialog(Stage primaryStage) {
         TextInputDialog dialog = new TextInputDialog(AppContext.RUN_DETAILS.outputDetails.csvSeparator);
         dialog.setTitle("Set CSV Separator");

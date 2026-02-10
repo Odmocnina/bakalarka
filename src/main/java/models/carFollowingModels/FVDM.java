@@ -7,7 +7,9 @@ import models.ModelId;
 import java.util.HashMap;
 
 /********************************************
- * Optimal Velocity Model (OVM) car following model implementation (continuous)
+ * Optimal Velocity Model (OVM) car following model implementation (continuous), it extends OVM_Different and adds the
+ * speed difference term to the calculation of new speed, it has its own parameters for generation and its own requested
+ * parameters for calculating new speed, annotated with @ModelId("fvdm") for identification during reflexive loading
  *
  * @author Michael Hladky
  * @version 1.0

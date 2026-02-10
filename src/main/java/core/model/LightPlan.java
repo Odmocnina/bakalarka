@@ -113,14 +113,28 @@ public class LightPlan {
         this.timeOfSwitch = timeOfSwitch;
     }
 
+    /**
+     * method to clone the light plan
+     *
+     * @return cloned LightPlan object
+     */
     public LightPlan clone() {
         return new LightPlan(cycleTime, timeOfSwitch, beginsOnGreen);
     }
 
+    /**
+     * toString method for LightPlan
+     *
+     * @return string representation of LightPlan
+     */
+    @Override
     public String toString() {
         return "LightPlan(cycleTime=" + cycleTime + ", timeOfSwitch=" + timeOfSwitch + ", beginsOnGreen=" + beginsOnGreen + ")";
     }
 
+    /**
+     * method to reset the light plan to its initial state
+     **/
     public void reset() {
         this.isGreen = beginsOnGreen;
     }

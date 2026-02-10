@@ -1,6 +1,5 @@
 package models.laneChangingModels;
 
-import app.AppContext;
 import core.model.Direction;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
@@ -11,7 +10,8 @@ import java.util.HashMap;
 import static core.model.Direction.*;
 
 /****************************************************
- * Rickert lane changing model class for deciding lane changes
+ * Rickert lane changing model class for deciding lane changes, annotated with @ModelId("rickert") for identification
+ * during reflexive loading
  *
  * @author Michael Hladky
  * @version 1.0
@@ -19,6 +19,7 @@ import static core.model.Direction.*;
 @ModelId("rickert")
 public class Rickert implements ILaneChangingModel {
 
+    /** chance to change lane if the model decides to change lane, used to add some randomness to the model **/
     private double chance = 0.9;
 
     /**
@@ -30,7 +31,7 @@ public class Rickert implements ILaneChangingModel {
         return "rickert";
     }
 
-    /*
+    /**
      * gives the list of parameters that the rickert model needs to make a decision
      *
      * @return the list of parameters that the rickert model needs to make a decision
@@ -54,6 +55,13 @@ public class Rickert implements ILaneChangingModel {
         return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
     }
 
+    /**
+     * gives the list of parameters that the rickert model needs to make a decision for a specific direction, used to
+     * reduce the number of parameters requested if the model is only used for one direction
+     *
+     * @param direction the direction for which the parameters are requested
+     * @return the list of parameters that the rickert model needs to make a decision for a specific direction
+     **/
     public String requestParameters(Direction direction) {
         if (direction == LEFT) {
             String[] requests = {
@@ -105,9 +113,6 @@ public class Rickert implements ILaneChangingModel {
      * @return the direction to change lane or go straight
      **/
     public Direction changeLaneIfDesired(HashMap<String, Double> parameters) {
-        if (AppContext.SIMULATION.getStepCount() > 2) {
-            int i = 0;
-        }
         int xPosition = parameters.get(RequestConstants.X_POSITION_REQUEST).intValue();
         int xPositionStraightForward = parameters.get(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST).intValue();
         int lengthStraightForward = parameters.get(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST).intValue();
@@ -174,6 +179,15 @@ public class Rickert implements ILaneChangingModel {
         return STRAIGHT;
     }
 
+    /**
+     * decides whether to change lane or not based on the rickert model for a specific direction, used to reduce the
+     * number of parameters requested if the model is only used for one direction
+     *
+     * @param parameters the parameters needed to make a decision in hashmap form, where key is the parameter name and
+     *                   value is the parameter value in double
+     * @param direction the direction to check for lane change
+     * @return the direction to change lane or go straight
+     **/
     public Direction changeLaneIfDesired(HashMap<String, Double> parameters, Direction direction) {
         int distanceToNextCar = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST).intValue();
         int maxSpeed = parameters.get(RequestConstants.MAX_SPEED_REQUEST).intValue();

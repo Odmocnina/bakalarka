@@ -197,6 +197,12 @@ public class Simulation {
         ResultsRecorder.getResultsRecorder().resetCarNumbers();
     }
 
+    /**
+     * method to reset all light plans on all roads, used when resetting the simulation with new roads to ensure light
+     * plans start from the beginning
+     *
+     * @param roads array of roads to reset light plans on
+     */
     private void resetAllLightPlans(Road[] roads) {
         for (Road road : roads) {
             road.resetLightPlans();

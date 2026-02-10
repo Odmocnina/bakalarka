@@ -6,7 +6,8 @@ import models.ICarFollowingModel;
 import models.ModelId;
 
 /********************************************
- * Rule 184 car following model implementation (cellular)
+ * Rule 184 car following model implementation (cellular), annotated with @ModelId("rule-184") for identification during
+ * reflexive loading
  *
  * @author Michael Hladky
  * @version 1.0

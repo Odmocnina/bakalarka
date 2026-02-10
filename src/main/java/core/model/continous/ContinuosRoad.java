@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 /*****************************
- * class representing continuous road
+ * class representing continuous road, for models such as idm, helly...
  *
  * @author Michael Hladky
  * @version 1.0
@@ -30,7 +30,7 @@ public class ContinuosRoad extends Road {
      * @param speedLimit speed limit on the road
      **/
     public ContinuosRoad(double length, int numberOfLanes, double speedLimit) {
-        super(length, numberOfLanes, speedLimit, Constants.CONTINOUS);
+        super(length, numberOfLanes, speedLimit, Constants.CONTINUOUS);
         createRoad();
     }
 
@@ -307,7 +307,7 @@ public class ContinuosRoad extends Road {
                 }
                 parameters.put(param, acceleration);
             } else if (StringEditor.isInArray(roadSimulationParams, param)) { //get from road/simulation
-                this.getRoadSimulationParameter(parameters, param, car);
+                this.getRoadSimulationParameter(parameters, param);
             } else {   // get parameter from different car in proximity
                 this.getParametersAboutDifferentCar(parameters, param, car, road);
             }
@@ -315,8 +315,6 @@ public class ContinuosRoad extends Road {
 
         return parameters;
     }
-
-    ///////////////////////////////////////////////////////////////////////////////////
 
     /**
      * method to get parameter about different car in proximity (used for lane changing models)

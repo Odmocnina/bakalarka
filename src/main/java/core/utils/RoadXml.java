@@ -8,8 +8,6 @@ import core.utils.constants.Constants;
 import core.utils.constants.DefaultValues;
 import core.utils.constants.RoadLoadingConstants;
 
-import javafx.scene.control.Spinner;
-import javafx.scene.control.TextField;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.xml.parsers.DocumentBuilder;
@@ -24,8 +22,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+/********************************************
+ * Class responsible for saving exiting map (roads) to the xml file
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ********************************************/
 public class RoadXml {
 
+    /**
+     * road parameters to XML, it creates a new XML document and adds the road parameters to it, then it writes the
+     * document to the given file name, if there is an error while writing the file, it logs the error and returns
+     * false, otherwise it returns true
+     *
+     * @param roadParameters roadParameters which were used for communication with user
+     * @param numberOfRoads number of roads in the map, this is used for iterating through the road parameters, it
+     *                      should be equal to the size of roadParameters list
+     * @param mapFileName file name to which the XML document should be written
+     * @return true if the XML document was successfully written to the file, false otherwise
+     **/
     public static boolean writeMapToXml(ArrayList<RoadParameters> roadParameters, int numberOfRoads, String mapFileName) {
 
         try {
@@ -57,7 +72,7 @@ public class RoadXml {
             DOMSource source = new DOMSource(doc);
             StreamResult result = new StreamResult(new File(mapFileName));
 
-            // wriring the content into xml file
+            // writing the content into xml file
             transformer.transform(source, result);
             return true;
 
@@ -68,11 +83,31 @@ public class RoadXml {
         }
     }
 
+    /**
+     * method that processes the road parameters and adds them to the XML document, it checks if the length and speed
+     * are valid, if not it sets them to default values and logs the error, it also checks if the light plan and car
+     * generator are defined for each lane, if not it sets them to default values and logs the error, finally it adds
+     * the road to the XML document using the addRoadToXml method
+     *
+     * @param lanes number of lanes on the road
+     * @param lengthText length of the road as a string, this is used for checking if the input is valid, if not it is
+     *                   set to default value
+     * @param speedText max speed on the road as a string, this is used for checking if the input is valid, if not it is
+     *                  set to default value
+     * @param lp light plan for the road, a linked list of LightPlan objects, one for each lane (first light plan in
+     *           linked list
+     * @param cg car generators for the road, a linked list of CarGenerator objects, one for each lane (first generator
+     *           in linked
+     * @param doc XML document to which the road should be added
+     * @param rootElement root element of the XML document, this is used for adding the road element to it
+     * @param i index of the road, this is used for logging purposes and for adding the index element to the XML
+     *          document
+     **/
     private static void processRoad(int lanes, String lengthText, String speedText, LinkedList<LightPlan> lp,
                                     LinkedList<CarGenerator> cg, Document doc, Element rootElement, int i) {
 
-        double length = 0;
-        double speed = 0;
+        double length;
+        double speed;
 
         try {
             if (speedText.isEmpty()) {
@@ -112,7 +147,6 @@ public class RoadXml {
         }
 
         if (lp == null) {
-            //lp = new LightPlan[lanes];
             lp = new LinkedList<LightPlan>();
             for (int j = 0; j < lanes; j++) {
                 lp.add(DefaultStuffMaker.createDefaultLightPlan());
@@ -134,10 +168,8 @@ public class RoadXml {
         }
 
         if (cg == null) {
-            //cg = new CarGenerator[lanes];
             cg = new LinkedList<CarGenerator>();
             for (int j = 0; j < lanes; j++) {
-                //cg[j] = new CarGenerator(DefaultValues.DEFAULT_FLOW_RATE);
                 cg.add(DefaultStuffMaker.createDefaultGenerator());
             }
             MyLogger.logBeforeLoading("No car generator defined for road: " + (i + 1) + ", setting to default " +
@@ -160,6 +192,22 @@ public class RoadXml {
         addRoadToXml(lanes, length, speed, lp, cg, doc, rootElement, i);
     }
 
+    /**
+     * writes road parameters to XML document, it creates a new road element and adds the road parameters to it, then it
+     * adds the road element to the root element of the XML document, it also adds the light plan and car generator
+     * parameters
+     *
+     * @param numberOfLanes number of lanes on the road, this is used for adding the number of lanes element to the XML
+     *                      document and for
+     * @param length length of the road, this is used for adding the length element to the XML document
+     * @param speed max speed on the road, this is used for adding the max speed element to the XML document
+     * @param lp light plan for the road, a linked list of LightPlan objects, one for each lane
+     *           (in linked list)
+     * @param cg car generators for the road, a linked list of CarGenerator objects, one for each lane (in linked list)
+     * @param doc XML document to which the road should be added
+     * @param rootElement root element of the XML document, this is used for adding the road element to it
+     * @param index index of the road, this is used for adding the index element to the XML document
+     **/
     private static void addRoadToXml(int numberOfLanes, double length, double speed, LinkedList<LightPlan> lp,
                                      LinkedList<CarGenerator> cg, Document doc, Element rootElement, int index) {
         Element roadElement = doc.createElement(RoadLoadingConstants.ROAD_TAG);
@@ -241,6 +289,14 @@ public class RoadXml {
         }
     }
 
+    /**
+     * method that saves the current map to the XML file, it gets the current road parameters from the existing roads in
+     * the simulation using the existingRoadsToRoadParameters method, then it calls the writeMapToXml method to write
+     * the road parameters to the XML file, if there is an error while writing the file, it logs the error and returns
+     * false, otherwise it sets the mapChanged flag to false and logs the success and returns true
+     *
+     * @return true if the current map was successfully saved to the XML file, false otherwise
+     */
     public static boolean saveCurrentMap() {
         ArrayList<RoadParameters> currentRoadParameters =
                 RoadParameters.existingRoadsToRoadParameters(AppContext.SIMULATION.getRoads());
@@ -257,6 +313,15 @@ public class RoadXml {
         }
     }
 
+    /**
+     * method that saves the current map to a new XML file, it sets the map file name in the application context to
+     * the given file name, then it calls the saveCurrentMap method to save the current map to the new XML file, if
+     * there is an error while saving the file, it logs the error and returns false, otherwise it logs the success
+     * and returns true, used for save as function
+     *
+     * @param fileName new file name to which the current map should be saved
+     * @return true if the current map was successfully saved to the new XML file, false otherwise
+     **/
     public static boolean saveAs(String fileName) {
         AppContext.RUN_DETAILS.mapFile = fileName;
         return saveCurrentMap();

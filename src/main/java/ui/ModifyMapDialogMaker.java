@@ -7,18 +7,31 @@ import core.model.Road;
 import core.utils.DefaultStuffMaker;
 import core.utils.MyLogger;
 import core.utils.RoadParameters;
-import core.utils.RoadXml;
 import core.utils.constants.Constants;
+
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+/***************************************
+ * Class with functions/methods connected to modification of the map, like changing properties of roads, adding new
+ * road, etc.
+ *
+ * @author Michael Hladky
+ * @version 1.0.0
+ ***************************************/
 public class ModifyMapDialogMaker extends DialogMaker {
+
+    /**
+     * show dialog to modify the map, with options to change properties of all roads, one road, or add a new road
+     *
+     * @param primaryStage owner stage
+     * @param roadParameters list of road parameters to be modified and then converted to roads for the simulation
+     * @param paintAll function to repaint the map after modification
+     **/
     public static void modifyMapDialog(Stage primaryStage, ArrayList<RoadParameters> roadParameters, Runnable paintAll) {
         // Create main dialog window
         Dialog<ButtonType> dialog = new Dialog<>();
@@ -70,6 +83,15 @@ public class ModifyMapDialogMaker extends DialogMaker {
         });
     }
 
+    /**
+     * show dialog to add a new road, with options to set properties of the new road, and then add it to the list of
+     * road parameters
+     *
+     * @param stage owner stage
+     * @param roadParameters list of road parameters to which the new road parameters will be added if the dialog is
+     *                       confirmed
+     * @param paintAll function to repaint the map after adding the new road
+     **/
     private static void addRoadDialog(Stage stage, ArrayList<RoadParameters> roadParameters, Runnable paintAll) {
         Dialog<ButtonType> dialog = new Dialog<>();
         String speed;
@@ -153,17 +175,15 @@ public class ModifyMapDialogMaker extends DialogMaker {
         editAllLightPlansButton.setOnAction(e -> {
             LightPlan lp = DefaultStuffMaker.createDefaultLightPlan();
             editLightPlanDialog(stage, lp, 0);
-            for (int i = 0; i < lightPlan.size(); i++) {
-                lightPlan.set(i, lp.clone());
-            }
+            //for (int i = 0; i < lightPlan.size(); i++) {lightPlan.set(i, lp.clone());}
+            lightPlan.replaceAll(ignored -> lp.clone());
         });
 
         editAllGeneratorsButton.setOnAction(e -> {
             CarGenerator cg = DefaultStuffMaker.createDefaultGenerator();
             editGeneratorDialog(stage, cg, 0);
-            for (int i = 0; i < generators.size(); i++) {
-                generators.set(i, cg.clone());
-            }
+            //for (int i = 0; i < generators.size(); i++) { generators.set(i, cg.clone()); }
+            generators.replaceAll(ignored -> cg.clone());
         });
 
         dialog.getDialogPane().setContent(grid);

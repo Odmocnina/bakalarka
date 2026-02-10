@@ -17,7 +17,7 @@ public class TestModel implements ICarFollowingModel {
      * constructor for test model
      **/
     public TestModel() {
-        this.type = Constants.CONTINOUS;
+        this.type = Constants.CONTINUOUS;
     }
 
     @Override

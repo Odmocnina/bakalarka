@@ -7,13 +7,19 @@ import core.utils.RoadParameters;
 import core.utils.RoadXml;
 import core.utils.constants.Constants;
 import core.utils.loading.RoadLoader;
+
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-
 import java.util.ArrayList;
 
+/***********************************************
+ * Class with functions/methods connected to creating a new map, like setting properties of roads, adding new road, etc.
+ *
+ * @author Michael Hladky
+ * @version 1.0.0
+ ***********************************************/
 public class NewMapDialogMaker extends DialogMaker {
 
     /**
@@ -112,6 +118,14 @@ public class NewMapDialogMaker extends DialogMaker {
         });
     }
 
+    /**
+     * show dialog to confirm opening the new map after creating it, and if confirmed, load the new map and repaint the
+     * map
+     *
+     * @param primaryStage owner stage
+     * @param mapFileName name of the new map file to be opened
+     * @param paintAll function to repaint the map after opening the new map
+     **/
     private static void openNewRoadDialog(Stage primaryStage, String mapFileName, Runnable paintAll) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Open new map");

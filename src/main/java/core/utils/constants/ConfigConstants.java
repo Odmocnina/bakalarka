@@ -7,6 +7,7 @@ package core.utils.constants;
  * @version 1.0
  ***************************/
 public class ConfigConstants {
+
     public static final String CONFIG_REQUEST_SEPARATOR = "/";
     public static final String ROAD_FILE_TAG = "roadFile";
     public static final String NUMBER_OF_ROADS_TAG = "numberOfRoads";

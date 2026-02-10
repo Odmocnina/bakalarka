@@ -8,7 +8,8 @@ import models.ModelId;
 import java.util.HashMap;
 
 /********************************************
- * Helly car following model implementation (continuous)
+ * Helly car following model implementation (continuous), annotated with @ModelId("helly") for identification during
+ * reflexive loading
  *
  * @author Michael Hladky
  * @version 1.0
@@ -119,7 +120,7 @@ public class Helly implements ICarFollowingModel {
      **/
     @Override
     public String getType() {
-        return Constants.CONTINOUS;
+        return Constants.CONTINUOUS;
     }
 
     /**

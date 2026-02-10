@@ -1,5 +1,12 @@
 package core.model;
 
+/********************************************
+ * class representing a parameter for generation, has min, max values, its name for ui and range (max - min) for
+ * generation
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ********************************************/
 public class Parameter {
 
     /** minimum value of parameter **/

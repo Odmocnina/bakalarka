@@ -191,7 +191,7 @@ class HellyTest {
      */
     @Test
     void getType_returnsCorrectType() {
-        assertEquals(Constants.CONTINOUS, new Helly().getType());
+        assertEquals(Constants.CONTINUOUS, new Helly().getType());
     }
 
     /**

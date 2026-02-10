@@ -8,6 +8,14 @@ import core.utils.constants.RequestConstants;
 
 import java.util.LinkedList;
 
+/***************************************
+ * Class responsible for creating default objects of various types, for example default light plans or default car
+ * generators, this is used when new roads are created or all roads/lanes are being changed at the same time, usually
+ * uses values form DefaultValues class for the default parameters of the created objects
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ***************************************/
 public class DefaultStuffMaker {
 
     /**
@@ -22,10 +30,10 @@ public class DefaultStuffMaker {
     }
 
     /**
-     * create default light plan array
+     * create default light plan linked list
      *
      * @param numberOfLanes number of lanes
-     * @return default light plan array
+     * @return default light plan linked list
      **/
     public static LinkedList<LightPlan> createDefaultLightPlan(int numberOfLanes) {
         LinkedList<LightPlan> lightPlan = new LinkedList<>();
@@ -36,6 +44,11 @@ public class DefaultStuffMaker {
         return lightPlan;
     }
 
+    /**
+     * create default car generator
+     *
+     * @return default car generator
+     **/
     public static CarGenerator createDefaultGenerator() {
         CarGenerator generator = new CarGenerator(DefaultValues.DEFAULT_FLOW_RATE);
         generator.setQueueSize(DefaultValues.DEFAULT_QUEUE_MIN_SIZE, DefaultValues.DEFAULT_QUEUE_MAX_SIZE);
@@ -65,11 +78,15 @@ public class DefaultStuffMaker {
         return generator;
     }
 
+    /**
+     * create multiple default car generators in linked list
+     *
+     * @param numberOfLanes number of lanes on the road
+     * @return linked list of default car generators for lanes on road
+     **/
     public static LinkedList<CarGenerator> createDefaultGenerator(int numberOfLanes) {
-        //CarGenerator[] generators = new CarGenerator[numberOfLanes];
         LinkedList<CarGenerator> generators = new LinkedList<>();
         for (int i = 0; i < numberOfLanes; i++) {
-            //generators[i] = createDefaultGenerator();
             generators.add(createDefaultGenerator());
         }
         return generators;

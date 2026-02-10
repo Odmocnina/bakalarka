@@ -52,6 +52,11 @@ public class RunDetails {
         return this.outputDetails != null && outputDetails.outputFile != null && !outputDetails.outputFile.isEmpty();
     }
 
+    /**
+     * Returns a string representation of the RunDetails object, including all its fields and their values.
+     *
+     * @return a string representation of the RunDetails object.
+     **/
     @Override
     public String toString() {
         return "RunDetails{" +
@@ -64,6 +69,12 @@ public class RunDetails {
                 '}';
     }
 
+    /**
+     * sets a new map file for the simulation, it updates the map file in the simulation context with the given value
+     * and resets the mapChanged flag to false
+     *
+     * @param mapFile new map file to be set in the simulation context
+     **/
     public void setNewMapFile(String mapFile) {
         this.mapChanged = false;
         this.mapFile = mapFile;

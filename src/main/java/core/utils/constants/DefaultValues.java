@@ -1,7 +1,5 @@
 package core.utils.constants;
 
-import core.model.CarGenerator;
-
 /***************************
  * Class holding default values for various parameters in the simulation, for example when new roads or car generators
  * are created and aren't given modified, this is supposed to be used
@@ -44,8 +42,5 @@ public class DefaultValues {
     public static final double DEFAULT_FLOW_RATE = 0.7;
     public static final int DEFAULT_QUEUE_MIN_SIZE = 5;
     public static final int DEFAULT_QUEUE_MAX_SIZE = 10;
-    public static final CarGenerator DEFAULT_CAR_GENERATOR = new CarGenerator(DEFAULT_FLOW_RATE) {{
-
-    }};
 
 }

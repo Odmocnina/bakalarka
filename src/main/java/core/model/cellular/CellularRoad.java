@@ -13,7 +13,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 /*****************************
- * CellularRoad class representing a road using cellular automaton model, extends Road class
+ * CellularRoad class representing a road using cellular automaton model, extends Road class, for models such as
+ * nagel-schreckenberg, rule-184, etc.
  *
  * @author Michael Hladky
  * @version 1.0
@@ -138,7 +139,6 @@ public class CellularRoad extends Road {
         for (LaneChangeResult lcr : changedCars) {
             Direction direction = lcr.direction;
             CarParams carParams = lcr.carParams;
-            //// changed part
             int targetLane = -1;
 
             if (direction == Direction.LEFT && AppContext.SIMULATION.getStepCount() % 2 == 0) {
@@ -159,24 +159,6 @@ public class CellularRoad extends Road {
                     this.removeCar(currentLane, (int) carParams.xPosition);
                 }
             }
-            ////////////
-            /*if (direction == Direction.LEFT && AppContext.SIMULATION.getStepCount() % 2 == 0) {
-                int currentLane = carParams.lane;
-                if (currentLane > 0) {
-                    int targetLane = currentLane - 1;
-                    carParams.lane = targetLane;
-                    this.placeCar(carParams, (int) carParams.xPosition, targetLane);
-                    this.removeCar(currentLane, (int) carParams.xPosition);
-                }
-            } else if (direction == Direction.RIGHT && AppContext.SIMULATION.getStepCount() % 2 == 1) {
-                int currentLane = carParams.lane;
-                if (currentLane < numberOfLanes - 1) {
-                    int targetLane = currentLane + 1;
-                    carParams.lane = targetLane;
-                    this.placeCar(carParams, (int) carParams.xPosition, targetLane);
-                    this.removeCar(currentLane, (int) carParams.xPosition);
-                }
-            }*/
         }
     }
 
@@ -319,7 +301,7 @@ public class CellularRoad extends Road {
                     || param.equals(RequestConstants.CURRENT_SPEED_REQUEST)) { // get parameters from car that is being
                 parameters.put(param, car.getParameter(param));                // inspected
             } else if (StringEditor.isInArray(roadSimulationParams, param)) {  //get from road/simulation
-                super.getRoadSimulationParameter(parameters, param, car);
+                super.getRoadSimulationParameter(parameters, param);
             } else {                                                           // get parameters about different car in
                 this.getParametersAboutDifferentCar(parameters, param, car);   // proximity of the inspected car
             }
@@ -452,6 +434,15 @@ public class CellularRoad extends Road {
         return null;
     }
 
+    /**
+     * function to check if there is enough space for a car to change lanes at the given position and lane, mainly used
+     * during lane change to check if the target lane is free for the car to move into
+     *
+     * @param lane lane number to check in
+     * @param headPosition position of the head of the car that wants to change lanes
+     * @param length length of the car in cells
+     * @return true if there is enough space for the car to change lanes, false otherwise
+     **/
     private boolean isSpaceFree(int lane, int headPosition, int length) {
         for (int i = 0; i < length; i++) {
             int posToCheck = headPosition - i;
@@ -732,7 +723,7 @@ public class CellularRoad extends Road {
     }
 
     /*******************************
-     * Class to represent the result of a lane change attempt, including the direction and car parameters
+     * Private class to represent the result of a lane change attempt, including the direction and car parameters
      *
      * @author Michael Hladky
      * @version 1.0

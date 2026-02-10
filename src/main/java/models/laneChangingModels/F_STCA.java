@@ -1,6 +1,5 @@
 package models.laneChangingModels;
 
-import app.AppContext;
 import core.model.Direction;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
@@ -10,7 +9,8 @@ import java.util.HashMap;
 import static core.model.Direction.*;
 
 /****************************************************
- * f-stca lane changing model class for deciding lane changes
+ * f-stca lane changing model class for deciding lane changes, annotated with @ModelId("f-stca") for identification
+ * during reflexive loading
  *
  * @author Michael Hladky
  * @version 1.0
@@ -27,7 +27,7 @@ public class F_STCA implements ILaneChangingModel {
         return "f-stca";
     }
 
-    /*
+    /**
      * gives the list of parameters that the f-stca model needs to make a decision
      *
      * @return the list of parameters that the f-stca model needs to make a decision
@@ -51,6 +51,12 @@ public class F_STCA implements ILaneChangingModel {
         return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
     }
 
+    /**
+     * gives the list of parameters that the f-stca model needs to make a decision for a specific direction
+     *
+     * @param direction the direction to check for lane change
+     * @return the list of parameters that the f-stca model needs to make a decision for a specific direction
+     **/
     public String requestParameters(Direction direction) {
         if (direction == LEFT) {
             String[] requests = {
@@ -102,9 +108,6 @@ public class F_STCA implements ILaneChangingModel {
      * @return the direction to change lane or go straight
      **/
     public Direction changeLaneIfDesired(HashMap<String, Double> parameters) {
-        if (AppContext.SIMULATION.getStepCount() > 2) {
-            int i = 0;
-        }
         int xPosition = parameters.get(RequestConstants.X_POSITION_REQUEST).intValue();
         int xPositionStraightForward = parameters.get(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST).intValue();
         int lengthStraightForward = parameters.get(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST).intValue();
@@ -169,6 +172,14 @@ public class F_STCA implements ILaneChangingModel {
         return STRAIGHT;
     }
 
+    /**
+     * decides whether to change lane or not based on the f-stca model for a specific direction
+     *
+     * @param parameters the parameters needed to make a decision in hashmap form, where key is the parameter name and
+     *                   value is the parameter value in double
+     * @param direction the direction to check for lane change
+     * @return the direction to change lane or go straight
+     **/
     public Direction changeLaneIfDesired(HashMap<String, Double> parameters, Direction direction) {
         int distanceToNextCar = parameters.get(RequestConstants.DISTANCE_TO_NEXT_CAR_REQUEST).intValue();
         int maxSpeed = parameters.get(RequestConstants.MAX_SPEED_REQUEST).intValue();
@@ -238,7 +249,7 @@ public class F_STCA implements ILaneChangingModel {
      **/
     @Override
     public String getName() {
-        return "F-STCA (Symetric Two-lane Cellular Automata)";
+        return "F-STCA (Symmetric Two-lane Cellular Automata)";
     }
 
 }

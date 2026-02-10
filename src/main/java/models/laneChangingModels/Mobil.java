@@ -9,9 +9,10 @@ import models.ModelId;
 import java.util.HashMap;
 
 /********************************************
- * MOBIL lane changing model class for deciding lane changes
+ * MOBIL lane changing model class for deciding lane changes, annotated with @ModelId("mobil") for identification
+ * during reflexive loading
  *
- * @author
+ * @author Michael Hladky
  * @version 1.0
  *********************************************/
 @ModelId("mobil")
@@ -52,6 +53,12 @@ public class Mobil implements ILaneChangingModel {
         return String.join(RequestConstants.REQUEST_SEPARATOR, requests);
     }
 
+    /**
+     * gives the list of parameters that the MOBIL model needs to make a decision for a specific direction
+     *
+     * @param direction the direction for which the parameters are requested
+     * @return the list of parameters that the MOBIL model needs to make a decision for a specific direction
+     **/
     @Override
     public String requestParameters(Direction direction) {
         String[] requests;
@@ -136,23 +143,21 @@ public class Mobil implements ILaneChangingModel {
         double theoreticalAccelerationStraightBackward = parameters.get(RequestConstants.
                 THEORETICAL_ACCELERATION_STRAIGHT_BACKWARD_REQUEST);
 
-        double decelerarion;
+        double deceleration;
         if (direction == Direction.LEFT) {
-            decelerarion = parameters.get(RequestConstants.DECELERATION_COMFORT_LEFT_BACKWARD_REQUEST);
+            deceleration = parameters.get(RequestConstants.DECELERATION_COMFORT_LEFT_BACKWARD_REQUEST);
         } else if (direction == Direction.RIGHT) {
-            decelerarion = parameters.get(RequestConstants.DECELERATION_COMFORT_RIGHT_BACKWARD_REQUEST);
+            deceleration = parameters.get(RequestConstants.DECELERATION_COMFORT_RIGHT_BACKWARD_REQUEST);
         } else {
             return Direction.STRAIGHT;
         }
-        double deacelarationForSaftey = Math.abs(theoreticalAcceleration);
-        if (decelerarion == Constants.NO_CAR_THERE) {
-            decelerarion = Double.MAX_VALUE;
+        double decelerationForSafety = Math.abs(theoreticalAcceleration);
+        if (deceleration == Constants.NO_CAR_THERE) {
+            deceleration = Double.MAX_VALUE;
         }
-        if (deacelarationForSaftey > decelerarion) { // safety check
+        if (decelerationForSafety > deceleration) { // safety check
             return Direction.STRAIGHT;
         }
-
-        //return direction;
 
         double nowAccelerationNeighborBackward = 0;
         double theoreticalAccelerationNeighborBackward = 0;

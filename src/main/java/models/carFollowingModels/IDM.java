@@ -8,7 +8,8 @@ import models.ModelId;
 import java.util.HashMap;
 
 /********************************************
- * Intelligent Driver Model (IDM) car following model implementation (continuous)
+ * Intelligent Driver Model (IDM) car following model implementation (continuous), annotated with @ModelId("idm") for
+ * identification during reflexive loading
  *
  * @author Michael Hladky
  * @version 1.0
@@ -26,7 +27,7 @@ public class IDM implements ICarFollowingModel {
      * constructor for IDM model
      **/
     public IDM() {
-        this.type = Constants.CONTINOUS;
+        this.type = Constants.CONTINUOUS;
     }
 
     /**

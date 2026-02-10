@@ -9,7 +9,8 @@ import java.util.HashMap;
 import java.util.Random;
 
 /********************************************
- * Head-leading car following model implementation (cellular)
+ * Head-leading car following model implementation (cellular), annotated with @ModelId("head-leading") for
+ * identification during reflexive loading
  *
  * @author Michael Hladky
  * @version 1.0

@@ -233,7 +233,7 @@ class OVM_OriginalTest {
     @Test
     void getType_returnsContinuous() {
         OVM_Original model = new OVM_Original();
-        assertEquals(Constants.CONTINOUS, model.getType());
+        assertEquals(Constants.CONTINUOUS, model.getType());
     }
 
     /**

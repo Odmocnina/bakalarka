@@ -40,6 +40,7 @@ public class ResultsRecorder {
     /** Output type (txt/csv)**/
     private String outputType = "txt";
 
+    /** Count of collisions during the simulation **/
     private int collisionsCount = 0;
 
     /**
@@ -150,12 +151,18 @@ public class ResultsRecorder {
         }
     }
 
+    /**
+     * writes the results in TXT format to the output file. It sets the output type to TXT and calls the write method.
+     **/
     public void writeResultsTxt() {
         this.outputType = Constants.RESULTS_OUTPUT_TXT;
         write();
     }
 
-     public void writeResultsCsv() {
+    /**
+     * writes the results in CSV format to the output file. It sets the output type to CSV and calls the write method.
+     **/
+    public void writeResultsCsv() {
         this.outputType = Constants.RESULTS_OUTPUT_CSV;
         write();
     }
@@ -265,6 +272,12 @@ public class ResultsRecorder {
         }
     }
 
+    /**
+     * writes the number of cars currently on the road for each road to the BufferedWriter.
+     *
+     * @param bw The BufferedWriter to write to.
+     * @throws IOException If an I/O error occurs.
+     **/
     private void writeCarsOnTheRoad(BufferedWriter bw) throws IOException {
         bw.write("=== Cars Currently on the Road ===\n");
         Road[] roads = AppContext.SIMULATION.getRoads();
@@ -274,11 +287,24 @@ public class ResultsRecorder {
         bw.write("\n");
     }
 
+    /**
+     * writes the total number of collisions that occurred during the simulation to the BufferedWriter.
+     *
+     * @param bw The BufferedWriter to write to.
+     * @throws IOException If an I/O error occurs.
+     **/
     private void writeCollisionsCount(BufferedWriter bw) throws IOException {
         bw.write("=== Collisions Count ===\n");
         bw.write("Total Collisions: " + this.collisionsCount + "\n\n");
     }
 
+    /**
+     * writes the recorded results in TXT format to the BufferedWriter. It checks the output details settings and writes
+     * the corresponding sections to the BufferedWriter.
+     *
+     * @param bw The BufferedWriter to write to.
+     * @throws IOException If an I/O error occurs.
+     **/
     private void writeTXT(BufferedWriter bw) throws IOException {
         // Implementation for writing results in TXT format
         bw.write("=== Traffic Simulation Results ===\n\n"); // header of the results file
@@ -307,6 +333,13 @@ public class ResultsRecorder {
         }
     }
 
+    /**
+     * writes the recorded results in CSV format to the BufferedWriter. It checks the output details settings and writes
+     * the corresponding sections to the BufferedWriter in CSV format.
+     *
+     * @param bw The BufferedWriter to write to.
+     * @throws IOException If an I/O error occurs.
+     **/
     private void writeCSV(BufferedWriter bw) throws IOException {
         // Implementation for writing results in CSV format
         OutputDetails outputDetails = AppContext.RUN_DETAILS.outputDetails;
@@ -364,14 +397,26 @@ public class ResultsRecorder {
         return 0;
     }
 
+    /**
+     * add collision to the total count of collisions that occurred during the simulation, it increments the
+     * collisionsCount variable by 1.
+     **/
     public void addCollision() {
         this.collisionsCount++;
     }
 
+    /**
+     * sets the output type for writing results, it updates the outputType variable with the given value (e.g., "txt" or
+     * "csv").
+     **/
     public void setOutputType(String outputType) {
         this.outputType = outputType;
     }
 
+    /**
+     * resets the recorded results, it sets all values in the carsPassedPerRoad array to 0 and resets the collisions
+     * count to 0.
+     **/
     public void resetCarNumbers() {
         if (this.carsPassedPerRoad != null) {
             Arrays.fill(this.carsPassedPerRoad, 0);
@@ -380,6 +425,11 @@ public class ResultsRecorder {
         this.collisionsCount = 0;
     }
 
+    /**
+     * sets the output file name for writing results.
+     *
+     * @param fileName The output file name to set.
+     **/
     public void setOutFileName(String fileName) {
         this.fileName = fileName;
     }

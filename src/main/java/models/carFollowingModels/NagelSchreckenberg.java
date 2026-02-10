@@ -26,6 +26,7 @@ public class NagelSchreckenberg implements ICarFollowingModel {
     /** random chance of slowing down when car is moving **/
     private final double slowDownChance = 0.3; // probability of random slowing down
 
+    /** random chance of slowing down when car is starting **/
     private final Random random;
 
     /**
@@ -87,7 +88,7 @@ public class NagelSchreckenberg implements ICarFollowingModel {
      **/
     @Override
     public String getID() {
-        return "nagelschreckenberg";
+        return "nagel-schreckenberg";
     }
 
     /**

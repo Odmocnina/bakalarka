@@ -17,7 +17,7 @@ public class Constants {
     public static final Color LINE_SEPERATOR_COLOR = Color.WHITE;
     public static final String CONFIG_FILE = "config/config.xml";
     public static final String CELLULAR = "cellular";
-    public static final String CONTINOUS = "continous";
+    public static final String CONTINUOUS = "continous";
     public static final int LINE_SEPARATOR_WIDTH = 2;
     public static final int CELL_SEPARATOR_WIDTH = 1;
     public static final Color CELL_SEPARATOR_COLOR = Color.BLACK;

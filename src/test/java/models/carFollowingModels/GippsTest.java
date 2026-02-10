@@ -103,7 +103,7 @@ class GippsTest {
     void getType_shouldReturnContinuousTypeConstant() {
         Gipps gipps = createGipps();
 
-        assertEquals(Constants.CONTINOUS, gipps.getType(),
+        assertEquals(Constants.CONTINUOUS, gipps.getType(),
                 "Model type should match Constants.CONTINOUS.");
     }
 

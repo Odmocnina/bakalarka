@@ -146,16 +146,6 @@ public abstract class Road {
     }
 
     /**
-     * method to initialize car queues per lane, called if generator generates to queues
-     **/
-    public void initializeCarQueues() {
-        carQueuesPerLane = new Queue[numberOfLanes];
-        for (int i = 0; i < numberOfLanes; i++) {
-            this.carQueuesPerLane[i] = this.generators[i].generateCarsInToQueue();
-        }
-    }
-
-    /**
      * method to check if all car queues are empty, if they are used
      *
      * @return true if all queues are empty, false otherwise
@@ -177,9 +167,8 @@ public abstract class Road {
      *
      * @param parameters map to put parameter in
      * @param param parameter to get
-     * @param car car parameters of car requesting parameter
      **/
-    protected void getRoadSimulationParameter(HashMap<String, Double> parameters, String param, CarParams car) {
+    protected void getRoadSimulationParameter(HashMap<String, Double> parameters, String param) {
         if (param.equals(RequestConstants.TIME_STEP_REQUEST)) {
             parameters.put(param, AppContext.RUN_DETAILS.timeStep);
         } else if (param.equals(RequestConstants.MAX_ROAD_SPEED_REQUEST)) {
@@ -303,8 +292,6 @@ public abstract class Road {
         return this.generators[0];
     }
 
-
-
     /**
      * method to check if the light on the given lane is green
      *
@@ -414,6 +401,11 @@ public abstract class Road {
         return this.lightPlansOnLanes;
     }
 
+    /**
+     * method to check if all generators have needed parameters for generation
+     *
+     * @return true if all generators have needed parameters, false otherwise
+     **/
     public boolean doAllGeneratorsHaveNeededParameters() {
         for (CarGenerator generator : generators) {
             if (!generator.checkIfAllParametersAreLoaded()) {
@@ -423,6 +415,9 @@ public abstract class Road {
         return true;
     }
 
+    /**
+     * method to set up queues for generators that are generating to queue, if needed
+     **/
     public void setUpQueuesIfNeeded() {
         carQueuesPerLane = new Queue[numberOfLanes];
         for (int i = 0; i < numberOfLanes; i++) {
@@ -434,6 +429,9 @@ public abstract class Road {
         }
     }
 
+    /**
+     * method to reset light plans on lanes, used when resetting the simulation
+     **/
     public void resetLightPlans() {
         for (LightPlan lp : lightPlansOnLanes) {
             lp.reset();

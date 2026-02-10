@@ -55,7 +55,7 @@ public class OutputDetails {
     };
 
     /** Indices of the output details corresponding to their names **/
-    private final int[] DETAIL_INDICIES = {
+    private final int[] DETAIL_INDEXES = {
             SIMULATION_DETAILS_INDEX,
             SIMULATION_TIME_INDEX,
             CARS_PASSED_INDEX,
@@ -66,17 +66,17 @@ public class OutputDetails {
     };
 
     /**
-     * Changes the 'output' boolean array settings based on the provided XML element.
+     * changes the 'output' boolean array settings based on the provided XML element.
      * It assumes the XML element contains sub-elements corresponding to the output details.
      * * @param outputElement The XML Element containing output configuration.
-     */
+     **/
     public void changeWhatToOutput(Element outputElement) {
         // Define indices for clarity and consistency
 
         // Iterate through all defined output details
         for (int i = 0; i < DETAILS_NAME.length; i++) {
             String name = DETAILS_NAME[i];
-            int index = DETAIL_INDICIES[i];
+            int index = DETAIL_INDEXES[i];
 
             NodeList nodeList = outputElement.getElementsByTagName(name);
 
@@ -96,15 +96,27 @@ public class OutputDetails {
         }
     }
 
+    /**
+     * method to check if a specific part of the output is enabled based on its name.
+     *
+     * @param partName The name of the output part to check (e.g., "simulationDetails", "carsPassed").
+     * @return true if the specified part is enabled for output, false otherwise.
+     **/
     public boolean writePart(String partName) {
         for (int i = 0; i < DETAILS_NAME.length; i++) {
             if (DETAILS_NAME[i].equals(partName)) {
-                return this.output[DETAIL_INDICIES[i]];
+                return this.output[DETAIL_INDEXES[i]];
             }
         }
         return false; // Default to false if partName not found
     }
 
+    /**
+     * overrides the default toString method to provide a string representation of the OutputDetails object, including
+     * the output file name, output settings, and CSV separator.
+     *
+     * @return a string representation of the OutputDetails object
+     **/
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -121,5 +133,4 @@ public class OutputDetails {
         sb.append('}');
         return sb.toString();
     }
-
 }

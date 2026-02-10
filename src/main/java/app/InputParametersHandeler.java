@@ -5,6 +5,13 @@ import core.utils.constants.Constants;
 import models.ICarFollowingModel;
 import models.ILaneChangingModel;
 
+/*****************************
+ * Class for handling input parameters from command line, such as duration of simulation, car following and lane
+ * changing models to use if different then default ones in config, etc.
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ****************************/
 public class InputParametersHandeler {
 
     /**

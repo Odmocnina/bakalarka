@@ -1,5 +1,12 @@
 package core.utils.constants;
 
+/***************************
+ * Class holding constants for loading roads from XML, this is used in the RoadLoader class to load roads from XML
+ * files, it holds the tags used in the XML file
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ***************************/
 public class RoadLoadingConstants {
 
     public static final String ROAD_LENGTH_TAG = "length";
@@ -21,6 +28,5 @@ public class RoadLoadingConstants {
     public static final String NAME_TAG = "name";
     public static final String QUEUE_TAG = "queue";
     public static final String USE_TAG = "use";
-
 
 }
