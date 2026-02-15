@@ -689,6 +689,8 @@ public class DialogMaker {
          Button editAllGeneratorsButton = new Button("Edit all car generators...");
          grid.add(editAllGeneratorsButton, 0, 5);
 
+         createWaringTextIfNeeded(grid, 6);
+
          lightPlanButton.setOnAction(e -> {
              int listIndex = laneIndexSpinner.getValue() - 1;
              LightPlan clone = lightPlan.get(listIndex).clone();
@@ -1124,5 +1126,17 @@ public class DialogMaker {
                 MyLogger.log("CSV separator updated to '" + separator + "' via dialog.", Constants.INFO_FOR_LOGGING);
             }
         });
+    }
+
+    protected static void createWaringTextIfNeeded(GridPane grid, int line) {
+        if (AppContext.SIMULATION.getStepCount() > 0) {
+            String warningMessage = "Warning: Changing the road properties will reset the simulation state (cars, their" +
+                    " positions, properties...) on ALL roads.";
+            Label warningLabel = new Label(warningMessage);
+            warningLabel.setWrapText(true);
+            warningLabel.setMaxWidth(350);
+            warningLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+            grid.add(warningLabel, 0, line, 2, 1);
+        }
     }
 }

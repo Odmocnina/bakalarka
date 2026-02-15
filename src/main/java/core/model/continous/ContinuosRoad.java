@@ -751,6 +751,15 @@ public class ContinuosRoad extends Road {
     }
 
     /**
+     * method to remove all cars from the road, used for resetting the simulation
+     **/
+    public void removeAllCars() {
+        for (int lane = 0; lane < numberOfLanes; lane++) {
+            vehicles[lane].clear();
+        }
+    }
+
+    /**
      * method to resolve collision for given car and new speed, if collision detected, log it and adjust speed
      *
      * @param car car to check for collision

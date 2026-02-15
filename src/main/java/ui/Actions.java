@@ -211,4 +211,10 @@ public class Actions {
         MyLogger.log("Toggling output detail index " + detailIndex, Constants.INFO_FOR_LOGGING);
         ConfigModification.changeOutput(detailIndex);
     }
+
+    public static void resetSimulationAction(Simulation simulation, Runnable paintAll) {
+        MyLogger.log("Resetting simulation...", Constants.INFO_FOR_LOGGING);
+        simulation.resetSimulationWithSameRoads();
+        paintAll.run();
+    }
 }

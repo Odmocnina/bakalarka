@@ -295,6 +295,8 @@ public abstract class Road {
      **/
     public abstract int getNumberOfCarsOnRoad();
 
+    public abstract void removeAllCars();
+
     /**
      * method to check if the generator is generating to queue
      *

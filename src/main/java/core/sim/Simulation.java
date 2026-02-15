@@ -218,6 +218,28 @@ public class Simulation {
     }
 
     /**
+     * Resets the simulation with the same roads, which clears all cars from the roads and resets light plans, but keeps
+     * the same road configuration, used when resetting the simulation after it has finished running to run it again with
+     * the same roads.
+     **/
+    public void resetSimulationWithSameRoads() {
+        this.stepCount = 0;
+        resetAllLightPlans(this.roads);
+        clearAllRoads();
+        ResultsRecorder.getResultsRecorder().resetCarNumbers();
+    }
+
+    /**
+     * Clears all cars from all roads, used when resetting the simulation with the same roads to ensure all cars are removed
+     * before running the simulation again.
+     **/
+    private void clearAllRoads() {
+        for (Road road : roads) {
+            road.removeAllCars();
+        }
+    }
+
+    /**
      * method to reset all light plans on all roads, used when resetting the simulation with new roads to ensure light
      * plans start from the beginning
      *

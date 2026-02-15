@@ -160,6 +160,8 @@ public class ModifyMapDialogMaker extends DialogMaker {
         Button editAllGeneratorsButton = new Button("Edit all car generators...");
         grid.add(editAllGeneratorsButton, 0, 6);
 
+        createWaringTextIfNeeded(grid, 7);
+
         lightPlanButton.setOnAction(e -> {
             int listIndex = laneIndexSpinner.getValue() - 1;
             LightPlan clone = lightPlan.get(listIndex).clone();

@@ -195,12 +195,14 @@ public class Window extends Application {
                 ArrayList<RoadParameters> roadParams = RoadParameters.existingRoadsToRoadParameters(roads);
                 DialogMaker.changeRoadsDialog(primaryStage, roadParams, 1, false,
                         clickedRoadIndex);
-                Road[] newRoads = RoadParameters.roadParametersToRoads(roadParams);
-                for (Road newRoad : newRoads) { // check if some generator needs to set up queues
-                    newRoad.setUpQueuesIfNeeded();
+                if (AppContext.RUN_DETAILS.mapChanged) {
+                    Road[] newRoads = RoadParameters.roadParametersToRoads(roadParams);
+                    for (Road newRoad : newRoads) { // check if some generator needs to set up queues
+                        newRoad.setUpQueuesIfNeeded();
+                    }
+                    AppContext.SIMULATION.resetSimulationWithNewRoads(newRoads);
+                    paintAll.run();
                 }
-                AppContext.SIMULATION.resetSimulationWithNewRoads(newRoads);
-                paintAll.run();
             } else {
                 MyLogger.log("Clicked outside of any road.", Constants.INFO_FOR_LOGGING);
             }
@@ -544,12 +546,14 @@ public class Window extends Application {
         // simulation control buttons
         Button startStopBtn = createIconButton("/icons/run.png", "Start/Stop simulation");
         Button nextStepBtn = createIconButton("/icons/nextStep.png", "Next simulation step");
+        Button resetBtn = createIconButton("/icons/reset.png", "Reset simulation");
         ToggleButton collisionBanBtn = createIconToggleButton("/icons/collisionBan.png",
                 "Ban collisions (toggle)");
         Button setTimeBetweenStepsBtn = createIconButton("/icons/time.png",
                 "Set time between simulation steps (ms)");
         startStopBtn.setStyle(defaultStyle);
         nextStepBtn.setStyle(defaultStyle);
+        resetBtn.setStyle(defaultStyle);
         setTimeBetweenStepsBtn.setStyle(defaultStyle);
         changeLaneBtn.setSelected(!AppContext.RUN_DETAILS.laneChange);
         collisionBanBtn.setSelected(AppContext.RUN_DETAILS.preventCollisions);
@@ -660,6 +664,8 @@ public class Window extends Application {
             }
         });
 
+        resetBtn.setOnAction(e -> Actions.resetSimulationAction(simulation, paintAll));
+
         exportResultsToTxtBtn.setOnAction(e -> Actions.exportResultsToTxtAction());
 
         exportToCsvBtn.setOnAction(e -> Actions.exportResultsToCsvAction());
@@ -692,6 +698,7 @@ public class Window extends Application {
                 saveAsMapFileBtn,
                 startStopBtn,
                 nextStepBtn,
+                resetBtn,
                 changeLaneBtn,
                 collisionBanBtn,
                 setTimeBetweenStepsBtn,
@@ -761,6 +768,7 @@ public class Window extends Application {
         Menu simulationMenu = new Menu("Simulation");
         MenuItem startStopItem = new MenuItem("Start/Stop simulation", createMenuIcon("/icons/run.png"));
         MenuItem nextStepItem = new MenuItem("Next simulation step", createMenuIcon("/icons/nextStep.png"));
+        MenuItem resetSimulationItem = new MenuItem("Reset simulation", createMenuIcon("/icons/reset.png"));
         CheckMenuItem changeLaneToggleItem = new CheckMenuItem("Toggle lane change ban", createMenuIcon("/icons/ban.png"));
         CheckMenuItem collisionBanToggleItem = new CheckMenuItem("Ban collisions (toggle)",
                 createMenuIcon("/icons/collisionBan.png"));
@@ -784,14 +792,16 @@ public class Window extends Application {
 
         nextStepItem.setOnAction(e -> Actions.nextStepAction(simulation, paintAll));
 
+        resetSimulationItem.setOnAction(e -> Actions.resetSimulationAction(simulation, paintAll));
+
         changeLaneToggleItem.setOnAction(e -> Actions.changeLaneChangingAction(paintAll));
 
         collisionBanToggleItem.setOnAction(e -> Actions.collisionBanAction(paintAll));
 
         setTimeBetweenStepsItem.setOnAction(e -> Actions.setTimeBetweenStepsAction(primaryStage, engine));
 
-        simulationMenu.getItems().addAll(startStopItem, nextStepItem, changeLaneToggleItem, collisionBanToggleItem,
-                setTimeBetweenStepsItem);
+        simulationMenu.getItems().addAll(startStopItem, nextStepItem, resetSimulationItem, changeLaneToggleItem,
+                collisionBanToggleItem, setTimeBetweenStepsItem);
 
         return simulationMenu;
     }

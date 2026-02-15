@@ -661,6 +661,19 @@ public class CellularRoad extends Road {
     }
 
     /**
+     * function to remove all cars from the road, used mainly for resetting the simulation
+     **/
+    public void removeAllCars() {
+        for (int lane = 0; lane < numberOfLanes; lane++) {
+            for (int position = 0; position < this.numberOfCells; position++) {
+                cells[lane][position].setOccupied(false);
+                cells[lane][position].setHead(false);
+                cells[lane][position].setCarParams(null);
+            }
+        }
+    }
+
+    /**
      * function to resolve collisions for a car given its new speed, if they happen
      *
      * @param car CarParams of the car to check for collisions
