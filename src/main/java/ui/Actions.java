@@ -201,4 +201,14 @@ public class Actions {
         MyLogger.log("Set CSV separator action triggered", Constants.INFO_FOR_LOGGING);
         DialogMaker.setCsvSeparatorDialog(primaryStage);
     }
+
+    /**
+     * method for toggling the output of a specific detail, which changes the configuration and then logs the action
+     *
+     * @param detailIndex the index of the output detail to be toggled
+     **/
+    public static void setOutputAction(int detailIndex) {
+        MyLogger.log("Toggling output detail index " + detailIndex, Constants.INFO_FOR_LOGGING);
+        ConfigModification.changeOutput(detailIndex);
+    }
 }

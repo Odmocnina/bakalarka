@@ -2,6 +2,7 @@ package core.utils;
 
 import app.AppContext;
 import core.model.Road;
+import core.utils.constants.ConfigConstants;
 import core.utils.constants.Constants;
 
 import java.io.BufferedWriter;
@@ -26,6 +27,7 @@ public class ResultsRecorder {
     /** Array to store the number of cars passed per road **/
     private int[] carsPassedPerRoad;
 
+    /** Array to store the time when the road was empty (if needed for future extensions) **/
     private int[] whenWasRoadEmpty;
 
     /** BigInt value used as a start of timer when simulation starts **/
@@ -41,7 +43,7 @@ public class ResultsRecorder {
     private String outputType = "txt";
 
     /** Count of collisions during the simulation **/
-    private int collisionsCount = 0;
+    private int[] collisionsCount;
 
     /**
      * Private constructor to prevent instantiation
@@ -70,6 +72,14 @@ public class ResultsRecorder {
         this.carsPassedPerRoad = new int[numberOfRoads];
         for (int i = 0; i < numberOfRoads; i++) {
             this.carsPassedPerRoad[i] = 0;
+        }
+        this.collisionsCount = new int[numberOfRoads];
+        for (int i = 0; i < numberOfRoads; i++) {
+            this.collisionsCount[i] = 0;
+        }
+        this.whenWasRoadEmpty = new int[numberOfRoads];
+        for (int i = 0; i < numberOfRoads; i++) {
+            this.whenWasRoadEmpty[i] = Constants.NO_RECORD_YET;
         }
         this.fileName = fileName;
     }
@@ -216,7 +226,7 @@ public class ResultsRecorder {
         bw.write("Lane changing model used: " + AppContext.LANE_CHANGING_MODEL.getName() + "\n");//lane change model
         bw.write("Simulation parameters: " + AppContext.RUN_DETAILS.toString() + "\n"); // simulation parameters
 
-        boolean queueUsed = AppContext.SIMULATION.getRoads()[0].generatingToQueue();
+       /* boolean queueUsed = AppContext.SIMULATION.getRoads()[0].generatingToQueue();
         if (queueUsed) {
             bw.write("Car generation: Cars were generated to queues before entering the roads.\n");
             if (AppContext.SIMULATION.areAllQueuesEmpty(AppContext.SIMULATION.getRoads())) {
@@ -228,7 +238,8 @@ public class ResultsRecorder {
             }
         } else {
             bw.write("Car generation: Cars were generated directly on the roads.\n\n");
-        }
+        }*/
+        bw.write("\n");
     }
 
     /**
@@ -252,10 +263,12 @@ public class ResultsRecorder {
      **/
     private void writeCarsPassedResults(BufferedWriter bw) throws IOException {
         bw.write("=== Cars Passed Results ===\n");
+        int totalCarsPassed = 0;
         for (int i = 0; i < carsPassedPerRoad.length; i++) {
             bw.write("Road " + i + ": " + carsPassedPerRoad[i] + " cars passed.\n");
+            totalCarsPassed += carsPassedPerRoad[i];
         }
-        bw.write("\n");
+        bw.write("Total Cars Passed: " + totalCarsPassed + "\n\n");
     }
 
     /**
@@ -281,10 +294,12 @@ public class ResultsRecorder {
     private void writeCarsOnTheRoad(BufferedWriter bw) throws IOException {
         bw.write("=== Cars Currently on the Road ===\n");
         Road[] roads = AppContext.SIMULATION.getRoads();
+        int totalCarsOnRoad = 0;
         for (int i = 0; i < roads.length; i++) {
             bw.write("Road " + i + " Cars: " + roads[i].getNumberOfCarsOnRoad() + "\n");
+            totalCarsOnRoad += roads[i].getNumberOfCarsOnRoad();
         }
-        bw.write("\n");
+        bw.write("Total Cars on Road: " + totalCarsOnRoad + "\n\n");
     }
 
     /**
@@ -295,7 +310,24 @@ public class ResultsRecorder {
      **/
     private void writeCollisionsCount(BufferedWriter bw) throws IOException {
         bw.write("=== Collisions Count ===\n");
-        bw.write("Total Collisions: " + this.collisionsCount + "\n\n");
+        int totalCollisions = 0;
+        for (int i = 0; i < collisionsCount.length; i++) {
+            bw.write("Road " + i + ": " + collisionsCount[i] + " collisions.\n");
+            totalCollisions += collisionsCount[i];
+        }
+        bw.write("Total Collisions: " + totalCollisions + "\n\n");
+    }
+
+    private void writeWhenWasRoadEmpty(BufferedWriter bw) throws IOException {
+        bw.write("=== When Was Road Empty ===\n");
+        for (int i = 0; i < whenWasRoadEmpty.length; i++) {
+            if (whenWasRoadEmpty[i] != Constants.NO_RECORD_YET) {
+                bw.write("Road " + i + " was empty at step: " + whenWasRoadEmpty[i] + "\n");
+            } else {
+                bw.write("Road " + i + " was never empty during the simulation.\n");
+            }
+        }
+        bw.write("\n");
     }
 
     /**
@@ -313,22 +345,25 @@ public class ResultsRecorder {
             MyLogger.log("RunDetails is null. Cannot write simulation details.", Constants.ERROR_FOR_LOGGING);
             return;
         }
-        if (outputDetails.writePart("simulationDetails")) {
+        if (outputDetails.writePart(ConfigConstants.SIMULATION_DETAILS_TAG)) {
             this.writeSimulationDetails(bw);
         }
-        if (outputDetails.writePart("simulationTime")) {
+        if (outputDetails.writePart(ConfigConstants.SIMULATION_TIME_TAG)) {
             this.writeSimulationTimeResults(bw);
         }
-        if (outputDetails.writePart("carsPassed")) {
+        if (outputDetails.writePart(ConfigConstants.CARS_PASSED_TAG)) {
             this.writeCarsPassedResults(bw);
         }
-        if (outputDetails.writePart("carsOnRoad")) {
+        if (outputDetails.writePart(ConfigConstants.CARS_ON_ROAD_TAG)) {
             this.writeCarsOnTheRoad(bw);
         }
-        if (outputDetails.writePart("collisionCount")) {
+        if (outputDetails.writePart(ConfigConstants.WHEN_WAS_ROAD_EMPTY_TAG)) {
+            this.writeWhenWasRoadEmpty(bw);
+        }
+        if (outputDetails.writePart(ConfigConstants.COLLISION_COUNT_TAG)) {
             this.writeCollisionsCount(bw);
         }
-        if (outputDetails.writePart("roadDetails")) {
+        if (outputDetails.writePart(ConfigConstants.ROAD_DETAILS_TAG)) {
             this.writeRoadDetails(bw);
         }
     }
@@ -352,14 +387,14 @@ public class ResultsRecorder {
         if (outputDetails.writePart("carsOnRoad")) {
             header = header + "Cars on Road" + csvSeparator;
         }
-        if (outputDetails.writePart("roadDetails")) {
-            header = header + "Road details" + csvSeparator;
+        if (outputDetails.writePart("whenWasRoadEmpty")) {
+            header = header + "When was road empty" + csvSeparator;
         }
         if (outputDetails.writePart("collisionCount")) {
             header = header + "Collisions Count" + csvSeparator;
         }
-        if (outputDetails.writePart("generationDetails")) {
-            header = header + "Generation Params";
+        if (outputDetails.writePart("roadDetails")) {
+            header = header + "Road details" + csvSeparator;
         }
         header = header.trim();
 
@@ -372,15 +407,19 @@ public class ResultsRecorder {
             if (outputDetails.writePart("carsOnRoad")) {
                 bw.write(AppContext.SIMULATION.getRoads()[i].getNumberOfCarsOnRoad() + csvSeparator);
             }
+            if (outputDetails.writePart("whenWasRoadEmpty")) {
+                int emptyStep = whenWasRoadEmpty[i];
+                String emptyStepStr = (emptyStep != Constants.NO_RECORD_YET) ?
+                        String.valueOf(emptyStep) : "Never empty"; // write when was road empty or not empty at all
+                bw.write(emptyStepStr + csvSeparator);
+            }
+            if (outputDetails.writePart("collisionCount")) {
+                bw.write(this.collisionsCount[i] + csvSeparator);
+            }
             if (outputDetails.writePart("roadDetails")) {
                 bw.write(AppContext.SIMULATION.getRoads()[i].toString() + csvSeparator);
             }
-            if (outputDetails.writePart("collisionCount")) {
-                bw.write(this.collisionsCount + csvSeparator);
-            }
-            if (outputDetails.writePart("generationDetails")) {
-                bw.write(AppContext.SIMULATION.getRoads()[i].getCarGenerator().toString() + "\n");
-            }
+            bw.write("\n");
         }
     }
 
@@ -399,10 +438,12 @@ public class ResultsRecorder {
 
     /**
      * add collision to the total count of collisions that occurred during the simulation, it increments the
-     * collisionsCount variable by 1.
+     * collisionsCount array on road index by 1.
+     *
+     * @param roadIndex The index of the road where the collision occurred
      **/
-    public void addCollision() {
-        this.collisionsCount++;
+    public void addCollision(int roadIndex) {
+        this.collisionsCount[roadIndex]++;
     }
 
     /**
@@ -421,8 +462,9 @@ public class ResultsRecorder {
         if (this.carsPassedPerRoad != null) {
             Arrays.fill(this.carsPassedPerRoad, 0);
         }
-
-        this.collisionsCount = 0;
+        if (this.collisionsCount != null) {
+            Arrays.fill(this.collisionsCount, 0);
+        }
     }
 
     /**
@@ -434,4 +476,30 @@ public class ResultsRecorder {
         this.fileName = fileName;
     }
 
+    /**
+     * records the time when a road was empty, it updates the whenWasRoadEmpty array on the given road index with the
+     * current step count of the simulation.
+     *
+     * @param roadIndex The index of the road that was empty.
+     **/
+    public void recordRoadEmpty(int roadIndex, int stepCount) {
+        if (whenWasRoadEmpty != null && roadIndex >= 0 && roadIndex < whenWasRoadEmpty.length) {
+            whenWasRoadEmpty[roadIndex] = stepCount;
+        }
+    }
+
+    /**
+     * checks if a road was already empty during the simulation, it checks the whenWasRoadEmpty array on the given road
+     * index and returns true if the value is not 0 (indicating that the road was empty at some point), otherwise it
+     * returns false.
+     *
+     * @param roadIndex The index of the road to check.
+     * @return true if the road was already empty during the simulation, false otherwise.
+     **/
+    public boolean wasRoadAlreadyEmpty(int roadIndex) {
+        if (whenWasRoadEmpty != null && roadIndex >= 0 && roadIndex < whenWasRoadEmpty.length) {
+            return whenWasRoadEmpty[roadIndex] != Constants.NO_RECORD_YET;
+        }
+        return false;
+    }
 }

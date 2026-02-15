@@ -567,8 +567,25 @@ public class Window extends Application {
             CheckMenuItem simulationTimeItem = new CheckMenuItem("Simulation time");
             CheckMenuItem carsPassedItem = new CheckMenuItem("Cars passed");
             CheckMenuItem carsOnRoadItem = new CheckMenuItem("Cars on road");
+            CheckMenuItem whenWasRoadEmptyItem = new CheckMenuItem("When was road empty");
             CheckMenuItem collisionsItem = new CheckMenuItem("Collisions");
             CheckMenuItem roadDetailsItem = new CheckMenuItem("Road details");
+
+            simulationDetailsItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.SIMULATION_DETAILS_OUTPUT_INDEX));
+            simulationTimeItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.SIMULATION_TIME_OUTPUT_INDEX));
+            carsPassedItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.CARS_PASSED_OUTPUT_INDEX));
+            carsOnRoadItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.CARS_ON_ROAD_OUTPUT_INDEX));
+            whenWasRoadEmptyItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX));
+            collisionsItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.COLLISION_COUNT_OUTPUT_INDEX));
+            roadDetailsItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.ROAD_DETAILS_OUTPUT_INDEX));
+
+            simulationDetailsItem.setOnAction(ev -> Actions.setOutputAction(Constants.SIMULATION_DETAILS_OUTPUT_INDEX));
+            simulationTimeItem.setOnAction(ev -> Actions.setOutputAction(Constants.SIMULATION_TIME_OUTPUT_INDEX));
+            carsPassedItem.setOnAction(ev -> Actions.setOutputAction(Constants.CARS_PASSED_OUTPUT_INDEX));
+            carsOnRoadItem.setOnAction(ev -> Actions.setOutputAction(Constants.CARS_ON_ROAD_OUTPUT_INDEX));
+            whenWasRoadEmptyItem.setOnAction(ev -> Actions.setOutputAction(Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX));
+            collisionsItem.setOnAction(ev -> Actions.setOutputAction(Constants.COLLISION_COUNT_OUTPUT_INDEX));
+            roadDetailsItem.setOnAction(ev -> Actions.setOutputAction(Constants.ROAD_DETAILS_OUTPUT_INDEX));
 
 
             contextMenu.getItems().addAll(
@@ -576,6 +593,7 @@ public class Window extends Application {
                     simulationTimeItem,
                     carsPassedItem,
                     carsOnRoadItem,
+                    whenWasRoadEmptyItem,
                     collisionsItem,
                     roadDetailsItem
             );
@@ -799,10 +817,28 @@ public class Window extends Application {
         CheckMenuItem simulationTimeItem = new CheckMenuItem("Simulation time");
         CheckMenuItem carsPassedItem = new CheckMenuItem("Cars passed");
         CheckMenuItem carsOnRoadItem = new CheckMenuItem("Cars on road");
+        CheckMenuItem whenWasRoadEmptyItem = new CheckMenuItem("When was road empty");
         CheckMenuItem collisionsItem = new CheckMenuItem("Collisions");
         CheckMenuItem roadDetailsItem = new CheckMenuItem("Road details");
+
+        simulationDetailsItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.SIMULATION_DETAILS_OUTPUT_INDEX));
+        simulationTimeItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.SIMULATION_TIME_OUTPUT_INDEX));
+        carsPassedItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.CARS_PASSED_OUTPUT_INDEX));
+        carsOnRoadItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.CARS_ON_ROAD_OUTPUT_INDEX));
+        whenWasRoadEmptyItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX));
+        collisionsItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.COLLISION_COUNT_OUTPUT_INDEX));
+        roadDetailsItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.ROAD_DETAILS_OUTPUT_INDEX));
+
+        simulationDetailsItem.setOnAction(e -> Actions.setOutputAction(Constants.SIMULATION_DETAILS_OUTPUT_INDEX));
+        simulationTimeItem.setOnAction(e -> Actions.setOutputAction(Constants.SIMULATION_TIME_OUTPUT_INDEX));
+        carsPassedItem.setOnAction(e -> Actions.setOutputAction(Constants.CARS_PASSED_OUTPUT_INDEX));
+        carsOnRoadItem.setOnAction(e -> Actions.setOutputAction(Constants.CARS_ON_ROAD_OUTPUT_INDEX));
+        whenWasRoadEmptyItem.setOnAction(e -> Actions.setOutputAction(Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX));
+        collisionsItem.setOnAction(e -> Actions.setOutputAction(Constants.COLLISION_COUNT_OUTPUT_INDEX));
+        roadDetailsItem.setOnAction(e -> Actions.setOutputAction(Constants.ROAD_DETAILS_OUTPUT_INDEX));
+
         whatToExportSubMenu.getItems().addAll(simulationDetailsItem, simulationTimeItem, carsPassedItem, carsOnRoadItem,
-                collisionsItem, roadDetailsItem);
+                whenWasRoadEmptyItem , collisionsItem, roadDetailsItem);
 
         setOutputFileNameItem.setOnAction(e -> Actions.setOutputFileAction());
 

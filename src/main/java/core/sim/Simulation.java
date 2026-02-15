@@ -108,13 +108,33 @@ public class Simulation {
      * @param roads array of roads to check
      * @return true if all roads and queues are empty, false otherwise
      **/
-    public boolean areAllRoadsAndQueuesEmpty(Road[] roads) {
+    public boolean areAllRoadsAndQueuesEmptyOld(Road[] roads) {
         for (Road road : roads) {
             if (road.getNumberOfCarsOnRoad() > 0 || !road.areAllQueuesEmpty()) {
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * Checks if all roads and their queues are empty, if they are
+     *
+     * @param roads array of roads to check
+     * @return true if all roads and queues are empty, false otherwise
+     **/
+    public boolean areAllRoadsAndQueuesEmpty(Road[] roads) {
+        boolean empty = true;
+        ResultsRecorder recorder = ResultsRecorder.getResultsRecorder();
+        for (Road road : roads) {
+            if (road.getNumberOfCarsOnRoad() > 0 || !road.areAllQueuesEmpty()) {
+                empty = false;
+            } else if (!recorder.wasRoadAlreadyEmpty(road.getId())) {
+                MyLogger.log("Road " + road.getId() + " is empty at step " + this.stepCount + ".", Constants.INFO_FOR_LOGGING);
+                recorder.recordRoadEmpty(road.getId(), this.stepCount);
+            }
+        }
+        return empty;
     }
 
     /**

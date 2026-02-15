@@ -52,6 +52,13 @@ public class RunDetails {
         return this.outputDetails != null && outputDetails.outputFile != null && !outputDetails.outputFile.isEmpty();
     }
 
+    public boolean getOutputDetail(int index) {
+        if (outputDetails == null || index < 0 || index >= outputDetails.output.length) {
+            return false; // Return false if outputDetails is null or index is out of bounds
+        }
+        return outputDetails.getOutputSetting(index);
+    }
+
     /**
      * Returns a string representation of the RunDetails object, including all its fields and their values.
      *

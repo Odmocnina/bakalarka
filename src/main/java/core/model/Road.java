@@ -39,6 +39,9 @@ public abstract class Road {
     /** id of cars **/
     public int idOfCar = 0;
 
+    /** id of road **/
+    public int id;
+
     /** light plans on lanes **/
     protected LightPlan[] lightPlansOnLanes;
 
@@ -50,11 +53,12 @@ public abstract class Road {
      * @param speedLimit speed limit on road
      * @param type type of road
      **/
-    public Road(double length, int numberOfLanes, double speedLimit, String type) {
+    public Road(double length, int numberOfLanes, double speedLimit, String type, int id) {
         this.length = length;
         this.numberOfLanes = numberOfLanes;
         this.speedLimit = speedLimit;
         this.type = type;
+        this.id = id;
         LinkedList<CarGenerator> carGenerators = DefaultStuffMaker.createDefaultGenerator(numberOfLanes);
         this.generators = new CarGenerator[numberOfLanes];
         for (int i = 0; i < numberOfLanes; i++) {
@@ -108,7 +112,7 @@ public abstract class Road {
                 .append(", type=").append(type)
                 .append("]");
         for (int i = 0; i < numberOfLanes; i++) {
-            sb.append("Lane ").append(i).append(": ");
+            sb.append(", Lane ").append(i).append(": ");
             sb.append("Generator: ").append(generators[i].toString()).append(", ");
             sb.append("LightPlan: ").append(lightPlansOnLanes[i].toString());
         }
@@ -156,6 +160,23 @@ public abstract class Road {
         }
         for (Queue<CarParams> queue : carQueuesPerLane) {
             if (queue != null && !queue.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * method to check if all lanes have queues, if they are used
+     *
+     * @return true if all lanes have queues, false otherwise
+     **/
+    public boolean areAllLanesQueue() {
+        if (carQueuesPerLane == null) {
+            return false;
+        }
+        for (Queue<CarParams> queue : carQueuesPerLane) {
+            if (queue == null) {
                 return false;
             }
         }
@@ -436,6 +457,15 @@ public abstract class Road {
         for (LightPlan lp : lightPlansOnLanes) {
             lp.reset();
         }
+    }
+
+    /**
+     * getter for id of road
+     *
+     * @return id of road
+     **/
+    public int getId() {
+        return id;
     }
 
 }

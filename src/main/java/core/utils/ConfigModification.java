@@ -53,4 +53,13 @@ public class ConfigModification {
         AppContext.RUN_DETAILS.log[index] = !AppContext.RUN_DETAILS.log[index];
     }
 
+    /**
+     * method to change the output settings, it toggles the output setting at the specified index (on/off) in the
+     * AppContext, this determines what simulation details are written to the output file when output is triggered
+     *
+     * @param index index of the output setting to be toggled in the AppContext
+     **/
+    public static void changeOutput(int index) {
+        AppContext.RUN_DETAILS.outputDetails.output[index] = !AppContext.RUN_DETAILS.outputDetails.output[index];
+    }
 }

@@ -51,6 +51,8 @@ public class ConfigConstants {
     public static final String TIME_BETWEEN_STEPS_TAG = "timeBetweenSteps";
     public static final String PREVENT_COLLISION_TAG = "preventCollision";
     public static final String COLLISION_COUNT_TAG = "collisionCount";
+    public static final String WHEN_WAS_ROAD_EMPTY_TAG = "whenWasRoadEmpty";
     public static final String MAP_TAG = "map";
+
 
 }

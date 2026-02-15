@@ -3,6 +3,8 @@ package app;
 import core.utils.*;
 import core.utils.constants.Constants;
 import core.utils.loading.ConfigLoader;
+import models.ICarFollowingModel;
+import models.ILaneChangingModel;
 import ui.Window;
 
 /*****************************
@@ -20,8 +22,55 @@ public class Main {
      *             file is used
      **/
     public static void main(String[] args) {
+        String durationArgument = InputParametersHandeler.getSpecificParameter(args, Constants.DURATION_PARAMETER_PREFIX);
+        int duration = InputParametersHandeler.getDurationFromParameter(durationArgument);
+        if (duration == Constants.INVALID_INPUT_PARAMETERS) {
+            MyLogger.logBeforeLoading("Invalid duration value provided in input parameters, exiting.",
+                    Constants.FATAL_FOR_LOGGING);
+            return;
+        } else if (duration != Constants.NO_DURATION_PROVIDED) {
+            MyLogger.logBeforeLoading("Duration provided: " + duration + " seconds (steps in simulation), starting app without GUI.",
+                    Constants.INFO_FOR_LOGGING);
+        } else {
+            MyLogger.logBeforeLoading("No duration provided, starting app with GUI.", Constants.INFO_FOR_LOGGING);
+        }
+
+        String configPathArgument = InputParametersHandeler.getSpecificParameter(args, Constants.CONFIG_PATH_PARAMETER_PREFIX);
+        String configPath = InputParametersHandeler.getConfigPathFromParameter(configPathArgument);
+
+        String outFileArgument = InputParametersHandeler.getSpecificParameter(args, Constants.OUTPUT_FILE_PARAMETER_PREFIX);
+        String outFile = InputParametersHandeler.getOutputFilePathFromParameter(outFileArgument);
+
+        String carFollowingModelArgument = InputParametersHandeler.getSpecificParameter(args, Constants.CAR_FOLLOWING_MODEL_PARAMETER_PREFIX);
+        ICarFollowingModel carFollowingModel = null;
+        if (carFollowingModelArgument != null && !carFollowingModelArgument.isEmpty()) {
+            carFollowingModel = InputParametersHandeler.getCarFollowingModelFromParameter(carFollowingModelArgument);
+            if (carFollowingModel == null) {
+                MyLogger.logBeforeLoading("Invalid car following model provided in input parameters, exiting.",
+                        Constants.FATAL_FOR_LOGGING);
+                return;
+            }
+        } else {
+            MyLogger.logBeforeLoading("No car following model provided in input parameters, using default " +
+                    "model in config file.", Constants.INFO_FOR_LOGGING);
+        }
+
+        String laneChangingModelArgument = InputParametersHandeler.getSpecificParameter(args, Constants.LANE_CHANGING_MODEL_PARAMETER_PREFIX);
+        ILaneChangingModel laneChangingModel = null;
+        if (laneChangingModelArgument != null && !laneChangingModelArgument.isEmpty()) {
+            laneChangingModel = InputParametersHandeler.getLaneChangingModelFromParameter(laneChangingModelArgument);
+            if (laneChangingModel == null) {
+                MyLogger.logBeforeLoading("Invalid lane changing model provided in input parameters, exiting.",
+                        Constants.FATAL_FOR_LOGGING);
+                return;
+            }
+        } else {
+            MyLogger.logBeforeLoading("No lane changing model provided in input parameters, using default " +
+                    "model in config file.", Constants.INFO_FOR_LOGGING);
+        }
+
         // load run details from configuration file
-        boolean success = ConfigLoader.loadAllConfig(args);
+        boolean success = ConfigLoader.loadAllConfig(configPath, carFollowingModel, laneChangingModel, duration, outFile);
 
         if (!success) {
             MyLogger.logBeforeLoading("Failed to load configuration, exiting.", Constants.ERROR_FOR_LOGGING);

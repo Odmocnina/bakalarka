@@ -49,7 +49,7 @@ public class ConfigLoader {
         } catch (NullPointerException e) {
             MyLogger.logBeforeLoading("Config file not found, loading default config"
                     , Constants.ERROR_FOR_LOGGING);
-            configFile = new File(Constants.CONFIG_FILE);
+            configFile = new File(Constants.DEFAULT_CONFIG_FILE);
             if (!configFile.exists()) {
                 MyLogger.logBeforeLoading("Default config file not found, exiting"
                         , Constants.FATAL_FOR_LOGGING);
@@ -261,7 +261,7 @@ public class ConfigLoader {
      * @throws ClassNotFoundException if a class in the package cannot be found
      * @throws IOException if there is an error reading from the package resources
      */
-    private static List<Class<?>> getClasses(String packageName) throws ClassNotFoundException, IOException {
+    public static List<Class<?>> getClasses(String packageName) throws ClassNotFoundException, IOException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         assert classLoader != null;
         String path = packageName.replace('.', '/');
@@ -312,7 +312,7 @@ public class ConfigLoader {
      *
      * @return loaded RunDetails object, or null if loading failed
      **/
-    public static RunDetails loadRunDetails() {
+    public static RunDetails loadRunDetails(int duration, String outputFileFromParameter) {
         try {
             RunDetails detailsFromConfig = new RunDetails();
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -322,9 +322,9 @@ public class ConfigLoader {
 
             Element runDetailsElement = (Element) doc.getElementsByTagName(ConfigConstants.RUN_DETAILS_TAG).
                     item(0);
-            Element duration = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.DURATION_TAG).item(0);
+            //Element duration = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.DURATION_TAG).item(0);
             Element timeStep = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.TIME_STEP_TAG).item(0);
-            Element showGui = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.SHOW_GUI_TAG).item(0);
+           // Element showGui = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.SHOW_GUI_TAG).item(0);
             Element outputElements = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.OUTPUT_TAG).item(0);
             Element drawCells = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.DRAW_CELLS_TAG).item(0);
             Element logElements = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.LOGGING_TAG).item(0);
@@ -334,7 +334,7 @@ public class ConfigLoader {
             Element debug = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.DEBUG_TAG).item(0);
             Element preventCollisions = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.PREVENT_COLLISION_TAG).item(0);
 
-            if (duration != null) {
+           /* if (duration != null) {
                 detailsFromConfig.duration = Integer.parseInt(duration.getTextContent());
                 if (detailsFromConfig.duration <= 0) {
                     MyLogger.logBeforeLoading("Duration must be greater than 0, exiting"
@@ -345,6 +345,14 @@ public class ConfigLoader {
                 MyLogger.logBeforeLoading("Missing duration in run details, setting to undefined"
                         , Constants.WARN_FOR_LOGGING);
                 detailsFromConfig.duration = (int) Constants.PARAMETER_UNDEFINED;
+            }*/
+            if (duration != Constants.NO_DURATION_PROVIDED) {
+                detailsFromConfig.duration = duration;
+                detailsFromConfig.showGui = false;
+                MyLogger.logBeforeLoading("Duration provided as input parameter: " + duration + " seconds (steps in simulation)"
+                        , Constants.INFO_FOR_LOGGING);
+            } else { // if no duration, then show gui
+                detailsFromConfig.showGui = true;
             }
 
             if (timeStep != null) {
@@ -357,7 +365,7 @@ public class ConfigLoader {
                 return null;
             }
 
-            if (showGui != null) {
+           /* if (showGui != null) {
                 MyLogger.logBeforeLoading("Show GUI from config: " + showGui.getTextContent()
                         , Constants.INFO_FOR_LOGGING);
                 detailsFromConfig.showGui = Boolean.parseBoolean(showGui.getTextContent());
@@ -365,9 +373,9 @@ public class ConfigLoader {
                 MyLogger.logBeforeLoading("Missing showGui in run details, setting to false"
                         , Constants.INFO_FOR_LOGGING);
                 detailsFromConfig.showGui = false;
-            }
+            }*/
 
-            boolean hasOutput = loadOutput(detailsFromConfig, outputElements);
+            boolean hasOutput = loadOutput(detailsFromConfig, outputElements, outputFileFromParameter);
             if (hasOutput) {
                 MyLogger.logBeforeLoading("Output will be written to file: " + detailsFromConfig.outputDetails
                                 .outputFile, Constants.INFO_FOR_LOGGING);
@@ -512,7 +520,7 @@ public class ConfigLoader {
      * @return true if output writing is enabled and settings were loaded successfully, false if output writing is
      *          disabled or loading failed
      */
-    private static boolean loadOutput(RunDetails detailsFromConfig, Element outputElements) {
+    private static boolean loadOutput(RunDetails detailsFromConfig, Element outputElements, String outputFileFromParameter) {
         if (outputElements == null) {
             MyLogger.logBeforeLoading("Missing output details in run details, defaulting to no output"
                     , Constants.WARN_FOR_LOGGING);
@@ -523,7 +531,7 @@ public class ConfigLoader {
         NodeList outputChildren = outputElements.getChildNodes();
 
         boolean writeOutput = true;
-        String outputFile = null;
+        String outputFile = outputFileFromParameter;
         String outputType = "txt";
         String csvSeparator = Constants.DEFAULT_CSV_SEPARATOR;
         OutputDetails outputDetails = new OutputDetails();
@@ -535,7 +543,11 @@ public class ConfigLoader {
                 String nodeName = outputElement.getNodeName();
 
                 switch (nodeName) {
-                    case ConfigConstants.FILE_TAG -> outputFile = outputElement.getTextContent();
+                    case ConfigConstants.FILE_TAG -> {
+                        if (outputFileFromParameter == null || outputFileFromParameter.isEmpty()) { // if output file is not specified in
+                            outputFile = outputElement.getTextContent(); // parameter, use config file
+                        }
+                    }
                     case ConfigConstants.WRITE_OUTPUT_TAG -> writeOutput = Boolean.parseBoolean(outputElement.getTextContent());
                     case ConfigConstants.TYPE_TAG -> outputType = outputElement.getTextContent().toLowerCase().trim();
                     case ConfigConstants.CSV_SEPARATOR_TAG -> csvSeparator = outputElement.getTextContent();
@@ -564,19 +576,19 @@ public class ConfigLoader {
 
     }
 
+
     /**
      * method to load all configuration from the config file, including car following model, lane changing model, roads,
      *
-     * @param args command line arguments, if args[0] is present, it is used as the config file path, otherwise default
-     *             config file is used
+     *
      * @return true if all configuration was loaded successfully, false if any part of the configuration failed to load
      */
-    public static boolean loadAllConfig(String[] args) {
+  /*  public static boolean loadAllConfig(String[] args) {
         String configFile;
         if (args.length == 0) { // use default config file if none provided
-            MyLogger.logBeforeLoading("No config file provided, using default: " + Constants.CONFIG_FILE,
+            MyLogger.logBeforeLoading("No config file provided, using default: " + Constants.DEFAULT_CONFIG_FILE,
                     Constants.WARN_FOR_LOGGING);
-            configFile = Constants.CONFIG_FILE;
+            configFile = Constants.DEFAULT_CONFIG_FILE;
         } else {
             MyLogger.logBeforeLoading("Config file provided: " + args[0], Constants.INFO_FOR_LOGGING);
             configFile = args[0];
@@ -651,6 +663,115 @@ public class ConfigLoader {
         AppContext.RENDERER = renderer;
 
         RunDetails runDetails = ConfigLoader.loadRunDetails(); // loading run details (show gui, duration...)
+        if (runDetails == null) {
+            MyLogger.logBeforeLoading("Failed to load run details, exiting.", Constants.FATAL_FOR_LOGGING);
+            return false;
+        } else {
+            MyLogger.logBeforeLoading("Loaded run details: duration=" + runDetails.duration + ", timeStep=" +
+                    runDetails.timeStep + ", showGui=" + runDetails.showGui + ", outputFile=" + runDetails.outputDetails
+                    .outputFile + ", drawCells=" + runDetails.drawCells, Constants.INFO_FOR_LOGGING);
+        }
+        runDetails.setNewMapFile(mapFileName);
+        AppContext.RUN_DETAILS = runDetails;
+
+        ResultsRecorder.getResultsRecorder().initialize(roads.length, runDetails.outputDetails.outputFile);
+
+        // create simulation and store it in app context, simulation is the thing that updates all roads and cars
+        AppContext.SIMULATION = new Simulation(roads);
+        return true;
+    }*/
+
+    public static boolean loadAllConfig(String configFilePath, ICarFollowingModel carFollowingModelFromInput,
+                                        ILaneChangingModel laneChangingModelFromInput, int duration, String outputFile) {
+        String configFile;
+        if (configFilePath == null || configFilePath.isEmpty()) { // use default config file if none provided
+            MyLogger.logBeforeLoading("No config file provided, using default: " + Constants.DEFAULT_CONFIG_FILE,
+                    Constants.WARN_FOR_LOGGING);
+            configFile = Constants.DEFAULT_CONFIG_FILE;
+        } else {
+            MyLogger.logBeforeLoading("Config file provided: " + configFilePath, Constants.INFO_FOR_LOGGING);
+            configFile = configFilePath;
+        }
+
+        if (ConfigLoader.giveConfigFile(configFile)) { // wierd thing that I thought of, config file was opened multiple
+            // times when loading config info so now its opened only once and class
+            // remembers it
+            MyLogger.logBeforeLoading("Config file opened successfully: " + configFile, Constants.INFO_FOR_LOGGING);
+        } else {
+            MyLogger.logBeforeLoading("Failed to open config file: " + configFile + ", exiting.",
+                    Constants.FATAL_FOR_LOGGING);
+            return false;
+        }
+
+        ICarFollowingModel carFollowingModel = carFollowingModelFromInput;
+        if (carFollowingModel == null) {
+            // load car following model if it was not provided in input parameters, if it was provided in input
+            // parameters, it is already loaded and stored in app context
+            carFollowingModel = ConfigLoader.loadCarFollowingModel();
+            if (carFollowingModel == null) {
+                MyLogger.logBeforeLoading("Failed to load car following model, exiting."
+                        , Constants.FATAL_FOR_LOGGING);
+                return false;
+            } else {
+                MyLogger.logBeforeLoading("Loaded car following model: " + carFollowingModel.getID(),
+                        Constants.INFO_FOR_LOGGING);
+            }
+        }
+        MyLogger.logBeforeLoading("Using car following model: " + carFollowingModel.getID(), Constants.INFO_FOR_LOGGING);
+        AppContext.CAR_FOLLOWING_MODEL = carFollowingModel; // store model in app context for later use
+
+        ILaneChangingModel laneChangingModel = laneChangingModelFromInput;
+        if (laneChangingModel == null) {
+            // load lane changing model if it was not provided in input parameters, if it was provided in input parameters,
+            // it is already loaded and stored in app context
+            laneChangingModel = ConfigLoader.loadLaneChangingModel();
+            if (laneChangingModel == null) {
+                MyLogger.logBeforeLoading("Failed to load lane changing model, exiting.", Constants.FATAL_FOR_LOGGING);
+                return false;
+            } else {
+                MyLogger.logBeforeLoading("Loaded lane changing model: " + laneChangingModel.getID(),
+                        Constants.INFO_FOR_LOGGING);
+            }
+        }
+        MyLogger.logBeforeLoading("Using lane changing model: " + laneChangingModel.getID(), Constants.INFO_FOR_LOGGING);
+        AppContext.LANE_CHANGING_MODEL = laneChangingModel; // store model in app context for later use
+
+        // load roads from config
+        Road[] roads = ConfigLoader.loadRoads();
+        if (roads == null) {
+            MyLogger.logBeforeLoading("Failed to load road configuration, exiting."
+                    , Constants.FATAL_FOR_LOGGING);
+            return false;
+        } else {
+            for (int i = 0; i < roads.length; i++) {
+                MyLogger.logBeforeLoading("Loaded road(" + i + "): " + roads[i].toString(), Constants.INFO_FOR_LOGGING);
+            }
+        }
+        String mapFileName = ConfigLoader.getMapFileName();
+
+        // check if type of road matches type of car following model
+        if (!roads[0].getType().equals(carFollowingModel.getType())) {
+            MyLogger.logBeforeLoading("Types of car following model and road do not match: model type=" +
+                    carFollowingModel.getType() + ", road type=" + roads[0].getType(), Constants.FATAL_FOR_LOGGING);
+            return false;
+        } else {
+            MyLogger.logBeforeLoading("Types of car following model and road match: " + roads[0].getType(),
+                    Constants.INFO_FOR_LOGGING);
+        }
+
+        IRoadRenderer renderer; // renderer for drawing roads in gui, depends on road type, because different road types
+        // have different content
+        if (roads[0].getType().equals(Constants.CELLULAR)) {
+            renderer = new CellularRoadRenderer();
+        } else if (roads[0].getType().equals(Constants.CONTINUOUS)) {
+            renderer = new ContinuousRoadRenderer();
+        } else {
+            MyLogger.logBeforeLoading("Unknown road type: " + roads[0].getType(), Constants.FATAL_FOR_LOGGING);
+            return false;
+        }
+        AppContext.RENDERER = renderer;
+
+        RunDetails runDetails = ConfigLoader.loadRunDetails(duration, outputFile); // loading run details (show gui, duration...)
         if (runDetails == null) {
             MyLogger.logBeforeLoading("Failed to load run details, exiting.", Constants.FATAL_FOR_LOGGING);
             return false;

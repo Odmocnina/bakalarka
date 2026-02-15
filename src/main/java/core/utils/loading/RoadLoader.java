@@ -77,7 +77,7 @@ public class RoadLoader {
 
             for (int i = 0; i < roadCount; i++) {
                 Element roadElement = (Element) doc.getElementsByTagName(RoadLoadingConstants.ROAD_TAG).item(i);
-                Road road = loadRoad(roadElement);
+                Road road = loadRoad(roadElement, i);
                 if (road != null) {
                     map[i] = road;
                 } else {
@@ -101,7 +101,7 @@ public class RoadLoader {
      * @param roadElement XML Element containing road configuration
      * @return loaded Road object, or null if loading failed
      **/
-    public static Road loadRoad(Element roadElement) {
+    public static Road loadRoad(Element roadElement, int index) {
         Element length = (Element) roadElement.getElementsByTagName(RoadLoadingConstants.ROAD_LENGTH_TAG).item(0);
         Element maxSpeed = (Element) roadElement.getElementsByTagName(RoadLoadingConstants.ROAD_MAX_SPEED_TAG).item(0);
         Element numberOfLanes = (Element) roadElement.getElementsByTagName(RoadLoadingConstants.NUMBER_OF_LANES_TAG).item(0);
@@ -114,9 +114,9 @@ public class RoadLoader {
 
         Road road;
         if (AppContext.CAR_FOLLOWING_MODEL.getType().equals(Constants.CELLULAR)) {
-            road = new CellularRoad(lengthValue, numberOfLanesValue, maxSpeedValue, AppContext.CAR_FOLLOWING_MODEL.getCellSize());
+            road = new CellularRoad(lengthValue, numberOfLanesValue, maxSpeedValue, AppContext.CAR_FOLLOWING_MODEL.getCellSize(), index);
         } else if (AppContext.CAR_FOLLOWING_MODEL.getType().equals(Constants.CONTINUOUS)) {
-            road = new ContinuosRoad(lengthValue, numberOfLanesValue, maxSpeedValue);
+            road = new ContinuosRoad(lengthValue, numberOfLanesValue, maxSpeedValue, index);
         } else {
             MyLogger.logBeforeLoading("Unknown car following model type: " + AppContext.CAR_FOLLOWING_MODEL.getType()
                     , Constants.FATAL_FOR_LOGGING);

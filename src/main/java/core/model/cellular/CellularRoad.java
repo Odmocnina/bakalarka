@@ -41,8 +41,8 @@ public class CellularRoad extends Road {
      * @param speedLimit speed limit on the road in m/s
      * @param cellSize size of each cell in meters
      **/
-    public CellularRoad(double length, int numberOfLanes, double speedLimit, double cellSize) {
-        super(length, numberOfLanes, speedLimit, Constants.CELLULAR);
+    public CellularRoad(double length, int numberOfLanes, double speedLimit, double cellSize, int id) {
+        super(length, numberOfLanes, speedLimit, Constants.CELLULAR, id);
         this.cellSize = cellSize;
         this.speedLimitInCells = (int) Math.ceil(speedLimit / cellSize);
         createRoad();
@@ -676,9 +676,10 @@ public class CellularRoad extends Road {
                 break; // beyond road end
             }
             if (cells[lane][pos].isOccupied()) {
-                ResultsRecorder.getResultsRecorder().addCollision();
                 if (AppContext.RUN_DETAILS.preventCollisions) {
                     return pos - 1 - oldX; // return distance to the cell before collision
+                } else {
+                    ResultsRecorder.getResultsRecorder().addCollision(this.id);
                 }
             }
         }

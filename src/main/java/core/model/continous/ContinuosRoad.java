@@ -29,8 +29,8 @@ public class ContinuosRoad extends Road {
      * @param numberOfLanes number of lanes on the road
      * @param speedLimit speed limit on the road
      **/
-    public ContinuosRoad(double length, int numberOfLanes, double speedLimit) {
-        super(length, numberOfLanes, speedLimit, Constants.CONTINUOUS);
+    public ContinuosRoad(double length, int numberOfLanes, double speedLimit, int id) {
+        super(length, numberOfLanes, speedLimit, Constants.CONTINUOUS, id);
         createRoad();
     }
 
@@ -766,9 +766,10 @@ public class ContinuosRoad extends Road {
             double distanceToCarInFront = carInFront.xPosition - carInFront.getParameter(RequestConstants.LENGTH_REQUEST)
                     - car.xPosition;
             if (distanceToCarInFront < newSpeed) {
-                ResultsRecorder.getResultsRecorder().addCollision();
                 if (AppContext.RUN_DETAILS.preventCollisions) {
                     return distanceToCarInFront - 1.0;
+                } else {
+                    ResultsRecorder.getResultsRecorder().addCollision(this.id);
                 }
             }
         }

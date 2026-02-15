@@ -33,7 +33,7 @@ class CellularRoadTest {
     @BeforeEach
     void setUp() {
         // length = 100 m, lanes = 3, speedLimit arbitrary, cellSize = 5 m -> 20 cells
-        road = new CellularRoad(100.0, 3, 30.0, 5.0);
+        road = new CellularRoad(100.0, 3, 30.0, 5.0, 0);
         cells = road.getContent();
         clearRoad(); // clear any debug cars created in createRoad()
     }

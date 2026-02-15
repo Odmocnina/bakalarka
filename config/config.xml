@@ -14,7 +14,7 @@
     <runDetails>
         <showGui>true</showGui>
         <drawCells>false</drawCells>
-        <laneChange>false</laneChange>
+        <laneChange>true</laneChange>
         <timeStep>1</timeStep>
         <duration>50000</duration>
         <debug>false</debug>
@@ -29,7 +29,7 @@
         </logging>
         <output>
             <writeOutput>true</writeOutput>
-            <file>output/queueTest.csv</file>
+            <file>output/helly.txt</file>
             <type>txt</type>
             <csvSeparator>;</csvSeparator>
             <whatToWrite>
@@ -37,9 +37,9 @@
                 <simulationTime>true</simulationTime>
                 <carsPassed>true</carsPassed>
                 <carsOnRoad>true</carsOnRoad>
-                <roadDetails>true</roadDetails>
-                <generationDetails>true</generationDetails>
+                <whenWasRoadEmpty>true</whenWasRoadEmpty>
                 <collisionCount>true</collisionCount>
+                <roadDetails>true</roadDetails>
             </whatToWrite>
         </output>
         <timeBetweenSteps>100</timeBetweenSteps>

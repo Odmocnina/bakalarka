@@ -93,9 +93,9 @@ public class RoadParameters {
             if (rp != null) {
                 Road road;
                 if (type.equals(Constants.CELLULAR)) {
-                    road = new CellularRoad(rp.length, rp.lanes, rp.maxSpeed, cellSize);
+                    road = new CellularRoad(rp.length, rp.lanes, rp.maxSpeed, cellSize, i);
                 } else if (type.equals(Constants.CONTINUOUS)) {
-                    road = new ContinuosRoad(rp.length, rp.lanes, rp.maxSpeed);
+                    road = new ContinuosRoad(rp.length, rp.lanes, rp.maxSpeed, i);
                 } else {
                     MyLogger.log("Unknown car following model type: " + type + ". Cannot create road.",
                             Constants.ERROR_FOR_LOGGING);

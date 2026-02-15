@@ -16,32 +16,32 @@ public class OutputDetails {
     /** Output file name for writing simulation results **/
     public String outputFile;
 
-    /** Output settings: [simulationDetails, simulationTime, carsPassed, carsOnRoad, roadDetails, generationDetails, collisions] **/
-    public boolean[] output = new boolean[] { true, true, true, true, true, false, true };
+    /** Output settings: [simulationDetails, simulationTime, carsPassed, carsOnRoad, whenWasRoadEmpty, collisions, roadDetails] **/
+    public boolean[] output = new boolean[] { true, true, true, true, true, true, false, true };
 
     /** CSV separator character **/
     public String csvSeparator = Constants.DEFAULT_CSV_SEPARATOR;
 
     /** index of true/false in output array of simulation details **/
-    final int SIMULATION_DETAILS_INDEX = 0;
+    final int SIMULATION_DETAILS_INDEX = Constants.SIMULATION_DETAILS_OUTPUT_INDEX;
 
     /** index of true/false in output array of simulation time **/
-    final int SIMULATION_TIME_INDEX = 1;
+    final int SIMULATION_TIME_INDEX = Constants.SIMULATION_TIME_OUTPUT_INDEX;
 
     /** index of true/false in output array of cars passed **/
-    final int CARS_PASSED_INDEX = 2;
+    final int CARS_PASSED_INDEX = Constants.CARS_PASSED_OUTPUT_INDEX;
 
     /** index of true/false in output array of cars on road **/
-    final int CARS_ON_ROAD_INDEX = 3;
+    final int CARS_ON_ROAD_INDEX = Constants.CARS_ON_ROAD_OUTPUT_INDEX;
 
-    /** index of true/false in output array of road details **/
-    final int ROAD_DETAILS_INDEX = 4;
-
-    /** index of true/false in output array of generation details **/
-    final int GENERATION_DETAILS_INDEX = 5;
+    /** index of true/false in output array of when was road empty **/
+    final int WHEN_WAS_ROAD_EMPTY_INDEX = Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX;
 
     /** index of true/false in output array of collision count **/
-    final int COLLISION_COUNT_INDEX = 6;
+    final int COLLISION_COUNT_INDEX = Constants.COLLISION_COUNT_OUTPUT_INDEX;
+
+    /** index of true/false in output array of road details **/
+    final int ROAD_DETAILS_INDEX = Constants.ROAD_DETAILS_OUTPUT_INDEX;
 
     /** Names of the output details corresponding to their indices **/
     private final String[] DETAILS_NAME = {// Mapping detail names from XML to their corresponding indices, bullshit
@@ -49,9 +49,9 @@ public class OutputDetails {
             ConfigConstants.SIMULATION_TIME_TAG,
             ConfigConstants.CARS_PASSED_TAG,
             ConfigConstants.CARS_ON_ROAD_TAG,
-            ConfigConstants.ROAD_DETAILS_TAG,
-            ConfigConstants.GENERATION_DETAILS_TAG,
-            ConfigConstants.COLLISION_COUNT_TAG
+            ConfigConstants.WHEN_WAS_ROAD_EMPTY_TAG,
+            ConfigConstants.COLLISION_COUNT_TAG,
+            ConfigConstants.ROAD_DETAILS_TAG
     };
 
     /** Indices of the output details corresponding to their names **/
@@ -60,9 +60,9 @@ public class OutputDetails {
             SIMULATION_TIME_INDEX,
             CARS_PASSED_INDEX,
             CARS_ON_ROAD_INDEX,
+            WHEN_WAS_ROAD_EMPTY_INDEX,
+            COLLISION_COUNT_INDEX,
             ROAD_DETAILS_INDEX,
-            GENERATION_DETAILS_INDEX,
-            COLLISION_COUNT_INDEX
     };
 
     /**
@@ -109,6 +109,20 @@ public class OutputDetails {
             }
         }
         return false; // Default to false if partName not found
+    }
+
+    /**
+     * method to get the output setting for a specific index.
+     *
+     * @param index The index of the output setting to retrieve.
+     * @return true if the output setting at the specified index is enabled, false otherwise.
+     * @throws IndexOutOfBoundsException if the provided index is out of bounds for the output array.
+     **/
+    public boolean getOutputSetting(int index) {
+        if (index >= 0 && index < output.length) {
+            return output[index];
+        }
+        throw new IndexOutOfBoundsException("Invalid output setting index: " + index);
     }
 
     /**

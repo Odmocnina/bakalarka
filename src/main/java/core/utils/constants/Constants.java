@@ -15,7 +15,7 @@ public class Constants {
     public static final int CANVAS_HEIGHT = 300;
     public static final Color ROAD_COLOR = Color.DARKGRAY;
     public static final Color LINE_SEPERATOR_COLOR = Color.WHITE;
-    public static final String CONFIG_FILE = "config/config.xml";
+    public static final String DEFAULT_CONFIG_FILE = "config/config.xml";
     public static final String CELLULAR = "cellular";
     public static final String CONTINUOUS = "continous";
     public static final int LINE_SEPARATOR_WIDTH = 2;
@@ -53,7 +53,25 @@ public class Constants {
     public static final int FATAL_LOGGING_INDEX = 4;
     public static final int DEBUG_LOGGING_INDEX = 5;
 
+    // indices for output details, this is used in the OutputDetails class to determine which details to output based on
+    // the configuration file, the indices correspond to the order of the details in the output array in the
+    // OutputDetails class
+    public static final int SIMULATION_DETAILS_OUTPUT_INDEX = 0;
+    public static final int SIMULATION_TIME_OUTPUT_INDEX = 1;
+    public static final int CARS_PASSED_OUTPUT_INDEX = 2;
+    public static final int CARS_ON_ROAD_OUTPUT_INDEX = 3;
+    public static final int WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX = 4;
+    public static final int COLLISION_COUNT_OUTPUT_INDEX = 5;
+    public static final int ROAD_DETAILS_OUTPUT_INDEX = 6;
+
+
     public static final int NO_DURATION_PROVIDED = -1;
     public static final int INVALID_INPUT_PARAMETERS = -2;
+    public static final int NO_RECORD_YET = -3;
 
+    public static final String DURATION_PARAMETER_PREFIX = "--dur=";
+    public static final String CONFIG_PATH_PARAMETER_PREFIX = "--cfg=";
+    public static final String OUTPUT_FILE_PARAMETER_PREFIX = "--out=";
+    public static final String CAR_FOLLOWING_MODEL_PARAMETER_PREFIX = "--cfm=";
+    public static final String LANE_CHANGING_MODEL_PARAMETER_PREFIX = "--lcm=";
 }
