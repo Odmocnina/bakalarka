@@ -56,6 +56,12 @@ public class Window extends Application {
     /** info label at the bottom **/
     private Label infoLabel;
 
+    /** button for start/stop in toolbar **/
+    private Button toolbarStartStopBtn;
+
+    /** menu item for start/stop in menu **/
+    private MenuItem menuStartStopItem;
+
     /**
      * start method for JavaFX application
      *
@@ -544,14 +550,16 @@ public class Window extends Application {
         saveAsMapFileBtn.setStyle(defaultStyle);
 
         // simulation control buttons
-        Button startStopBtn = createIconButton("/icons/run.png", "Start/Stop simulation");
+       // Button startStopBtn = createIconButton("/icons/run.png", "Start/Stop simulation");
+        toolbarStartStopBtn = createIconButton("/icons/run.png", "Start/Stop simulation");
         Button nextStepBtn = createIconButton("/icons/nextStep.png", "Next simulation step");
         Button resetBtn = createIconButton("/icons/reset.png", "Reset simulation");
         ToggleButton collisionBanBtn = createIconToggleButton("/icons/collisionBan.png",
                 "Ban collisions (toggle)");
         Button setTimeBetweenStepsBtn = createIconButton("/icons/time.png",
                 "Set time between simulation steps (ms)");
-        startStopBtn.setStyle(defaultStyle);
+        //startStopBtn.setStyle(defaultStyle);
+        toolbarStartStopBtn.setStyle(defaultStyle);
         nextStepBtn.setStyle(defaultStyle);
         resetBtn.setStyle(defaultStyle);
         setTimeBetweenStepsBtn.setStyle(defaultStyle);
@@ -652,7 +660,7 @@ public class Window extends Application {
 
         editMapFileBtn.setOnAction(e -> Actions.editMapFile(primaryStage, paintAll));
 
-        startStopBtn.setOnAction(e -> {
+        /*startStopBtn.setOnAction(e -> {
             if (engine.getRunning()) {
                 setButtonImage("/icons/run.png", startStopBtn);
                 engine.stop();
@@ -662,7 +670,9 @@ public class Window extends Application {
                 engine.start();
                 MyLogger.log("Simulation started via toolbar button", Constants.INFO_FOR_LOGGING);
             }
-        });
+        });*/
+
+        toolbarStartStopBtn.setOnAction(e -> handleStartStopAction());
 
         resetBtn.setOnAction(e -> Actions.resetSimulationAction(simulation, paintAll));
 
@@ -696,7 +706,8 @@ public class Window extends Application {
                 openMapFileBtn,
                 saveMapFileBtn,
                 saveAsMapFileBtn,
-                startStopBtn,
+                toolbarStartStopBtn,
+                //startStopBtn,
                 nextStepBtn,
                 resetBtn,
                 changeLaneBtn,
@@ -766,7 +777,9 @@ public class Window extends Application {
      **/
     private Menu createSimulationMenu(Stage primaryStage, Runnable paintAll) {
         Menu simulationMenu = new Menu("Simulation");
-        MenuItem startStopItem = new MenuItem("Start/Stop simulation", createMenuIcon("/icons/run.png"));
+        //MenuItem startStopItem = new MenuItem("Start/Stop simulation", createMenuIcon("/icons/run.png"));
+        menuStartStopItem = new MenuItem("Start/Stop simulation", createMenuIcon("/icons/run.png"));
+            menuStartStopItem.setOnAction(e -> handleStartStopAction());
         MenuItem nextStepItem = new MenuItem("Next simulation step", createMenuIcon("/icons/nextStep.png"));
         MenuItem resetSimulationItem = new MenuItem("Reset simulation", createMenuIcon("/icons/reset.png"));
         CheckMenuItem changeLaneToggleItem = new CheckMenuItem("Toggle lane change ban", createMenuIcon("/icons/ban.png"));
@@ -778,7 +791,7 @@ public class Window extends Application {
         changeLaneToggleItem.setSelected(!AppContext.RUN_DETAILS.laneChange);
         collisionBanToggleItem.setSelected(AppContext.RUN_DETAILS.preventCollisions);
 
-        startStopItem.setOnAction(e -> {
+        /*startStopItem.setOnAction(e -> {
             if (engine.getRunning()) {
                 setButtonImage("/icons/run.png", startStopItem);
                 engine.stop();
@@ -788,7 +801,8 @@ public class Window extends Application {
                 engine.start();
                 MyLogger.log("Simulation started via toolbar button", Constants.INFO_FOR_LOGGING);
             }
-        });
+        });*/
+        menuStartStopItem.setOnAction(e -> handleStartStopAction());
 
         nextStepItem.setOnAction(e -> Actions.nextStepAction(simulation, paintAll));
 
@@ -800,7 +814,7 @@ public class Window extends Application {
 
         setTimeBetweenStepsItem.setOnAction(e -> Actions.setTimeBetweenStepsAction(primaryStage, engine));
 
-        simulationMenu.getItems().addAll(startStopItem, nextStepItem, resetSimulationItem, changeLaneToggleItem,
+        simulationMenu.getItems().addAll(menuStartStopItem, nextStepItem, resetSimulationItem, changeLaneToggleItem,
                 collisionBanToggleItem, setTimeBetweenStepsItem);
 
         return simulationMenu;
@@ -919,5 +933,27 @@ public class Window extends Application {
      **/
     public static void main(String[] args) {
         launch(args);
+    }
+
+    /**
+     * helper method to handle start/stop action for simulation, used by both toolbar button and menu item to keep them
+     * in sync
+     **/
+    private void handleStartStopAction() {
+        boolean isRunning = engine.getRunning();
+
+        if (isRunning) {
+            engine.stop();
+            MyLogger.log("Simulation stopped.", Constants.INFO_FOR_LOGGING);
+
+            setButtonImage("/icons/run.png", toolbarStartStopBtn);
+            setButtonImage("/icons/run.png", menuStartStopItem);
+        } else {
+            engine.start();
+            MyLogger.log("Simulation started.", Constants.INFO_FOR_LOGGING);
+
+            setButtonImage("/icons/stop.png", toolbarStartStopBtn);
+            setButtonImage("/icons/stop.png", menuStartStopItem);
+        }
     }
 }
