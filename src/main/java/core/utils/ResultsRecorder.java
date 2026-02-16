@@ -381,43 +381,47 @@ public class ResultsRecorder {
         String csvSeparator = outputDetails.csvSeparator;
         String header = "";
         header = header + "Road Index" + csvSeparator;
-        if (outputDetails.writePart("carsPassed")) {
+        if (outputDetails.writePart(ConfigConstants.CARS_PASSED_TAG)) {
             header = header + "Cars Passed" + csvSeparator;
         }
-        if (outputDetails.writePart("carsOnRoad")) {
+        if (outputDetails.writePart(ConfigConstants.CARS_ON_ROAD_TAG)) {
             header = header + "Cars on Road" + csvSeparator;
         }
-        if (outputDetails.writePart("whenWasRoadEmpty")) {
+        if (outputDetails.writePart(ConfigConstants.WHEN_WAS_ROAD_EMPTY_TAG)) {
             header = header + "When was road empty" + csvSeparator;
         }
-        if (outputDetails.writePart("collisionCount")) {
+        if (outputDetails.writePart(ConfigConstants.COLLISION_COUNT_TAG)) {
             header = header + "Collisions Count" + csvSeparator;
         }
-        if (outputDetails.writePart("roadDetails")) {
-            header = header + "Road details" + csvSeparator;
+        if (outputDetails.writePart(ConfigConstants.ROAD_DETAILS_TAG)) {
+            header = header + "Road length" + csvSeparator + "Number of lanes" + csvSeparator + "Max speed" +
+                    csvSeparator;
         }
         header = header.trim();
 
         bw.write(header + "\n");
         for (int i = 0; i < carsPassedPerRoad.length; i++) {
             bw.write(i + csvSeparator);
-            if (outputDetails.writePart("carsPassed")) {
+            if (outputDetails.writePart(ConfigConstants.CARS_PASSED_TAG)) {
                 bw.write(carsPassedPerRoad[i] + csvSeparator);
             }
-            if (outputDetails.writePart("carsOnRoad")) {
+            if (outputDetails.writePart(ConfigConstants.CARS_ON_ROAD_TAG)) {
                 bw.write(AppContext.SIMULATION.getRoads()[i].getNumberOfCarsOnRoad() + csvSeparator);
             }
-            if (outputDetails.writePart("whenWasRoadEmpty")) {
+            if (outputDetails.writePart(ConfigConstants.WHEN_WAS_ROAD_EMPTY_TAG)) {
                 int emptyStep = whenWasRoadEmpty[i];
                 String emptyStepStr = (emptyStep != Constants.NO_RECORD_YET) ?
                         String.valueOf(emptyStep) : "Never empty"; // write when was road empty or not empty at all
                 bw.write(emptyStepStr + csvSeparator);
             }
-            if (outputDetails.writePart("collisionCount")) {
+            if (outputDetails.writePart(ConfigConstants.COLLISION_COUNT_TAG)) {
                 bw.write(this.collisionsCount[i] + csvSeparator);
             }
-            if (outputDetails.writePart("roadDetails")) {
-                bw.write(AppContext.SIMULATION.getRoads()[i].toString() + csvSeparator);
+            if (outputDetails.writePart(ConfigConstants.ROAD_DETAILS_TAG)) {
+                //bw.write(AppContext.SIMULATION.getRoads()[i].toString() + csvSeparator);
+                bw.write(AppContext.SIMULATION.getRoads()[i].getLength() + csvSeparator +
+                        AppContext.SIMULATION.getRoads()[i].getNumberOfLanes() + csvSeparator +
+                        AppContext.SIMULATION.getRoads()[i].getSpeedLimit() + csvSeparator);
             }
             bw.write("\n");
         }

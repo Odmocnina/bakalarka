@@ -672,9 +672,9 @@ public class Window extends Application {
             }
         });*/
 
-        toolbarStartStopBtn.setOnAction(e -> handleStartStopAction());
+        toolbarStartStopBtn.setOnAction(e -> handleStartStopAction(primaryStage));
 
-        resetBtn.setOnAction(e -> Actions.resetSimulationAction(simulation, paintAll));
+        resetBtn.setOnAction(e -> handleReset(primaryStage, paintAll));
 
         exportResultsToTxtBtn.setOnAction(e -> Actions.exportResultsToTxtAction());
 
@@ -779,7 +779,7 @@ public class Window extends Application {
         Menu simulationMenu = new Menu("Simulation");
         //MenuItem startStopItem = new MenuItem("Start/Stop simulation", createMenuIcon("/icons/run.png"));
         menuStartStopItem = new MenuItem("Start/Stop simulation", createMenuIcon("/icons/run.png"));
-            menuStartStopItem.setOnAction(e -> handleStartStopAction());
+       //     menuStartStopItem.setOnAction(e -> handleStartStopAction(primaryStage));
         MenuItem nextStepItem = new MenuItem("Next simulation step", createMenuIcon("/icons/nextStep.png"));
         MenuItem resetSimulationItem = new MenuItem("Reset simulation", createMenuIcon("/icons/reset.png"));
         CheckMenuItem changeLaneToggleItem = new CheckMenuItem("Toggle lane change ban", createMenuIcon("/icons/ban.png"));
@@ -802,11 +802,11 @@ public class Window extends Application {
                 MyLogger.log("Simulation started via toolbar button", Constants.INFO_FOR_LOGGING);
             }
         });*/
-        menuStartStopItem.setOnAction(e -> handleStartStopAction());
+        menuStartStopItem.setOnAction(e -> handleStartStopAction(primaryStage));
 
         nextStepItem.setOnAction(e -> Actions.nextStepAction(simulation, paintAll));
 
-        resetSimulationItem.setOnAction(e -> Actions.resetSimulationAction(simulation, paintAll));
+        resetSimulationItem.setOnAction(e -> handleReset(primaryStage, paintAll));
 
         changeLaneToggleItem.setOnAction(e -> Actions.changeLaneChangingAction(paintAll));
 
@@ -939,8 +939,18 @@ public class Window extends Application {
      * helper method to handle start/stop action for simulation, used by both toolbar button and menu item to keep them
      * in sync
      **/
-    private void handleStartStopAction() {
+    private void handleStartStopAction(Stage stage) {
         boolean isRunning = engine.getRunning();
+
+        if (!isRunning && simulation.getStepCount() <= 0 && AppContext.RUN_DETAILS.mapChanged) {
+            boolean start = DialogMaker.askIfUserWantToSaveMap(stage, "Unsaved Changes",
+                    "Unsaved changes in map.", "You have unsaved changes in current map. Any exported data will not" +
+                            " reflect current map file. Do you wish to start simulation anyway?", "Start simulation");
+            if (!start) {
+                MyLogger.log("Start simulation cancelled by user.", Constants.INFO_FOR_LOGGING);
+                return;
+            }
+        }
 
         if (isRunning) {
             engine.stop();
@@ -955,5 +965,23 @@ public class Window extends Application {
             setButtonImage("/icons/stop.png", toolbarStartStopBtn);
             setButtonImage("/icons/stop.png", menuStartStopItem);
         }
+    }
+
+    /**
+     * helper method to handle reset action for simulation, used by both toolbar button and menu item
+     *
+     * @param stage primary stage for confirmation dialog
+     * @param paintAll runnable to repaint all roads after reset
+     */
+    private void handleReset(Stage stage, Runnable paintAll) {
+        if (simulation.getStepCount() > 0) {
+            boolean reset = DialogMaker.confirmDialog(stage, "Reset Simulation Confirmation",
+                    "Changing road properties will reset the simulation state.");
+            if (!reset) {
+                MyLogger.log("Reset simulation cancelled by user.", Constants.INFO_FOR_LOGGING);
+                return;
+            }
+        }
+        Actions.resetSimulationAction(simulation, paintAll);
     }
 }

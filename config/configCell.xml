@@ -12,11 +12,9 @@
     </models>
 
     <runDetails>
-        <showGui>true</showGui>
         <laneChange>true</laneChange>
         <drawCells>false</drawCells>
         <timeStep>1</timeStep>
-        <duration>1200</duration>
         <debug>true</debug>
         <logging>
             <log>true</log>
@@ -31,6 +29,6 @@
             <file>output/simulationKKWQ.csv</file>
             <type>csv</type>
         </output>
-    <timeBetweenSteps>100</timeBetweenSteps>
+        <timeBetweenSteps>100</timeBetweenSteps>
     </runDetails>
 </config>

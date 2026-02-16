@@ -106,7 +106,7 @@ public class DialogMaker {
      * @param stage owner stage
      * @param message warning message
      **/
-    protected static void warningDialog(Stage stage, String message) {
+    public static void warningDialog(Stage stage, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Warning");
         alert.setHeaderText("Warning");
@@ -430,62 +430,74 @@ public class DialogMaker {
 
         dialog.getDialogPane().setContent(grid);
 
+        // get the apply button to add event filter for validation before closing the dialog
+        final Button applyButton = (Button) dialog.getDialogPane().lookupButton(applyButtonType);
+
+        // add event filter to apply button to validate input before closing the dialog
+        applyButton.addEventFilter(ActionEvent.ACTION, event -> {
+            double minValue;
+            double maxValue;
+            String key = paramKeyInput.getText();
+
+            // validate the min value
+            try {
+                minValue = Double.parseDouble(minValueInput.getText());
+            } catch (NumberFormatException e) {
+                String error = "Invalid minimum value for parameter: " + minValueInput.getText();
+                MyLogger.log(error, Constants.ERROR_FOR_LOGGING);
+                warningDialog(stage, error);
+                event.consume(); // don't close the window when there is wrong input
+                return; // end execution of the event handler
+            }
+
+            // validate the max value
+            try {
+                maxValue = Double.parseDouble(maxValueInput.getText());
+            } catch (NumberFormatException e) {
+                String error = "Invalid maximum value for parameter: " + maxValueInput.getText();
+                MyLogger.log(error, Constants.ERROR_FOR_LOGGING);
+                warningDialog(stage, error);
+                event.consume(); // don't close the window when there is wrong input
+                return; // end execution of the event handler
+            }
+
+            // validate that min value is less or equal than max value
+            if (minValue > maxValue) {
+                String error = "Minimum value must be less or equal than maximum value for parameter: " + minValue + " > " + maxValue;
+                MyLogger.log(error, Constants.ERROR_FOR_LOGGING);
+                warningDialog(stage, error);
+                event.consume(); // don't close the window when there is wrong input
+                return; // end execution of the event handler
+            }
+
+            // validate the key is not empty
+            if (key == null || key.isEmpty()) {
+                String error = "Parameter key cannot be empty.";
+                MyLogger.log(error, Constants.ERROR_FOR_LOGGING);
+                warningDialog(stage, error);
+                event.consume(); // don't close the window when there is wrong input
+                return; // end execution of the event handler
+            }
+
+            // validate that if the key was changed, the new key isn't already used by another parameter
+            if (!key.equals(oldKey) && generator.keyExists(key)) {
+                String error = "Parameter key already exists: " + key;
+                MyLogger.log(error, Constants.ERROR_FOR_LOGGING);
+                warningDialog(stage, error);
+                event.consume(); // don't close the window when there is wrong input
+                return; // end execution of the event handler
+            }
+
+            // all validation passed, change the parameter in the generator
+            String nameOfParam = paramNameInput.getText();
+            generator.removeComParameter(oldKey);
+            generator.addComParameter(key, nameOfParam, minValue, maxValue);
+            MyLogger.log("Parameter changed via dialog.", Constants.INFO_FOR_LOGGING);
+        });
+
         // show the dialog and wait for user response
-        dialog.showAndWait().ifPresent(response -> {
-            if (response == applyButtonType) {
-                double minValue = 0;
-                double maxValue = 0;
-                String key = paramKeyInput.getText();
-                boolean ok = true;
-                // check if parameter key and values are legit
-
-                // min value
-                try {
-                    minValue = Double.parseDouble(minValueInput.getText());
-                } catch (NumberFormatException e) {
-                    MyLogger.log("Invalid minimum value for parameter: " + minValueInput.getText(),
-                            Constants.ERROR_FOR_LOGGING);
-                    warningDialog(stage, "Invalid minimum value for parameter: " + minValueInput.getText());
-                    ok = false;
-                }
-
-                // max value
-                try {
-                    maxValue = Double.parseDouble(maxValueInput.getText());
-                } catch (NumberFormatException e) {
-                    MyLogger.log("Invalid maximum value for parameter: " + maxValueInput.getText(),
-                            Constants.ERROR_FOR_LOGGING);
-                    warningDialog(stage, "Invalid maximum value for parameter: " + maxValueInput.getText());
-                    ok = false;
-                }
-
-                // if min < max
-                if (minValue > maxValue) {
-                    MyLogger.log("Minimum value must be less or equal than maximum value for parameter: "
-                            + minValue + " > " + maxValue, Constants.ERROR_FOR_LOGGING);
-                    warningDialog(stage, "Minimum value must be less or equal than maximum value for parameter: "
-                            + minValue + " > " + maxValue);
-                    ok = false;
-                }
-
-                // if key is ok
-                if (key == null || key.isEmpty()) {
-                    MyLogger.log("Parameter key cannot be empty .", Constants.ERROR_FOR_LOGGING);
-                    warningDialog(stage, "Parameter key cannot be empty.");
-                    ok = false;
-                } else if (!key.equals(oldKey) && generator.keyExists(key)) { // id key isn't already used
-                    MyLogger.log("Parameter key already exists: " + key, Constants.ERROR_FOR_LOGGING);
-                    warningDialog(stage, "Parameter key already exists: " + key);
-                    ok = false;
-                }
-                String nameOfParam = paramNameInput.getText();
-
-                if (ok) {
-                    generator.removeComParameter(oldKey);
-                    generator.addComParameter(key, nameOfParam, minValue, maxValue);
-                    MyLogger.log("Parameter changed via dialog.", Constants.INFO_FOR_LOGGING);
-                }
-            } else {
+        dialog.showAndWait().ifPresent(response -> { // cancel and close button
+            if (response != applyButtonType) {
                 MyLogger.log("Old parameter dialog cancelled.", Constants.INFO_FOR_LOGGING);
             }
         });
@@ -533,64 +545,74 @@ public class DialogMaker {
 
         dialog.getDialogPane().setContent(grid);
 
+        // get the apply button to add event filter for validation before closing the dialog
+        final Button applyButton = (Button) dialog.getDialogPane().lookupButton(applyButtonType);
+
+        // add event filter to apply button to validate input before closing the dialog
+        applyButton.addEventFilter(ActionEvent.ACTION, event -> {
+            double minValue;
+            double maxValue;
+            String key = paramKeyInput.getText();
+
+            // validate Min Value
+            try {
+                minValue = Double.parseDouble(minValueInput.getText());
+            } catch (NumberFormatException e) {
+                String error = "Invalid minimum value for new parameter: " + minValueInput.getText();
+                MyLogger.log(error, Constants.ERROR_FOR_LOGGING);
+                warningDialog(stage, error);
+                event.consume(); // stop closing the window
+                return; // end execution of the event handler
+            }
+
+            // validate Max Value
+            try {
+                maxValue = Double.parseDouble(maxValueInput.getText());
+            } catch (NumberFormatException e) {
+                String error = "Invalid maximum value for new parameter: " + maxValueInput.getText();
+                MyLogger.log(error, Constants.ERROR_FOR_LOGGING);
+                warningDialog(stage, error);
+                event.consume(); // stop closing the window
+                return; // end execution of the event handler
+            }
+
+            // validate that Min Value is less or equal than Max Value
+            if (minValue > maxValue) {
+                String error = "Minimum value must be less or equal than maximum value for new parameter: "
+                        + minValue + " > " + maxValue;
+                MyLogger.log(error, Constants.ERROR_FOR_LOGGING);
+                warningDialog(stage, error);
+                event.consume(); // stop closing the window
+                return; // end execution of the event handler
+            }
+
+            // validate that key is not empty
+            if (key == null || key.isEmpty()) {
+                String error = "Parameter key cannot be empty.";
+                MyLogger.log(error, Constants.ERROR_FOR_LOGGING);
+                warningDialog(stage, error);
+                event.consume(); // stop closing the window
+                return; // end execution of the event handler
+            }
+
+            // validate that the key isn't already used by another parameter
+            if (generator.keyExists(key)) {
+                String error = "Parameter key already exists: " + key;
+                MyLogger.log(error, Constants.ERROR_FOR_LOGGING);
+                warningDialog(stage, error);
+                event.consume(); // stop closing the window
+                return; // end execution of the event handler
+            }
+
+            // all validation passed, add the new parameter to the generator
+            String nameOfParam = paramNameInput.getText();
+            generator.addComParameter(key, nameOfParam, minValue, maxValue);
+            MyLogger.log("New parameter added via dialog.", Constants.INFO_FOR_LOGGING);
+        });
+
         // show the dialog and wait for user response
-        dialog.showAndWait().ifPresent(response -> {
-            if (response == applyButtonType) {
-                double minValue = 0;
-                double maxValue = 0;
-                String key = paramKeyInput.getText();
-                boolean ok = true;
-                // check if parameter key and values are legit
-
-                // min value
-                try {
-                    minValue = Double.parseDouble(minValueInput.getText());
-                } catch (NumberFormatException e) {
-                    MyLogger.log("Invalid minimum value for new parameter: " + minValueInput.getText(),
-                            Constants.ERROR_FOR_LOGGING);
-                    warningDialog(stage, "Invalid minimum value for new parameter: " + minValueInput.getText());
-                    ok = false;
-                }
-
-                // max value
-                try {
-                    maxValue = Double.parseDouble(maxValueInput.getText());
-                } catch (NumberFormatException e) {
-                    MyLogger.log("Invalid maximum value for new parameter: " + maxValueInput.getText(),
-                            Constants.ERROR_FOR_LOGGING);
-                    warningDialog(stage, "Invalid maximum value for new parameter: " + maxValueInput.getText());
-                    ok = false;
-                }
-
-                // if min < max
-                if (minValue > maxValue) {
-                    MyLogger.log("Minimum value must be less or equal than maximum value for new parameter: "
-                            + minValue + " > " + maxValue, Constants.ERROR_FOR_LOGGING);
-                    warningDialog(stage, "Minimum value must be less or equal than maximum value for new parameter: "
-                            + minValue + " > " + maxValue);
-                    ok = false;
-                }
-
-                // if key is ok
-                if (key == null || key.isEmpty()) {
-                    MyLogger.log("Parameter key cannot be empty .", Constants.ERROR_FOR_LOGGING);
-                    warningDialog(stage, "Parameter key cannot be empty.");
-                    ok = false;
-                }
-
-                // id key isn't already used
-                if (generator.keyExists(key)) {
-                    MyLogger.log("Parameter key already exists: " + key, Constants.ERROR_FOR_LOGGING);
-                    warningDialog(stage, "Parameter key already exists: " + key);
-                    ok = false;
-                }
-                String nameOfParam = paramNameInput.getText();
-
-                if (ok) {
-                    generator.addComParameter(key, nameOfParam, minValue, maxValue);
-                    MyLogger.log("New parameter added via dialog.", Constants.INFO_FOR_LOGGING);
-                }
-            } else {
+        dialog.showAndWait().ifPresent(response -> { // cancel and close button
+            if (response != applyButtonType) {
                 MyLogger.log("New parameter dialog cancelled.", Constants.INFO_FOR_LOGGING);
             }
         });
@@ -718,8 +740,59 @@ public class DialogMaker {
 
          dialog.getDialogPane().setContent(grid);
 
+         // find apply button and add event filter to validate inputs before closing the dialog
+         final Button applyButton = (Button) dialog.getDialogPane().lookupButton(applyButtonType);
+
+         // add event filter to validate inputs when Apply is clicked
+         applyButton.addEventFilter(ActionEvent.ACTION, event -> {
+             // if inputs are not valid, show warning and consume the event to prevent dialog from closing
+             if (!checkRoadInputs(lanesSpinner.getValue(), speedLimitField.getText(), lengthField.getText(), generators, lightPlan)) {
+                 MyLogger.log("Invalid road inputs provided in dialog.", Constants.ERROR_FOR_LOGGING);
+                 warningDialog(stage, "Invalid road inputs provided. Please check number of lanes, max speed and length.");
+
+                 // stop the event from propagating, which prevents the dialog from closing
+                 event.consume();
+             }
+             else {
+                 // if inputs are valid, set mapChanged to true and apply changes to the road(s)
+                 AppContext.RUN_DETAILS.mapChanged = true;
+
+                 // try to parse the inputs and apply changes, if parsing fails, consume the event to prevent dialog from closing
+                 try {
+                     double newSpeed = Double.parseDouble(speedLimitField.getText());
+                     double newLength = Double.parseDouble(lengthField.getText());
+                     int newLanes = lanesSpinner.getValue();
+
+                     if (!changingAll) {
+                         MyLogger.log("Selected road properties updated via dialog.", Constants.INFO_FOR_LOGGING);
+                         changeRoadParameters(index, newLanes, newSpeed, newLength, lightPlan, generators, roadParameters);
+                     } else {
+                         MyLogger.log("All road properties updated via dialog.", Constants.INFO_FOR_LOGGING);
+                         for (int i = 0; i < numberOfRoads; i++) {
+                             changeRoadParameters(i, newLanes, newSpeed, newLength, lightPlan, generators, roadParameters);
+                         }
+                     }
+                 } catch (NumberFormatException ex) {
+                     event.consume();
+                 }
+             }
+         });
+
          // show the dialog and wait for user response
          dialog.showAndWait().ifPresent(response -> {
+             // Apply button is handled by event filter above, so only need to handle Delete and Cancel here
+             if (response == deleteButtonType) {
+                 if (!changingAll) {
+                     removeRoadFormMap(roadParameters, index, stage);
+                     AppContext.RUN_DETAILS.mapChanged = true;
+                 }
+             } else if (response != applyButtonType) { // cancel button or close dialog
+                 MyLogger.log("Dialog cancelled.", Constants.INFO_FOR_LOGGING);
+             }
+         });
+
+         // show the dialog and wait for user response
+         /*dialog.showAndWait().ifPresent(response -> {
              if (response == applyButtonType) {
                  if (checkRoadInputs(lanesSpinner.getValue(), speedLimitField.getText(), lengthField.getText(), generators, lightPlan)) {
                      AppContext.RUN_DETAILS.mapChanged = true;
@@ -747,7 +820,7 @@ public class DialogMaker {
              } else {
                  MyLogger.log("Dialog cancelled.", Constants.INFO_FOR_LOGGING);
              }
-         });
+         });*/
      }
 
     /**
@@ -972,31 +1045,8 @@ public class DialogMaker {
      *         cancels closing
      **/
     public static boolean onCloseUnsavedChangesDialog(Stage stage) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Unsaved Changes");
-        alert.setHeaderText("You have unsaved changes.");
-        alert.setContentText("Do you want to save your changes before exiting?");
-        alert.initOwner(stage);
-
-        ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
-        ButtonType dontSaveButton = new ButtonType("Don't Save", ButtonBar.ButtonData.NO);
-        ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        alert.getButtonTypes().setAll(saveButton, dontSaveButton, cancelButton);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent()) {
-            if (result.get() == saveButton) {
-                MyLogger.log("User chose to save changes before exiting.", Constants.INFO_FOR_LOGGING);
-                RoadXml.saveAs(AppContext.RUN_DETAILS.mapFile);
-                return true;
-            } else if (result.get() == dontSaveButton) {
-                MyLogger.log("User chose not to save changes before exiting.", Constants.INFO_FOR_LOGGING);
-                return true;
-            }
-        }
-
-        return false;
+        return askIfUserWantToSaveMap(stage, "Unsaved Changes", "You have unsaved changes.",
+                "Do you want to save your changes before exiting?", " exiting");
     }
 
     /**
@@ -1043,25 +1093,37 @@ public class DialogMaker {
 
         dialog.getDialogPane().setContent(grid);
 
-        // show the dialog and wait for user response
-        dialog.showAndWait().ifPresent(response -> {
-            if (response == applyButtonType) {
-                try {
-                    long timeBetweenSteps = Integer.parseInt(timeInput.getText());
-                    if (timeBetweenSteps <= 0) {
-                        throw new NumberFormatException("Value must be positive");
-                    }
+        final Button applyButton = (Button) dialog.getDialogPane().lookupButton(applyButtonType);
 
-                    AppContext.RUN_DETAILS.timeBetweenSteps = (int)timeBetweenSteps;
-                    engine.setPeriodMs(timeBetweenSteps);
-                    MyLogger.log("Time between simulation steps updated via dialog.", Constants.INFO_FOR_LOGGING);
-                } catch (NumberFormatException e) {
-                    String errorMessage = "Invalid time between steps value: " + e.getMessage();
-                    MyLogger.log(errorMessage, Constants.ERROR_FOR_LOGGING);
-                    warningDialog(stage, errorMessage);
+        // apply button event filter to validate input before closing the dialog
+        applyButton.addEventFilter(ActionEvent.ACTION, event -> {
+            try {
+                long timeBetweenSteps = Integer.parseInt(timeInput.getText());
 
+                // validate if the time between steps is a positive integer
+                if (timeBetweenSteps <= 0) {
+                    throw new NumberFormatException("Value must be positive");
                 }
-            } else {
+
+                // if no bullshit was inputted, set the new time between steps in run details and core engine
+                AppContext.RUN_DETAILS.timeBetweenSteps = (int) timeBetweenSteps;
+                engine.setPeriodMs(timeBetweenSteps);
+                MyLogger.log("Time between simulation steps updated via dialog.", Constants.INFO_FOR_LOGGING);
+
+            } catch (NumberFormatException e) {
+                // if wrong input then warn and not accept input
+                String errorMessage = "Invalid time between steps value: " + e.getMessage();
+                MyLogger.log(errorMessage, Constants.ERROR_FOR_LOGGING);
+                warningDialog(stage, errorMessage);
+
+                // kill event so that the window doesn't close
+                event.consume();
+            }
+        });
+
+        // cancel button
+        dialog.showAndWait().ifPresent(response -> {
+            if (response != applyButtonType) {
                 MyLogger.log("Time between steps dialog cancelled.", Constants.INFO_FOR_LOGGING);
             }
         });
@@ -1115,17 +1177,33 @@ public class DialogMaker {
         dialog.setContentText("CSV Separator:");
         dialog.initOwner(primaryStage);
 
-        // show the dialog and wait for user response
-        dialog.showAndWait().ifPresent(separator -> {
+        final Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+
+        // add event filter to validate input before closing the dialog
+        okButton.addEventFilter(ActionEvent.ACTION, event -> {
+            // get the input separator
+            String separator = dialog.getEditor().getText();
+
             if (separator.length() != 1) {
                 String errorMessage = "CSV separator must be a single character.";
                 MyLogger.log(errorMessage, Constants.ERROR_FOR_LOGGING);
-                warningDialog(null, errorMessage);
+
+                // show warning dialog with the error message, owner is primary stage so that it shows in front of the
+                // main window
+                warningDialog(primaryStage, errorMessage);
+
+                // kill event so that the window doesn't close
+                event.consume();
             } else {
+                // if input is valid, set the new separator in run details
                 AppContext.RUN_DETAILS.outputDetails.csvSeparator = separator;
                 MyLogger.log("CSV separator updated to '" + separator + "' via dialog.", Constants.INFO_FOR_LOGGING);
             }
         });
+
+        // show the dialog and wait for user response, the actual handling of the input is done in the event filter
+        // above, so no need to handle it here
+        dialog.showAndWait();
     }
 
     protected static void createWaringTextIfNeeded(GridPane grid, int line) {
@@ -1138,5 +1216,46 @@ public class DialogMaker {
             warningLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
             grid.add(warningLabel, 0, line, 2, 1);
         }
+    }
+
+    public static boolean confirmDialog(Stage stage, String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(message);
+        alert.setContentText("Do you want to proceed?");
+        alert.initOwner(stage);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
+    }
+
+    protected static boolean askIfUserWantToSaveMap(Stage stage, String title, String header, String message,
+                                                  String action) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+        alert.initOwner(stage);
+
+        ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.YES);
+        ButtonType dontSaveButton = new ButtonType("Don't Save", ButtonBar.ButtonData.NO);
+        ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(saveButton, dontSaveButton, cancelButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent()) {
+            if (result.get() == saveButton) {
+                MyLogger.log("User chose to save changes before " + action + ".", Constants.INFO_FOR_LOGGING);
+                RoadXml.saveAs(AppContext.RUN_DETAILS.mapFile);
+                return true;
+            } else if (result.get() == dontSaveButton) {
+                MyLogger.log("User chose not to save changes before " + action + ".",
+                        Constants.INFO_FOR_LOGGING);
+                return true;
+            }
+        }
+
+        return false;
     }
 }

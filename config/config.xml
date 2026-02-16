@@ -12,11 +12,9 @@
     </models>
 
     <runDetails>
-        <showGui>true</showGui>
         <drawCells>false</drawCells>
         <laneChange>true</laneChange>
         <timeStep>1</timeStep>
-        <duration>50000</duration>
         <debug>false</debug>
         <preventCollision>true</preventCollision>
         <logging>
@@ -30,7 +28,7 @@
         <output>
             <writeOutput>true</writeOutput>
             <file>output/helly.txt</file>
-            <type>txt</type>
+            <type>csv</type>
             <csvSeparator>;</csvSeparator>
             <whatToWrite>
                 <simulationDetails>true</simulationDetails>
