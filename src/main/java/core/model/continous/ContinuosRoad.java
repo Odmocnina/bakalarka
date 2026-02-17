@@ -183,7 +183,10 @@ public class ContinuosRoad extends Road {
             this.checkForDuplicates();
         }
 
-        return this.checkRelevancyOfCars();
+        int carsPassed = this.checkRelevancyOfCars();
+        countStoppedCars();
+
+        return carsPassed;
     }
 
     /**
@@ -432,6 +435,7 @@ public class ContinuosRoad extends Road {
                     this.placeCar(car, this.vehicles, Direction.LEFT);
                     MyLogger.log("Car at lane " + lane + " position " + index + " changed lane to LEFT.",
                             Constants.DEBUG_FOR_LOGGING);
+                    ResultsRecorder.getResultsRecorder().recordLaneChange(this.id);
                     return Direction.LEFT;
                 }
             }
@@ -448,6 +452,7 @@ public class ContinuosRoad extends Road {
                     this.placeCar(car, this.vehicles, Direction.RIGHT);
                     MyLogger.log("Car at lane " + lane + " position " + index + " changed lane to RIGHT.",
                             Constants.DEBUG_FOR_LOGGING);
+                    ResultsRecorder.getResultsRecorder().recordLaneChange(this.id);
                     return Direction.RIGHT;
                 }
             }
@@ -757,6 +762,22 @@ public class ContinuosRoad extends Road {
         for (int lane = 0; lane < numberOfLanes; lane++) {
             vehicles[lane].clear();
         }
+    }
+
+    /**
+     * method to count number of stopped cars in given lane, used for traffic light model
+     *
+     * @param lane lane to count in
+     * @return number of stopped cars in the lane
+     **/
+    protected int countStoppedCarsInLane(int lane) {
+        int count = 0;
+        for (CarParams car : vehicles[lane]) {
+            if (car.getParameter(RequestConstants.CURRENT_SPEED_REQUEST) <= 1.0) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**

@@ -25,14 +25,14 @@ public class Main {
         String durationArgument = InputParametersHandeler.getSpecificParameter(args, Constants.DURATION_PARAMETER_PREFIX);
         int duration = InputParametersHandeler.getDurationFromParameter(durationArgument);
         if (duration == Constants.INVALID_INPUT_PARAMETERS) {
-            MyLogger.logBeforeLoading("Invalid duration value provided in input parameters, exiting.",
+            MyLogger.logLoadingOrSimulationStartEnd("Invalid duration value provided in input parameters, exiting.",
                     Constants.FATAL_FOR_LOGGING);
             return;
         } else if (duration != Constants.NO_DURATION_PROVIDED) {
-            MyLogger.logBeforeLoading("Duration provided: " + duration + " seconds (steps in simulation), starting app without GUI.",
+            MyLogger.logLoadingOrSimulationStartEnd("Duration provided: " + duration + " seconds (steps in simulation), starting app without GUI.",
                     Constants.INFO_FOR_LOGGING);
         } else {
-            MyLogger.logBeforeLoading("No duration provided, starting app with GUI.", Constants.INFO_FOR_LOGGING);
+            MyLogger.logLoadingOrSimulationStartEnd("No duration provided, starting app with GUI.", Constants.INFO_FOR_LOGGING);
         }
 
         String configPathArgument = InputParametersHandeler.getSpecificParameter(args, Constants.CONFIG_PATH_PARAMETER_PREFIX);
@@ -41,17 +41,20 @@ public class Main {
         String outFileArgument = InputParametersHandeler.getSpecificParameter(args, Constants.OUTPUT_FILE_PARAMETER_PREFIX);
         String outFile = InputParametersHandeler.getOutputFilePathFromParameter(outFileArgument);
 
+        String loggingArgument = InputParametersHandeler.getSpecificParameter(args, Constants.LOGGING_PARAMETER_PREFIX);
+        int logging = InputParametersHandeler.getLoggingFromParameter(loggingArgument);
+
         String carFollowingModelArgument = InputParametersHandeler.getSpecificParameter(args, Constants.CAR_FOLLOWING_MODEL_PARAMETER_PREFIX);
         ICarFollowingModel carFollowingModel = null;
         if (carFollowingModelArgument != null && !carFollowingModelArgument.isEmpty()) {
             carFollowingModel = InputParametersHandeler.getCarFollowingModelFromParameter(carFollowingModelArgument);
             if (carFollowingModel == null) {
-                MyLogger.logBeforeLoading("Invalid car following model provided in input parameters, exiting.",
+                MyLogger.logLoadingOrSimulationStartEnd("Invalid car following model provided in input parameters, exiting.",
                         Constants.FATAL_FOR_LOGGING);
                 return;
             }
         } else {
-            MyLogger.logBeforeLoading("No car following model provided in input parameters, using default " +
+            MyLogger.logLoadingOrSimulationStartEnd("No car following model provided in input parameters, using default " +
                     "model in config file.", Constants.INFO_FOR_LOGGING);
         }
 
@@ -60,30 +63,30 @@ public class Main {
         if (laneChangingModelArgument != null && !laneChangingModelArgument.isEmpty()) {
             laneChangingModel = InputParametersHandeler.getLaneChangingModelFromParameter(laneChangingModelArgument);
             if (laneChangingModel == null) {
-                MyLogger.logBeforeLoading("Invalid lane changing model provided in input parameters, exiting.",
+                MyLogger.logLoadingOrSimulationStartEnd("Invalid lane changing model provided in input parameters, exiting.",
                         Constants.FATAL_FOR_LOGGING);
                 return;
             }
         } else {
-            MyLogger.logBeforeLoading("No lane changing model provided in input parameters, using default " +
+            MyLogger.logLoadingOrSimulationStartEnd("No lane changing model provided in input parameters, using default " +
                     "model in config file.", Constants.INFO_FOR_LOGGING);
         }
 
         // load run details from configuration file
-        boolean success = ConfigLoader.loadAllConfig(configPath, carFollowingModel, laneChangingModel, duration, outFile);
+        boolean success = ConfigLoader.loadAllConfig(configPath, carFollowingModel, laneChangingModel, duration, outFile, logging);
 
         if (!success) {
-            MyLogger.logBeforeLoading("Failed to load configuration, exiting.", Constants.ERROR_FOR_LOGGING);
+            MyLogger.logLoadingOrSimulationStartEnd("Failed to load configuration, exiting.", Constants.ERROR_FOR_LOGGING);
             return;
         }
 
         if (AppContext.RUN_DETAILS.showGui) {
-            MyLogger.logBeforeLoading("GUI enabled, starting GUI.", Constants.INFO_FOR_LOGGING);
+            MyLogger.logLoadingOrSimulationStartEnd("GUI enabled, starting GUI.", Constants.INFO_FOR_LOGGING);
             Window.main(args); // start gui
         } else { // if no gui, run simulation in console mode
-            MyLogger.logBeforeLoading("Starting simulation in console mode.", Constants.INFO_FOR_LOGGING);
+            MyLogger.logLoadingOrSimulationStartEnd("Starting simulation in console mode.", Constants.INFO_FOR_LOGGING);
             AppContext.SIMULATION.runSimulation(AppContext.RUN_DETAILS.duration);
-            MyLogger.logBeforeLoading("Simulation finished, exiting.", Constants.INFO_FOR_LOGGING);
+            MyLogger.logLoadingOrSimulationStartEnd("Simulation finished, exiting.", Constants.INFO_FOR_LOGGING);
             if (AppContext.RUN_DETAILS.writingResults()) {
                 ResultsRecorder.getResultsRecorder().writeResults();
             }

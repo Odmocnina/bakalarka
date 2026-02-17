@@ -38,7 +38,7 @@ public class RoadLoader {
         Road[] map = loadMapStart(filePath);
 
         if (map == null) {
-            MyLogger.logBeforeLoading("No roads loaded from map file", Constants.ERROR_FOR_LOGGING);
+            MyLogger.logLoadingOrSimulationStartEnd("No roads loaded from map file", Constants.ERROR_FOR_LOGGING);
             return false;
         }
 
@@ -59,7 +59,7 @@ public class RoadLoader {
         try {
             xmlFile = new File(filePath);
         } catch (NullPointerException e) {
-            MyLogger.logBeforeLoading("Map file not found",
+            MyLogger.logLoadingOrSimulationStartEnd("Map file not found",
                     Constants.ERROR_FOR_LOGGING);
             return null;
         }
@@ -70,7 +70,7 @@ public class RoadLoader {
             Document doc = dBuilder.parse(xmlFile);
             doc.getDocumentElement().normalize();
             int roadCount = doc.getElementsByTagName(RoadLoadingConstants.ROAD_TAG).getLength();
-            MyLogger.logBeforeLoading("Loading map from config: number of roads=" + roadCount
+            MyLogger.logLoadingOrSimulationStartEnd("Loading map from config: number of roads=" + roadCount
                     , Constants.INFO_FOR_LOGGING);
 
             map = new Road[roadCount];
@@ -81,14 +81,14 @@ public class RoadLoader {
                 if (road != null) {
                     map[i] = road;
                 } else {
-                    MyLogger.logBeforeLoading("Failed to load road: " + (i + 1) + " from file",
+                    MyLogger.logLoadingOrSimulationStartEnd("Failed to load road: " + (i + 1) + " from file",
                             Constants.ERROR_FOR_LOGGING);
                     return null;
                 }
             }
 
         } catch (Exception e) {
-            MyLogger.logBeforeLoading("Error loading map file: " + e.getMessage(), Constants.ERROR_FOR_LOGGING);
+            MyLogger.logLoadingOrSimulationStartEnd("Error loading map file: " + e.getMessage(), Constants.ERROR_FOR_LOGGING);
             return null;
         }
 
@@ -118,7 +118,7 @@ public class RoadLoader {
         } else if (AppContext.CAR_FOLLOWING_MODEL.getType().equals(Constants.CONTINUOUS)) {
             road = new ContinuosRoad(lengthValue, numberOfLanesValue, maxSpeedValue, index);
         } else {
-            MyLogger.logBeforeLoading("Unknown car following model type: " + AppContext.CAR_FOLLOWING_MODEL.getType()
+            MyLogger.logLoadingOrSimulationStartEnd("Unknown car following model type: " + AppContext.CAR_FOLLOWING_MODEL.getType()
                     , Constants.FATAL_FOR_LOGGING);
             return null;
         }
@@ -148,13 +148,13 @@ public class RoadLoader {
         }
 
         if (road.getLength() == 0) {
-            MyLogger.logBeforeLoading("No roads loaded from map file", Constants.FATAL_FOR_LOGGING);
+            MyLogger.logLoadingOrSimulationStartEnd("No roads loaded from map file", Constants.FATAL_FOR_LOGGING);
             return null;
         }
 
         boolean allParametersInGenerators = road.doAllGeneratorsHaveNeededParameters();
         if (!allParametersInGenerators) {
-            MyLogger.logBeforeLoading("Not all car generators have necessary parameters for models, exiting"
+            MyLogger.logLoadingOrSimulationStartEnd("Not all car generators have necessary parameters for models, exiting"
                     , Constants.FATAL_FOR_LOGGING);
             return null;
         }

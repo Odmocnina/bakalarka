@@ -77,7 +77,7 @@ public class RoadXml {
             return true;
 
         } catch (Exception e) {
-            MyLogger.logBeforeLoading("Error while writing map to XML: " + e.getMessage(),
+            MyLogger.logLoadingOrSimulationStartEnd("Error while writing map to XML: " + e.getMessage(),
                     Constants.ERROR_FOR_LOGGING);
             return false;
         }
@@ -112,11 +112,11 @@ public class RoadXml {
         try {
             if (speedText.isEmpty()) {
                 speed = DefaultValues.DEFAULT_ROAD_MAX_SPEED;
-                MyLogger.logBeforeLoading("Wrong input speed in road: " + (i + 1) + "(empty), setting to" +
+                MyLogger.logLoadingOrSimulationStartEnd("Wrong input speed in road: " + (i + 1) + "(empty), setting to" +
                         " default value.", Constants.ERROR_FOR_LOGGING);
             } else if (Double.parseDouble(speedText) <= 0) {
                 speed = DefaultValues.DEFAULT_ROAD_MAX_SPEED;
-                MyLogger.logBeforeLoading("Wrong input speed in road: " + (i + 1) + "(zero or smaller)," +
+                MyLogger.logLoadingOrSimulationStartEnd("Wrong input speed in road: " + (i + 1) + "(zero or smaller)," +
                         "setting to default value.", Constants.ERROR_FOR_LOGGING);
             } else {
               //  speed = Math.ceil(Double.parseDouble(speedText) / 3.6); // km/h to m/s
@@ -124,25 +124,25 @@ public class RoadXml {
             }
         } catch (NumberFormatException e) {
             speed = DefaultValues.DEFAULT_ROAD_MAX_SPEED;
-            MyLogger.logBeforeLoading("Wrong input length in road: " + (i + 1) + "(not number), setting " +
+            MyLogger.logLoadingOrSimulationStartEnd("Wrong input length in road: " + (i + 1) + "(not number), setting " +
                     "to default value.", Constants.ERROR_FOR_LOGGING);
         }
 
         try {
             if (lengthText.isEmpty()) {
                 length = DefaultValues.DEFAULT_ROAD_LENGTH;
-                MyLogger.logBeforeLoading("Wrong input length in road: " + (i + 1) + "(empty), setting to " +
+                MyLogger.logLoadingOrSimulationStartEnd("Wrong input length in road: " + (i + 1) + "(empty), setting to " +
                         "default value.", Constants.ERROR_FOR_LOGGING);
             } else if (Double.parseDouble(lengthText) <= 0) {
                 length = DefaultValues.DEFAULT_ROAD_LENGTH;
-                MyLogger.logBeforeLoading("Wrong input length in road: " + (i + 1) + "(zero or smaller)," +
+                MyLogger.logLoadingOrSimulationStartEnd("Wrong input length in road: " + (i + 1) + "(zero or smaller)," +
                         " setting to default value.", Constants.ERROR_FOR_LOGGING);
             } else {
                 length = Double.parseDouble(lengthText);
             }
         } catch (NumberFormatException e) {
             length = DefaultValues.DEFAULT_ROAD_LENGTH;
-            MyLogger.logBeforeLoading("Wrong input length in road: " + (i + 1) + "(not number), setting to" +
+            MyLogger.logLoadingOrSimulationStartEnd("Wrong input length in road: " + (i + 1) + "(not number), setting to" +
                     " default value.", Constants.ERROR_FOR_LOGGING);
         }
 
@@ -151,18 +151,18 @@ public class RoadXml {
             for (int j = 0; j < lanes; j++) {
                 lp.add(DefaultStuffMaker.createDefaultLightPlan());
             }
-            MyLogger.logBeforeLoading("No light plan defined for road: " + (i + 1) + ", setting to default " +
+            MyLogger.logLoadingOrSimulationStartEnd("No light plan defined for road: " + (i + 1) + ", setting to default " +
                     "value.", Constants.ERROR_FOR_LOGGING);
         }
 
         for (int lane = 0; lane < lp.size(); lane++) {
             if (lp.get(lane) == null) {
                 lp.add(lane, DefaultStuffMaker.createDefaultLightPlan());
-                MyLogger.logBeforeLoading("No light plan defined for lane: " + (lane + 1) + " in road: " + (i + 1) +
+                MyLogger.logLoadingOrSimulationStartEnd("No light plan defined for lane: " + (lane + 1) + " in road: " + (i + 1) +
                         ", setting to default value.", Constants.ERROR_FOR_LOGGING);
             } else if (!lp.get(lane).isLegitimate()) {
                 lp.add(lane, DefaultStuffMaker.createDefaultLightPlan());
-                MyLogger.logBeforeLoading("Wrong light plan defined for road: " + (i + 1) + ", setting to default " +
+                MyLogger.logLoadingOrSimulationStartEnd("Wrong light plan defined for road: " + (i + 1) + ", setting to default " +
                         "value.", Constants.ERROR_FOR_LOGGING);
             }
         }
@@ -172,7 +172,7 @@ public class RoadXml {
             for (int j = 0; j < lanes; j++) {
                 cg.add(DefaultStuffMaker.createDefaultGenerator());
             }
-            MyLogger.logBeforeLoading("No car generator defined for road: " + (i + 1) + ", setting to default " +
+            MyLogger.logLoadingOrSimulationStartEnd("No car generator defined for road: " + (i + 1) + ", setting to default " +
                     "value.", Constants.ERROR_FOR_LOGGING);
         }
 
@@ -180,7 +180,7 @@ public class RoadXml {
             if (cg.get(lane) == null) {
                 //cg[lane] = new CarGenerator(DefaultValues.DEFAULT_FLOW_RATE);
                 cg.add(lane, DefaultStuffMaker.createDefaultGenerator());
-                MyLogger.logBeforeLoading("No car generator defined for lane: " + (lane + 1) + " in road: " + (i + 1) +
+                MyLogger.logLoadingOrSimulationStartEnd("No car generator defined for lane: " + (lane + 1) + " in road: " + (i + 1) +
                         ", setting to default value.", Constants.ERROR_FOR_LOGGING);
             } /*else if (!cg[lane].isLegitimate()) {
                 cg[lane] = new CarGenerator(DefaultValues.DEFAULT_FLOW_RATE);
@@ -302,12 +302,12 @@ public class RoadXml {
                 RoadParameters.existingRoadsToRoadParameters(AppContext.SIMULATION.getRoads());
         boolean success = writeMapToXml(currentRoadParameters, currentRoadParameters.size(), AppContext.RUN_DETAILS.mapFile);
         if (!success) {
-            MyLogger.logBeforeLoading("Error while saving current map to XML file: " + AppContext.RUN_DETAILS.mapFile,
+            MyLogger.logLoadingOrSimulationStartEnd("Error while saving current map to XML file: " + AppContext.RUN_DETAILS.mapFile,
                     Constants.ERROR_FOR_LOGGING);
             return false;
         } else {
             AppContext.RUN_DETAILS.mapChanged = false;
-            MyLogger.logBeforeLoading("Current map saved to XML file: " + AppContext.RUN_DETAILS.mapFile,
+            MyLogger.logLoadingOrSimulationStartEnd("Current map saved to XML file: " + AppContext.RUN_DETAILS.mapFile,
                     Constants.INFO_FOR_LOGGING);
             return true;
         }

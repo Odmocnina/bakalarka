@@ -2,6 +2,7 @@ package core.model;
 
 import app.AppContext;
 import core.utils.DefaultStuffMaker;
+import core.utils.ResultsRecorder;
 import core.utils.constants.Constants;
 import core.utils.MyLogger;
 import core.utils.constants.RequestConstants;
@@ -295,7 +296,23 @@ public abstract class Road {
      **/
     public abstract int getNumberOfCarsOnRoad();
 
+    /**
+     * abstract method to remove all cars from the road, used when resetting the simulation
+     **/
     public abstract void removeAllCars();
+
+    /**
+     * method for clearing car queues, used when resetting the simulation
+     **/
+    public void clearCarQueues() {
+        if (carQueuesPerLane != null) {
+            for (Queue<CarParams> queue : carQueuesPerLane) {
+                if (queue != null) {
+                    queue.clear();
+                }
+            }
+        }
+    }
 
     /**
      * method to check if the generator is generating to queue
@@ -458,6 +475,19 @@ public abstract class Road {
     public void resetLightPlans() {
         for (LightPlan lp : lightPlansOnLanes) {
             lp.reset();
+        }
+    }
+
+    protected abstract int countStoppedCarsInLane(int lane);
+
+    /**
+     * Function to count the number of stopped cars in all lanes and record the results in the ResultsRecorder
+     **/
+    protected void countStoppedCars() {
+        for (int i = 0; i < numberOfLanes; i++) {
+            int numberOfStandingCars = countStoppedCarsInLane(i);
+            boolean isGreen = this.lightPlansOnLanes[i].isGreen();
+            ResultsRecorder.getResultsRecorder().recordNumberOfStoppedCars(numberOfStandingCars, isGreen, this.id, i);
         }
     }
 

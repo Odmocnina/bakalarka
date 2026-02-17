@@ -10,7 +10,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /********************************
  * Singleton class responsible for recording and writing simulation results such as the number of cars passed on each
@@ -45,6 +48,15 @@ public class ResultsRecorder {
     /** Count of collisions during the simulation **/
     private int[] collisionsCount;
 
+    /** Lane changes count **/
+    private int[] laneChangesCount;
+
+    /** time when cars have reached end of the road **/
+    private int[] whenCarsStartedToBeAtEnd;
+
+    /** records of stopped cars on roads **/
+    private StoppedCarsOnRoadRecord[] stoppedCarsOnRoadRecord;
+
     /**
      * Private constructor to prevent instantiation
      **/
@@ -65,10 +77,11 @@ public class ResultsRecorder {
     /**
      * Initializes the ResultsRecorder with the number of roads and output file name.
      *
-     * @param numberOfRoads The number of roads in the simulation.
+     * @param roads The array of roads in the simulation, used to determine the size of the carsPassedPerRoad array.
      * @param fileName The output file name for writing results.
      **/
-    public void initialize(int numberOfRoads, String fileName) {
+    public void initialize(Road[] roads, String fileName) {
+        int numberOfRoads = roads.length;
         this.carsPassedPerRoad = new int[numberOfRoads];
         for (int i = 0; i < numberOfRoads; i++) {
             this.carsPassedPerRoad[i] = 0;
@@ -80,6 +93,14 @@ public class ResultsRecorder {
         this.whenWasRoadEmpty = new int[numberOfRoads];
         for (int i = 0; i < numberOfRoads; i++) {
             this.whenWasRoadEmpty[i] = Constants.NO_RECORD_YET;
+        }
+        this.laneChangesCount = new int[numberOfRoads];
+        for (int i = 0; i < numberOfRoads; i++) {
+            this.laneChangesCount[i] = 0;
+        }
+            this.stoppedCarsOnRoadRecord = new StoppedCarsOnRoadRecord[numberOfRoads];
+        for (int i = 0; i < numberOfRoads; i++) {
+            this.stoppedCarsOnRoadRecord[i] = new StoppedCarsOnRoadRecord(roads[i].getNumberOfLanes());
         }
         this.fileName = fileName;
     }
@@ -159,6 +180,8 @@ public class ResultsRecorder {
         } else {
             MyLogger.log("Output file name is not set. Cannot write results.", Constants.WARN_FOR_LOGGING);
         }
+
+        writeStandingCars("standing_cars_");
     }
 
     /**
@@ -506,4 +529,62 @@ public class ResultsRecorder {
         }
         return false;
     }
+
+    /**
+     * records a lane change on the specified road, it increments the laneChangesCount array on the given road index by
+     * 1.
+     *
+     * @param roadIndex The index of the road where the lane change occurred.
+     **/
+    public void recordLaneChange(int roadIndex) {
+        this.laneChangesCount[roadIndex]++;
+    }
+
+    public void recordNumberOfStoppedCars(int count, boolean onRed, int roadIndex, int lane) {
+        this.stoppedCarsOnRoadRecord[roadIndex].recordStoppedCars(count, onRed, lane);
+    }
+
+    private void writeStandingCars(String filePath) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
+            for (int roadIndex = 0; roadIndex < stoppedCarsOnRoadRecord.length; roadIndex++) {
+                bw.write("Road " + roadIndex + ":\n");
+                StoppedCarsOnRoadRecord record = stoppedCarsOnRoadRecord[roadIndex];
+                for (int lane = 0; lane < record.stoppedCarsPerStep.size(); lane++) {
+                    bw.write("  Lane " + lane + ":\n");
+                    LinkedList<NumberOfStandingCars> stoppedCarsList = record.stoppedCarsPerStep.get(lane);
+                    for (NumberOfStandingCars entry : stoppedCarsList) {
+                        bw.write("    Count: " + entry.count + ", On Red: " + entry.onRed + "\n");
+                    }
+                }
+            }
+        } catch (IOException e) {
+            MyLogger.log("Error writing standing cars data to file: " + e.getMessage(), Constants.ERROR_FOR_LOGGING);
+        }
+
+    }
+
+    private static class StoppedCarsOnRoadRecord {
+        List<LinkedList<NumberOfStandingCars>> stoppedCarsPerStep;
+        public StoppedCarsOnRoadRecord(int numberOfLanes) {
+            stoppedCarsPerStep = new ArrayList<>(numberOfLanes);
+            for (int i = 0; i < numberOfLanes; i++) {
+                stoppedCarsPerStep.add(new LinkedList<>());
+            }
+        }
+        public void recordStoppedCars(int count, boolean onRed, int lane) {
+            if (lane < stoppedCarsPerStep.size()) {
+                stoppedCarsPerStep.get(lane).add(new NumberOfStandingCars(count, onRed));
+            }
+        }
+    }
+
+    private static class NumberOfStandingCars {
+        int count;
+        boolean onRed;
+        public NumberOfStandingCars(int count, boolean onRed) {
+            this.count = count;
+            this.onRed = onRed;
+        }
+    }
+
 }

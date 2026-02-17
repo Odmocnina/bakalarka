@@ -143,7 +143,7 @@ public class CarGenerator implements Cloneable {
         } else if (this.type.equals(Constants.CONTINUOUS)) {
             car = generateCarContinuous();
         } else {
-            MyLogger.logBeforeLoading("Unknown car generator type: " + this.type, Constants.WARN_FOR_LOGGING);
+            MyLogger.logLoadingOrSimulationStartEnd("Unknown car generator type: " + this.type, Constants.WARN_FOR_LOGGING);
         }
 
         this.id++;
@@ -347,7 +347,7 @@ public class CarGenerator implements Cloneable {
         String[] requiredParams = this.carGenerationParameters;
 
         if (requiredParams.length == 0) {
-            MyLogger.logBeforeLoading("CarGenerator: No parameters requested by the car following model."
+            MyLogger.logLoadingOrSimulationStartEnd("CarGenerator: No parameters requested by the car following model."
                     , Constants.FATAL_FOR_LOGGING);
             return false;
         }
@@ -356,13 +356,13 @@ public class CarGenerator implements Cloneable {
             Parameter p = parameters.get(param);
 
             if (p == null) {
-                MyLogger.logBeforeLoading("CarGenerator: Parameter " + param + " not set in car generator."
+                MyLogger.logLoadingOrSimulationStartEnd("CarGenerator: Parameter " + param + " not set in car generator."
                         , Constants.FATAL_FOR_LOGGING);
                 return false;
             }
 
             if (!p.checkIfValid()) {
-                MyLogger.logBeforeLoading("CarGenerator: Parameter " + param + " has invalid range: min=" + p.minValue +
+                MyLogger.logLoadingOrSimulationStartEnd("CarGenerator: Parameter " + param + " has invalid range: min=" + p.minValue +
                         ", max=" + p.maxValue, Constants.FATAL_FOR_LOGGING);
                 return false;
             }
@@ -383,7 +383,7 @@ public class CarGenerator implements Cloneable {
         StringBuilder missingParameters = new StringBuilder();
 
         if (requiredParams.length == 0) {
-            MyLogger.logBeforeLoading("CarGenerator: No parameters requested by the car following model."
+            MyLogger.logLoadingOrSimulationStartEnd("CarGenerator: No parameters requested by the car following model."
                     , Constants.FATAL_FOR_LOGGING);
             return missingParameters.toString();
         }
@@ -392,11 +392,11 @@ public class CarGenerator implements Cloneable {
             Parameter p = parametersForCommunication.get(param);
 
             if (p == null) {
-                MyLogger.logBeforeLoading("CarGenerator: Parameter " + param + " not set in car generator."
+                MyLogger.logLoadingOrSimulationStartEnd("CarGenerator: Parameter " + param + " not set in car generator."
                         , Constants.FATAL_FOR_LOGGING);
                 missingParameters.append(param).append(RequestConstants.REQUEST_SEPARATOR);
             } else if (!p.checkIfValid()) {
-                MyLogger.logBeforeLoading("CarGenerator: Parameter " + param + " has invalid range: min=" + p.minValue +
+                MyLogger.logLoadingOrSimulationStartEnd("CarGenerator: Parameter " + param + " has invalid range: min=" + p.minValue +
                         ", max=" + p.maxValue, Constants.FATAL_FOR_LOGGING);
                 missingParameters.append(param).append(RequestConstants.REQUEST_SEPARATOR);
             }

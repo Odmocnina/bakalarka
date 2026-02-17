@@ -1,20 +1,13 @@
 package app;
 
 import core.utils.MyLogger;
-import core.utils.constants.ConfigConstants;
 import core.utils.constants.Constants;
 import core.utils.loading.ConfigLoader;
 import models.ICarFollowingModel;
 import models.ILaneChangingModel;
 import models.ModelId;
 
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-
-import static core.utils.loading.ConfigLoader.getClasses;
 
 /*****************************
  * Class for handling input parameters from command line, such as duration of simulation, car following and lane
@@ -146,7 +139,7 @@ public class InputParametersHandeler {
 
     public static int getDurationFromParameter(String duration) {
         if (duration == null) {
-            MyLogger.logBeforeLoading("Duration not given, application will run in GUI mode.",
+            MyLogger.logLoadingOrSimulationStartEnd("Duration not given, application will run in GUI mode.",
                     Constants.INFO_FOR_LOGGING);
             return Constants.NO_DURATION_PROVIDED;
         }
@@ -154,15 +147,15 @@ public class InputParametersHandeler {
         try {
             int durationValue = Integer.parseInt(duration);
             if (durationValue < 0) {
-                MyLogger.logBeforeLoading("Duration value cannot be negative: " + durationValue + ", exiting.",
+                MyLogger.logLoadingOrSimulationStartEnd("Duration value cannot be negative: " + durationValue + ", exiting.",
                         Constants.FATAL_FOR_LOGGING);
                 return Constants.INVALID_INPUT_PARAMETERS;
             }
-            MyLogger.logBeforeLoading("Duration provided: " + durationValue + " seconds (steps in simulation)," +
+            MyLogger.logLoadingOrSimulationStartEnd("Duration provided: " + durationValue + " seconds (steps in simulation)," +
                     " starting app without GUI.", Constants.INFO_FOR_LOGGING);
             return durationValue;
         } catch (NumberFormatException e) {
-            MyLogger.logBeforeLoading("Invalid duration value provided in input parameters (needs to be " +
+            MyLogger.logLoadingOrSimulationStartEnd("Invalid duration value provided in input parameters (needs to be " +
                     "Integer: " + duration + ", exiting.", Constants.FATAL_FOR_LOGGING);
             return Constants.INVALID_INPUT_PARAMETERS;
         }
@@ -170,37 +163,61 @@ public class InputParametersHandeler {
 
     public static String getConfigPathFromParameter(String configPath) {
         if (configPath == null || configPath.isEmpty()) {
-            MyLogger.logBeforeLoading("No config file path provided in input parameters, using default config" +
+            MyLogger.logLoadingOrSimulationStartEnd("No config file path provided in input parameters, using default config" +
                     " file path: " + Constants.DEFAULT_CONFIG_FILE, Constants.WARN_FOR_LOGGING);
             return Constants.DEFAULT_CONFIG_FILE;
         }
-        MyLogger.logBeforeLoading("Config file path provided: " + configPath, Constants.INFO_FOR_LOGGING);
+        MyLogger.logLoadingOrSimulationStartEnd("Config file path provided: " + configPath, Constants.INFO_FOR_LOGGING);
         return configPath;
     }
 
     public static String getOutputFilePathFromParameter(String outputFilePath) {
         if (outputFilePath == null || outputFilePath.isEmpty()) {
-            MyLogger.logBeforeLoading("No output file path provided in input parameters, using default output " +
+            MyLogger.logLoadingOrSimulationStartEnd("No output file path provided in input parameters, using default output " +
                     "file path: " + Constants.DEFAULT_OUTPUT_FILE, Constants.WARN_FOR_LOGGING);
             return Constants.DEFAULT_OUTPUT_FILE;
         }
-        MyLogger.logBeforeLoading("Output file path provided: " + outputFilePath, Constants.INFO_FOR_LOGGING);
+        MyLogger.logLoadingOrSimulationStartEnd("Output file path provided: " + outputFilePath, Constants.INFO_FOR_LOGGING);
         return outputFilePath;
+    }
+
+    public static int getLoggingFromParameter(String logging) {
+        if (logging == null || logging.isEmpty()) {
+            MyLogger.logLoadingOrSimulationStartEnd("No logging settings provided in input parameters, using" +
+                            " default logging settings from config file.", Constants.WARN_FOR_LOGGING);
+            return Constants.LOGGING_NOT_PROVIDED_IN_INPUT_PARAMETERS;
+        }
+
+        String loggingLower = logging.toLowerCase();
+        try {
+            boolean loggingValue = Boolean.parseBoolean(loggingLower);
+            MyLogger.logLoadingOrSimulationStartEnd("Logging settings provided: " + loggingValue, Constants.INFO_FOR_LOGGING);
+            if (loggingValue) {
+                return Constants.LOGGING_ON_FROM_INPUT_PARAMETERS;
+            } else {
+                return Constants.LOGGING_OFF_FROM_INPUT_PARAMETERS;
+            }
+        } catch (Exception e) {
+            MyLogger.logLoadingOrSimulationStartEnd("Invalid value (needs to be true/false) for logging " +
+                    "settings provided in input parameters: " + logging + ", using specification from config.",
+                    Constants.FATAL_FOR_LOGGING);
+            return Constants.LOGGING_NOT_PROVIDED_IN_INPUT_PARAMETERS;
+        }
     }
 
     public static ICarFollowingModel getCarFollowingModelFromParameter(String carFollowingModelId) {
         if (carFollowingModelId == null || carFollowingModelId.isEmpty()) {
-            MyLogger.logBeforeLoading("Invalid car following model provided in input parameters: " +
+            MyLogger.logLoadingOrSimulationStartEnd("Invalid car following model provided in input parameters: " +
                     carFollowingModelId + ", exiting.", Constants.FATAL_FOR_LOGGING);
             return null;
         }
         ICarFollowingModel model = getCarFollowingModelById(carFollowingModelId);
         if (model == null) {
-            MyLogger.logBeforeLoading("Invalid car following model provided in input parameters: " +
+            MyLogger.logLoadingOrSimulationStartEnd("Invalid car following model provided in input parameters: " +
                     carFollowingModelId + ", exiting.", Constants.FATAL_FOR_LOGGING);
             return null;
         }
-        MyLogger.logBeforeLoading("Car following model provided: " + carFollowingModelId, Constants.INFO_FOR_LOGGING);
+        MyLogger.logLoadingOrSimulationStartEnd("Car following model provided: " + carFollowingModelId, Constants.INFO_FOR_LOGGING);
         return model;
     }
 
@@ -225,33 +242,33 @@ public class InputParametersHandeler {
 
                     // if the same => found the model, create new instance and return it
                     if (annotation.value().equals(targetId)) {
-                        MyLogger.logBeforeLoading("Found model via reflection (by ID): " + clazz.getSimpleName(), Constants.INFO_FOR_LOGGING);
+                        MyLogger.logLoadingOrSimulationStartEnd("Found model via reflection (by ID): " + clazz.getSimpleName(), Constants.INFO_FOR_LOGGING);
                         return (ICarFollowingModel) clazz.getDeclaredConstructor().newInstance();
                     }
                 }
             }
         } catch (Exception e) {
-            MyLogger.logBeforeLoading("Error searching for model by ID: " + e.getMessage(), Constants.FATAL_FOR_LOGGING);
+            MyLogger.logLoadingOrSimulationStartEnd("Error searching for model by ID: " + e.getMessage(), Constants.FATAL_FOR_LOGGING);
             e.printStackTrace();
         }
 
-        MyLogger.logBeforeLoading("Model with ID '" + targetId + "' not found.", Constants.WARN_FOR_LOGGING);
+        MyLogger.logLoadingOrSimulationStartEnd("Model with ID '" + targetId + "' not found.", Constants.WARN_FOR_LOGGING);
         return null;
     }
 
     public static ILaneChangingModel getLaneChangingModelFromParameter(String laneChangingModelId) {
         if (laneChangingModelId == null || laneChangingModelId.isEmpty()) {
-            MyLogger.logBeforeLoading("Invalid lane changing model provided in input parameters: " +
+            MyLogger.logLoadingOrSimulationStartEnd("Invalid lane changing model provided in input parameters: " +
                     laneChangingModelId + ", exiting.", Constants.FATAL_FOR_LOGGING);
             return null;
         }
         ILaneChangingModel model = getLaneChangingModelById(laneChangingModelId);
         if (model == null) {
-            MyLogger.logBeforeLoading("Invalid lane changing model provided in input parameters: " +
+            MyLogger.logLoadingOrSimulationStartEnd("Invalid lane changing model provided in input parameters: " +
                     laneChangingModelId + ", exiting.", Constants.FATAL_FOR_LOGGING);
             return null;
         }
-        MyLogger.logBeforeLoading("Lane changing model provided: " + laneChangingModelId, Constants.INFO_FOR_LOGGING);
+        MyLogger.logLoadingOrSimulationStartEnd("Lane changing model provided: " + laneChangingModelId, Constants.INFO_FOR_LOGGING);
         return model;
     }
 
@@ -276,17 +293,17 @@ public class InputParametersHandeler {
 
                     // if the same => found the model, create new instance and return it
                     if (annotation.value().equals(targetId)) {
-                        MyLogger.logBeforeLoading("Found model via reflection (by ID): " + clazz.getSimpleName(), Constants.INFO_FOR_LOGGING);
+                        MyLogger.logLoadingOrSimulationStartEnd("Found model via reflection (by ID): " + clazz.getSimpleName(), Constants.INFO_FOR_LOGGING);
                         return (ILaneChangingModel) clazz.getDeclaredConstructor().newInstance();
                     }
                 }
             }
         } catch (Exception e) {
-            MyLogger.logBeforeLoading("Error searching for model by ID: " + e.getMessage(), Constants.FATAL_FOR_LOGGING);
+            MyLogger.logLoadingOrSimulationStartEnd("Error searching for model by ID: " + e.getMessage(), Constants.FATAL_FOR_LOGGING);
             e.printStackTrace();
         }
 
-        MyLogger.logBeforeLoading("Model with ID '" + targetId + "' not found.", Constants.WARN_FOR_LOGGING);
+        MyLogger.logLoadingOrSimulationStartEnd("Model with ID '" + targetId + "' not found.", Constants.WARN_FOR_LOGGING);
         return null;
     }
 

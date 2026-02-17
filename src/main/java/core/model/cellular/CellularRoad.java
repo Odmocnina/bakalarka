@@ -157,6 +157,8 @@ public class CellularRoad extends Road {
                     carParams.lane = targetLane;
                     this.placeCar(carParams, (int) carParams.xPosition, targetLane);
                     this.removeCar(currentLane, (int) carParams.xPosition);
+                    // record lane change in the results recorder
+                    ResultsRecorder.getResultsRecorder().recordLaneChange(this.id);
                 }
             }
         }
@@ -216,6 +218,8 @@ public class CellularRoad extends Road {
                 }
             }
         }
+
+        this.countStoppedCars();
 
         return carsPassed;
     }
@@ -734,6 +738,25 @@ public class CellularRoad extends Road {
      **/
     public double getCellSize() {
         return this.cellSize;
+    }
+
+    /**
+     * Function to count the number of stopped cars in a given lane, used for traffic light control and other purposes
+     *
+     * @param lane lane number to count stopped cars in
+     * @return number of stopped cars in the specified lane
+     **/
+    protected int countStoppedCarsInLane(int lane) {
+        int count = 0;
+        for (int position = 0; position < this.numberOfCells; position++) {
+            if (cells[lane][position].isOccupied() && cells[lane][position].isHead()) {
+                CarParams carParams = cells[lane][position].getCarParams();
+                if (carParams.getParameter(RequestConstants.CURRENT_SPEED_REQUEST) == 0) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
     /*******************************

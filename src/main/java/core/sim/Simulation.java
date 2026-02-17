@@ -240,6 +240,29 @@ public class Simulation {
     }
 
     /**
+     * Clears all queues on all roads, used when resetting the simulation with the same roads to ensure all queues are cleared
+     * before running the simulation again.
+     **/
+    private void clearAllQueues() {
+        for (Road road : roads) {
+            road.clearCarQueues();
+        }
+    }
+
+    private void resetCarQueues() {
+        for (Road road : roads) {
+            road.removeAllCars();
+            road.clearCarQueues();
+        }
+    }
+
+    private void remakeCarQueues() {
+        for (Road road : roads) {
+            road.setUpQueuesIfNeeded();
+        }
+    }
+
+    /**
      * method to reset all light plans on all roads, used when resetting the simulation with new roads to ensure light
      * plans start from the beginning
      *

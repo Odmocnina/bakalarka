@@ -59,7 +59,7 @@ public class MyLogger {
      * @param message The message to log.
      * @param level The log4j level at which to log the message (INFO, DEBUG, ERROR, WARN, FATAL).
      **/
-    public static void logBeforeLoading(String message, String level) {
+    public static void logLoadingOrSimulationStartEnd(String message, String level) {
         if (level.equalsIgnoreCase(Constants.INFO_FOR_LOGGING)) {
             logger.info(message);
         } else if (level.equalsIgnoreCase(Constants.DEBUG_FOR_LOGGING)) {
