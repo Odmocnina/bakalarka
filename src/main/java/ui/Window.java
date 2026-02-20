@@ -7,6 +7,9 @@ import core.model.cellular.Cell;
 import core.model.cellular.CellularRoad;
 import core.utils.*;
 import core.utils.constants.Constants;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.ObservableList;
 import ui.render.IRoadRenderer;
 import core.sim.Simulation;
 
@@ -61,6 +64,22 @@ public class Window extends Application {
 
     /** menu item for start/stop in menu **/
     private MenuItem menuStartStopItem;
+
+    /** boolean property for lane change ban toggle button and menu item, used for keeping toggle button and menu item
+     * in sync **/
+    private BooleanProperty laneChangeProp;
+
+    /** boolean property for collision ban toggle button and menu item, used for keeping toggle button and menu item in
+     *  sync **/
+    private BooleanProperty collisionBanProp;
+
+    /** boolean properties for output settings toggle buttons and menu items, used for keeping toggle buttons and menu
+     * items in sync **/
+    private BooleanProperty[] whatToExportProps;
+
+    /** boolean properties for logging settings toggle buttons and menu items, used for keeping toggle buttons and menu
+     * items in sync **/
+    private BooleanProperty[] logSettingsProps;
 
     /**
      * start method for JavaFX application
@@ -126,9 +145,10 @@ public class Window extends Application {
             }
         };
 
+        setSyncedProperties(paintAll); // set up the BooleanProperties for syncing toggle buttons and menu items
+
         MenuBar menuBar = createMenu(primaryStage, paintAll);
         ToolBar toolBar = createToolBar(primaryStage, paintAll);
-
 
         // top: info menu + toolbar
         VBox topPane = new VBox(menuBar, toolBar);
@@ -221,6 +241,84 @@ public class Window extends Application {
 
         // first paint
         paintAll.run();
+    }
+
+    /**
+     * creates menu with menu items and their actions which are toggleable, this is so that toggle options are synced
+     * between menu and toolbar, for example lane change ban toggle button in toolbar and lane change ban menu
+     * item in menu are synced using laneChangeProp BooleanProperty, when one of them is toggled, the laneChangeProp is
+     * updated, which triggers the listener that calls the action to update the simulation and repaint, and since both
+     * the toggle button and menu item are bound to the same laneChangeProp, they will both update to reflect the
+     * change, this way we ensure that the toggle options are always in sync between menu and toolbar
+     *
+     * @param paintAll runnable to repaint all roads after actions that change the simulation
+     **/
+    private void setSyncedProperties(Runnable paintAll) {
+        this.laneChangeProp = new SimpleBooleanProperty(!AppContext.RUN_DETAILS.laneChange);
+        this.laneChangeProp.addListener((obs, oldVal, newVal) -> {
+            Actions.changeLaneChangingAction(paintAll);  // call the action to update the simulation and repaint
+        });
+
+        this.collisionBanProp = new SimpleBooleanProperty(AppContext.RUN_DETAILS.preventCollisions);
+        this.collisionBanProp.addListener((obs, oldVal, newVal) -> Actions.collisionBanAction(paintAll));
+
+        boolean[] whatToExport = AppContext.RUN_DETAILS.outputDetails.output;
+        this.whatToExportProps = new BooleanProperty[whatToExport.length];
+        this.whatToExportProps[Constants.SIMULATION_DETAILS_OUTPUT_INDEX] =
+                new SimpleBooleanProperty(whatToExport[Constants.SIMULATION_DETAILS_OUTPUT_INDEX]);
+        this.whatToExportProps[Constants.SIMULATION_DETAILS_OUTPUT_INDEX].addListener((obs, oldVal, newVal) ->
+                Actions.setOutputAction(Constants.SIMULATION_DETAILS_OUTPUT_INDEX));
+        this.whatToExportProps[Constants.SIMULATION_TIME_OUTPUT_INDEX] =
+                new SimpleBooleanProperty(whatToExport[Constants.SIMULATION_TIME_OUTPUT_INDEX]);
+        this.whatToExportProps[Constants.SIMULATION_TIME_OUTPUT_INDEX].addListener((obs, oldVal, newVal) ->
+                Actions.setOutputAction(Constants.SIMULATION_TIME_OUTPUT_INDEX));
+        this.whatToExportProps[Constants.CARS_PASSED_OUTPUT_INDEX] =
+                new SimpleBooleanProperty(whatToExport[Constants.CARS_PASSED_OUTPUT_INDEX]);
+        this.whatToExportProps[Constants.CARS_PASSED_OUTPUT_INDEX].addListener((obs, oldVal, newVal) ->
+                Actions.setOutputAction(Constants.CARS_PASSED_OUTPUT_INDEX));
+        this.whatToExportProps[Constants.CARS_ON_ROAD_OUTPUT_INDEX] =
+                new SimpleBooleanProperty(whatToExport[Constants.CARS_ON_ROAD_OUTPUT_INDEX]);
+        this.whatToExportProps[Constants.CARS_ON_ROAD_OUTPUT_INDEX].addListener((obs, oldVal, newVal) ->
+                Actions.setOutputAction(Constants.CARS_ON_ROAD_OUTPUT_INDEX));
+        this.whatToExportProps[Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX] =
+                new SimpleBooleanProperty(whatToExport[Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX]);
+        this.whatToExportProps[Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX].addListener((obs, oldVal, newVal) ->
+                Actions.setOutputAction(Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX));
+        this.whatToExportProps[Constants.COLLISION_COUNT_OUTPUT_INDEX] =
+                new SimpleBooleanProperty(whatToExport[Constants.COLLISION_COUNT_OUTPUT_INDEX]);
+        this.whatToExportProps[Constants.COLLISION_COUNT_OUTPUT_INDEX].addListener((obs, oldVal, newVal) ->
+                Actions.setOutputAction(Constants.COLLISION_COUNT_OUTPUT_INDEX));
+        this.whatToExportProps[Constants.ROAD_DETAILS_OUTPUT_INDEX] =
+                new SimpleBooleanProperty(whatToExport[Constants.ROAD_DETAILS_OUTPUT_INDEX]);
+        this.whatToExportProps[Constants.ROAD_DETAILS_OUTPUT_INDEX].addListener((obs, oldVal, newVal) ->
+                Actions.setOutputAction(Constants.ROAD_DETAILS_OUTPUT_INDEX));
+
+        boolean[] logSettings = AppContext.RUN_DETAILS.log;
+        this.logSettingsProps = new BooleanProperty[logSettings.length];
+        this.logSettingsProps[Constants.GENERAL_LOGGING_INDEX] =
+                new SimpleBooleanProperty(logSettings[Constants.GENERAL_LOGGING_INDEX]);
+        this.logSettingsProps[Constants.GENERAL_LOGGING_INDEX].addListener((obs, oldVal, newVal) ->
+                Actions.setLoggingAction(Constants.GENERAL_LOGGING_INDEX));
+        this.logSettingsProps[Constants.INFO_LOGGING_INDEX] =
+                new SimpleBooleanProperty(logSettings[Constants.INFO_LOGGING_INDEX]);
+        this.logSettingsProps[Constants.INFO_LOGGING_INDEX].addListener((obs, oldVal, newVal) ->
+                Actions.setLoggingAction(Constants.INFO_LOGGING_INDEX));
+        this.logSettingsProps[Constants.WARN_LOGGING_INDEX] =
+                new SimpleBooleanProperty(logSettings[Constants.WARN_LOGGING_INDEX]);
+        this.logSettingsProps[Constants.WARN_LOGGING_INDEX].addListener((obs, oldVal, newVal) ->
+                Actions.setLoggingAction(Constants.WARN_LOGGING_INDEX));
+        this.logSettingsProps[Constants.ERROR_LOGGING_INDEX] =
+                new SimpleBooleanProperty(logSettings[Constants.ERROR_LOGGING_INDEX]);
+        this.logSettingsProps[Constants.ERROR_LOGGING_INDEX].addListener((obs, oldVal, newVal) ->
+                Actions.setLoggingAction(Constants.ERROR_LOGGING_INDEX));
+        this.logSettingsProps[Constants.FATAL_LOGGING_INDEX] =
+                new SimpleBooleanProperty(logSettings[Constants.FATAL_LOGGING_INDEX]);
+        this.logSettingsProps[Constants.FATAL_LOGGING_INDEX].addListener((obs, oldVal, newVal) ->
+                Actions.setLoggingAction(Constants.FATAL_LOGGING_INDEX));
+        this.logSettingsProps[Constants.DEBUG_LOGGING_INDEX] =
+                new SimpleBooleanProperty(logSettings[Constants.DEBUG_LOGGING_INDEX]);
+        this.logSettingsProps[Constants.DEBUG_LOGGING_INDEX].addListener((obs, oldVal, newVal) ->
+                Actions.setLoggingAction(Constants.DEBUG_LOGGING_INDEX));
     }
 
     /**
@@ -506,7 +604,7 @@ public class Window extends Application {
      *
      * @param resourcePath path to icon in resources (e.g. "/icons/run.png")
      * @return ImageView with icon
-     */
+     **/
     private ImageView createMenuIcon(String resourcePath) {
         InputStream stream = getClass().getResourceAsStream(resourcePath);
 
@@ -527,6 +625,47 @@ public class Window extends Application {
     }
 
     /**
+     * Creates a ToggleButton that is bound to a BooleanProperty. This allows the button to reflect the state of the
+     * property, used for toolbar
+     *
+     * @param iconPath path to icon in resources (e.g. "/icons/ban.png")
+     * @param tooltip tooltip text for button
+     * @param property BooleanProperty to bind the button's selected state to. When the property changes, the button
+     *                 will update, and when the button is toggled, the property will update.
+     * @return ToggleButton that is bound to the given BooleanProperty
+     **/
+    private ToggleButton createBoundToggleButton(String iconPath, String tooltip, BooleanProperty property) {
+        ToggleButton btn = createIconToggleButton(iconPath, tooltip);
+
+        btn.selectedProperty().bindBidirectional(property);
+
+        return btn;
+    }
+
+    /**
+     * Creates a CheckMenuItem that is bound to a BooleanProperty. This allows the menu item to reflect the state of the
+     * property, used for menu
+     *
+     * @param text text for menu item
+     * @param iconPath path to icon in resources (e.g. "/icons/ban.png")
+     * @param property BooleanProperty to bind the menu item's selected state to. When the property changes, the menu item
+     *                 will update, and when the menu item is toggled, the property will update.
+     * @return CheckMenuItem that is bound to the given BooleanProperty
+     */
+    private CheckMenuItem createBoundMenuItem(String text, String iconPath, BooleanProperty property) {
+        CheckMenuItem item;
+        if (iconPath == null || iconPath.isEmpty()) {
+            item = new CheckMenuItem(text);
+        } else {
+            item = new CheckMenuItem(text, createMenuIcon(iconPath));
+        }
+
+        item.selectedProperty().bindBidirectional(property);
+
+        return item;
+    }
+
+    /**
      * creates toolbar with buttons
      *
      * @param primaryStage primary stage for file choosers
@@ -542,7 +681,8 @@ public class Window extends Application {
         Button openMapFileBtn = createIconButton("/icons/openMapFile.png", "Open map file");
         Button saveMapFileBtn = createIconButton("/icons/saveMapFile.png", "Save map file");
         Button saveAsMapFileBtn = createIconButton("/icons/saveAsMapFile.png", "Save map file as...");
-        ToggleButton changeLaneBtn = createIconToggleButton("/icons/ban.png", "Toggle lane change ban");
+        ToggleButton changeLaneBtn = createBoundToggleButton("/icons/ban.png", "Toggle lane change ban",
+                laneChangeProp);
         editMapFileBtn.setStyle(defaultStyle);
         newMapFileBtn.setStyle(defaultStyle);
         openMapFileBtn.setStyle(defaultStyle);
@@ -550,21 +690,17 @@ public class Window extends Application {
         saveAsMapFileBtn.setStyle(defaultStyle);
 
         // simulation control buttons
-       // Button startStopBtn = createIconButton("/icons/run.png", "Start/Stop simulation");
         toolbarStartStopBtn = createIconButton("/icons/run.png", "Start/Stop simulation");
         Button nextStepBtn = createIconButton("/icons/nextStep.png", "Next simulation step");
         Button resetBtn = createIconButton("/icons/reset.png", "Reset simulation");
-        ToggleButton collisionBanBtn = createIconToggleButton("/icons/collisionBan.png",
-                "Ban collisions (toggle)");
+        ToggleButton collisionBanBtn = createBoundToggleButton("/icons/collisionBan.png",
+                "Ban collisions (toggle)", collisionBanProp);
         Button setTimeBetweenStepsBtn = createIconButton("/icons/time.png",
                 "Set time between simulation steps (ms)");
-        //startStopBtn.setStyle(defaultStyle);
         toolbarStartStopBtn.setStyle(defaultStyle);
         nextStepBtn.setStyle(defaultStyle);
         resetBtn.setStyle(defaultStyle);
         setTimeBetweenStepsBtn.setStyle(defaultStyle);
-        changeLaneBtn.setSelected(!AppContext.RUN_DETAILS.laneChange);
-        collisionBanBtn.setSelected(AppContext.RUN_DETAILS.preventCollisions);
 
         // out file buttons
         Button exportResultsToTxtBtn = createIconButton("/icons/export.png", "Export results to TXT");
@@ -575,40 +711,7 @@ public class Window extends Application {
         whatToExportBtn.setOnAction(e -> {
             ContextMenu contextMenu = new ContextMenu();
 
-            CheckMenuItem simulationDetailsItem = new CheckMenuItem("Simulation details");
-            CheckMenuItem simulationTimeItem = new CheckMenuItem("Simulation time");
-            CheckMenuItem carsPassedItem = new CheckMenuItem("Cars passed");
-            CheckMenuItem carsOnRoadItem = new CheckMenuItem("Cars on road");
-            CheckMenuItem whenWasRoadEmptyItem = new CheckMenuItem("When was road empty");
-            CheckMenuItem collisionsItem = new CheckMenuItem("Collisions");
-            CheckMenuItem roadDetailsItem = new CheckMenuItem("Road details");
-
-            simulationDetailsItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.SIMULATION_DETAILS_OUTPUT_INDEX));
-            simulationTimeItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.SIMULATION_TIME_OUTPUT_INDEX));
-            carsPassedItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.CARS_PASSED_OUTPUT_INDEX));
-            carsOnRoadItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.CARS_ON_ROAD_OUTPUT_INDEX));
-            whenWasRoadEmptyItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX));
-            collisionsItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.COLLISION_COUNT_OUTPUT_INDEX));
-            roadDetailsItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.ROAD_DETAILS_OUTPUT_INDEX));
-
-            simulationDetailsItem.setOnAction(ev -> Actions.setOutputAction(Constants.SIMULATION_DETAILS_OUTPUT_INDEX));
-            simulationTimeItem.setOnAction(ev -> Actions.setOutputAction(Constants.SIMULATION_TIME_OUTPUT_INDEX));
-            carsPassedItem.setOnAction(ev -> Actions.setOutputAction(Constants.CARS_PASSED_OUTPUT_INDEX));
-            carsOnRoadItem.setOnAction(ev -> Actions.setOutputAction(Constants.CARS_ON_ROAD_OUTPUT_INDEX));
-            whenWasRoadEmptyItem.setOnAction(ev -> Actions.setOutputAction(Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX));
-            collisionsItem.setOnAction(ev -> Actions.setOutputAction(Constants.COLLISION_COUNT_OUTPUT_INDEX));
-            roadDetailsItem.setOnAction(ev -> Actions.setOutputAction(Constants.ROAD_DETAILS_OUTPUT_INDEX));
-
-
-            contextMenu.getItems().addAll(
-                    simulationDetailsItem,
-                    simulationTimeItem,
-                    carsPassedItem,
-                    carsOnRoadItem,
-                    whenWasRoadEmptyItem,
-                    collisionsItem,
-                    roadDetailsItem
-            );
+            makeToggleWhatToExportMenu(contextMenu.getItems());
 
             contextMenu.show(whatToExportBtn, Side.BOTTOM, 0, 0);
         });
@@ -618,59 +721,21 @@ public class Window extends Application {
         setCsvSeparatorBtn.setStyle(defaultStyle);
         whatToExportBtn.setStyle(defaultStyle);
 
-        ToggleButton toggleAllLoggingBtn = createIconToggleButton("/icons/log.png", "Toggle all logging");
+        ToggleButton toggleAllLoggingBtn = //createIconToggleButton("/icons/log.png", "Toggle all logging");
+                createBoundToggleButton("/icons/log.png", "Toggle all logging",
+                        logSettingsProps[Constants.GENERAL_LOGGING_INDEX]);
         Button whatToLogBtn = createIconButton("/icons/whatToExport.png", "What to log");
         whatToLogBtn.setOnAction(e -> {
             ContextMenu contextMenu = new ContextMenu();
-
-            CheckMenuItem infoItem = new CheckMenuItem("Log info");
-            CheckMenuItem warnItem = new CheckMenuItem("Log warnings");
-            CheckMenuItem errorItem = new CheckMenuItem("Log errors");
-            CheckMenuItem fatalItem = new CheckMenuItem("Log fatal problems");
-            CheckMenuItem debugItem = new CheckMenuItem("Log debug info");
-
-            infoItem.setSelected(AppContext.RUN_DETAILS.log[Constants.INFO_LOGGING_INDEX]);
-            warnItem.setSelected(AppContext.RUN_DETAILS.log[Constants.WARN_LOGGING_INDEX]);
-            errorItem.setSelected(AppContext.RUN_DETAILS.log[Constants.ERROR_LOGGING_INDEX]);
-            fatalItem.setSelected(AppContext.RUN_DETAILS.log[Constants.FATAL_LOGGING_INDEX]);
-            debugItem.setSelected(AppContext.RUN_DETAILS.log[Constants.DEBUG_LOGGING_INDEX]);
-
-            infoItem.setOnAction(ev -> Actions.setLoggingAction(Constants.INFO_LOGGING_INDEX));
-            warnItem.setOnAction(ev -> Actions.setLoggingAction(Constants.WARN_LOGGING_INDEX));
-            errorItem.setOnAction(ev -> Actions.setLoggingAction(Constants.ERROR_LOGGING_INDEX));
-            fatalItem.setOnAction(ev -> Actions.setLoggingAction(Constants.FATAL_LOGGING_INDEX));
-            debugItem.setOnAction(ev -> Actions.setLoggingAction(Constants.DEBUG_LOGGING_INDEX));
-
-            contextMenu.getItems().addAll(
-                    infoItem,
-                    warnItem,
-                    errorItem,
-                    fatalItem,
-                    debugItem
-            );
-
+            makeToggleLoggingMenu(contextMenu.getItems());
             contextMenu.show(whatToLogBtn, Side.BOTTOM, 0, 0);
         });
-        toggleAllLoggingBtn.setSelected(AppContext.RUN_DETAILS.log[0]);
-        //toggleAllLoggingBtn.setStyle(defaultStyle);
         whatToLogBtn.setStyle(defaultStyle);
 
 
         newMapFileBtn.setOnAction(e -> Actions.newMapAction(primaryStage, paintAll));
 
         editMapFileBtn.setOnAction(e -> Actions.editMapFile(primaryStage, paintAll));
-
-        /*startStopBtn.setOnAction(e -> {
-            if (engine.getRunning()) {
-                setButtonImage("/icons/run.png", startStopBtn);
-                engine.stop();
-                MyLogger.log("Simulation stopped via toolbar button", Constants.INFO_FOR_LOGGING);
-            } else {
-                setButtonImage("/icons/stop.png", startStopBtn);
-                engine.start();
-                MyLogger.log("Simulation started via toolbar button", Constants.INFO_FOR_LOGGING);
-            }
-        });*/
 
         toolbarStartStopBtn.setOnAction(e -> handleStartStopAction(primaryStage));
 
@@ -682,23 +747,17 @@ public class Window extends Application {
 
         nextStepBtn.setOnAction(e -> Actions.nextStepAction(simulation, paintAll));
 
-        changeLaneBtn.setOnAction(e -> Actions.changeLaneChangingAction(paintAll));
-
         saveMapFileBtn.setOnAction(e -> Actions.saveMapAction());
 
         saveAsMapFileBtn.setOnAction(e -> Actions.saveMapAsAction(primaryStage));
 
         openMapFileBtn.setOnAction(e -> Actions.openMapAction(primaryStage, paintAll));
 
-        collisionBanBtn.setOnAction(e -> Actions.collisionBanAction(paintAll));
-
         setTimeBetweenStepsBtn.setOnAction(e -> Actions.setTimeBetweenStepsAction(primaryStage, engine));
 
         setOutputFileNameBtn.setOnAction(e -> Actions.setOutputFileAction());
 
         setCsvSeparatorBtn.setOnAction(e -> Actions.setCsvSeparatorAction(primaryStage));
-
-        toggleAllLoggingBtn.setOnAction(e -> Actions.setLoggingAction(Constants.GENERAL_LOGGING_INDEX));
 
         return new ToolBar(
                 newMapFileBtn,
@@ -707,7 +766,6 @@ public class Window extends Application {
                 saveMapFileBtn,
                 saveAsMapFileBtn,
                 toolbarStartStopBtn,
-                //startStopBtn,
                 nextStepBtn,
                 resetBtn,
                 changeLaneBtn,
@@ -720,6 +778,67 @@ public class Window extends Application {
                 whatToExportBtn,
                 toggleAllLoggingBtn,
                 whatToLogBtn
+        );
+    }
+
+    /**
+     * helper method to create menu items for "what to export" menu, these menu items are toggleable and bound to
+     * BooleanProperties
+     *
+     * @param items list of menu items to add the created menu items to
+     **/
+    private void makeToggleWhatToExportMenu(ObservableList<MenuItem> items) {
+        CheckMenuItem simulationDetailsItem = createBoundMenuItem("Simulation details",
+                null, whatToExportProps[Constants.SIMULATION_DETAILS_OUTPUT_INDEX]);
+        CheckMenuItem simulationTimeItem = createBoundMenuItem("Simulation time",
+                null, whatToExportProps[Constants.SIMULATION_TIME_OUTPUT_INDEX]);
+        CheckMenuItem carsPassedItem = createBoundMenuItem("Cars passed",
+                null, whatToExportProps[Constants.CARS_PASSED_OUTPUT_INDEX]);
+        CheckMenuItem carsOnRoadItem = createBoundMenuItem("Cars on road",
+                null, whatToExportProps[Constants.CARS_ON_ROAD_OUTPUT_INDEX]);
+        CheckMenuItem whenWasRoadEmptyItem = createBoundMenuItem("When was road empty",
+                null, whatToExportProps[Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX]);
+        CheckMenuItem collisionsItem = createBoundMenuItem("Collisions",
+                null, whatToExportProps[Constants.COLLISION_COUNT_OUTPUT_INDEX]);
+        CheckMenuItem roadDetailsItem = createBoundMenuItem("Road details",
+                null, whatToExportProps[Constants.ROAD_DETAILS_OUTPUT_INDEX]);
+
+        items.addAll(
+                simulationDetailsItem,
+                simulationTimeItem,
+                carsPassedItem,
+                carsOnRoadItem,
+                whenWasRoadEmptyItem,
+                collisionsItem,
+                roadDetailsItem
+        );
+    }
+
+    /**
+     * helper method to create menu items for "what to log" menu, these menu items are toggleable and bound to
+     * BooleanProperties
+     *
+     * @param items list of menu items to add the created menu items to
+     **/
+    private void makeToggleLoggingMenu(ObservableList<MenuItem> items) {
+        CheckMenuItem infoItem = createBoundMenuItem("Log info", null,
+                logSettingsProps[Constants.INFO_LOGGING_INDEX]);
+        CheckMenuItem warnItem = createBoundMenuItem("Log warnings", null,
+                logSettingsProps[Constants.WARN_LOGGING_INDEX]);
+        CheckMenuItem errorItem = createBoundMenuItem("Log errors", null,
+                logSettingsProps[Constants.ERROR_LOGGING_INDEX]);
+        CheckMenuItem fatalItem = createBoundMenuItem("Log fatal problems", null,
+                logSettingsProps[Constants.FATAL_LOGGING_INDEX]);
+        CheckMenuItem debugItem = createBoundMenuItem("Log debug info", null,
+                logSettingsProps[Constants.DEBUG_LOGGING_INDEX]);
+
+
+        items.addAll(
+                infoItem,
+                warnItem,
+                errorItem,
+                fatalItem,
+                debugItem
         );
     }
 
@@ -782,35 +901,19 @@ public class Window extends Application {
        //     menuStartStopItem.setOnAction(e -> handleStartStopAction(primaryStage));
         MenuItem nextStepItem = new MenuItem("Next simulation step", createMenuIcon("/icons/nextStep.png"));
         MenuItem resetSimulationItem = new MenuItem("Reset simulation", createMenuIcon("/icons/reset.png"));
-        CheckMenuItem changeLaneToggleItem = new CheckMenuItem("Toggle lane change ban", createMenuIcon("/icons/ban.png"));
-        CheckMenuItem collisionBanToggleItem = new CheckMenuItem("Ban collisions (toggle)",
-                createMenuIcon("/icons/collisionBan.png"));
+        CheckMenuItem changeLaneToggleItem = createBoundMenuItem("Toggle lane change ban",
+                "/icons/ban.png", laneChangeProp);
+        CheckMenuItem collisionBanToggleItem = createBoundMenuItem("Ban collisions (toggle)",
+                "/icons/collisionBan.png", collisionBanProp);
+
         MenuItem setTimeBetweenStepsItem = new MenuItem("Set time between simulation steps (ms)",
                 createMenuIcon("/icons/time.png"));
 
-        changeLaneToggleItem.setSelected(!AppContext.RUN_DETAILS.laneChange);
-        collisionBanToggleItem.setSelected(AppContext.RUN_DETAILS.preventCollisions);
-
-        /*startStopItem.setOnAction(e -> {
-            if (engine.getRunning()) {
-                setButtonImage("/icons/run.png", startStopItem);
-                engine.stop();
-                MyLogger.log("Simulation stopped via toolbar button", Constants.INFO_FOR_LOGGING);
-            } else {
-                setButtonImage("/icons/stop.png", startStopItem);
-                engine.start();
-                MyLogger.log("Simulation started via toolbar button", Constants.INFO_FOR_LOGGING);
-            }
-        });*/
         menuStartStopItem.setOnAction(e -> handleStartStopAction(primaryStage));
 
         nextStepItem.setOnAction(e -> Actions.nextStepAction(simulation, paintAll));
 
         resetSimulationItem.setOnAction(e -> handleReset(primaryStage, paintAll));
-
-        changeLaneToggleItem.setOnAction(e -> Actions.changeLaneChangingAction(paintAll));
-
-        collisionBanToggleItem.setOnAction(e -> Actions.collisionBanAction(paintAll));
 
         setTimeBetweenStepsItem.setOnAction(e -> Actions.setTimeBetweenStepsAction(primaryStage, engine));
 
@@ -837,32 +940,8 @@ public class Window extends Application {
                 createMenuIcon("/icons/csvSeparator.png"));
         Menu whatToExportSubMenu = new Menu("What to export",
                 createMenuIcon("/icons/whatToExport.png"));
-        CheckMenuItem simulationDetailsItem = new CheckMenuItem("Simulation details");
-        CheckMenuItem simulationTimeItem = new CheckMenuItem("Simulation time");
-        CheckMenuItem carsPassedItem = new CheckMenuItem("Cars passed");
-        CheckMenuItem carsOnRoadItem = new CheckMenuItem("Cars on road");
-        CheckMenuItem whenWasRoadEmptyItem = new CheckMenuItem("When was road empty");
-        CheckMenuItem collisionsItem = new CheckMenuItem("Collisions");
-        CheckMenuItem roadDetailsItem = new CheckMenuItem("Road details");
 
-        simulationDetailsItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.SIMULATION_DETAILS_OUTPUT_INDEX));
-        simulationTimeItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.SIMULATION_TIME_OUTPUT_INDEX));
-        carsPassedItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.CARS_PASSED_OUTPUT_INDEX));
-        carsOnRoadItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.CARS_ON_ROAD_OUTPUT_INDEX));
-        whenWasRoadEmptyItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX));
-        collisionsItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.COLLISION_COUNT_OUTPUT_INDEX));
-        roadDetailsItem.setSelected(AppContext.RUN_DETAILS.getOutputDetail(Constants.ROAD_DETAILS_OUTPUT_INDEX));
-
-        simulationDetailsItem.setOnAction(e -> Actions.setOutputAction(Constants.SIMULATION_DETAILS_OUTPUT_INDEX));
-        simulationTimeItem.setOnAction(e -> Actions.setOutputAction(Constants.SIMULATION_TIME_OUTPUT_INDEX));
-        carsPassedItem.setOnAction(e -> Actions.setOutputAction(Constants.CARS_PASSED_OUTPUT_INDEX));
-        carsOnRoadItem.setOnAction(e -> Actions.setOutputAction(Constants.CARS_ON_ROAD_OUTPUT_INDEX));
-        whenWasRoadEmptyItem.setOnAction(e -> Actions.setOutputAction(Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX));
-        collisionsItem.setOnAction(e -> Actions.setOutputAction(Constants.COLLISION_COUNT_OUTPUT_INDEX));
-        roadDetailsItem.setOnAction(e -> Actions.setOutputAction(Constants.ROAD_DETAILS_OUTPUT_INDEX));
-
-        whatToExportSubMenu.getItems().addAll(simulationDetailsItem, simulationTimeItem, carsPassedItem, carsOnRoadItem,
-                whenWasRoadEmptyItem , collisionsItem, roadDetailsItem);
+        makeToggleWhatToExportMenu(whatToExportSubMenu.getItems());
 
         setOutputFileNameItem.setOnAction(e -> Actions.setOutputFileAction());
 
@@ -885,33 +964,10 @@ public class Window extends Application {
      **/
     private Menu createLoggingMenu() {
         Menu loggingMenu = new Menu("Logging");
-        CheckMenuItem toggleAllLogItem = new CheckMenuItem("Toggle all logging");
-        toggleAllLogItem.setSelected(AppContext.RUN_DETAILS.log[Constants.GENERAL_LOGGING_INDEX]);
-        CheckMenuItem toggleInfoLogItem = new CheckMenuItem("Toggle info logging");
-        toggleInfoLogItem.setSelected(AppContext.RUN_DETAILS.log[Constants.INFO_LOGGING_INDEX]);
-        CheckMenuItem toggleWarnLogItem = new CheckMenuItem("Toggle warning logging");
-        toggleWarnLogItem.setSelected(AppContext.RUN_DETAILS.log[Constants.WARN_LOGGING_INDEX]);
-        CheckMenuItem toggleErrorLogItem = new CheckMenuItem("Toggle error logging");
-        toggleErrorLogItem.setSelected(AppContext.RUN_DETAILS.log[Constants.ERROR_LOGGING_INDEX]);
-        CheckMenuItem toggleFatalLogItem = new CheckMenuItem("Toggle fatal logging");
-        toggleFatalLogItem.setSelected(AppContext.RUN_DETAILS.log[Constants.FATAL_LOGGING_INDEX]);
-        CheckMenuItem toggleDebugLogItem = new CheckMenuItem("Toggle debug logging");
-        toggleDebugLogItem.setSelected(AppContext.RUN_DETAILS.log[Constants.DEBUG_LOGGING_INDEX]);
-        loggingMenu.getItems().addAll(toggleAllLogItem, toggleInfoLogItem, toggleWarnLogItem,
-                toggleDebugLogItem, toggleErrorLogItem, toggleFatalLogItem);
-
-        toggleAllLogItem.setOnAction(e -> Actions.setLoggingAction(Constants.GENERAL_LOGGING_INDEX));
-
-        toggleInfoLogItem.setOnAction(e -> Actions.setLoggingAction(Constants.INFO_LOGGING_INDEX));
-
-        toggleWarnLogItem.setOnAction(e -> Actions.setLoggingAction(Constants.WARN_LOGGING_INDEX));
-
-        toggleErrorLogItem.setOnAction(e -> Actions.setLoggingAction(Constants.ERROR_LOGGING_INDEX));
-
-        toggleFatalLogItem.setOnAction(e -> Actions.setLoggingAction(Constants.FATAL_LOGGING_INDEX));
-
-        toggleDebugLogItem.setOnAction(e -> Actions.setLoggingAction(Constants.DEBUG_LOGGING_INDEX));
-
+        MenuItem toggleAllLoggingItem = createBoundMenuItem("Toggle all logging", "/icons/log.png",
+                logSettingsProps[Constants.GENERAL_LOGGING_INDEX]);
+        loggingMenu.getItems().add(toggleAllLoggingItem);
+        makeToggleLoggingMenu(loggingMenu.getItems());
         return loggingMenu;
     }
 
@@ -972,7 +1028,7 @@ public class Window extends Application {
      *
      * @param stage primary stage for confirmation dialog
      * @param paintAll runnable to repaint all roads after reset
-     */
+     **/
     private void handleReset(Stage stage, Runnable paintAll) {
         if (simulation.getStepCount() > 0) {
             boolean reset = DialogMaker.confirmDialog(stage, "Reset Simulation Confirmation",

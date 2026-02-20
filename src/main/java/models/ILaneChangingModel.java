@@ -51,6 +51,15 @@ public interface ILaneChangingModel {
      **/
     Direction changeLaneIfDesired(HashMap<String, Double> parameters);
 
+    /**
+     * decides whether to change lane or not based on the specific lane changing model, with direction consideration
+     * (so when changing to left lane, parameters for left lane change are used)
+     *
+     * @param parameters the parameters needed to make a decision in hashmap form, where key is the parameter name and
+     *                   value is the parameter value in double
+     * @param direction the direction of the desired lane change (left or right)
+     * @return the direction to change lane or go straight
+     **/
     Direction changeLaneIfDesired(HashMap<String, Double> parameters, Direction direction);
 
     /**
@@ -59,4 +68,12 @@ public interface ILaneChangingModel {
      * @return name of the model as String
      **/
     String getName();
+
+    /**
+     * function to get the type of the model (e.g., cellular, continuous), used for control if car foll. model type
+     * matches lane changing model type
+     *
+     * @return type of the model as String
+     **/
+    String getType();
 }

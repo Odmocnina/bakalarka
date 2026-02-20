@@ -569,113 +569,7 @@ public class ConfigLoader {
             ResultsRecorder.getResultsRecorder().setOutputType(outputType);
             return true;
         }
-
     }
-
-
-    /**
-     * method to load all configuration from the config file, including car following model, lane changing model, roads,
-     *
-     *
-     * @return true if all configuration was loaded successfully, false if any part of the configuration failed to load
-     */
-  /*  public static boolean loadAllConfig(String[] args) {
-        String configFile;
-        if (args.length == 0) { // use default config file if none provided
-            MyLogger.logBeforeLoading("No config file provided, using default: " + Constants.DEFAULT_CONFIG_FILE,
-                    Constants.WARN_FOR_LOGGING);
-            configFile = Constants.DEFAULT_CONFIG_FILE;
-        } else {
-            MyLogger.logBeforeLoading("Config file provided: " + args[0], Constants.INFO_FOR_LOGGING);
-            configFile = args[0];
-        }
-
-        if (ConfigLoader.giveConfigFile(configFile)) { // wierd thing that I thought of, config file was opened multiple
-            // times when loading config info so now its opened only once and class
-            // remembers it
-            MyLogger.logBeforeLoading("Config file opened successfully: " + configFile, Constants.INFO_FOR_LOGGING);
-        } else {
-            MyLogger.logBeforeLoading("Failed to open config file: " + configFile + ", exiting.",
-                    Constants.FATAL_FOR_LOGGING);
-            return false;
-        }
-
-        // load car following model
-        ICarFollowingModel carFollowingModel = ConfigLoader.loadCarFollowingModel();
-        if (carFollowingModel == null) {
-            MyLogger.logBeforeLoading("Failed to load car following model, exiting."
-                    , Constants.FATAL_FOR_LOGGING);
-            return false;
-        } else {
-            MyLogger.logBeforeLoading("Loaded car following model: " + carFollowingModel.getID(),
-                    Constants.INFO_FOR_LOGGING);
-        }
-        AppContext.CAR_FOLLOWING_MODEL = carFollowingModel; // store model in app context for later use
-
-        // load lane changing model
-        ILaneChangingModel laneChangingModel = ConfigLoader.loadLaneChangingModel();
-        if (laneChangingModel == null) {
-            MyLogger.logBeforeLoading("Failed to load lane changing model, exiting.", Constants.FATAL_FOR_LOGGING);
-            return false;
-        } else {
-            MyLogger.logBeforeLoading("Loaded lane changing model: " + laneChangingModel.getID(),
-                    Constants.INFO_FOR_LOGGING);
-        }
-        AppContext.LANE_CHANGING_MODEL = laneChangingModel; // store model in app context for later use
-
-        // load roads from config
-        Road[] roads = ConfigLoader.loadRoads();
-        if (roads == null) {
-            MyLogger.logBeforeLoading("Failed to load road configuration, exiting."
-                    , Constants.FATAL_FOR_LOGGING);
-            return false;
-        } else {
-            for (int i = 0; i < roads.length; i++) {
-                MyLogger.logBeforeLoading("Loaded road(" + i + "): " + roads[i].toString(), Constants.INFO_FOR_LOGGING);
-            }
-        }
-        String mapFileName = ConfigLoader.getMapFileName();
-
-        // check if type of road matches type of car following model
-        if (!roads[0].getType().equals(carFollowingModel.getType())) {
-            MyLogger.logBeforeLoading("Types of car following model and road do not match: model type=" +
-                    carFollowingModel.getType() + ", road type=" + roads[0].getType(), Constants.FATAL_FOR_LOGGING);
-            return false;
-        } else {
-            MyLogger.logBeforeLoading("Types of car following model and road match: " + roads[0].getType(),
-                    Constants.INFO_FOR_LOGGING);
-        }
-
-        IRoadRenderer renderer; // renderer for drawing roads in gui, depends on road type, because different road types
-        // have different content
-        if (roads[0].getType().equals(Constants.CELLULAR)) {
-            renderer = new CellularRoadRenderer();
-        } else if (roads[0].getType().equals(Constants.CONTINUOUS)) {
-            renderer = new ContinuousRoadRenderer();
-        } else {
-            MyLogger.logBeforeLoading("Unknown road type: " + roads[0].getType(), Constants.FATAL_FOR_LOGGING);
-            return false;
-        }
-        AppContext.RENDERER = renderer;
-
-        RunDetails runDetails = ConfigLoader.loadRunDetails(); // loading run details (show gui, duration...)
-        if (runDetails == null) {
-            MyLogger.logBeforeLoading("Failed to load run details, exiting.", Constants.FATAL_FOR_LOGGING);
-            return false;
-        } else {
-            MyLogger.logBeforeLoading("Loaded run details: duration=" + runDetails.duration + ", timeStep=" +
-                    runDetails.timeStep + ", showGui=" + runDetails.showGui + ", outputFile=" + runDetails.outputDetails
-                    .outputFile + ", drawCells=" + runDetails.drawCells, Constants.INFO_FOR_LOGGING);
-        }
-        runDetails.setNewMapFile(mapFileName);
-        AppContext.RUN_DETAILS = runDetails;
-
-        ResultsRecorder.getResultsRecorder().initialize(roads.length, runDetails.outputDetails.outputFile);
-
-        // create simulation and store it in app context, simulation is the thing that updates all roads and cars
-        AppContext.SIMULATION = new Simulation(roads);
-        return true;
-    }*/
 
     public static boolean loadAllConfig(String configFilePath, ICarFollowingModel carFollowingModelFromInput,
                                         ILaneChangingModel laneChangingModelFromInput, int duration, String outputFile,
@@ -732,6 +626,14 @@ public class ConfigLoader {
         }
         MyLogger.logLoadingOrSimulationStartEnd("Using lane changing model: " + laneChangingModel.getID(), Constants.INFO_FOR_LOGGING);
         AppContext.LANE_CHANGING_MODEL = laneChangingModel; // store model in app context for later use
+
+        if (!carFollowingModel.getType().equals(laneChangingModel.getType())) {
+            MyLogger.logLoadingOrSimulationStartEnd("Types of car following model and lane changing model do " +
+                            "not match: car following model type=" + carFollowingModel.getType() + ", lane changing " +
+                            "model type=" + laneChangingModel.getType() + ", exiting",
+                    Constants.FATAL_FOR_LOGGING);
+            return false;
+        }
 
         // load roads from config
         Road[] roads = ConfigLoader.loadRoads();

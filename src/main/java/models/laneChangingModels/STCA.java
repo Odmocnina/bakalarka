@@ -255,4 +255,13 @@ public class STCA implements ILaneChangingModel {
         return "STCA (Symmetric Two-lane Cellular Automata)";
     }
 
+    /**
+     * gives the type of the rickert model, used for control if it matches the car foll. model
+     *
+     * @return the type of the rickert model
+     **/
+    public String getType() {
+        return Constants.CELLULAR;
+    }
+
 }

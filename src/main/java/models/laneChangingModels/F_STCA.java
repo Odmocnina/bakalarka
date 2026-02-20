@@ -252,4 +252,13 @@ public class F_STCA implements ILaneChangingModel {
         return "F-STCA (Symmetric Two-lane Cellular Automata)";
     }
 
+    /**
+     * gives the type of the f-stca model, used control if it matches the car foll. model
+     *
+     * @return the type of the f-stca model
+     **/
+    public String getType() {
+        return Constants.CELLULAR;
+    }
+
 }

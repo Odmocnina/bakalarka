@@ -258,4 +258,14 @@ public class Rickert implements ILaneChangingModel {
         return "Rickert Model";
     }
 
+    /**
+     * gives the type of the rickert model, used for control if it matches the car following model type (e.g., cellular,
+     * continuous)
+     *
+     * @return the type of the rickert model
+     **/
+    public String getType() {
+        return Constants.CELLULAR;
+    }
+
 }

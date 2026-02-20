@@ -195,4 +195,13 @@ public class Mobil implements ILaneChangingModel {
         return "MOBIL";
     }
 
+    /**
+     * gives the type of the MOBIL model, used for control if car foll. model type matches
+     *
+     * @return the type of the rickert model
+     **/
+    public String getType() {
+        return Constants.CONTINUOUS;
+    }
+
 }

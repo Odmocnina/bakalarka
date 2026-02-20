@@ -257,4 +257,14 @@ public class RickertTranssims implements ILaneChangingModel {
         return "Rickert Model, Transsims version";
     }
 
+    /**
+     * gives the type of the rickert model (transsims version), used for control if it matches the type of car foll.
+     * model
+     *
+     * @return the type of the rickert model (transsims version)
+     **/
+    public String getType() {
+        return Constants.CELLULAR;
+    }
+
 }
