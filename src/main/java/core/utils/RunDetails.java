@@ -36,11 +36,17 @@ public class RunDetails {
     /** Whether to prevent collisions during the simulation **/
     public boolean preventCollisions = true;
 
+    /** Map file to be used for the simulation, null if no map file is specified **/
     public String mapFile = null;
+
+    /** Flag to indicate if the map has changed used for controlling if map should be saved when turning off the app **/
     public boolean mapChanged = false;
 
     /** Enable debug mode, writing id of cars, controlling if cars aren't duplicated or in collision **/
     public boolean debug = false;
+
+    /** Whether the map has been loaded successfully **/
+    public boolean mapLoaded = false;
 
     /**
      * Checks if the simulation results should be written to an output file (null or empty output file/details

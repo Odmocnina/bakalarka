@@ -636,39 +636,44 @@ public class ConfigLoader {
         }
 
         // load roads from config
+        boolean mapLoaded = false;
         Road[] roads = ConfigLoader.loadRoads();
         if (roads == null) {
             MyLogger.logLoadingOrSimulationStartEnd("Failed to load road configuration, exiting."
                     , Constants.FATAL_FOR_LOGGING);
-            return false;
+          //  return false;
         } else {
             for (int i = 0; i < roads.length; i++) {
                 MyLogger.logLoadingOrSimulationStartEnd("Loaded road(" + i + ")", Constants.INFO_FOR_LOGGING); //+ roads[i].toString(), Constants.INFO_FOR_LOGGING);
             }
+            mapLoaded = true;
         }
-        String mapFileName = ConfigLoader.getMapFileName();
 
         // check if type of road matches type of car following model
-        if (!roads[0].getType().equals(carFollowingModel.getType())) {
-            MyLogger.logLoadingOrSimulationStartEnd("Types of car following model and road do not match: model type=" +
-                    carFollowingModel.getType() + ", road type=" + roads[0].getType(), Constants.FATAL_FOR_LOGGING);
-            return false;
-        } else {
-            MyLogger.logLoadingOrSimulationStartEnd("Types of car following model and road match: " + roads[0].getType(),
-                    Constants.INFO_FOR_LOGGING);
+        if (mapLoaded) {
+            if (!roads[0].getType().equals(carFollowingModel.getType())) {
+                MyLogger.logLoadingOrSimulationStartEnd("Types of car following model and road do not match: model type=" +
+                        carFollowingModel.getType() + ", road type=" + roads[0].getType(), Constants.FATAL_FOR_LOGGING);
+                return false;
+            } else {
+                MyLogger.logLoadingOrSimulationStartEnd("Types of car following model and road match: " + roads[0].getType(),
+                        Constants.INFO_FOR_LOGGING);
+            }
         }
 
-        IRoadRenderer renderer; // renderer for drawing roads in gui, depends on road type, because different road types
-        // have different content
-        if (roads[0].getType().equals(Constants.CELLULAR)) {
-            renderer = new CellularRoadRenderer();
-        } else if (roads[0].getType().equals(Constants.CONTINUOUS)) {
-            renderer = new ContinuousRoadRenderer();
-        } else {
-            MyLogger.logLoadingOrSimulationStartEnd("Unknown road type: " + roads[0].getType(), Constants.FATAL_FOR_LOGGING);
-            return false;
+        if (mapLoaded) {
+            IRoadRenderer renderer; // renderer for drawing roads in gui, depends on road type, because different road types
+            // have different content
+            if (roads[0].getType().equals(Constants.CELLULAR)) {
+                renderer = new CellularRoadRenderer();
+            } else if (roads[0].getType().equals(Constants.CONTINUOUS)) {
+                renderer = new ContinuousRoadRenderer();
+            } else {
+                MyLogger.logLoadingOrSimulationStartEnd("Unknown road type: " + roads[0].getType(), Constants.FATAL_FOR_LOGGING);
+                return false;
+            }
+            AppContext.RENDERER = renderer;
         }
-        AppContext.RENDERER = renderer;
 
         RunDetails runDetails = ConfigLoader.loadRunDetails(duration, outputFile, logFromParameter); // loading run details (show gui, duration...)
         if (runDetails == null) {
@@ -681,10 +686,15 @@ public class ConfigLoader {
         }
 
 
-        runDetails.setNewMapFile(mapFileName);
+        if (mapLoaded) {
+            String mapFileName = ConfigLoader.getMapFileName();
+            runDetails.setNewMapFile(mapFileName);
+        }
         AppContext.RUN_DETAILS = runDetails;
 
-        ResultsRecorder.getResultsRecorder().initialize(roads, runDetails.outputDetails.outputFile);
+        if (mapLoaded) {
+            ResultsRecorder.getResultsRecorder().initialize(roads, runDetails.outputDetails.outputFile);
+        }
 
         // create simulation and store it in app context, simulation is the thing that updates all roads and cars
         AppContext.SIMULATION = new Simulation(roads);

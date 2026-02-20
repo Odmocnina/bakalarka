@@ -10,7 +10,6 @@ import core.utils.constants.Constants;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
-import ui.render.IRoadRenderer;
 import core.sim.Simulation;
 
 import javafx.geometry.Side;
@@ -46,9 +45,6 @@ public class Window extends Application {
 
     /** core engine for running simulation **/
     private CoreEngine engine;
-
-    /** renderer for drawing roads **/
-    private IRoadRenderer renderer;
 
     /** horizontal scrollbar **/
     private ScrollBar hScroll;
@@ -90,7 +86,6 @@ public class Window extends Application {
     public void start(Stage primaryStage) {
         // get renderer and simulation from AppContext
         this.simulation = AppContext.SIMULATION;
-        this.renderer = AppContext.RENDERER;
 
         //set up stuff inf the window
 
@@ -256,11 +251,11 @@ public class Window extends Application {
     private void setSyncedProperties(Runnable paintAll) {
         this.laneChangeProp = new SimpleBooleanProperty(!AppContext.RUN_DETAILS.laneChange);
         this.laneChangeProp.addListener((obs, oldVal, newVal) -> {
-            Actions.changeLaneChangingAction(paintAll);  // call the action to update the simulation and repaint
+            Actions.changeLaneChangingAction(this.simulation, paintAll);  // call the action to update the simulation and repaint
         });
 
         this.collisionBanProp = new SimpleBooleanProperty(AppContext.RUN_DETAILS.preventCollisions);
-        this.collisionBanProp.addListener((obs, oldVal, newVal) -> Actions.collisionBanAction(paintAll));
+        this.collisionBanProp.addListener((obs, oldVal, newVal) -> Actions.collisionBanAction(this.simulation, paintAll));
 
         boolean[] whatToExport = AppContext.RUN_DETAILS.outputDetails.output;
         this.whatToExportProps = new BooleanProperty[whatToExport.length];
@@ -491,7 +486,7 @@ public class Window extends Application {
             // Use max of neededWidth to ensure renderer doesn't cut off drawing loop
             //noinspection SynchronizationOnLocalVariableOrMethodParameter
             synchronized (road) {
-                renderer.draw(gc, road, Math.max(neededWidth, viewportW), roadHeight, CELL_PIXEL_SIZE);
+                AppContext.RENDERER.draw(gc, road, Math.max(neededWidth, viewportW), roadHeight, CELL_PIXEL_SIZE);
             }
             gc.restore();
 
@@ -735,21 +730,21 @@ public class Window extends Application {
 
         newMapFileBtn.setOnAction(e -> Actions.newMapAction(primaryStage, paintAll));
 
-        editMapFileBtn.setOnAction(e -> Actions.editMapFile(primaryStage, paintAll));
+        editMapFileBtn.setOnAction(e -> Actions.editMapFile(this.simulation, primaryStage, paintAll));
 
         toolbarStartStopBtn.setOnAction(e -> handleStartStopAction(primaryStage));
 
         resetBtn.setOnAction(e -> handleReset(primaryStage, paintAll));
 
-        exportResultsToTxtBtn.setOnAction(e -> Actions.exportResultsToTxtAction());
+        exportResultsToTxtBtn.setOnAction(e -> Actions.exportResultsToTxtAction(this.simulation));
 
-        exportToCsvBtn.setOnAction(e -> Actions.exportResultsToCsvAction());
+        exportToCsvBtn.setOnAction(e -> Actions.exportResultsToCsvAction(this.simulation));
 
         nextStepBtn.setOnAction(e -> Actions.nextStepAction(simulation, paintAll));
 
-        saveMapFileBtn.setOnAction(e -> Actions.saveMapAction());
+        saveMapFileBtn.setOnAction(e -> Actions.saveMapAction(this.simulation));
 
-        saveAsMapFileBtn.setOnAction(e -> Actions.saveMapAsAction(primaryStage));
+        saveAsMapFileBtn.setOnAction(e -> Actions.saveMapAsAction(this.simulation, primaryStage));
 
         openMapFileBtn.setOnAction(e -> Actions.openMapAction(primaryStage, paintAll));
 
@@ -872,17 +867,19 @@ public class Window extends Application {
         MenuItem itemSaveAsFile = new MenuItem("Save map file as...", createMenuIcon("/icons/saveAsMapFile.png"));
 
         itemNewFile.setOnAction(e -> Actions.newMapAction(primaryStage, paintAll));
-
-        itemEditFile.setOnAction(e -> Actions.editMapFile(primaryStage, paintAll));
-
+        itemEditFile.setOnAction(e -> Actions.editMapFile(this.simulation, primaryStage, paintAll));
         itemOpenFile.setOnAction(e -> Actions.openMapAction(primaryStage, paintAll));
-
-        itemSaveFile.setOnAction(e -> Actions.saveMapAction());
-
-        itemSaveAsFile.setOnAction(e -> Actions.saveMapAsAction(primaryStage));
+        itemSaveFile.setOnAction(e -> Actions.saveMapAction(this.simulation));
+        itemSaveAsFile.setOnAction(e -> Actions.saveMapAsAction(this.simulation, primaryStage));
 
         Menu fileMenu = new Menu("Map file");
-        fileMenu.getItems().addAll(itemNewFile, itemEditFile, itemOpenFile, itemSaveFile, itemSaveAsFile);
+        fileMenu.getItems().addAll(
+                itemNewFile,
+                itemEditFile,
+                itemOpenFile,
+                itemSaveFile,
+                itemSaveAsFile
+        );
 
         return fileMenu;
     }
@@ -896,29 +893,30 @@ public class Window extends Application {
      **/
     private Menu createSimulationMenu(Stage primaryStage, Runnable paintAll) {
         Menu simulationMenu = new Menu("Simulation");
-        //MenuItem startStopItem = new MenuItem("Start/Stop simulation", createMenuIcon("/icons/run.png"));
+
         menuStartStopItem = new MenuItem("Start/Stop simulation", createMenuIcon("/icons/run.png"));
-       //     menuStartStopItem.setOnAction(e -> handleStartStopAction(primaryStage));
         MenuItem nextStepItem = new MenuItem("Next simulation step", createMenuIcon("/icons/nextStep.png"));
         MenuItem resetSimulationItem = new MenuItem("Reset simulation", createMenuIcon("/icons/reset.png"));
         CheckMenuItem changeLaneToggleItem = createBoundMenuItem("Toggle lane change ban",
                 "/icons/ban.png", laneChangeProp);
         CheckMenuItem collisionBanToggleItem = createBoundMenuItem("Ban collisions (toggle)",
                 "/icons/collisionBan.png", collisionBanProp);
-
         MenuItem setTimeBetweenStepsItem = new MenuItem("Set time between simulation steps (ms)",
                 createMenuIcon("/icons/time.png"));
 
         menuStartStopItem.setOnAction(e -> handleStartStopAction(primaryStage));
-
         nextStepItem.setOnAction(e -> Actions.nextStepAction(simulation, paintAll));
-
         resetSimulationItem.setOnAction(e -> handleReset(primaryStage, paintAll));
-
         setTimeBetweenStepsItem.setOnAction(e -> Actions.setTimeBetweenStepsAction(primaryStage, engine));
 
-        simulationMenu.getItems().addAll(menuStartStopItem, nextStepItem, resetSimulationItem, changeLaneToggleItem,
-                collisionBanToggleItem, setTimeBetweenStepsItem);
+        simulationMenu.getItems().addAll(
+                menuStartStopItem,
+                nextStepItem,
+                resetSimulationItem,
+                changeLaneToggleItem,
+                collisionBanToggleItem,
+                setTimeBetweenStepsItem
+        );
 
         return simulationMenu;
     }
@@ -944,15 +942,17 @@ public class Window extends Application {
         makeToggleWhatToExportMenu(whatToExportSubMenu.getItems());
 
         setOutputFileNameItem.setOnAction(e -> Actions.setOutputFileAction());
-
         setCsvSeparator.setOnAction(e -> Actions.setCsvSeparatorAction(primaryStage));
+        exportResultsItem.setOnAction(e -> Actions.exportResultsToTxtAction(this.simulation));
+        exportToCSVItem.setOnAction(e -> Actions.exportResultsToCsvAction(this.simulation));
 
-        exportResultsItem.setOnAction(e -> Actions.exportResultsToTxtAction());
-
-        exportToCSVItem.setOnAction(e -> Actions.exportResultsToCsvAction());
-
-        outputMenu.getItems().addAll(exportResultsItem, exportToCSVItem, setOutputFileNameItem, setCsvSeparator,
-                whatToExportSubMenu);
+        outputMenu.getItems().addAll(
+                exportResultsItem,
+                exportToCSVItem,
+                setOutputFileNameItem,
+                setCsvSeparator,
+                whatToExportSubMenu
+        );
 
         return outputMenu;
     }
@@ -996,6 +996,11 @@ public class Window extends Application {
      * in sync
      **/
     private void handleStartStopAction(Stage stage) {
+        if (this.simulation.getRoads() == null || this.simulation.getRoads().length == 0) {
+            MyLogger.log("No roads in the simulation, cannot start/stop.", Constants.WARN_FOR_LOGGING);
+            return;
+        }
+
         boolean isRunning = engine.getRunning();
 
         if (!isRunning && simulation.getStepCount() <= 0 && AppContext.RUN_DETAILS.mapChanged) {

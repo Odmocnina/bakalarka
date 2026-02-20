@@ -7,6 +7,7 @@ import core.model.Road;
 import core.model.cellular.CellularRoad;
 import core.model.continous.ContinuosRoad;
 import core.utils.MyLogger;
+import core.utils.ResultsRecorder;
 import core.utils.StringEditor;
 import core.utils.constants.Constants;
 import core.utils.constants.RoadLoadingConstants;
@@ -14,6 +15,9 @@ import core.utils.constants.RoadLoadingConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import ui.render.CellularRoadRenderer;
+import ui.render.ContinuousRoadRenderer;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
@@ -42,6 +46,16 @@ public class RoadLoader {
             return false;
         }
 
+        if (!AppContext.RUN_DETAILS.mapLoaded) {
+            if (AppContext.CAR_FOLLOWING_MODEL.getType().equals(Constants.CELLULAR)) {
+                AppContext.RENDERER = new CellularRoadRenderer();
+            } else {
+                AppContext.RENDERER = new ContinuousRoadRenderer();
+            }
+            AppContext.RUN_DETAILS.mapLoaded = true;
+        }
+
+        ResultsRecorder.getResultsRecorder().initialize(map, AppContext.RUN_DETAILS.outputDetails.outputFile);
         AppContext.SIMULATION.setRoads(map);
         return true;
     }

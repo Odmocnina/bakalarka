@@ -72,10 +72,13 @@ public class Actions {
      *
      * @param paintAll the function to repaint the map after toggling the collision ban
      **/
-    public static void collisionBanAction(Runnable paintAll) {
+    public static void collisionBanAction(Simulation simulation, Runnable paintAll) {
         ConfigModification.changePreventCollision();
         MyLogger.log("Toggled collision ban", Constants.INFO_FOR_LOGGING);
-        paintAll.run();
+
+        if (simulation.getRoads() != null && simulation.getRoads().length > 0) {
+            paintAll.run();
+        }
     }
 
     /**
@@ -83,7 +86,11 @@ public class Actions {
      *
      * @param primaryStage the primary stage of the application, used for showing file chooser and dialogs
      **/
-    public static void saveMapAsAction(Stage primaryStage) {
+    public static void saveMapAsAction(Simulation simulation, Stage primaryStage) {
+        if (simulation.getRoads() == null || simulation.getRoads().length == 0) {
+            MyLogger.log("No roads in the simulation, cannot save map.", Constants.WARN_FOR_LOGGING);
+            return;
+        }
         MyLogger.log("Saving map file as...", Constants.INFO_FOR_LOGGING);
         DialogMaker.saveAsDialog(primaryStage);
     }
@@ -91,7 +98,11 @@ public class Actions {
     /**
      * method for saving the current map file, which saves the map file and then logs the action
      **/
-    public static void saveMapAction() {
+    public static void saveMapAction(Simulation simulation) {
+        if (simulation.getRoads() == null || simulation.getRoads().length == 0) {
+            MyLogger.log("No roads in the simulation, cannot save map.", Constants.WARN_FOR_LOGGING);
+            return;
+        }
         RoadXml.saveCurrentMap();
         MyLogger.log("Saving map file...", Constants.INFO_FOR_LOGGING);
     }
@@ -102,10 +113,13 @@ public class Actions {
      *
      * @param paintAll the function to repaint the map after toggling the lane change ban
      **/
-    public static void changeLaneChangingAction(Runnable paintAll) {
+    public static void changeLaneChangingAction(Simulation simulation, Runnable paintAll) {
         ConfigModification.changeLaneChangeBan();
         MyLogger.log("Toggled lane change ban", Constants.INFO_FOR_LOGGING);
-        paintAll.run();
+
+        if (simulation.getRoads() != null && simulation.getRoads().length > 0) {
+            paintAll.run();
+        }
     }
 
     /**
@@ -125,7 +139,11 @@ public class Actions {
      * @param primaryStage the primary stage of the application, used for showing file chooser and dialogs
      * @param paintAll the function to repaint the map after editing the map file
      **/
-    public static void editMapFile(Stage primaryStage, Runnable paintAll) {
+    public static void editMapFile(Simulation simulation, Stage primaryStage, Runnable paintAll) {
+        if (simulation.getRoads() == null || simulation.getRoads().length == 0) {
+            MyLogger.log("No roads in the simulation, cannot edit map.", Constants.WARN_FOR_LOGGING);
+            return;
+        }
         MyLogger.log("Modifying map file...", Constants.INFO_FOR_LOGGING);
         ModifyMapDialogMaker.modifyMapDialog(primaryStage,
                 RoadParameters.existingRoadsToRoadParameters(AppContext.SIMULATION.getRoads()), paintAll);
@@ -134,7 +152,11 @@ public class Actions {
     /**
      * method for exporting the results to txt file, which writes the results to txt file and then logs the action
      **/
-    public static void exportResultsToTxtAction() {
+    public static void exportResultsToTxtAction(Simulation simulation) {
+        if (simulation.getRoads() == null || simulation.getRoads().length == 0) {
+            MyLogger.log("No roads in the simulation, cannot export any results.", Constants.WARN_FOR_LOGGING);
+            return;
+        }
         MyLogger.log("Exporting results to txt...", Constants.INFO_FOR_LOGGING);
         ResultsRecorder.getResultsRecorder().writeResultsTxt();
         MyLogger.log("Results exporting to txt finished.", Constants.INFO_FOR_LOGGING);
@@ -143,7 +165,11 @@ public class Actions {
     /**
      * method for exporting the results to csv file, which writes the results to csv file and then logs the action
      **/
-    public static void exportResultsToCsvAction() {
+    public static void exportResultsToCsvAction(Simulation simulation) {
+        if (simulation.getRoads() == null || simulation.getRoads().length == 0) {
+            MyLogger.log("No roads in the simulation, cannot export any results.", Constants.WARN_FOR_LOGGING);
+            return;
+        }
         MyLogger.log("Exporting results to csv...", Constants.INFO_FOR_LOGGING);
         ResultsRecorder.getResultsRecorder().writeResultsCsv();
         MyLogger.log("Results exporting to csv finished.", Constants.INFO_FOR_LOGGING);
@@ -179,6 +205,10 @@ public class Actions {
      * @param paintAll the function to repaint the map after stepping the simulation
      **/
     public static void nextStepAction(Simulation simulation, Runnable paintAll) {
+        if (simulation.getRoads() == null || simulation.getRoads().length == 0) {
+            MyLogger.log("No roads in the simulation, cannot perform next step.", Constants.WARN_FOR_LOGGING);
+            return;
+        }
         MyLogger.log("Next step action triggered", Constants.INFO_FOR_LOGGING);
         simulation.step();
         paintAll.run();
@@ -212,7 +242,17 @@ public class Actions {
         ConfigModification.changeOutput(detailIndex);
     }
 
+    /**
+     * method for resetting the simulation, which resets the simulation and then repaints the map to reflect the change
+     *
+     * @param simulation the simulation to be reset
+     * @param paintAll the function to repaint the map after resetting the simulation
+     **/
     public static void resetSimulationAction(Simulation simulation, Runnable paintAll) {
+        if (simulation.getRoads() == null || simulation.getRoads().length == 0) {
+            MyLogger.log("No roads in the simulation, cannot reset simulation.", Constants.WARN_FOR_LOGGING);
+            return;
+        }
         MyLogger.log("Resetting simulation...", Constants.INFO_FOR_LOGGING);
         simulation.resetSimulationWithSameRoads();
         paintAll.run();
