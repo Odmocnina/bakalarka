@@ -1,5 +1,6 @@
 package models.carFollowingModels;
 
+import core.utils.RandomNumberGenerator;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
 import models.ICarFollowingModel;
@@ -30,14 +31,15 @@ public class HeadLeading implements ICarFollowingModel {
     /** random chance of slowing down when car is starting **/
     private final double slowDownChanceStart = 0.5; // initial probability of random slowing down
 
-    private final Random random;
+    private RandomNumberGenerator randomNumberGenerator;
 
     /**
      * constructor for head-leading model
      **/
     public HeadLeading() {
         this.type = Constants.CELLULAR;
-        this.random = new Random();
+        this.randomNumberGenerator = RandomNumberGenerator.getInstance(0); // the seed set here is not relevant,
+        // as the seed should be already set in the RandomNumberGenerator singleton before creating the model
     }
 
     /**
@@ -78,7 +80,7 @@ public class HeadLeading implements ICarFollowingModel {
         // use chance for starting when starting from 0 speed (to simulate slower start, should be higher than normal
         // slow down chance
         double currentSlowDownChance = starting ? this.slowDownChanceStart : this.slowDownChance;
-        if (currentSpeed > 0 && random.nextDouble() < currentSlowDownChance) { // 30% chance to slow down
+        if (currentSpeed > 0 && randomNumberGenerator.nextDouble() < currentSlowDownChance) { // 30% chance to slow down
             currentSpeed--;
         }
         return Math.max(0, currentSpeed);
@@ -161,7 +163,7 @@ public class HeadLeading implements ICarFollowingModel {
      **/
     HeadLeading(Random random) {
         this.type = Constants.CELLULAR;
-        this.random = random;
+      //  this.random = random;
     }
 }
 

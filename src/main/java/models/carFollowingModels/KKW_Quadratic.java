@@ -16,6 +16,10 @@ public class KKW_Quadratic extends KKW_Linear {
     /** coefficient for the quadratic term in the synchronization gap calculation **/
     private double beta = 0.5;
 
+    public KKW_Quadratic() {
+        super();
+    }
+
     /**
      * function to calculate the synchronization gap based on the KKW quadratic model
      *

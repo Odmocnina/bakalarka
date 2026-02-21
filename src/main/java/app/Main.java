@@ -44,6 +44,9 @@ public class Main {
         String loggingArgument = InputParametersHandeler.getSpecificParameter(args, Constants.LOGGING_PARAMETER_PREFIX);
         int logging = InputParametersHandeler.getLoggingFromParameter(loggingArgument);
 
+        String mapFileArgument = InputParametersHandeler.getSpecificParameter(args, Constants.MAP_FILE_PARAMETER_PREFIX);
+        String mapFile = InputParametersHandeler.handleMapFileParameter(mapFileArgument);
+
         String carFollowingModelArgument = InputParametersHandeler.getSpecificParameter(args, Constants.CAR_FOLLOWING_MODEL_PARAMETER_PREFIX);
         ICarFollowingModel carFollowingModel = null;
         if (carFollowingModelArgument != null && !carFollowingModelArgument.isEmpty()) {
@@ -72,8 +75,10 @@ public class Main {
                     "model in config file.", Constants.INFO_FOR_LOGGING);
         }
 
+
         // load run details from configuration file
-        boolean success = ConfigLoader.loadAllConfig(configPath, carFollowingModel, laneChangingModel, duration, outFile, logging);
+        boolean success = ConfigLoader.loadAllConfig(configPath, carFollowingModel, laneChangingModel, duration,
+                outFile, logging, mapFile);
 
         if (!success) {
             MyLogger.logLoadingOrSimulationStartEnd("Failed to load configuration, exiting.", Constants.ERROR_FOR_LOGGING);

@@ -66,20 +66,25 @@ public class ConfigLoader {
      *
      * @return array of loaded roads, or null if loading failed
      **/
-    public static Road[] loadRoads() {
-
+    public static Road[] loadRoads(String mapFileFromParameter) {
         try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(configFile);
+            String roadFile;
+            if (mapFileFromParameter == null) {
+                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+                Document doc = dBuilder.parse(configFile);
 
-            Element roadElement = (Element) doc.getElementsByTagName(ConfigConstants.ROAD_FILE_TAG).item(0);
-            if (roadElement == null) {
-                MyLogger.logLoadingOrSimulationStartEnd("Missing road file tag in config file, exiting", Constants.FATAL_FOR_LOGGING);
-                return null;
+                Element roadElement = (Element) doc.getElementsByTagName(ConfigConstants.ROAD_FILE_TAG).item(0);
+                if (roadElement == null) {
+                    MyLogger.logLoadingOrSimulationStartEnd("Missing road file tag in config file, exiting", Constants.FATAL_FOR_LOGGING);
+                    return null;
+                }
+
+                roadFile = roadElement.getTextContent();
+
+            } else {
+                roadFile = mapFileFromParameter;
             }
-
-            String roadFile = roadElement.getTextContent();
 
             if (roadFile == null || roadFile.isEmpty()) {
                 // to - do open without road file
@@ -329,9 +334,7 @@ public class ConfigLoader {
 
             Element runDetailsElement = (Element) doc.getElementsByTagName(ConfigConstants.RUN_DETAILS_TAG).
                     item(0);
-            //Element duration = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.DURATION_TAG).item(0);
             Element timeStep = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.TIME_STEP_TAG).item(0);
-           // Element showGui = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.SHOW_GUI_TAG).item(0);
             Element outputElements = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.OUTPUT_TAG).item(0);
             Element drawCells = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.DRAW_CELLS_TAG).item(0);
             Element logElements = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.LOGGING_TAG).item(0);
@@ -340,6 +343,7 @@ public class ConfigLoader {
             Element laneChange = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.LANE_CHANGE_TAG).item(0);
             Element debug = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.DEBUG_TAG).item(0);
             Element preventCollisions = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.PREVENT_COLLISION_TAG).item(0);
+            Element seed = (Element) runDetailsElement.getElementsByTagName(ConfigConstants.SEED_TAG).item(0);
 
             if (duration != Constants.NO_DURATION_PROVIDED) {
                 detailsFromConfig.duration = duration;
@@ -349,6 +353,23 @@ public class ConfigLoader {
             } else { // if no duration, then show gui
                 detailsFromConfig.showGui = true;
             }
+
+            if (seed != null) {
+                try {
+                    detailsFromConfig.seed = Long.parseLong(seed.getTextContent());
+                    MyLogger.logLoadingOrSimulationStartEnd("Seed from config: " + detailsFromConfig.seed, Constants.INFO_FOR_LOGGING);
+                } catch (NumberFormatException e) {
+                    detailsFromConfig.seed = seed.getTextContent().hashCode();
+                    MyLogger.logLoadingOrSimulationStartEnd("String seed provided in config, using hash code " +
+                            "of the string as seed: " + seed.getTextContent(), Constants.INFO_FOR_LOGGING);
+                }
+            } else {
+                detailsFromConfig.seed = System.currentTimeMillis();
+                MyLogger.logLoadingOrSimulationStartEnd("No seed provided in config, using current time as seed: " + detailsFromConfig.seed
+                        , Constants.INFO_FOR_LOGGING);
+            }
+
+            RandomNumberGenerator.getInstance(detailsFromConfig.seed).resetSeed(detailsFromConfig.seed);
 
             if (timeStep != null) {
                 MyLogger.logLoadingOrSimulationStartEnd("Time step from config: " + timeStep.getTextContent()
@@ -573,7 +594,7 @@ public class ConfigLoader {
 
     public static boolean loadAllConfig(String configFilePath, ICarFollowingModel carFollowingModelFromInput,
                                         ILaneChangingModel laneChangingModelFromInput, int duration, String outputFile,
-                                        int logFromParameter) {
+                                        int logFromParameter, String mapFileFromInput) {
         String configFile;
         if (configFilePath == null || configFilePath.isEmpty()) { // use default config file if none provided
             MyLogger.logLoadingOrSimulationStartEnd("No config file provided, using default: " + Constants.DEFAULT_CONFIG_FILE,
@@ -592,6 +613,17 @@ public class ConfigLoader {
             MyLogger.logLoadingOrSimulationStartEnd("Failed to open config file: " + configFile + ", exiting.",
                     Constants.FATAL_FOR_LOGGING);
             return false;
+        }
+
+        // loading run details (seed, time between steps...)
+        RunDetails runDetails = ConfigLoader.loadRunDetails(duration, outputFile, logFromParameter);
+        if (runDetails == null) {
+            MyLogger.logLoadingOrSimulationStartEnd("Failed to load run details, exiting.", Constants.FATAL_FOR_LOGGING);
+            return false;
+        } else {
+            MyLogger.logLoadingOrSimulationStartEnd("Loaded run details: duration=" + runDetails.duration + ", timeStep=" +
+                    runDetails.timeStep + ", showGui=" + runDetails.showGui + ", outputFile=" + runDetails.outputDetails
+                    .outputFile + ", drawCells=" + runDetails.drawCells, Constants.INFO_FOR_LOGGING);
         }
 
         ICarFollowingModel carFollowingModel = carFollowingModelFromInput;
@@ -637,7 +669,7 @@ public class ConfigLoader {
 
         // load roads from config
         boolean mapLoaded = false;
-        Road[] roads = ConfigLoader.loadRoads();
+        Road[] roads = ConfigLoader.loadRoads(mapFileFromInput);
         if (roads == null) {
             MyLogger.logLoadingOrSimulationStartEnd("Failed to load road configuration, exiting."
                     , Constants.FATAL_FOR_LOGGING);
@@ -673,16 +705,6 @@ public class ConfigLoader {
                 return false;
             }
             AppContext.RENDERER = renderer;
-        }
-
-        RunDetails runDetails = ConfigLoader.loadRunDetails(duration, outputFile, logFromParameter); // loading run details (show gui, duration...)
-        if (runDetails == null) {
-            MyLogger.logLoadingOrSimulationStartEnd("Failed to load run details, exiting.", Constants.FATAL_FOR_LOGGING);
-            return false;
-        } else {
-            MyLogger.logLoadingOrSimulationStartEnd("Loaded run details: duration=" + runDetails.duration + ", timeStep=" +
-                    runDetails.timeStep + ", showGui=" + runDetails.showGui + ", outputFile=" + runDetails.outputDetails
-                    .outputFile + ", drawCells=" + runDetails.drawCells, Constants.INFO_FOR_LOGGING);
         }
 
 

@@ -1,5 +1,6 @@
 package models.carFollowingModels;
 
+import core.utils.RandomNumberGenerator;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
 import models.ICarFollowingModel;
@@ -26,15 +27,14 @@ public class NagelSchreckenberg implements ICarFollowingModel {
     /** random chance of slowing down when car is moving **/
     private final double slowDownChance = 0.3; // probability of random slowing down
 
-    /** random chance of slowing down when car is starting **/
-    private final Random random;
+    private RandomNumberGenerator randomNumberGenerator;
 
     /**
      * constructor for Nagel-Schreckenberg model
      **/
     public NagelSchreckenberg() {
         this.type = Constants.CELLULAR;
-        this.random = new Random();
+        this.randomNumberGenerator = RandomNumberGenerator.getInstance(0); // the seed set here is not relevant
     }
 
     /**
@@ -66,7 +66,7 @@ public class NagelSchreckenberg implements ICarFollowingModel {
             currentSpeed = distanceInCells - 1;
         }
         // Step 3: Randomization
-        if (currentSpeed > 0 && random.nextDouble() < this.slowDownChance) { // 30% chance to slow down
+        if (currentSpeed > 0 && randomNumberGenerator.nextDouble() < this.slowDownChance) { // 30% chance to slow down
             currentSpeed--;
         }
 

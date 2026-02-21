@@ -1,6 +1,7 @@
 package models.laneChangingModels;
 
 import core.model.Direction;
+import core.utils.RandomNumberGenerator;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
 import models.ILaneChangingModel;
@@ -21,6 +22,13 @@ public class Rickert implements ILaneChangingModel {
 
     /** chance to change lane if the model decides to change lane, used to add some randomness to the model **/
     private double chance = 0.9;
+
+    private RandomNumberGenerator randomNumberGenerator;
+
+    public Rickert() {
+        this.randomNumberGenerator = RandomNumberGenerator.getInstance(0); // the seed set here is not relevant,
+        // as the seed should be already set in the RandomNumberGenerator singleton before creating the model
+    }
 
     /**
      * gives the unique ID of the rickert model
@@ -147,7 +155,7 @@ public class Rickert implements ILaneChangingModel {
             }
 
             if (makeDecision((int) distanceToNextCar, maxSpeed, currentSpeed, forwardGap, previousGap, maxSpeedRoad)
-                    && Math.random() < chance) {
+                    && randomNumberGenerator.nextDouble() < chance) {
                 return LEFT;
             }
         }
@@ -170,7 +178,7 @@ public class Rickert implements ILaneChangingModel {
             }
 
             if (makeDecision((int) distanceToNextCar, maxSpeed, currentSpeed, forwardGap, previousGap, maxSpeedRoad)
-                    && Math.random() < chance) {
+                    && randomNumberGenerator.nextDouble() < chance) {
                 return RIGHT;
             }
         }

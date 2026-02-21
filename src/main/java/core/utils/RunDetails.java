@@ -48,6 +48,9 @@ public class RunDetails {
     /** Whether the map has been loaded successfully **/
     public boolean mapLoaded = false;
 
+    /** Random seed for the simulation, can be set for reproducibility **/
+    public long seed;
+
     /**
      * Checks if the simulation results should be written to an output file (null or empty output file/details
      * means results should not be recorded).
@@ -79,6 +82,7 @@ public class RunDetails {
                 ", output='" + outputDetails + '\'' +
                 ", drawCells=" + drawCells +
                 ", timeBetweenSteps=" + timeBetweenSteps +
+                ", random seed=" + seed +
                 '}';
     }
 

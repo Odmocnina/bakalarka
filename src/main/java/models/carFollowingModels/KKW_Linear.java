@@ -1,5 +1,6 @@
 package models.carFollowingModels;
 
+import core.utils.RandomNumberGenerator;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
 import models.ICarFollowingModel;
@@ -19,7 +20,7 @@ import java.util.Random;
 public class KKW_Linear implements ICarFollowingModel {
 
     /** Random number generator **/
-    Random rand = new Random();
+    RandomNumberGenerator randomNumberGenerator;
 
     /** size of one cell in meters **/
     private double cellSize = 1.5;
@@ -50,6 +51,10 @@ public class KKW_Linear implements ICarFollowingModel {
 
     /** random slowdown when car is moving **/
     private double randomSlowdownChance = 0.3; // random slowdown chance when moving
+
+    public KKW_Linear() {
+        this.randomNumberGenerator = RandomNumberGenerator.getInstance(0); // the seed set here is not relevant
+    }
 
     /**
      * function to request parameters needed for KKW linear model to the road
@@ -213,7 +218,7 @@ public class KKW_Linear implements ICarFollowingModel {
      * @return random speed modification as double (-1, 0 or 1)
      **/
     private double getRandomSpeedModification(double chanceA, double chanceB) {
-        double r = rand.nextDouble();
+        double r = randomNumberGenerator.nextDouble();
         if (r < chanceB) {
             return -1.0;
         } else if (r < chanceA + chanceB) {

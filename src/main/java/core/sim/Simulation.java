@@ -127,7 +127,8 @@ public class Simulation {
         boolean empty = true;
         ResultsRecorder recorder = ResultsRecorder.getResultsRecorder();
         for (Road road : roads) {
-            if (road.getNumberOfCarsOnRoad() > 0 || !road.areAllQueuesEmpty()) {
+            if (road.getNumberOfCarsOnRoad() > 0 || !road.areAllGeneratorsGeneratingToQueue()
+                    || !road.areAllQueuesEmpty()) {
                 empty = false;
             } else if (!recorder.wasRoadAlreadyEmpty(road.getId())) {
                 MyLogger.log("Road " + road.getId() + " is empty at step " + this.stepCount + ".", Constants.INFO_FOR_LOGGING);

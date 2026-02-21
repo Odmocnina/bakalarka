@@ -17,7 +17,7 @@ class HeadLeadingTest {
      * @return HeadLeading instance
      **/
     private HeadLeading create() {
-        return new HeadLeading();
+        return new HeadLeading(new Random());
     }
 
     /**

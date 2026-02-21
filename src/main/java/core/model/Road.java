@@ -470,6 +470,20 @@ public abstract class Road {
     }
 
     /**
+     * method to check if all generators are generating to queue
+     *
+     * @return true if all generators are generating to queue, false otherwise
+     **/
+    public boolean areAllGeneratorsGeneratingToQueue() {
+        for (CarGenerator generator : generators) {
+            if (!generator.generatingToQueue()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * method to reset light plans on lanes, used when resetting the simulation
      **/
     public void resetLightPlans() {

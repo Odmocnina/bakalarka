@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <config>
 
-    <roadFile>map.xml</roadFile>
+    <roadFile>mapNoQueue.xml</roadFile>
 
     <models>
         <carFollowingModel>
@@ -17,7 +17,9 @@
         <laneChange>true</laneChange>
         <timeStep>1</timeStep>
         <debug>false</debug>
-        <preventCollision>true</preventCollision>
+        <preventCollision>false</preventCollision>
+        <timeBetweenSteps>100</timeBetweenSteps>
+        <seed>semenoNaKozy</seed>
         <logging>
             <log>true</log>
             <info>true</info>
@@ -41,6 +43,5 @@
                 <roadDetails>true</roadDetails>
             </whatToWrite>
         </output>
-        <timeBetweenSteps>100</timeBetweenSteps>
     </runDetails>
 </config>

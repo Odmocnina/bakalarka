@@ -307,5 +307,14 @@ public class InputParametersHandeler {
         return null;
     }
 
+    public static String handleMapFileParameter(String mapFile) {
+        if (mapFile == null || mapFile.isEmpty()) {
+            MyLogger.logLoadingOrSimulationStartEnd("No map file provided in input parameters, using default map file from config.", Constants.WARN_FOR_LOGGING);
+            return null;
+        }
+        MyLogger.logLoadingOrSimulationStartEnd("Map file provided: " + mapFile, Constants.INFO_FOR_LOGGING);
+        return mapFile;
+    }
+
 
 }

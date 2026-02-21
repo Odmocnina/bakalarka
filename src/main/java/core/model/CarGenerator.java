@@ -1,6 +1,7 @@
 package core.model;
 
 import core.model.cellular.CellularRoad;
+import core.utils.RandomNumberGenerator;
 import core.utils.constants.Constants;
 import core.utils.MyLogger;
 import core.utils.constants.RequestConstants;
@@ -8,7 +9,6 @@ import core.utils.constants.RequestConstants;
 import javafx.scene.paint.Color;
 import java.util.HashMap;
 import java.util.Queue;
-import java.util.Random;
 
 
 /********************************************
@@ -46,9 +46,6 @@ public class CarGenerator implements Cloneable {
     /** time to next arrival **/
     private double timeToNext = Double.NaN;
 
-    /** random number generator **/
-    private final Random RNG = new Random();
-
     /** allow multiple cars to be generated per tick **/
     private boolean allowMultiplePerTick = false;
 
@@ -64,6 +61,8 @@ public class CarGenerator implements Cloneable {
     /** maximum queue size for queue generation **/
     private int maxQueueSize = 0;
 
+    RandomNumberGenerator randomNumberGenerator;
+
     /**
      * constructor for car generator
      *
@@ -71,6 +70,7 @@ public class CarGenerator implements Cloneable {
      **/
     public CarGenerator(double density) {
         this.lambdaPerSec = Math.max(0.0, density); // lambda parameter for exponential distribution
+        randomNumberGenerator = RandomNumberGenerator.getInstance(0);
     }
 
     /**
@@ -84,7 +84,7 @@ public class CarGenerator implements Cloneable {
             return false;
         }
         double p = 1.0 - Math.exp(-lambdaPerSec);
-        return RNG.nextDouble() < p;
+        return randomNumberGenerator.nextDouble() < p;
     }
 
     /**
@@ -95,7 +95,7 @@ public class CarGenerator implements Cloneable {
             timeToNext = Double.POSITIVE_INFINITY;
         } else {
             // T = -ln(U)/λ, U ~ U(0,1]
-            double u = 1.0 - RNG.nextDouble();
+            double u = 1.0 - randomNumberGenerator.nextDouble();
             timeToNext = -Math.log(u) / lambdaPerSec;
         }
     }
@@ -163,7 +163,7 @@ public class CarGenerator implements Cloneable {
             car.setParameter(key, value);
         }
 
-        car.color = COLORS[(int) (Math.random() * COLORS.length)];
+        car.color = COLORS[(int) (randomNumberGenerator.nextDouble() * COLORS.length)];
         car.id = this.id;
 
         return car;
@@ -182,7 +182,7 @@ public class CarGenerator implements Cloneable {
             car.setParameter(key, value);
         }
 
-        car.color = COLORS[(int) (Math.random() * COLORS.length)];
+        car.color = COLORS[(int) (randomNumberGenerator.nextDouble() * COLORS.length)];
         car.id = this.id;
 
         return car;
@@ -200,8 +200,7 @@ public class CarGenerator implements Cloneable {
             if (param.range == 0) { // no range, fixed value
                 return param.minValue;
             } else {
-                Random rand = new Random();
-                return param.minValue + (rand.nextDouble() * param.range);
+                return param.minValue + (randomNumberGenerator.nextDouble() * param.range);
             }
         } else {
             MyLogger.log("Parameter " + key + " not found in generator parameters.", Constants.WARN_FOR_LOGGING);
@@ -221,8 +220,7 @@ public class CarGenerator implements Cloneable {
             if (param.range == 0) {
                 return (int) param.minValue;
             } else {
-                Random rand = new Random();
-                return (int) (param.minValue + rand.nextInt((int) param.range));
+                return randomNumberGenerator.nextInt((int) param.minValue, (int) param.maxValue);
             }
         } else {
             MyLogger.log("Parameter " + key + " not found in generator parameters."
@@ -325,9 +323,7 @@ public class CarGenerator implements Cloneable {
      **/
     public Queue<CarParams> generateCarsInToQueue() {
         Queue<CarParams> queue = new java.util.LinkedList<>();
-        Random rand = new Random();
-        int range = maxQueueSize - minQueueSize;
-        int numberOfCars = rand.nextInt(range + 1) + minQueueSize;
+        int numberOfCars = randomNumberGenerator.nextInt(minQueueSize, maxQueueSize);
 
         while (queue.size() < numberOfCars) {
             CarParams car = generateCar();

@@ -54,5 +54,7 @@ public class ConfigConstants {
     public static final String WHEN_WAS_ROAD_EMPTY_TAG = "whenWasRoadEmpty";
     public static final String MAP_TAG = "map";
 
+    public static final String SEED_TAG = "seed";
+
 
 }
