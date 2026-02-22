@@ -6,6 +6,7 @@ import core.model.Road;
 import core.model.cellular.Cell;
 import core.model.cellular.CellularRoad;
 import core.utils.*;
+import core.utils.constants.ConfigConstants;
 import core.utils.constants.Constants;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -30,7 +31,9 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 /********************************************
  * Main window for traffic simulator GUI, javaFX is used
@@ -71,7 +74,9 @@ public class Window extends Application {
 
     /** boolean properties for output settings toggle buttons and menu items, used for keeping toggle buttons and menu
      * items in sync **/
-    private BooleanProperty[] whatToExportProps;
+   // private BooleanProperty[] whatToExportProps;
+
+    private HashMap<String, BooleanProperty> whatToExportPropsMap; // map to hold BooleanProperties for output settings, key is setting name
 
     /** boolean properties for logging settings toggle buttons and menu items, used for keeping toggle buttons and menu
      * items in sync **/
@@ -257,36 +262,15 @@ public class Window extends Application {
         this.collisionBanProp = new SimpleBooleanProperty(AppContext.RUN_DETAILS.preventCollisions);
         this.collisionBanProp.addListener((obs, oldVal, newVal) -> Actions.collisionBanAction(this.simulation, paintAll));
 
-        boolean[] whatToExport = AppContext.RUN_DETAILS.outputDetails.output;
-        this.whatToExportProps = new BooleanProperty[whatToExport.length];
-        this.whatToExportProps[Constants.SIMULATION_DETAILS_OUTPUT_INDEX] =
-                new SimpleBooleanProperty(whatToExport[Constants.SIMULATION_DETAILS_OUTPUT_INDEX]);
-        this.whatToExportProps[Constants.SIMULATION_DETAILS_OUTPUT_INDEX].addListener((obs, oldVal, newVal) ->
-                Actions.setOutputAction(Constants.SIMULATION_DETAILS_OUTPUT_INDEX));
-        this.whatToExportProps[Constants.SIMULATION_TIME_OUTPUT_INDEX] =
-                new SimpleBooleanProperty(whatToExport[Constants.SIMULATION_TIME_OUTPUT_INDEX]);
-        this.whatToExportProps[Constants.SIMULATION_TIME_OUTPUT_INDEX].addListener((obs, oldVal, newVal) ->
-                Actions.setOutputAction(Constants.SIMULATION_TIME_OUTPUT_INDEX));
-        this.whatToExportProps[Constants.CARS_PASSED_OUTPUT_INDEX] =
-                new SimpleBooleanProperty(whatToExport[Constants.CARS_PASSED_OUTPUT_INDEX]);
-        this.whatToExportProps[Constants.CARS_PASSED_OUTPUT_INDEX].addListener((obs, oldVal, newVal) ->
-                Actions.setOutputAction(Constants.CARS_PASSED_OUTPUT_INDEX));
-        this.whatToExportProps[Constants.CARS_ON_ROAD_OUTPUT_INDEX] =
-                new SimpleBooleanProperty(whatToExport[Constants.CARS_ON_ROAD_OUTPUT_INDEX]);
-        this.whatToExportProps[Constants.CARS_ON_ROAD_OUTPUT_INDEX].addListener((obs, oldVal, newVal) ->
-                Actions.setOutputAction(Constants.CARS_ON_ROAD_OUTPUT_INDEX));
-        this.whatToExportProps[Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX] =
-                new SimpleBooleanProperty(whatToExport[Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX]);
-        this.whatToExportProps[Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX].addListener((obs, oldVal, newVal) ->
-                Actions.setOutputAction(Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX));
-        this.whatToExportProps[Constants.COLLISION_COUNT_OUTPUT_INDEX] =
-                new SimpleBooleanProperty(whatToExport[Constants.COLLISION_COUNT_OUTPUT_INDEX]);
-        this.whatToExportProps[Constants.COLLISION_COUNT_OUTPUT_INDEX].addListener((obs, oldVal, newVal) ->
-                Actions.setOutputAction(Constants.COLLISION_COUNT_OUTPUT_INDEX));
-        this.whatToExportProps[Constants.ROAD_DETAILS_OUTPUT_INDEX] =
-                new SimpleBooleanProperty(whatToExport[Constants.ROAD_DETAILS_OUTPUT_INDEX]);
-        this.whatToExportProps[Constants.ROAD_DETAILS_OUTPUT_INDEX].addListener((obs, oldVal, newVal) ->
-                Actions.setOutputAction(Constants.ROAD_DETAILS_OUTPUT_INDEX));
+        this.whatToExportPropsMap = new HashMap<>();
+        Map<String, Boolean> whatToOutputMap = AppContext.RUN_DETAILS.outputDetails.getWhatToOutput();
+        for (Map.Entry<String, Boolean> entry : whatToOutputMap.entrySet()) {
+            String key = entry.getKey();
+            boolean value = entry.getValue();
+            BooleanProperty prop = new SimpleBooleanProperty(value);
+            prop.addListener((obs, oldVal, newVal) -> Actions.setOutputAction(key));
+            whatToExportPropsMap.put(key, prop);
+        }
 
         boolean[] logSettings = AppContext.RUN_DETAILS.log;
         this.logSettingsProps = new BooleanProperty[logSettings.length];
@@ -727,31 +711,18 @@ public class Window extends Application {
         });
         whatToLogBtn.setStyle(defaultStyle);
 
-
         newMapFileBtn.setOnAction(e -> Actions.newMapAction(primaryStage, paintAll));
-
         editMapFileBtn.setOnAction(e -> Actions.editMapFile(this.simulation, primaryStage, paintAll));
-
         toolbarStartStopBtn.setOnAction(e -> handleStartStopAction(primaryStage));
-
         resetBtn.setOnAction(e -> handleReset(primaryStage, paintAll));
-
         exportResultsToTxtBtn.setOnAction(e -> Actions.exportResultsToTxtAction(this.simulation));
-
         exportToCsvBtn.setOnAction(e -> Actions.exportResultsToCsvAction(this.simulation));
-
         nextStepBtn.setOnAction(e -> Actions.nextStepAction(simulation, paintAll));
-
         saveMapFileBtn.setOnAction(e -> Actions.saveMapAction(this.simulation));
-
         saveAsMapFileBtn.setOnAction(e -> Actions.saveMapAsAction(this.simulation, primaryStage));
-
         openMapFileBtn.setOnAction(e -> Actions.openMapAction(primaryStage, paintAll));
-
         setTimeBetweenStepsBtn.setOnAction(e -> Actions.setTimeBetweenStepsAction(primaryStage, engine));
-
         setOutputFileNameBtn.setOnAction(e -> Actions.setOutputFileAction());
-
         setCsvSeparatorBtn.setOnAction(e -> Actions.setCsvSeparatorAction(primaryStage));
 
         return new ToolBar(
@@ -784,19 +755,29 @@ public class Window extends Application {
      **/
     private void makeToggleWhatToExportMenu(ObservableList<MenuItem> items) {
         CheckMenuItem simulationDetailsItem = createBoundMenuItem("Simulation details",
-                null, whatToExportProps[Constants.SIMULATION_DETAILS_OUTPUT_INDEX]);
-        CheckMenuItem simulationTimeItem = createBoundMenuItem("Simulation time",
-                null, whatToExportProps[Constants.SIMULATION_TIME_OUTPUT_INDEX]);
-        CheckMenuItem carsPassedItem = createBoundMenuItem("Cars passed",
-                null, whatToExportProps[Constants.CARS_PASSED_OUTPUT_INDEX]);
-        CheckMenuItem carsOnRoadItem = createBoundMenuItem("Cars on road",
-                null, whatToExportProps[Constants.CARS_ON_ROAD_OUTPUT_INDEX]);
-        CheckMenuItem whenWasRoadEmptyItem = createBoundMenuItem("When was road empty",
-                null, whatToExportProps[Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX]);
-        CheckMenuItem collisionsItem = createBoundMenuItem("Collisions",
-                null, whatToExportProps[Constants.COLLISION_COUNT_OUTPUT_INDEX]);
-        CheckMenuItem roadDetailsItem = createBoundMenuItem("Road details",
-                null, whatToExportProps[Constants.ROAD_DETAILS_OUTPUT_INDEX]);
+                null, whatToExportPropsMap.getOrDefault(ConfigConstants.SIMULATION_DETAILS_TAG, new SimpleBooleanProperty(false)));
+        CheckMenuItem simulationTimeItem = createBoundMenuItem("Simulation time", null,
+                whatToExportPropsMap.getOrDefault(ConfigConstants.SIMULATION_TIME_TAG, new SimpleBooleanProperty(false)));
+        CheckMenuItem carsPassedItem = createBoundMenuItem("Cars passed", null,
+                whatToExportPropsMap.getOrDefault(ConfigConstants.CARS_PASSED_TAG, new SimpleBooleanProperty(false)));
+        CheckMenuItem carsOnRoadItem = createBoundMenuItem("Cars on road", null,
+                whatToExportPropsMap.getOrDefault(ConfigConstants.CARS_ON_ROAD_TAG, new SimpleBooleanProperty(false)));
+        CheckMenuItem whenWasRoadEmptyItem = createBoundMenuItem("When was road empty", null,
+                whatToExportPropsMap.getOrDefault(ConfigConstants.WHEN_WAS_ROAD_EMPTY_TAG, new SimpleBooleanProperty(false)));
+        CheckMenuItem laneChangeCount = createBoundMenuItem("Lane change count", null,
+                whatToExportPropsMap.getOrDefault(ConfigConstants.LANE_CHANGES_COUNT_TAG, new SimpleBooleanProperty(false)));
+        CheckMenuItem laneQueueLengthItem = createBoundMenuItem("Average lane queue length", null,
+                whatToExportPropsMap.getOrDefault(ConfigConstants.AVERAGE_LANE_QUEUE_LENGTH_TAG, new SimpleBooleanProperty(false)));
+        CheckMenuItem detailedLaneQueueLengthItem = createBoundMenuItem("Detailed lane queue length", null,
+                whatToExportPropsMap.getOrDefault(ConfigConstants.DETAILED_LANE_QUEUE_LENGTH_TAG, new SimpleBooleanProperty(false)));
+        CheckMenuItem detailedLightPlanItem = createBoundMenuItem("Detailed light plan", null,
+                whatToExportPropsMap.getOrDefault(ConfigConstants.DETAILED_LIGHT_PLANS_TAG, new SimpleBooleanProperty(false)));
+        CheckMenuItem detailedExportToSeparateFilesItem = createBoundMenuItem("Export detailed info to separate files", null,
+                whatToExportPropsMap.getOrDefault(ConfigConstants.EXPORT_DETAILED_TO_SEPARATE_FILES_TAG, new SimpleBooleanProperty(false)));
+        CheckMenuItem collisionsItem = createBoundMenuItem("Collision count", null,
+                whatToExportPropsMap.getOrDefault(ConfigConstants.COLLISION_COUNT_TAG, new SimpleBooleanProperty(false)));
+        CheckMenuItem roadDetailsItem = createBoundMenuItem("Road details", null,
+                whatToExportPropsMap.getOrDefault(ConfigConstants.ROAD_DETAILS_TAG, new SimpleBooleanProperty(false)));
 
         items.addAll(
                 simulationDetailsItem,
@@ -804,6 +785,11 @@ public class Window extends Application {
                 carsPassedItem,
                 carsOnRoadItem,
                 whenWasRoadEmptyItem,
+                laneChangeCount,
+                laneQueueLengthItem,
+                detailedLaneQueueLengthItem,
+                detailedLightPlanItem,
+                detailedExportToSeparateFilesItem,
                 collisionsItem,
                 roadDetailsItem
         );

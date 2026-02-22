@@ -184,7 +184,7 @@ public class ContinuosRoad extends Road {
         }
 
         int carsPassed = this.checkRelevancyOfCars();
-        countStoppedCars();
+        this.countStoppedCars();
 
         return carsPassed;
     }

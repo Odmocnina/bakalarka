@@ -51,9 +51,6 @@ public class ResultsRecorder {
     /** Lane changes count **/
     private int[] laneChangesCount;
 
-    /** time when cars have reached end of the road **/
-    private int[] whenCarsStartedToBeAtEnd;
-
     /** records of stopped cars on roads **/
     private StoppedCarsOnRoadRecord[] stoppedCarsOnRoadRecord;
 
@@ -98,7 +95,7 @@ public class ResultsRecorder {
         for (int i = 0; i < numberOfRoads; i++) {
             this.laneChangesCount[i] = 0;
         }
-            this.stoppedCarsOnRoadRecord = new StoppedCarsOnRoadRecord[numberOfRoads];
+        this.stoppedCarsOnRoadRecord = new StoppedCarsOnRoadRecord[numberOfRoads];
         for (int i = 0; i < numberOfRoads; i++) {
             this.stoppedCarsOnRoadRecord[i] = new StoppedCarsOnRoadRecord(roads[i].getNumberOfLanes());
         }
@@ -166,11 +163,11 @@ public class ResultsRecorder {
      */
     private String resolveFileName(String fileName) {
         if (!fileName.endsWith(".txt") && outputType.equalsIgnoreCase(Constants.RESULTS_OUTPUT_TXT)) {
-            String[] parts = fileName.split("\\.(?=[^\\.]+$)"); // Split on the last dot
+            String[] parts = fileName.split("\\.(?=[^.]+$)"); // Split on the last dot
             String name = parts[0]; // Get the name part before the extension
             return name + ".txt";
         } else if (!fileName.endsWith(".csv") && outputType.equalsIgnoreCase(Constants.RESULTS_OUTPUT_CSV)) {
-            String[] parts = fileName.split("\\.(?=[^\\.]+$)"); // Split on the last dot
+            String[] parts = fileName.split("\\.(?=[^.]+$)"); // Split on the last dot
             String name = parts[0]; // Get the name part before the extension
             return name + ".csv";
         }
@@ -201,8 +198,6 @@ public class ResultsRecorder {
         } else {
             MyLogger.log("Output file name is not set. Cannot write results.", Constants.WARN_FOR_LOGGING);
         }
-
-        writeStandingCars("standing_cars_");
     }
 
     /**
@@ -269,20 +264,6 @@ public class ResultsRecorder {
                 AppContext.CAR_FOLLOWING_MODEL.getType() + ")" + "\n"); // car following model
         bw.write("Lane changing model used: " + AppContext.LANE_CHANGING_MODEL.getName() + "\n");//lane change model
         bw.write("Simulation parameters: " + AppContext.RUN_DETAILS.toString() + "\n"); // simulation parameters
-
-       /* boolean queueUsed = AppContext.SIMULATION.getRoads()[0].generatingToQueue();
-        if (queueUsed) {
-            bw.write("Car generation: Cars were generated to queues before entering the roads.\n");
-            if (AppContext.SIMULATION.areAllQueuesEmpty(AppContext.SIMULATION.getRoads())) {
-                bw.write("All car queues were emptied during the simulation. Number of steps in simulation: " +
-                        AppContext.SIMULATION.getStepCount() + "\n\n");
-            } else {
-                bw.write("During the simulation time (" + AppContext.RUN_DETAILS.duration + " steps), not all cars "
-                        + " in queues were emptied.\n\n");
-            }
-        } else {
-            bw.write("Car generation: Cars were generated directly on the roads.\n\n");
-        }*/
         bw.write("\n");
     }
 
@@ -313,20 +294,6 @@ public class ResultsRecorder {
             totalCarsPassed += carsPassedPerRoad[i];
         }
         bw.write("Total Cars Passed: " + totalCarsPassed + "\n\n");
-    }
-
-    /**
-     * Writes the car generation parameters for each road to the BufferedWriter.
-     *
-     * @param bw The BufferedWriter to write to.
-     * @throws IOException If an I/O error occurs.
-     **/
-    private void writeGenerationParams(BufferedWriter bw) throws IOException {
-        bw.write("=== Car Generation Parameters ===\n");
-        Road[] roads = AppContext.SIMULATION.getRoads();
-        for (int i = 0; i < roads.length; i++) {
-            bw.write("Road " + i + " Generation Params: " + roads[i].getCarGenerator().toString() + "\n");
-        }
     }
 
     /**
@@ -362,6 +329,15 @@ public class ResultsRecorder {
         bw.write("Total Collisions: " + totalCollisions + "\n\n");
     }
 
+    /**
+     * writes the time when each road was empty during the simulation to the BufferedWriter. It iterates through the
+     * whenWasRoadEmpty array and writes the step count when each road was empty, or indicates if a road was never
+     * empty during the simulation. Used when all generators are queue based, and we want to see when the roads
+     * (and queues) were empty during the simulation.
+     *
+     * @param bw The BufferedWriter to write to.
+     * @throws IOException If an I/O error occurs.
+     **/
     private void writeWhenWasRoadEmpty(BufferedWriter bw) throws IOException {
         bw.write("=== When Was Road Empty ===\n");
         for (int i = 0; i < whenWasRoadEmpty.length; i++) {
@@ -404,12 +380,69 @@ public class ResultsRecorder {
         if (outputDetails.writePart(ConfigConstants.WHEN_WAS_ROAD_EMPTY_TAG)) {
             this.writeWhenWasRoadEmpty(bw);
         }
+        if (outputDetails.writePart(ConfigConstants.LANE_CHANGES_COUNT_TAG)) {
+            this.writeLaneChangesCount(bw);
+        }
+        if (outputDetails.writePart(ConfigConstants.AVERAGE_LANE_QUEUE_LENGTH_TAG)) {
+            this.writeAverageLaneQueueLength(bw);
+        }
+        if (outputDetails.writePart(ConfigConstants.DETAILED_LANE_QUEUE_LENGTH_TAG)) {
+            if (outputDetails.writePart(ConfigConstants.EXPORT_DETAILED_TO_SEPARATE_FILES_TAG)) {
+                this.processDetailedLaneQueueOutputSeparateFiles(outputDetails, AppContext.SIMULATION.getStepCount());
+            } else {
+                this.processDetailedLaneQueueOutput(outputDetails, AppContext.SIMULATION.getStepCount());
+            }
+        }
+        if (outputDetails.writePart(ConfigConstants.DETAILED_LIGHT_PLANS_TAG)) {
+            if (outputDetails.writePart(ConfigConstants.EXPORT_DETAILED_TO_SEPARATE_FILES_TAG)) {
+                this.processLightPlanOfAllRoadsSeparateFiles(outputDetails, AppContext.SIMULATION.getStepCount());
+            } else {
+                this.processLightPlanOfAllRoads(outputDetails, AppContext.SIMULATION.getStepCount());
+            }
+        }
         if (outputDetails.writePart(ConfigConstants.COLLISION_COUNT_TAG)) {
             this.writeCollisionsCount(bw);
         }
         if (outputDetails.writePart(ConfigConstants.ROAD_DETAILS_TAG)) {
             this.writeRoadDetails(bw);
         }
+    }
+
+    /**
+     * writes the lane changes count results to the BufferedWriter, it iterates through the laneChangesCount array and
+     * writes the number of lane changes for each road, as well as the total number of lane changes across all roads.
+     *
+     * @param bw The BufferedWriter to write to.
+     * @throws IOException If an I/O error occurs.
+     **/
+    private void writeLaneChangesCount(BufferedWriter bw) throws IOException {
+        bw.write("=== Lane Changes Count ===\n");
+        int totalLaneChanges = 0;
+        for (int i = 0; i < laneChangesCount.length; i++) {
+            bw.write("Road " + i + ": " + laneChangesCount[i] + " lane changes.\n");
+            totalLaneChanges += laneChangesCount[i];
+        }
+        bw.write("Total Lane Changes: " + totalLaneChanges + "\n\n");
+    }
+
+    /**
+     * writes the average lane queue length results to the BufferedWriter, it iterates through the stoppedCarsOnRoadRecord
+     * array and writes the average lane queue length for each road, as well as the overall average lane queue length
+     * across all roads.
+     *
+     * @param bw The BufferedWriter to write to.
+     * @throws IOException If an I/O error occurs.
+     **/
+    private void writeAverageLaneQueueLength(BufferedWriter bw) throws IOException {
+        bw.write("=== Average Lane Queue Length ===\n");
+        double totalAverageQueueLength = 0.0;
+        int numberOfRoads = stoppedCarsOnRoadRecord.length;
+        for (int i = 0; i < stoppedCarsOnRoadRecord.length; i++) {
+            double averageQueueLength = getAverageLaneQueueLength(i);
+            bw.write("Road " + i + ": Average Lane Queue Length: " + averageQueueLength + "\n");
+            totalAverageQueueLength += averageQueueLength;
+        }
+        bw.write("Overall Average Lane Queue Length: " + (totalAverageQueueLength / numberOfRoads) + "\n\n");
     }
 
     /**
@@ -433,6 +466,12 @@ public class ResultsRecorder {
         }
         if (outputDetails.writePart(ConfigConstants.WHEN_WAS_ROAD_EMPTY_TAG)) {
             header = header + "When was road empty" + csvSeparator;
+        }
+        if (outputDetails.writePart(ConfigConstants.LANE_CHANGES_COUNT_TAG)) {
+            header = header + "Lane Changes Count" + csvSeparator;
+        }
+        if (outputDetails.writePart(ConfigConstants.AVERAGE_LANE_QUEUE_LENGTH_TAG)) {
+            header = header + "Average Lane Queue Length" + csvSeparator;
         }
         if (outputDetails.writePart(ConfigConstants.COLLISION_COUNT_TAG)) {
             header = header + "Collisions Count" + csvSeparator;
@@ -458,17 +497,34 @@ public class ResultsRecorder {
                         String.valueOf(emptyStep) : "Never empty"; // write when was road empty or not empty at all
                 bw.write(emptyStepStr + csvSeparator);
             }
+            if (outputDetails.writePart(ConfigConstants.LANE_CHANGES_COUNT_TAG)) {
+                bw.write(this.laneChangesCount[i] + csvSeparator);
+            }
+            if (outputDetails.writePart(ConfigConstants.AVERAGE_LANE_QUEUE_LENGTH_TAG)) {
+                double averageQueueLength = getAverageLaneQueueLength(i);
+                bw.write(averageQueueLength + csvSeparator);
+            }
             if (outputDetails.writePart(ConfigConstants.COLLISION_COUNT_TAG)) {
                 bw.write(this.collisionsCount[i] + csvSeparator);
             }
             if (outputDetails.writePart(ConfigConstants.ROAD_DETAILS_TAG)) {
-                //bw.write(AppContext.SIMULATION.getRoads()[i].toString() + csvSeparator);
                 bw.write(AppContext.SIMULATION.getRoads()[i].getLength() + csvSeparator +
                         AppContext.SIMULATION.getRoads()[i].getNumberOfLanes() + csvSeparator +
                         AppContext.SIMULATION.getRoads()[i].getSpeedLimit() + csvSeparator);
             }
             bw.write("\n");
         }
+    }
+
+    /**
+     * Retrieves the average lane queue length for a specific road.
+     *
+     * @param roadIndex The index of the road to retrieve the average lane queue length for.
+     * @return The average lane queue length for the specified road.
+     **/
+    private double getAverageLaneQueueLength(int roadIndex) {
+        StoppedCarsOnRoadRecord record = stoppedCarsOnRoadRecord[roadIndex];
+        return record.getAverageStoppedCars();
     }
 
     /**
@@ -512,6 +568,17 @@ public class ResultsRecorder {
         }
         if (this.collisionsCount != null) {
             Arrays.fill(this.collisionsCount, 0);
+        }
+        if (this.laneChangesCount != null) {
+            Arrays.fill(this.laneChangesCount, 0);
+        }
+        if (this.whenWasRoadEmpty != null) {
+            Arrays.fill(this.whenWasRoadEmpty, Constants.NO_RECORD_YET);
+        }
+        if (this.stoppedCarsOnRoadRecord != null) {
+            for (StoppedCarsOnRoadRecord record : this.stoppedCarsOnRoadRecord) {
+                record.reset();
+            }
         }
     }
 
@@ -561,51 +628,435 @@ public class ResultsRecorder {
         this.laneChangesCount[roadIndex]++;
     }
 
+    /**
+     * records the number of stopped cars on a specific road and lane, it updates the stoppedCarsOnRoadRecord for the
+     * given road index by recording the count of stopped cars, whether they were on red light, and the lane index.
+     *
+     * @param count The number of stopped cars to record.
+     * @param onRed A boolean indicating whether the cars were stopped on a red light.
+     * @param roadIndex The index of the road where the cars are stopped.
+     * @param lane The index of the lane where the cars are stopped.
+     **/
     public void recordNumberOfStoppedCars(int count, boolean onRed, int roadIndex, int lane) {
         this.stoppedCarsOnRoadRecord[roadIndex].recordStoppedCars(count, onRed, lane);
     }
 
-    private void writeStandingCars(String filePath) {
+    /**
+     * processes the detailed lane queue output by writing the data for each road and lane to a single CSV file, it
+     * creates a file name for the detailed lane queue output by appending "DetailedLaneQueue.csv" to the base name of
+     * the output file and then calls the writeDetailedLaneQueue method to write the data to that file.
+     *
+     * @param outputDetails The OutputDetails object containing the settings for output generation.
+     * @param stepCount The total number of steps in the simulation.
+     **/
+    private void processDetailedLaneQueueOutput(OutputDetails outputDetails, int stepCount) {
+        String[] baseFileNameParts = this.fileName.split("\\.(?=[^.]+$)"); // Split on the last dot
+        String filePath = baseFileNameParts[0] + "DetailedLaneQueue.csv"; // Append suffix to the base name
+        writeDetailedLaneQueue(filePath, outputDetails.csvSeparator, stepCount);
+    }
+
+    /**
+     * writes the detailed lane queue data to a CSV file, it creates a BufferedWriter to write the data to the specified
+     * file path, it writes the header with road and lane information and then iterates through each time step and lane
+     * to write the count of stopped cars for that lane and step based on the stopped cars record.
+     *
+     * @param filePath The path of the file to write the detailed lane queue data to.
+     * @param csvSeparator The separator to use in the CSV file.
+     * @param stepCount The total number of steps in the simulation.
+     **/
+    private void writeDetailedLaneQueue(String filePath, String csvSeparator, int stepCount) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
-            for (int roadIndex = 0; roadIndex < stoppedCarsOnRoadRecord.length; roadIndex++) {
-                bw.write("Road " + roadIndex + ":\n");
-                StoppedCarsOnRoadRecord record = stoppedCarsOnRoadRecord[roadIndex];
-                for (int lane = 0; lane < record.stoppedCarsPerStep.size(); lane++) {
-                    bw.write("  Lane " + lane + ":\n");
-                    LinkedList<NumberOfStandingCars> stoppedCarsList = record.stoppedCarsPerStep.get(lane);
-                    for (NumberOfStandingCars entry : stoppedCarsList) {
-                        bw.write("    Count: " + entry.count + ", On Red: " + entry.onRed + "\n");
+            StringBuilder firstLine = new StringBuilder("Step" + csvSeparator);
+            for (int i = 0; i < stoppedCarsOnRoadRecord.length; i++) {
+                for (int j = 0; j < stoppedCarsOnRoadRecord[i].stoppedCarsPerStep.size(); j++) {
+                    firstLine.append("Road ").append(i).append(" Lane ").append(j).append(csvSeparator);
+                }
+            }
+            bw.write(firstLine.toString().trim() + "\n");
+            for (int step = 0; step < stepCount; step++) {
+                StringBuilder line = new StringBuilder(step + csvSeparator);
+                for (StoppedCarsOnRoadRecord record : stoppedCarsOnRoadRecord) {
+                    for (int lane = 0; lane < record.stoppedCarsPerStep.size(); lane++) {
+                        addNumberOfSoppedCarsToString(csvSeparator, record, step, line, lane);
                     }
                 }
+                bw.write(line.toString().trim() + "\n");
             }
         } catch (IOException e) {
             MyLogger.log("Error writing standing cars data to file: " + e.getMessage(), Constants.ERROR_FOR_LOGGING);
         }
-
     }
 
+    /**
+     * processes the light plan of all roads by writing the data for each road and lane to a single CSV file, it creates
+     * a file name for the light plan output by appending "LightPlanOfAllRoads.csv" to the base name of the output file
+     * and then calls the writeLightPlanOfAllRoads method to write the data to that file.
+     *
+     * @param outputDetails The OutputDetails object containing the settings for output generation.
+     * @param stepCount The total number of steps in the simulation.
+     **/
+    private void processLightPlanOfAllRoads(OutputDetails outputDetails, int stepCount) {
+        String[] baseFileNameParts = this.fileName.split("\\.(?=[^.]+$)"); // Split on the last dot
+        String filePath = baseFileNameParts[0] + "LightPlanOfAllRoads.csv"; // Append suffix to the base name
+        writeLightPlanOfAllRoads(filePath, outputDetails.csvSeparator, stepCount);
+    }
+
+    /**
+     * writes the light plan of all roads to a CSV file, it creates a BufferedWriter to write the data to the specified
+     * file path, it writes the header with road and lane information and then iterates through each time step and lane
+     * to write whether the light was red or green for that lane and step based on the stopped cars record.
+     *
+     * @param fileName The path of the file to write the light plan data to.
+     * @param csvSeparator The separator to use in the CSV file.
+     * @param stepCount The total number of steps in the simulation.
+     **/
+    private void writeLightPlanOfAllRoads(String fileName, String csvSeparator, int stepCount) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
+            StringBuilder firstLine = new StringBuilder("Step" + csvSeparator);
+            int road = 0;
+            for (StoppedCarsOnRoadRecord record : stoppedCarsOnRoadRecord) {
+                for (int lane = 0; lane < record.stoppedCarsPerStep.size(); lane++) {
+                    firstLine.append("Road ").append(road).append(" Lane ").append(lane).append(csvSeparator);
+                }
+                road++;
+            }
+            bw.write(firstLine.toString().trim() + "\n");
+            for (int step = 0; step < stepCount; step++) {
+                StringBuilder line = new StringBuilder(step + csvSeparator);
+                for (StoppedCarsOnRoadRecord record : stoppedCarsOnRoadRecord) {
+                    int numberOfLanes = record.stoppedCarsPerStep.size();
+                    for (int lane = 0; lane < numberOfLanes; lane++) {
+                        NumberOfStandingCars entry = record.getStoppedCarsAtStep(lane, step);
+                        if (entry.onRed) {
+                            line.append("Was red").append(csvSeparator);
+                        } else {
+                            line.append("Was green").append(csvSeparator);
+                        }
+                    }
+                    road++;
+                }
+                bw.write(line.toString().trim() + "\n");
+            }
+        } catch (IOException e) {
+            MyLogger.log("Error writing light plan data to file: " + e.getMessage(), Constants.ERROR_FOR_LOGGING);
+        }
+    }
+
+    /**
+     * processes the detailed lane queue output by writing the data for each road to separate files, it creates a directory
+     * for detailed outputs and then iterates through each road to write the lane queue data for that road to a separate
+     * file using the writeDetailedLaneQueue method.
+     *
+     * @param outputDetails The OutputDetails object containing the settings for output generation.
+     * @param stepCount The total number of steps in the simulation.
+     **/
+    private void processDetailedLaneQueueOutputSeparateFiles(OutputDetails outputDetails, int stepCount) {
+        String[] baseFileNameParts = this.fileName.split("\\.(?=[^.]+$)");
+        String baseDirPath = baseFileNameParts[0] + "DetailedExport"; // folder for detailed outputs
+
+        for (int i = 0; i < stoppedCarsOnRoadRecord.length; i++) {
+            // create separate directory for each road
+            String roadDirPath = baseDirPath + File.separator + "road" + i;
+            if (!createFolderForRoadDetailedOutputs(roadDirPath)) {
+                MyLogger.log("Skipping light plan output for road " + i + " due to directory creation failure.",
+                        Constants.ERROR_FOR_LOGGING);
+                continue; // Skip this road if we couldn't create the directory
+            }
+
+            String filePath = roadDirPath + File.separator + "DetailedLaneQueue.csv";
+            // give the record for each road and write it to a separate file
+            writeDetailedLaneQueueOneRoad(filePath, outputDetails.csvSeparator, stepCount, stoppedCarsOnRoadRecord[i]);
+        }
+    }
+
+    /**
+     * writes the detailed lane queue data for one road to a CSV file, it creates a BufferedWriter to write the data to the
+     * specified file path, it writes the header with lane numbers and then iterates through each time step and lane to write
+     * the number of stopped cars for that lane and step based on the stopped cars record.
+     *
+     * @param filePath The path of the file to write the detailed lane queue data to.
+     * @param csvSeparator The separator to use in the CSV file.
+     * @param stepCount The total number of steps in the simulation.
+     * @param record The StoppedCarsOnRoadRecord containing the data for one road of stopped cars for each lane and step.
+     **/
+    private void writeDetailedLaneQueueOneRoad(String filePath, String csvSeparator, int stepCount, StoppedCarsOnRoadRecord record) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
+            int numberOfLanes = record.stoppedCarsPerStep.size();
+            bw.write(createFirstLineForDetailedExportSeparateFile(numberOfLanes, csvSeparator));
+
+            for (int step = 0; step < stepCount; step++) {
+                StringBuilder line = new StringBuilder(step + csvSeparator);
+                for (int lane = 0; lane < numberOfLanes; lane++) {
+                    addNumberOfSoppedCarsToString(csvSeparator, record, step, line, lane);
+                }
+                bw.write(line.toString().trim() + "\n");
+            }
+        } catch (IOException e) {
+            MyLogger.log("Error writing standing cars data to file: " + e.getMessage(), Constants.ERROR_FOR_LOGGING);
+        }
+    }
+
+    /**
+     * adds the number of stopped cars for a specific lane and step to the line string, it retrieves the list of stopped
+     * cars for the given lane from the record and checks if there is an entry for the current step. If there is an
+     * entry, it appends the count of stopped cars to the line string, otherwise it appends "0" to indicate no data for
+     * that step.
+     *
+     * @param csvSeparator The separator to use in the CSV file.
+     * @param record The StoppedCarsOnRoadRecord containing the data for one road of stopped cars for each lane and step.
+     * @param step The current time step in the simulation.
+     * @param line The StringBuilder object representing the current line being constructed for the CSV file.
+     * @param lane The index of the lane to retrieve the stopped cars data for.
+     **/
+    private void addNumberOfSoppedCarsToString(String csvSeparator, StoppedCarsOnRoadRecord record, int step,
+                                               StringBuilder line, int lane) {
+        LinkedList<NumberOfStandingCars> stoppedCarsList = record.stoppedCarsPerStep.get(lane);
+        if (step < stoppedCarsList.size()) {
+            NumberOfStandingCars entry = stoppedCarsList.get(step);
+            line.append(entry.count).append(csvSeparator);
+        } else {
+            line.append("0").append(csvSeparator); // No data for this step
+        }
+    }
+
+    /**
+     * creates the first line (header) for the detailed lane queue output CSV file for one road, it constructs a header
+     * string that includes the step and lane information based on the number of lanes in the given record.
+     *
+     * @param numberOfLanes The number of lanes for the road to create the header for
+     * @param csvSeparator The separator to use in the CSV file
+     * @return A string representing the first line (header) for the detailed lane queue output CSV file for one road.
+     **/
+    private String createFirstLineForDetailedExportSeparateFile(int numberOfLanes, String csvSeparator) {
+        // write header with lane numbers
+        StringBuilder firstLine = new StringBuilder("Step" + csvSeparator);
+        for (int lane = 0; lane < numberOfLanes; lane++) {
+            firstLine.append("Lane ").append(lane).append(csvSeparator);
+        }
+
+        return firstLine.toString().trim() + "\n";
+    }
+
+    /**
+     * writes the light plan of all roads to separate CSV files (and folders), it creates a directory for each road and
+     * writes the light plan data for that road to a separate file using the writeLightPlanOfOneRoad method.
+     *
+     * @param outputDetails The OutputDetails object containing the settings for output generation.
+     * @param stepCount The total number of steps in the simulation.
+     **/
+    private void processLightPlanOfAllRoadsSeparateFiles(OutputDetails outputDetails, int stepCount) {
+        String[] baseFileNameParts = this.fileName.split("\\.(?=[^.]+$)");
+        String baseDirPath = baseFileNameParts[0] + "DetailedExport"; // folder for light plan outputs
+
+        for (int i = 0; i < stoppedCarsOnRoadRecord.length; i++) {
+            // create separate directory for each road
+            String roadDirPath = baseDirPath + File.separator + "road" + i;
+            if (!createFolderForRoadDetailedOutputs(roadDirPath)) {
+                MyLogger.log("Skipping light plan output for road " + i + " due to directory creation failure.",
+                        Constants.ERROR_FOR_LOGGING);
+                continue; // Skip this road if we couldn't create the directory
+            }
+
+            String filePath = roadDirPath + File.separator + "LightPlanOfAllRoads.csv";
+            // give the record for each road and write it to a separate file
+            writeLightPlanOfOneRoad(filePath, outputDetails.csvSeparator, stepCount, stoppedCarsOnRoadRecord[i]);
+        }
+    }
+
+    /**
+     * creates a folder for detailed outputs of road if it does not already exist, it checks if the specified directory
+     * path exists and if not, it attempts to create the directory.
+     *
+     * @param roadDirPath The path of the road directory to create for detailed outputs.
+     * @return true if the directory exists or was created successfully, false if there was an error creating the
+     *         directory.
+     **/
+    private boolean createFolderForRoadDetailedOutputs(String roadDirPath) {
+        File roadDir = new File(roadDirPath);
+        if (!roadDir.exists()) {
+            boolean success = roadDir.mkdirs();
+            if (!success) {
+                MyLogger.log("Failed to create directory: " + roadDirPath, Constants.ERROR_FOR_LOGGING);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * writes the light plan of one road to a CSV file, it creates a BufferedWriter to write the data to the specified
+     * file path, it writes the header with lane numbers and then iterates through each time step and lane to write
+     * whether the lane was on red or green light based on the stopped cars record.
+     *
+     * @param filePath The path of the file to write the light plan data to.
+     * @param csvSeparator The separator to use in the CSV file.
+     * @param stepCount The total number of steps in the simulation.
+     * @param record The StoppedCarsOnRoadRecord containing the data for one road of stopped cars and light status for
+     *               each lane and step.
+     **/
+    private void writeLightPlanOfOneRoad(String filePath, String csvSeparator, int stepCount, StoppedCarsOnRoadRecord record) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
+            int numberOfLanes = record.stoppedCarsPerStep.size();
+
+            // write header with lane numbers
+            StringBuilder firstLine = new StringBuilder("Step" + csvSeparator);
+            for (int lane = 0; lane < numberOfLanes; lane++) {
+                firstLine.append("Lane ").append(lane).append(csvSeparator);
+            }
+            bw.write(firstLine.toString().trim() + "\n");
+
+            for (int step = 0; step < stepCount; step++) {
+                StringBuilder line = new StringBuilder(step + csvSeparator);
+                for (int lane = 0; lane < numberOfLanes; lane++) {
+                    NumberOfStandingCars entry = record.getStoppedCarsAtStep(lane, step);
+
+                    // write whether the lane was on red or green light based on the stopped cars record, if there is
+                    // an entry for the given step and lane
+                    if (entry != null) {
+                        if (entry.onRed) {
+                            line.append("Was red").append(csvSeparator);
+                        } else {
+                            line.append("Was green").append(csvSeparator);
+                        }
+                    } else {
+                        line.append("Unknown").append(csvSeparator);
+                    }
+                }
+                bw.write(line.toString().trim() + "\n");
+            }
+        } catch (IOException e) {
+            MyLogger.log("Error writing light plan data to file: " + e.getMessage(), Constants.ERROR_FOR_LOGGING);
+        }
+    }
+
+    /************************************
+     * Class representing the record of stopped cars on a road during the simulation, it maintains a list (lanes)
+     * of linked lists (steps) that store the number of standing cars and whether they were on red light for each lane
+     * of the road at each time step (instance of NumberOfStandingCars class)
+     *
+     * @author Michael Hladky
+     * @version 1.0
+     ************************************/
     private static class StoppedCarsOnRoadRecord {
+
+        /** A list of linked lists that store the number of standing cars and whether they were on red light for each
+         * lane of the road at each time step. Each index in the outer list represents a lane, and each linked list
+         * contains entries for each time step, where each entry is an instance of the NumberOfStandingCars class. **/
         List<LinkedList<NumberOfStandingCars>> stoppedCarsPerStep;
+
+        /**
+         * Constructor to initialize the stoppedCarsPerStep list based on the number of lanes on the road. It creates a
+         * new ArrayList to hold the linked lists for each lane, and for each lane, it initializes a new LinkedList to
+         * store the number of standing cars and red light status for each time step.
+         *
+         * @param numberOfLanes The number of lanes on the road
+         */
         public StoppedCarsOnRoadRecord(int numberOfLanes) {
             stoppedCarsPerStep = new ArrayList<>(numberOfLanes);
             for (int i = 0; i < numberOfLanes; i++) {
                 stoppedCarsPerStep.add(new LinkedList<>());
             }
         }
+
+        /**
+         * Records the number of stopped cars and whether they were on red light for a specific lane at a given time
+         * step. It checks if the lane index is within bounds and then adds a new instance of NumberOfStandingCars to
+         * the corresponding linked list for that lane in the stoppedCarsPerStep list.
+         *
+         * @param count The number of stopped cars to record.
+         * @param onRed A boolean indicating whether the light was red at the end of the lane
+         * @param lane The index of the lane where the cars are stopped.
+         */
         public void recordStoppedCars(int count, boolean onRed, int lane) {
             if (lane < stoppedCarsPerStep.size()) {
                 stoppedCarsPerStep.get(lane).add(new NumberOfStandingCars(count, onRed));
             }
         }
+
+        /**
+         * Retrieves the number of stopped cars and whether they were on red light for a specific lane at a given time
+         * step. It checks if the lane index and step index are within bounds and returns the corresponding entry from
+         * the linked list for that lane. If the lane or step index is out of bounds, it returns a default instance of
+         * NumberOfStandingCars with count 0 and onRed false.
+         *
+         * @param lane The index of the lane to retrieve the data for.
+         * @param step The index of the time step to retrieve the data for.
+         * @return An instance of NumberOfStandingCars containing the count and red light status for the specified lane
+         *         and time step, or a default instance if the indices are out of bounds.
+         */
+        public NumberOfStandingCars getStoppedCarsAtStep(int lane, int step) {
+            if (lane < stoppedCarsPerStep.size()) {
+                LinkedList<NumberOfStandingCars> stoppedCarsList = stoppedCarsPerStep.get(lane);
+                if (step < stoppedCarsList.size()) {
+                    return stoppedCarsList.get(step);
+                }
+            }
+            return new NumberOfStandingCars(0, false); // Return default if lane or step is out of bounds
+        }
+
+        /**
+         * Resets the recorded stopped cars data by clearing the lists for each lane. It iterates through the
+         * stoppedCarsPerStep list and calls the clear method on each LinkedList to remove all recorded entries of
+         * stopped cars for each lane.
+         **/
+        public void reset() {
+            for (LinkedList<NumberOfStandingCars> laneList : stoppedCarsPerStep) {
+                laneList.clear();
+            }
+        }
+
+        /**
+         * Calculates the average number of stopped cars across all lanes and time steps, considering only those entries
+         * where the cars were stopped at a red light. It iterates through the stoppedCarsPerStep list, sums up the
+         * counts of stopped cars for entries where onRed is true, and counts the number of such entries to calculate
+         * the average.
+         *
+         * @return The average number of stopped cars at red lights across all lanes and time steps. If there are no
+         *         entries with onRed true, it returns 0.0 to avoid division by zero.
+         */
+        public double getAverageStoppedCars() {
+            int totalCount = 0;
+            int totalEntries = 0;
+
+            for (LinkedList<NumberOfStandingCars> laneList : stoppedCarsPerStep) {
+                for (NumberOfStandingCars entry : laneList) {
+                    if (entry.onRed) {
+                        totalCount += entry.count;
+                        totalEntries++;
+                    }
+                }
+            }
+
+            return totalEntries > 0 ? (double) totalCount / totalEntries : 0.0;
+        }
     }
 
+    /**********************************
+     * Class representing the number of standing cars on lane at a given time step and whether the lane is on red light
+     * or not on lane, this is used for recording the number of stopped cars on each lane of the road during the
+     * simulation
+     *
+     * @author Michael Hladky
+     * @version 1.0
+     **********************************/
     private static class NumberOfStandingCars {
+
+        /** The number of standing cars at a given time step. **/
         int count;
+
+        /** A boolean indicating whether the cars are stopped at a red light (true) or not (false). **/
         boolean onRed;
+
+        /**
+         *  Constructor to initialize the number of standing cars and whether they are on red light.
+         *
+         * @param count The number of standing cars.
+         * @param onRed A boolean indicating if the cars are stopped at a red light.
+         **/
         public NumberOfStandingCars(int count, boolean onRed) {
             this.count = count;
             this.onRed = onRed;
         }
     }
-
 }

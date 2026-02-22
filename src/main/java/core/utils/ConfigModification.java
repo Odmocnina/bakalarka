@@ -54,12 +54,12 @@ public class ConfigModification {
     }
 
     /**
-     * method to change the output settings, it toggles the output setting at the specified index (on/off) in the
-     * AppContext, this determines what simulation details are written to the output file when output is triggered
+     * method to change the output settings, it toggles the output setting for the specified key (on/off) in the
+     * simulation context
      *
-     * @param index index of the output setting to be toggled in the AppContext
+     * @param key key of the output setting to be toggled in the simulation context
      **/
-    public static void changeOutput(int index) {
-        AppContext.RUN_DETAILS.outputDetails.output[index] = !AppContext.RUN_DETAILS.outputDetails.output[index];
+    public static void changeOutput(String key) {
+        AppContext.RUN_DETAILS.outputDetails.setPart(key, !AppContext.RUN_DETAILS.outputDetails.writePart(key));
     }
 }

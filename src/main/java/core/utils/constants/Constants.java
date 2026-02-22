@@ -24,14 +24,13 @@ public class Constants {
 
     public static final int NO_CAR_IN_FRONT = -1;
     public static final double PARAMETER_UNDEFINED = -1.0;
-    public static final double LANE_WIDTH = 3.5; // in meters
     public static final int NO_LANE_THERE = -2;
     public static final Color[] CAR_COLORS = {
             Color.DARKRED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.ORANGE,
             Color.PURPLE, Color.PINK, Color.BROWN, Color.CYAN, Color.MAGENTA
     };
     public static final double CONTINOUS_ROAD_DRAWING_SCALE_FACTOR = 2.0;
-    public static final String GENERATOR_QUEUE = "queue";
+
     public static final double NO_CAR_THERE = -10000.0;
     public static final String WARN_FOR_LOGGING = "warn";
     public static final String DEBUG_FOR_LOGGING = "debug";
@@ -46,25 +45,13 @@ public class Constants {
 
     public static final String newMapFileName = "newMap.xml";
 
+    // logging indexes constants
     public static final int GENERAL_LOGGING_INDEX = 0;
     public static final int INFO_LOGGING_INDEX = 1;
     public static final int WARN_LOGGING_INDEX = 2;
     public static final int ERROR_LOGGING_INDEX = 3;
     public static final int FATAL_LOGGING_INDEX = 4;
     public static final int DEBUG_LOGGING_INDEX = 5;
-
-    // indices for output details, this is used in the OutputDetails class to determine which details to output based on
-    // the configuration file, the indices correspond to the order of the details in the output array in the
-    // OutputDetails class
-    public static final int SIMULATION_DETAILS_OUTPUT_INDEX = 0;
-    public static final int SIMULATION_TIME_OUTPUT_INDEX = 1;
-    public static final int CARS_PASSED_OUTPUT_INDEX = 2;
-    public static final int CARS_ON_ROAD_OUTPUT_INDEX = 3;
-    public static final int WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX = 4;
-
-    public static final int LANE_CHANGES_COUNT_OUTPUT_INDEX = 5;
-    public static final int COLLISION_COUNT_OUTPUT_INDEX = 5;
-    public static final int ROAD_DETAILS_OUTPUT_INDEX = 6;
 
 
     public static final int NO_DURATION_PROVIDED = -1;
@@ -79,6 +66,7 @@ public class Constants {
     public static final String LOGGING_PARAMETER_PREFIX = "--log=";
     public static final String MAP_FILE_PARAMETER_PREFIX = "--map=";
 
+    // state of logging in input parameters
     public static final int LOGGING_ON_FROM_INPUT_PARAMETERS = 1;
     public static final int LOGGING_NOT_PROVIDED_IN_INPUT_PARAMETERS = 0;
     public static final int LOGGING_OFF_FROM_INPUT_PARAMETERS = -1;

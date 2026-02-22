@@ -34,13 +34,18 @@
             <type>txt</type>
             <csvSeparator>;</csvSeparator>
             <whatToWrite>
-                <simulationDetails>true</simulationDetails>
-                <simulationTime>true</simulationTime>
-                <carsPassed>true</carsPassed>
+                <simulationDetails>false</simulationDetails>
+                <simulationTime>false</simulationTime>
+                <carsPassed>false</carsPassed>
                 <carsOnRoad>true</carsOnRoad>
-                <whenWasRoadEmpty>true</whenWasRoadEmpty>
-                <collisionCount>true</collisionCount>
-                <roadDetails>true</roadDetails>
+                <whenWasRoadEmpty>false</whenWasRoadEmpty>
+                <laneChangesCount>true</laneChangesCount>
+                <averageLaneQueueLength>true</averageLaneQueueLength>
+                <detailedLaneQueueLength>true</detailedLaneQueueLength>
+                <detailedLightPlans>true</detailedLightPlans>
+                <exportDetailedToSeparateFiles>true</exportDetailedToSeparateFiles>
+                <collisionCount>false</collisionCount>
+                <roadDetails>false</roadDetails>
             </whatToWrite>
         </output>
     </runDetails>

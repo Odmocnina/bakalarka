@@ -61,11 +61,17 @@ public class RunDetails {
         return this.outputDetails != null && outputDetails.outputFile != null && !outputDetails.outputFile.isEmpty();
     }
 
-    public boolean getOutputDetail(int index) {
-        if (outputDetails == null || index < 0 || index >= outputDetails.output.length) {
-            return false; // Return false if outputDetails is null or index is out of bounds
+    /**
+     * Checks if a specific part of the output is enabled based on its name.
+     *
+     * @param tag The name of the output part to check (e.g., from ConfigConstants).
+     * @return true if enabled, false otherwise.
+     **/
+    public boolean getOutputDetail(String tag) {
+        if (outputDetails == null || !outputDetails.whatToOutput.containsKey(tag)) {
+            return false; // Return false if outputDetails is null or tag is not found
         }
-        return outputDetails.getOutputSetting(index);
+        return outputDetails.whatToOutput.get(tag);
     }
 
     /**

@@ -10,24 +10,14 @@ public class ConfigConstants {
 
     public static final String CONFIG_REQUEST_SEPARATOR = "/";
     public static final String ROAD_FILE_TAG = "roadFile";
-    public static final String NUMBER_OF_ROADS_TAG = "numberOfRoads";
     public static final String MODELS_TAG = "models";
     public static final String CAR_FOLLOWING_MODEL_TAG = "carFollowingModel";
     public static final String LANE_CHANGING_MODEL_TAG = "laneChangingModel";
     public static final String ID_TAG = "id";
-    public static final String GENERATOR_TAG = "generator";
-    public static final String FLOW_RATE_TAG = "flowRate";
-    public static final String QUEUE_TAG = "queue";
-    public static final String USE_TAG = "use";
-    public static final String MIN_VALUE_TAG = "minValue";
-    public static final String MAX_VALUE_TAG = "maxValue";
-    public static final String CAR_PARAMS_TAG = "carParams";
     public static final String RUN_DETAILS_TAG = "runDetails";
-    public static final String SHOW_GUI_TAG = "showGui";
     public static final String DRAW_CELLS_TAG = "drawCells";
     public static final String LANE_CHANGE_TAG = "laneChange";
     public static final String TIME_STEP_TAG = "timeStep";
-    public static final String DURATION_TAG = "duration";
     public static final String DEBUG_TAG = "debug";
     public static final String LOGGING_TAG = "logging";
     public static final String LOG_GENERAL_TAG = "log";
@@ -41,20 +31,22 @@ public class ConfigConstants {
     public static final String FILE_TAG = "file";
     public static final String TYPE_TAG = "type";
     public static final String CSV_SEPARATOR_TAG = "csvSeparator";
+    public static final String TIME_BETWEEN_STEPS_TAG = "timeBetweenSteps";
+    public static final String PREVENT_COLLISION_TAG = "preventCollision";
+    public static final String SEED_TAG = "seed";
+
+    // what to write tags
     public static final String WHAT_TO_WRITE_TAG = "whatToWrite";
     public static final String SIMULATION_DETAILS_TAG = "simulationDetails";
     public static final String SIMULATION_TIME_TAG = "simulationTime";
     public static final String CARS_PASSED_TAG = "carsPassed";
     public static final String CARS_ON_ROAD_TAG = "carsOnRoad";
     public static final String ROAD_DETAILS_TAG = "roadDetails";
-    public static final String GENERATION_DETAILS_TAG = "generationDetails";
-    public static final String TIME_BETWEEN_STEPS_TAG = "timeBetweenSteps";
-    public static final String PREVENT_COLLISION_TAG = "preventCollision";
     public static final String COLLISION_COUNT_TAG = "collisionCount";
     public static final String WHEN_WAS_ROAD_EMPTY_TAG = "whenWasRoadEmpty";
-    public static final String MAP_TAG = "map";
-
-    public static final String SEED_TAG = "seed";
-
-
+    public static final String LANE_CHANGES_COUNT_TAG = "laneChangesCount";
+    public static final String AVERAGE_LANE_QUEUE_LENGTH_TAG = "averageLaneQueueLength";
+    public static final String DETAILED_LANE_QUEUE_LENGTH_TAG = "detailedLaneQueueLength";
+    public static final String DETAILED_LIGHT_PLANS_TAG = "detailedLightPlans";
+    public static final String EXPORT_DETAILED_TO_SEPARATE_FILES_TAG = "exportDetailedToSeparateFiles";
 }

@@ -233,14 +233,15 @@ public class Actions {
     }
 
     /**
-     * method for toggling the output of a specific detail, which changes the configuration and then logs the action
+     * method for toggling the output of a specific key, which changes the configuration and then logs the action
      *
-     * @param detailIndex the index of the output detail to be toggled
+     * @param key the key of the output to be toggled
      **/
-    public static void setOutputAction(int detailIndex) {
-        MyLogger.log("Toggling output detail index " + detailIndex, Constants.INFO_FOR_LOGGING);
-        ConfigModification.changeOutput(detailIndex);
+    public static void setOutputAction(String key) {
+        MyLogger.log("Toggling output detail with key " + key, Constants.INFO_FOR_LOGGING);
+        ConfigModification.changeOutput(key);
     }
+
 
     /**
      * method for resetting the simulation, which resets the simulation and then repaints the map to reflect the change
