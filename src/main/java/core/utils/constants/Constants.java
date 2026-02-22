@@ -61,6 +61,8 @@ public class Constants {
     public static final int CARS_PASSED_OUTPUT_INDEX = 2;
     public static final int CARS_ON_ROAD_OUTPUT_INDEX = 3;
     public static final int WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX = 4;
+
+    public static final int LANE_CHANGES_COUNT_OUTPUT_INDEX = 5;
     public static final int COLLISION_COUNT_OUTPUT_INDEX = 5;
     public static final int ROAD_DETAILS_OUTPUT_INDEX = 6;
 

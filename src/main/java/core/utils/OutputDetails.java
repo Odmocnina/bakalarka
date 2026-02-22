@@ -37,6 +37,9 @@ public class OutputDetails {
     /** index of true/false in output array of when was road empty **/
     final int WHEN_WAS_ROAD_EMPTY_INDEX = Constants.WHEN_WAS_ROAD_EMPTY_OUTPUT_INDEX;
 
+    /** index of true/false in output array of lane changes count **/
+    final int LANE_CHANGES_COUNT = Constants.LANE_CHANGES_COUNT_OUTPUT_INDEX;
+
     /** index of true/false in output array of collision count **/
     final int COLLISION_COUNT_INDEX = Constants.COLLISION_COUNT_OUTPUT_INDEX;
 

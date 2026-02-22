@@ -157,6 +157,27 @@ public class ResultsRecorder {
     }
 
     /**
+     * removes the .txt or .csv extension from the file name if it exists, it checks if the file name ends with either
+     * ".txt" or ".csv" and removes the extension if found, a d puts extension back to the file name based on the output
+     * type (txt or csv).
+     *
+     * @param fileName The file name to resolve.
+     * @return The resolved file name with the correct extension based on the output type.
+     */
+    private String resolveFileName(String fileName) {
+        if (!fileName.endsWith(".txt") && outputType.equalsIgnoreCase(Constants.RESULTS_OUTPUT_TXT)) {
+            String[] parts = fileName.split("\\.(?=[^\\.]+$)"); // Split on the last dot
+            String name = parts[0]; // Get the name part before the extension
+            return name + ".txt";
+        } else if (!fileName.endsWith(".csv") && outputType.equalsIgnoreCase(Constants.RESULTS_OUTPUT_CSV)) {
+            String[] parts = fileName.split("\\.(?=[^\\.]+$)"); // Split on the last dot
+            String name = parts[0]; // Get the name part before the extension
+            return name + ".csv";
+        }
+        return fileName;
+    }
+
+    /**
      * Writes the recorded results to the output file.
      **/
     public void writeResults() {
@@ -169,7 +190,7 @@ public class ResultsRecorder {
     private void write() {
         if (this.fileName != null && !this.fileName.isEmpty()) {
             try {
-                File file = new File(fileName);
+                File file = new File(resolveFileName(this.fileName));
                 FileWriter fw = new FileWriter(file);
                 BufferedWriter bw = getBufferedWriter(fw);
                 bw.close();
