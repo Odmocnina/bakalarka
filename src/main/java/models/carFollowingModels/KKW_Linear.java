@@ -7,7 +7,6 @@ import models.ICarFollowingModel;
 import models.ModelId;
 
 import java.util.HashMap;
-import java.util.Random;
 
 /********************************************
  * Kerner-Klenov-Wolf (linear) car following model implementation (cellular), annotated with @ModelId("kkw-linear") for
