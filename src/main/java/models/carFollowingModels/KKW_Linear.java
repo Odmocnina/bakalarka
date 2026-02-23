@@ -108,7 +108,7 @@ public class KKW_Linear implements ICarFollowingModel {
         if (xPositionStraightForward == Constants.NO_CAR_THERE) {
             distance = Double.MAX_VALUE; // no car ahead
         } else {
-            distance = (xPositionStraightForward - xPosition - lengthStraightForward); // distance in cells
+            distance = Math.max(0, (xPositionStraightForward - xPosition - lengthStraightForward) - 1); // distance in cells
         }
         double timeStep = parameters.get(RequestConstants.TIME_STEP_REQUEST);
         double speedNextCar = parameters.get(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST);
