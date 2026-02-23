@@ -72,11 +72,10 @@ public class Window extends Application {
      *  sync **/
     private BooleanProperty collisionBanProp;
 
-    /** boolean properties for output settings toggle buttons and menu items, used for keeping toggle buttons and menu
-     * items in sync **/
-   // private BooleanProperty[] whatToExportProps;
-
-    private HashMap<String, BooleanProperty> whatToExportPropsMap; // map to hold BooleanProperties for output settings, key is setting name
+    /** map of BooleanProperties for output settings toggle buttons and menu items, used for keeping toggle buttons and
+     * menu items in sync, key is setting name (e.g. "outputDetailedLightPlans") and value is the BooleanProperty that
+     * toggle button and menu item are bound to **/
+    private HashMap<String, BooleanProperty> whatToExportPropsMap;
 
     /** boolean properties for logging settings toggle buttons and menu items, used for keeping toggle buttons and menu
      * items in sync **/
@@ -715,12 +714,12 @@ public class Window extends Application {
         editMapFileBtn.setOnAction(e -> Actions.editMapFile(this.simulation, primaryStage, paintAll));
         toolbarStartStopBtn.setOnAction(e -> handleStartStopAction(primaryStage));
         resetBtn.setOnAction(e -> handleReset(primaryStage, paintAll));
-        exportResultsToTxtBtn.setOnAction(e -> Actions.exportResultsToTxtAction(this.simulation));
-        exportToCsvBtn.setOnAction(e -> Actions.exportResultsToCsvAction(this.simulation));
+        exportResultsToTxtBtn.setOnAction(e -> this.handleExportResults(primaryStage, Constants.RESULTS_OUTPUT_TXT));
+        exportToCsvBtn.setOnAction(e -> this.handleExportResults(primaryStage, Constants.RESULTS_OUTPUT_CSV));
         nextStepBtn.setOnAction(e -> Actions.nextStepAction(simulation, paintAll));
         saveMapFileBtn.setOnAction(e -> Actions.saveMapAction(this.simulation));
         saveAsMapFileBtn.setOnAction(e -> Actions.saveMapAsAction(this.simulation, primaryStage));
-        openMapFileBtn.setOnAction(e -> Actions.openMapAction(primaryStage, paintAll));
+        openMapFileBtn.setOnAction(e -> this.handleOpenNewMap(primaryStage, paintAll));
         setTimeBetweenStepsBtn.setOnAction(e -> Actions.setTimeBetweenStepsAction(primaryStage, engine));
         setOutputFileNameBtn.setOnAction(e -> Actions.setOutputFileAction());
         setCsvSeparatorBtn.setOnAction(e -> Actions.setCsvSeparatorAction(primaryStage));
@@ -854,7 +853,7 @@ public class Window extends Application {
 
         itemNewFile.setOnAction(e -> Actions.newMapAction(primaryStage, paintAll));
         itemEditFile.setOnAction(e -> Actions.editMapFile(this.simulation, primaryStage, paintAll));
-        itemOpenFile.setOnAction(e -> Actions.openMapAction(primaryStage, paintAll));
+        itemOpenFile.setOnAction(e -> this.handleOpenNewMap(primaryStage, paintAll));
         itemSaveFile.setOnAction(e -> Actions.saveMapAction(this.simulation));
         itemSaveAsFile.setOnAction(e -> Actions.saveMapAsAction(this.simulation, primaryStage));
 
@@ -929,8 +928,8 @@ public class Window extends Application {
 
         setOutputFileNameItem.setOnAction(e -> Actions.setOutputFileAction());
         setCsvSeparator.setOnAction(e -> Actions.setCsvSeparatorAction(primaryStage));
-        exportResultsItem.setOnAction(e -> Actions.exportResultsToTxtAction(this.simulation));
-        exportToCSVItem.setOnAction(e -> Actions.exportResultsToCsvAction(this.simulation));
+        exportResultsItem.setOnAction(e -> this.handleExportResults(primaryStage, Constants.RESULTS_OUTPUT_TXT));
+        exportToCSVItem.setOnAction(e -> this.handleExportResults(primaryStage, Constants.RESULTS_OUTPUT_CSV));
 
         outputMenu.getItems().addAll(
                 exportResultsItem,
@@ -1030,5 +1029,27 @@ public class Window extends Application {
             }
         }
         Actions.resetSimulationAction(simulation, paintAll);
+    }
+
+    private void handleOpenNewMap(Stage stage, Runnable paintAll) {
+        hScroll.setValue(0);
+        vScroll.setValue(0);
+        Actions.openMapAction(stage, paintAll);
+    }
+
+    private void handleExportResults(Stage stage, String fileType) {
+        // if simulation is running, don't export and give dialog where its said that cannot export while running
+        if (engine.getRunning()) {
+            DialogMaker.warningDialog(stage, "Cannot export while simulation is running. " +
+                    "Stop the simulation to export results.");
+            MyLogger.log("Export cancelled: Simulation is running.", Constants.INFO_FOR_LOGGING);
+            return;
+        }
+
+        if (fileType.equalsIgnoreCase(Constants.RESULTS_OUTPUT_CSV)) {
+            Actions.exportResultsToCsvAction(this.simulation);
+        } else if (fileType.equalsIgnoreCase(Constants.RESULTS_OUTPUT_TXT)) {
+            Actions.exportResultsToTxtAction(this.simulation);
+        }
     }
 }

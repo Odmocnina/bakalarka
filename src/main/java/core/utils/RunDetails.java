@@ -85,10 +85,17 @@ public class RunDetails {
                 "duration=" + duration +
                 ", timeStep=" + timeStep +
                 ", showGui=" + showGui +
-                ", output='" + outputDetails + '\'' +
+                ", outputDetails=" + outputDetails +
                 ", drawCells=" + drawCells +
+                ", laneChange=" + laneChange +
+                ", log=" + java.util.Arrays.toString(log) +
                 ", timeBetweenSteps=" + timeBetweenSteps +
-                ", random seed=" + seed +
+                ", preventCollisions=" + preventCollisions +
+                ", mapFile='" + mapFile + '\'' +
+                ", mapChanged=" + mapChanged +
+                ", debug=" + debug +
+                ", mapLoaded=" + mapLoaded +
+                ", seed=" + seed +
                 '}';
     }
 
