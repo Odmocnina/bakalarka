@@ -216,6 +216,7 @@ public class Simulation {
         this.running = false;
         this.roads = roads;
         ResultsRecorder.getResultsRecorder().resetCarNumbers();
+        ResultsRecorder.getResultsRecorder().initialize(roads, AppContext.RUN_DETAILS.outputDetails.outputFile);
     }
 
     /**

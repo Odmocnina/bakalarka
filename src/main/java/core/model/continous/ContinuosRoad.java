@@ -695,11 +695,14 @@ public class ContinuosRoad extends Road {
             car.setParameter(RequestConstants.LENGTH_REQUEST, length - overflow);
             car.xPosition = super.length;
         }
-        /*if (car.xPosition > super.length) {
-            MyLogger.log("Car passed the end of the road and is being removed, carParams: " + car,
-                    Constants.DEBUG_FOR_LOGGING);
-            return false;
-        }*/
+
+        if (car.xPosition == super.length) {
+            int lane = car.lane;
+            if (super.lightPlansOnLanes[lane] != null && !super.isLaneGreen(lane)) {
+                return false; // if car is at end cut and light is red, remove the car, otherwise keep it until it fully
+                              // passes the end of the road
+            }
+        }
 
         return true;
     }

@@ -61,6 +61,10 @@ public class CarGenerator implements Cloneable {
     /** maximum queue size for queue generation **/
     private int maxQueueSize = 0;
 
+    /** whether length parameter should return 1 for cellular models, used for cellular models that have length always
+     * as 1 like nagel-schreckenberg, or rule 184 **/
+    private boolean lengthReturnAsOne = false;
+
     RandomNumberGenerator randomNumberGenerator;
 
     /**
@@ -215,6 +219,10 @@ public class CarGenerator implements Cloneable {
      * @return int parameter value
      **/
     private int getParameterValueCellular(String key) {
+        if (lengthReturnAsOne && key.equals(RequestConstants.LENGTH_REQUEST)) {
+            return 1;
+        }
+
         Parameter param = parameters.get(key);
         if (param != null) {
             if (param.range == 0) {
@@ -494,6 +502,7 @@ public class CarGenerator implements Cloneable {
         copy.carGenerationParameters = this.carGenerationParameters;
         copy.setFlowRate(this.getFlowRate());
         copy.setQueueSize(this.minQueueSize, this.maxQueueSize);
+        copy.setLengthReturnAsOne(this.lengthReturnAsOne);
         if (!this.useQueue) {
             copy.disableQueue();
         }
@@ -559,6 +568,15 @@ public class CarGenerator implements Cloneable {
         return true;
     }
 
+    /**
+     * function to copy parameters from communication parameters (parameters used for communication with ui, user,
+     * map file...) to real parameters used for generation, and translate them if cellular road is used, this is used
+     * to avoid multiple translations of parameters when they are changed in communication parameters, because they are
+     * only translated when they are copied to real parameters used for generation
+     *
+     * @param type type of road the generator is assigned to
+     * @param cellSize size of cell in cellular road
+     **/
     public void copyComParametersToRealParameters(String type, double cellSize) {
         for (String key : parametersForCommunication.keySet()) {
             Parameter param = parametersForCommunication.get(key);
@@ -570,6 +588,14 @@ public class CarGenerator implements Cloneable {
         }
     }
 
+    /**
+     * function to add parameter to communication parameters (parameters used for communication with ui, user, map
+     * file...)
+     *
+     * @param key parameter key
+     * @param minValue minimum value
+     * @param maxValue maximum value
+     **/
     public void addComParameter(String key, String name, Double minValue, Double maxValue) {
         Parameter param = new Parameter(name, minValue, maxValue);
         parametersForCommunication.put(key, param);
@@ -630,5 +656,15 @@ public class CarGenerator implements Cloneable {
      **/
     public int getMaxQueueSize() {
         return this.maxQueueSize;
+    }
+
+    /*
+     * setter for length return as one, if true, the length parameter will return 1 for cellular models, this is used
+     * for cellular models that have length always as 1 like nagel-schreckenberg, or rule 184
+     *
+     * @param lengthReturnAsOne boolean whether length parameter should return 1 for cellular models
+     */
+    public void setLengthReturnAsOne(boolean lengthReturnAsOne) {
+        this.lengthReturnAsOne = lengthReturnAsOne;
     }
 }

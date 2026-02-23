@@ -216,6 +216,11 @@ public class RoadLoader {
 
         generator.copyComParametersToRealParameters(AppContext.CAR_FOLLOWING_MODEL.getType(), AppContext.CAR_FOLLOWING_MODEL.getCellSize());
 
+        String id = AppContext.CAR_FOLLOWING_MODEL.getID();
+        if (id.equals("nagel-schreckenberg") || id.equals("rule-184")) {
+            generator.setLengthReturnAsOne(true);
+        }
+
         return generator;
     }
 

@@ -119,4 +119,18 @@ public class RoadParameters {
         return roads;
     }
 
+    public static void setGenerateLengthAsOneOnAllGenerators(ArrayList<RoadParameters> roadsParameters, boolean generateLengthAsOne) {
+        for (RoadParameters rp : roadsParameters) {
+            for (CarGenerator cg : rp.carGenerators) {
+                cg.setLengthReturnAsOne(generateLengthAsOne);
+            }
+        }
+    }
+
+    public static void handleSettingOfLengthGeneration(ArrayList<RoadParameters> roadsParameters, String id) {
+        if (id.equals("nagel-schreckenberg") || id.equals("rule-184")) {
+            RoadParameters.setGenerateLengthAsOneOnAllGenerators(roadsParameters, true);
+        }
+    }
+
 }

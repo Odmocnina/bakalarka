@@ -61,7 +61,7 @@ public class Rule184 implements ICarFollowingModel {
      **/
     @Override
     public String getID() {
-        return "rule184";
+        return "rule-184";
     }
 
     /**

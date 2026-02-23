@@ -72,6 +72,8 @@ public class ModifyMapDialogMaker extends DialogMaker {
         // Handle Create button click
         dialog.showAndWait().ifPresent(result -> {
             if (result == createButtonType) {
+                String id = AppContext.CAR_FOLLOWING_MODEL.getID();
+                RoadParameters.handleSettingOfLengthGeneration(roadParameters, id);
                 Road[] roads = RoadParameters.roadParametersToRoads(roadParameters);
                 for (Road road : roads) {
                     road.setUpQueuesIfNeeded();

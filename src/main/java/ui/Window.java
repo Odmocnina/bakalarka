@@ -221,6 +221,8 @@ public class Window extends Application {
                 DialogMaker.changeRoadsDialog(primaryStage, roadParams, 1, false,
                         clickedRoadIndex);
                 if (AppContext.RUN_DETAILS.mapChanged) {
+                    String id = AppContext.CAR_FOLLOWING_MODEL.getID();
+                    RoadParameters.handleSettingOfLengthGeneration(roadParams, id);
                     Road[] newRoads = RoadParameters.roadParametersToRoads(roadParams);
                     for (Road newRoad : newRoads) { // check if some generator needs to set up queues
                         newRoad.setUpQueuesIfNeeded();
