@@ -147,7 +147,6 @@ public class InputParametersHandeler {
             }
         } catch (Exception e) {
             MyLogger.logLoadingOrSimulationStartEnd("Error searching for model by ID: " + e.getMessage(), Constants.FATAL_FOR_LOGGING);
-            e.printStackTrace();
         }
 
         MyLogger.logLoadingOrSimulationStartEnd("Model with ID '" + targetId + "' not found.", Constants.WARN_FOR_LOGGING);

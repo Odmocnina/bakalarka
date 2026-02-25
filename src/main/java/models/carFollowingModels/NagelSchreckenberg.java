@@ -7,7 +7,6 @@ import models.ICarFollowingModel;
 import models.ModelId;
 
 import java.util.HashMap;
-import java.util.Random;
 
 /********************************************
  * Nagel-Schreckenberg car following model implementation (cellular)
@@ -27,6 +26,7 @@ public class NagelSchreckenberg implements ICarFollowingModel {
     /** random chance of slowing down when car is moving **/
     private final double slowDownChance = 0.3; // probability of random slowing down
 
+    /** random number generator for randomization step, seed based **/
     private RandomNumberGenerator randomNumberGenerator;
 
     /**

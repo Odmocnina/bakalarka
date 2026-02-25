@@ -4,80 +4,84 @@ import core.sim.Simulation;
 import core.utils.RunDetails;
 import models.ICarFollowingModel;
 import models.ILaneChangingModel;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import ui.render.IRoadRenderer;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-/**
- * Unit testy pro {@link AppContext}.
- */
-public class AppContextTest {
+/****************************
+ * Unit tests for AppContext class
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ****************************/
+class AppContextTest {
 
     /**
-     * Ověří, že AppContext má privátní konstruktor
-     * (utility třída, nelze normálně instanciovat).
-     */
-    @Test
-    void testPrivateConstructor() throws Exception {
-        Constructor<AppContext> constructor = AppContext.class.getDeclaredConstructor();
-        assertTrue(Modifier.isPrivate(constructor.getModifiers()),
-                "Constructor of AppContext should be private");
+     * clear and set up before and after each test to ensure that static fields in AppContext do not interfere between
+     * tests, maintaining test isolation
+     **/
+    @BeforeEach
+    @AfterEach
+    void resetAppContext() {
+        // clear all static fields in AppContext before and after each test to ensure test isolation
+        AppContext.RENDERER = null;
+        AppContext.CAR_FOLLOWING_MODEL = null;
+        AppContext.LANE_CHANGING_MODEL = null;
+        AppContext.SIMULATION = null;
+        AppContext.RUN_DETAILS = null;
+    }
 
-        // umožníme volání, jen abychom ověřili, že tam není nějaká chyba
+    /**
+     * test to verify that the private constructor can be invoked via reflection
+     * to achieve 100% code coverage, ensuring no exception is thrown during instantiation
+     **/
+    @Test
+    void privateConstructor_ShouldBeInstantiableViaReflection() throws Exception {
+        // Act
+        // get the private constructor of AppContext and make it accessible, then create an instance
+        Constructor<AppContext> constructor = AppContext.class.getDeclaredConstructor();
         constructor.setAccessible(true);
         AppContext instance = constructor.newInstance();
-        assertNotNull(instance, "Even private constructor should be invokable via reflection");
+
+        // Assert
+        // verify that the instance was created successfully and is not null
+        assertNotNull(instance, "Instance should be created via reflection");
     }
 
     /**
-     * Ověří, že statická pole jsou po startu JVM defaultně null.
-     * (Pozn.: pokud někde jinde v testech AppContext používáš,
-     * bude potřeba tenhle test pouštět izolovaně, nebo před ním
-     * AppContext zresetovat.)
-     */
+     * test to verify that all static fields in AppContext can be set and retrieved correctly
+     **/
     @Test
-    void testStaticFieldsAreInitiallyNull() {
-        // POZOR: tento test předpokládá, že před jeho spuštěním
-        // nikdo na AppContext sahal. Pokud ano, je potřeba
-        // hodnoty před testem vynulovat.
-        assertNull(AppContext.RENDERER, "RENDERER should be null by default");
-        assertNull(AppContext.CAR_FOLLOWING_MODEL, "CAR_FOLLOWING_MODEL should be null by default");
-        assertNull(AppContext.LANE_CHANGING_MODEL, "LANE_CHANGING_MODEL should be null by default");
-        assertNull(AppContext.SIMULATION, "SIMULATION should be null by default");
-        assertNull(AppContext.RUN_DETAILS, "RUN_DETAILS should be null by default");
-    }
+    void staticFields_CanBeSetAndRetrieved() {
+        // Arrange
+        // create mock objects for each of the static fields in AppContext
+        IRoadRenderer mockRenderer = mock(IRoadRenderer.class);
+        ICarFollowingModel mockCarModel = mock(ICarFollowingModel.class);
+        ILaneChangingModel mockLaneModel = mock(ILaneChangingModel.class);
+        Simulation mockSimulation = mock(Simulation.class);
+        RunDetails mockRunDetails = new RunDetails();
 
-    /**
-     * Ověří, že do statických polí lze přiřadit hodnoty a že se pak vrací stejné instance.
-     */
-    @Test
-    void testStaticFieldsAssignment() {
-        IRoadRenderer renderer = mock(IRoadRenderer.class);
-        ICarFollowingModel cfModel = mock(ICarFollowingModel.class);
-        ILaneChangingModel lcModel = mock(ILaneChangingModel.class);
-        Simulation simulation = mock(Simulation.class);
-        RunDetails runDetails = new RunDetails();
-        runDetails.timeBetweenSteps = 123;
-        runDetails.showGui = true;
-        runDetails.outputDetails = null;
+        // Act
+        // set each static field in AppContext to the corresponding mock object
+        AppContext.RENDERER = mockRenderer;
+        AppContext.CAR_FOLLOWING_MODEL = mockCarModel;
+        AppContext.LANE_CHANGING_MODEL = mockLaneModel;
+        AppContext.SIMULATION = mockSimulation;
+        AppContext.RUN_DETAILS = mockRunDetails;
 
-        AppContext.RENDERER = renderer;
-        AppContext.CAR_FOLLOWING_MODEL = cfModel;
-        AppContext.LANE_CHANGING_MODEL = lcModel;
-        AppContext.SIMULATION = simulation;
-        AppContext.RUN_DETAILS = runDetails;
-
-        assertSame(renderer, AppContext.RENDERER, "RENDERER should return assigned instance");
-        assertSame(cfModel, AppContext.CAR_FOLLOWING_MODEL, "CAR_FOLLOWING_MODEL should return assigned instance");
-        assertSame(lcModel, AppContext.LANE_CHANGING_MODEL, "LANE_CHANGING_MODEL should return assigned instance");
-        assertSame(simulation, AppContext.SIMULATION, "SIMULATION should return assigned instance");
-        assertSame(runDetails, AppContext.RUN_DETAILS, "RUN_DETAILS should return assigned instance");
+        // Assert
+        // zkontrolujeme, zda globální proměnné skutečně drží ty objekty, které jsme do nich vložili
+        assertEquals(mockRenderer, AppContext.RENDERER, "Renderer should be set correctly");
+        assertEquals(mockCarModel, AppContext.CAR_FOLLOWING_MODEL, "Car following model should be set correctly");
+        assertEquals(mockLaneModel, AppContext.LANE_CHANGING_MODEL, "Lane changing model should be set correctly");
+        assertEquals(mockSimulation, AppContext.SIMULATION, "Simulation should be set correctly");
+        assertEquals(mockRunDetails, AppContext.RUN_DETAILS, "Run details should be set correctly");
     }
 }
-

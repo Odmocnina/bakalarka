@@ -103,21 +103,6 @@ public class Simulation {
     }
 
     /**
-     * Checks if all roads and their queues are empty
-     *
-     * @param roads array of roads to check
-     * @return true if all roads and queues are empty, false otherwise
-     **/
-    public boolean areAllRoadsAndQueuesEmptyOld(Road[] roads) {
-        for (Road road : roads) {
-            if (road.getNumberOfCarsOnRoad() > 0 || !road.areAllQueuesEmpty()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
      * Checks if all roads and their queues are empty, if they are
      *
      * @param roads array of roads to check

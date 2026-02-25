@@ -16,7 +16,7 @@ import java.util.Random;
  * @author Michael Hladky
  * @version 1.0
  ********************************************/
-@ModelId("head-leading")
+@ModelId("juts")
 public class HeadLeading implements ICarFollowingModel {
 
     /** size of one cell in meters **/
@@ -102,7 +102,7 @@ public class HeadLeading implements ICarFollowingModel {
      **/
     @Override
     public String getID() {
-        return "head-leading";
+        return "juts";
     }
 
     /**
@@ -153,7 +153,7 @@ public class HeadLeading implements ICarFollowingModel {
      **/
     @Override
     public String getName() {
-        return "Head-leading algorithm";
+        return "JUTS (Java urban traffic simulation) Model";
     }
 
     /**

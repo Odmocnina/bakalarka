@@ -6,15 +6,31 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/************************
+ * Unit tests for Cell class
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ************************/
 class CellTest {
 
+    /** instance of Cell to be used in tests **/
     private Cell cell;
 
+    /**
+     * setup method to initialize a new Cell instance before each test
+     **/
     @BeforeEach
     void setUp() {
         cell = new Cell();
     }
 
+    /**
+     * test to verify that a new Cell instance is initialized with expected default values:
+     * - occupied should be false
+     * - isHead should be false
+     * - carParams should be null
+     **/
     @Test
     void newCellShouldBeUnoccupiedAndNotHeadAndHaveNullCarParams() {
         assertFalse(cell.isOccupied(), "new cell should be unoccupied");
@@ -22,6 +38,9 @@ class CellTest {
         assertNull(cell.getCarParams(), "new cell should have null carParams");
     }
 
+    /**
+     * test to verify that setOccupied method correctly updates the occupied flag of the cell
+     **/
     @Test
     void setOccupiedShouldChangeOccupiedFlag() {
         assertFalse(cell.isOccupied());
@@ -33,6 +52,9 @@ class CellTest {
         assertFalse(cell.isOccupied(), "setOccupied(false) should set occupied to false");
     }
 
+    /**
+     * test to verify that setHead method correctly updates the isHead flag of the cell
+     **/
     @Test
     void setHeadShouldChangeHeadFlag() {
         assertFalse(cell.isHead());
@@ -44,6 +66,9 @@ class CellTest {
         assertFalse(cell.isHead(), "setHead(false) should set isHead to false");
     }
 
+    /**
+     * test to verify that setCarParams method correctly stores the reference to CarParams
+     **/
     @Test
     void setCarParamsShouldStoreReference() {
         CarParams params = new CarParams();
@@ -52,6 +77,9 @@ class CellTest {
         assertSame(params, cell.getCarParams(), "setCarParams should store the reference to CarParams");
     }
 
+    /**
+     * test to verify that setting CarParams to null clears the reference and getCarParams returns null
+     **/
     @Test
     void setCarParamsToNullShouldClearReference() {
         CarParams params = new CarParams();

@@ -77,11 +77,11 @@ public class CellularRoadRenderer implements IRoadRenderer {
                 gc.setFill(cell.isOccupied() ? carColor : Constants.ROAD_COLOR);
                 gc.fillRect(x, y, cellSize, cellSize);
 
-                if (AppContext.RUN_DETAILS.drawCells) {
+                /*if (AppContext.RUN_DETAILS.drawCells) {
                     gc.setLineWidth(Constants.CELL_SEPARATOR_WIDTH);
                     gc.setStroke(Constants.CELL_SEPARATOR_COLOR);
                     gc.strokeRect(x, y, cellSize, cellSize);
-                }
+                }*/
             }
 
             // separating line between lanes

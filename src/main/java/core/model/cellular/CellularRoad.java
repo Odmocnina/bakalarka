@@ -33,6 +33,16 @@ public class CellularRoad extends Road {
     /** speed limit in cells per time step (max speed of the road divided by cell size, the rounded up) **/
     private int speedLimitInCells;
 
+    /** value to mark car as cut, if car is cut and light is red then car is removed from the road, this is to prevent
+     * cars that are cut and are almost from road, but then the red light comes, and they can't move and are still on the
+     * road, so the would be waiting in the middle of the road for the light to turn green, so remove cars that already
+     * passed the road but sill have butt in on the road, this is a bit of a hack, but it works */
+    private final double CAR_IS_CUT = -2.0;
+
+    /** parameter name to mark car as cut, used in car parameters, if car has this parameter with value of CAR_IS_CUT
+     * then it is considered cut **/
+    private final String CAR_IS_CUT_PARAMETER = "HAS_BEEN_CUT";
+
     /**
      * Constructor for CellularRoad, creates the road and initializes cells, and other parameters, like cell size
      *
@@ -211,9 +221,21 @@ public class CellularRoad extends Road {
                         //delete it whole but im a retard and keep trying to make that only
                         //part that is outside will delete, viz voodoo at top, fucking thing
                     } else {
-                        cells[lane][position].getCarParams().setParameter(RequestConstants.CURRENT_SPEED_REQUEST
-                                , newSpeed);
-                        this.moveCar(cells[lane][position]);
+
+                        CarParams car = cells[lane][position].getCarParams();
+                        // try to get info that car is cut, if not return NaM
+                        double isCut = car.getParameter(CAR_IS_CUT_PARAMETER);
+
+                        // if car is cut and red light then remove car
+                        if (!Double.isNaN(isCut) && isCut == CAR_IS_CUT && !super.isLaneGreen(lane)) {
+                            removeCar(lane, position);
+                            carsPassed++;
+                        } else {
+
+                            cells[lane][position].getCarParams().setParameter(RequestConstants.CURRENT_SPEED_REQUEST
+                                    , newSpeed);
+                            this.moveCar(cells[lane][position]);
+                        }
                     }
                 }
             }
@@ -598,6 +620,8 @@ public class CellularRoad extends Road {
         if (car == null) {
             return;
         }
+
+        car.setParameter(CAR_IS_CUT_PARAMETER, CAR_IS_CUT);
 
         int oldX = (int) car.xPosition;
         int howMuchOverflow = (int) (car.xPosition + newSpeed - this.numberOfCells + 1);
