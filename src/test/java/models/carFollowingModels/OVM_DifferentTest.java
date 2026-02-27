@@ -8,6 +8,12 @@ import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/***********************************************
+ * Unit tests for OVM_Different car following model class
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ***********************************************/
 class OVM_DifferentTest {
 
     /**
@@ -38,12 +44,12 @@ class OVM_DifferentTest {
         return p;
     }
 
-    /***************************************************************************
-     * TESTS FOR optimalVelocity()
-     **************************************************************************/
+    //***************************************************************************
+    // * TESTS FOR optimalVelocity()
+    //***************************************************************************
 
     /**
-     * Test: optimalVelocity follows exact implemented formula.
+     * optimalVelocity follows exact implemented formula.
      */
     @Test
     void optimalVelocity_matchesFormula() {
@@ -68,7 +74,7 @@ class OVM_DifferentTest {
     }
 
     /**
-     * Test: extremely large distance should give velocity close to maxSpeedRoad.
+     *  extremely large distance should give velocity close to maxSpeedRoad.
      */
     @Test
     void optimalVelocity_largeDistance_approachesMaxSpeed() {
@@ -80,7 +86,7 @@ class OVM_DifferentTest {
     }
 
     /**
-     * Test: distance equal to minGap should give low or near-zero velocity.
+     * distance equal to minGap should give low or near-zero velocity.
      */
     @Test
     void optimalVelocity_distanceEqualsMinGap() {
@@ -98,14 +104,13 @@ class OVM_DifferentTest {
                 "When distance = minGap, optimalVelocity should be significantly lower than max speed.");
     }
 
-    /***************************************************************************
-     * TESTS FOR getNewSpeed()
-     **************************************************************************/
+    //**************************************************************************
+    //* TESTS FOR getNewSpeed()
+    //**************************************************************************
 
     /**
-     * Test: getNewSpeed must use the overridden optimalVelocity().
-     *
-     * We compute expected speed using the OVM_Different formula manually.
+     *  getNewSpeed must use the overridden optimalVelocity(). We compute expected speed using the OVM_Different formula
+     *  manually.
      */
     @Test
     void getNewSpeed_usesDifferentOptimalVelocity() {
@@ -149,15 +154,21 @@ class OVM_DifferentTest {
                 "getNewSpeed must use the overridden OVM_Different optimalVelocity formula.");
     }
 
-    /***************************************************************************
-     * SIMPLE METADATA TESTS
-     **************************************************************************/
+    //***************************************************************************
+    // * SIMPLE METADATA TESTS
+    // **************************************************************************
 
+    /**
+     * getName() must return "Optimal Velocity Model (different)" to distinguish from OVM_Original.
+     */
     @Test
     void getName_returnsCorrectName() {
         assertEquals("Optimal Velocity Model (different)", new OVM_Different().getName());
     }
 
+    /**
+     * getID() must return "ovm-different" to distinguish from OVM_Original.
+     */
     @Test
     void getID_returnsCorrectID() {
         assertEquals("ovm-different", new OVM_Different().getID());

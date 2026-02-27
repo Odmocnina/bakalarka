@@ -8,6 +8,14 @@ import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**********************************
+ * Unit tests for the Nagel-Schreckenberg cellular automaton car-following model.
+ * These tests focus on verifying the model's metadata, parameter requests, and
+ * the behavior of the getNewSpeed() method under various conditions (e.g., large gap, small gap).
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ **********************************/
 class NagelSchreckenbergTest {
 
     /**
@@ -20,9 +28,7 @@ class NagelSchreckenbergTest {
     /**
      * helper to build parameter map for getNewSpeed()
      */
-    private HashMap<String, Double> buildParams(double currentSpeed,
-                                                double maxSpeed,
-                                                double distanceToNextCar) {
+    private HashMap<String, Double> buildParams(double currentSpeed, double maxSpeed, double distanceToNextCar) {
         HashMap<String, Double> params = new HashMap<>();
         params.put(RequestConstants.CURRENT_SPEED_REQUEST, currentSpeed);
         params.put(RequestConstants.MAX_SPEED_REQUEST, maxSpeed);
@@ -39,18 +45,43 @@ class NagelSchreckenbergTest {
         return params;
     }
 
-    // ------------------------------------------------------------------
-    // basic metadata & getters
-    // ------------------------------------------------------------------
+    /**
+     * Helper method to dynamically find and set a seed for RandomNumberGenerator.
+     * This ensures the tests are 100% deterministic regardless of JDK version.
+     *
+     * @param triggerProbability true if we want the random event to happen, false to bypass it
+     * @param threshold the probability threshold to test against
+     */
+    private void setSeedForTest(boolean triggerProbability, double threshold) {
+        long seed = 0;
+        while (true) {
+            java.util.Random tempRandom = new java.util.Random(seed);
+            double val = tempRandom.nextDouble();
+            if (triggerProbability && val < threshold) {
+                core.utils.RandomNumberGenerator.getInstance(0).resetSeed(seed);
+                break;
+            } else if (!triggerProbability && val >= threshold) {
+                core.utils.RandomNumberGenerator.getInstance(0).resetSeed(seed);
+                break;
+            }
+            seed++;
+        }
+    }
 
+    /**
+     * test for id
+     **/
     @Test
     void getId_shouldReturnNagelSchreckenberg() {
         NagelSchreckenberg model = createModel();
 
-        assertEquals("nagelschreckenberg", model.getID(),
-                "Model ID should be 'nagelschreckenberg'.");
+        assertEquals("nagel-schreckenberg", model.getID(),
+                "Model ID should be 'nagel-schreckenberg'.");
     }
 
+    /**
+     * test for name
+     **/
     @Test
     void getName_shouldReturnReadableName() {
         NagelSchreckenberg model = createModel();
@@ -59,6 +90,9 @@ class NagelSchreckenbergTest {
                 "Model name should be the human readable Nagel-Schreckenberg name.");
     }
 
+    /**
+     * test for type
+     **/
     @Test
     void getType_shouldReturnCellularTypeConstant() {
         NagelSchreckenberg model = createModel();
@@ -67,6 +101,9 @@ class NagelSchreckenbergTest {
                 "Model type should be Constants.CELLULAR.");
     }
 
+    /**
+     * test for cell size
+     **/
     @Test
     void getCellSize_shouldReturnExpectedCellSize() {
         NagelSchreckenberg model = createModel();
@@ -75,6 +112,9 @@ class NagelSchreckenbergTest {
                 "Cell size should be 7.5 meters.");
     }
 
+    /**
+     * test for request parameters
+     **/
     @Test
     void requestParameters_shouldReturnCorrectRequestString() {
         NagelSchreckenberg model = createModel();
@@ -92,6 +132,9 @@ class NagelSchreckenbergTest {
                 "Request parameters string should contain all required parameters in the correct order.");
     }
 
+    /**
+     * test for generation parameters
+     **/
     @Test
     void getParametersForGeneration_shouldReturnCorrectRequestString() {
         NagelSchreckenberg model = createModel();
@@ -110,6 +153,9 @@ class NagelSchreckenbergTest {
     // getNewSpeed() behaviour and invariants
     // ------------------------------------------------------------------
 
+    /**
+     * getNewSpeed() should never return a negative speed (should be clamped to 0).
+     **/
     @Test
     void getNewSpeed_shouldNeverBeNegative() {
         NagelSchreckenberg model = createModel();
@@ -127,6 +173,43 @@ class NagelSchreckenbergTest {
                 "New speed must never be negative (should be clamped to 0).");
     }
 
+    /**
+     * test to verify that the model correctly applies the random slowdown (dawdling)
+     * when the random number falls below the probability threshold.
+     **/
+    @Test
+    void getNewSpeed_ShouldRandomlySlowDown() {
+        setSeedForTest(true, 0.1);
+
+        NagelSchreckenberg model = createModel();
+
+        HashMap<String, Double> params = buildParams(3.0, 5.0, 100.0);
+
+        double newSpeed = model.getNewSpeed(params);
+
+        assertEquals(3.0, newSpeed, "The speed should decrease by 1 due to random dawdling.");
+    }
+
+    /**
+     * test to verify that the model does NOT apply the random slowdown
+     * when the random number is above the probability threshold.
+     **/
+    @Test
+    void getNewSpeed_ShouldNotRandomlySlowDown() {
+        setSeedForTest(false, 0.9);
+
+        NagelSchreckenberg model = createModel();
+
+        HashMap<String, Double> params = buildParams(3.0, 5.0, 100.0);
+
+        double newSpeed = model.getNewSpeed(params);
+
+        assertEquals(4.0, newSpeed, "The speed should NOT decrease because the random chance was bypassed.");
+    }
+
+    /**
+     * getNewSpeed() should never return a speed above the max speed (should be clamped to max speed).
+     **/
     @Test
     void getNewSpeed_shouldNotExceedMaxSpeed() {
         NagelSchreckenberg model = createModel();
@@ -143,17 +226,13 @@ class NagelSchreckenbergTest {
                 "New speed must never exceed max speed.");
     }
 
+    /**
+     * getNewSpeed() should increase by at most 1 cell per step when there is a large gap ahead,
+     * and should not decrease below the current speed (except for random slowdown).
+     **/
     @Test
     void getNewSpeed_largeGap_shouldIncreaseByAtMostOneAndNotDecreaseBelowCurrent() {
         NagelSchreckenberg model = createModel();
-
-        // For a large distance: step 1 increases by +1 (if below max),
-        // step 2 does nothing (no need to brake),
-        // step 3 may or may not decrease by 1 due to randomization.
-        //
-        // So final speed is either:
-        //  - currentSpeed + 1 (no random slowdown), or
-        //  - currentSpeed     (random slowdown applied).
         double currentSpeed = 2.0;
         double maxSpeed = 5.0;
 
@@ -171,16 +250,14 @@ class NagelSchreckenbergTest {
                 "With large gap, new speed should not increase by more than 1 cell per step.");
     }
 
+    /**
+     * getNewSpeed() should reduce speed to at most distanceInCells - 1 when the gap is small,
+     * and should not go negative (should be clamped to 0).
+     **/
     @Test
     void getNewSpeed_smallGap_shouldLimitByDistanceToNextCar() {
         NagelSchreckenberg model = createModel();
 
-        // Here we force a small gap: after acceleration, car must brake to keep at least one empty cell.
-        //
-        // Example:
-        //   currentSpeed = 4 -> after accel = 5
-        //   distanceInCells = 2 => since 2 <= 5, speed becomes 1 = distanceInCells - 1
-        //   randomization may reduce to 0, but never above 1.
         double currentSpeed = 4.0;
         double maxSpeed = 5.0;
         double distanceToNextCar = 2.0; // distanceInCells = 2
@@ -199,6 +276,9 @@ class NagelSchreckenbergTest {
                 "Speed must still be non-negative after braking and randomization.");
     }
 
+    /**
+     * getNewSpeed() should always return an integral value (in cells per time step) since it's a cellular automaton model.
+     **/
     @Test
     void getNewSpeed_resultShouldBeIntegralValue() {
         NagelSchreckenberg model = createModel();

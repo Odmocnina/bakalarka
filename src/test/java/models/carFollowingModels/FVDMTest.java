@@ -40,8 +40,7 @@ class FVDMTest {
     }
 
     /**
-     * Test: FVDM.getNewSpeed = OVM_Different.getNewSpeed + λ * (v_l - v)
-     * for normal case when car is ahead.
+     *  FVDM.getNewSpeed = OVM_Different.getNewSpeed + λ * (v_l - v) for normal case when car is ahead.
      **/
     @Test
     void getNewSpeed_addsVelocityDifferenceTerm() {
@@ -64,8 +63,8 @@ class FVDMTest {
     }
 
     /**
-     * Test: if there is no car ahead (CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST == NO_CAR_THERE), FVDM uses
-     * Double.MAX_VALUE instead of some wierd value.
+     * if there is no car ahead (CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST == NO_CAR_THERE), FVDM uses Double.MAX_VALUE
+     * instead of some wierd value.
      **/
     @Test
     void getNewSpeed_usesDoubleMaxValueWhenNoCarAhead() {
@@ -92,7 +91,7 @@ class FVDMTest {
     }
 
     /**
-     * Test: requestParameters has correct parameter
+     * requestParameters has correct parameter
      **/
     @Test
     void requestParameters_returnsExpectedList() {
@@ -117,7 +116,7 @@ class FVDMTest {
     }
 
     /**
-     * Test: getParametersForGeneration gives correct list of parameters for car generation.
+     * getParametersForGeneration gives correct list of parameters for car generation.
      **/
     @Test
     void getParametersForGeneration_returnsExpectedList() {
@@ -137,7 +136,7 @@ class FVDMTest {
     }
 
     /**
-     * Test: getID() should return "fvdm".
+     * getID() should return "fvdm".
      **/
     @Test
     void getID_returnsFvdm() {
@@ -146,7 +145,7 @@ class FVDMTest {
     }
 
     /**
-     * Test: getName() should return "Full Velocity Difference Model".
+     * getName() should return "Full Velocity Difference Model".
      **/
     @Test
     void getName_returnsCorrectName() {

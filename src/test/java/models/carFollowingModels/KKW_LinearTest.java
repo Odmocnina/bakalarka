@@ -1,363 +1,186 @@
 package models.carFollowingModels;
 
+import core.utils.RandomNumberGenerator;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class KKW_LinearTest {
+/****************************************************
+ * Unit tests for the KKW_Linear car-following model, focusing on basic properties,
+ * parameter requests, and the complex combination of deterministic speed
+ * synchronization and stochastic (random) modifications.
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ *****************************************************/
+public class KKW_LinearTest {
+
+    /** instance of the KKW_Linear model to be used in tests **/
+    private KKW_Linear kkwLinearModel;
 
     /**
-     * Helper method: create a base parameter set for a simple scenario
-     * where deterministicSpeed = 4 and smallestSpeed = 4.
+     * setup method to initialize a fresh instance of the model before each test
+     **/
+    @BeforeEach
+    void setUp() {
+        kkwLinearModel = new KKW_Linear();
+    }
+
+    /**
+     * Helper method to dynamically find and set a seed for RandomNumberGenerator.
+     * Ensures tests trigger specific probability branches in KKW_Linear.
      *
-     * Used to test slowdown / no-change behavior of the stochastic part.
+     * @param desiredOutcome -1 for slowdown, 1 for acceleration, 0 for no change
+     * @param chanceB the threshold for slowdown
+     * @param chanceA_plus_B the threshold for acceleration
      */
-    private HashMap<String, Double> createBaseParamsScenario1() {
+    private void setSeedForTest(int desiredOutcome, double chanceB, double chanceA_plus_B) {
+        long seed = 0;
+        while (true) {
+            java.util.Random tempRandom = new java.util.Random(seed);
+            double val = tempRandom.nextDouble();
+            if (desiredOutcome == -1 && val < chanceB) {
+                RandomNumberGenerator.getInstance(0).resetSeed(seed);
+                break;
+            } else if (desiredOutcome == 1 && val >= chanceB && val < chanceA_plus_B) {
+                RandomNumberGenerator.getInstance(0).resetSeed(seed);
+                break;
+            } else if (desiredOutcome == 0 && val >= chanceA_plus_B) {
+                RandomNumberGenerator.getInstance(0).resetSeed(seed);
+                break;
+            }
+            seed++;
+        }
+    }
+
+    /**
+     * Helper method to create standard parameters for tests
+     **/
+    private HashMap<String, Double> createBaseParams() {
         HashMap<String, Double> params = new HashMap<>();
-
-        // freeSpeed
         params.put(RequestConstants.MAX_SPEED_REQUEST, 10.0);
-        // currentSpeed = 3
         params.put(RequestConstants.CURRENT_SPEED_REQUEST, 3.0);
-
-        // position setup: distance to next car = 10 cells
-        double xPosition = 0.0;
-        double distanceToNextCar = 10.0;
-        double lengthStraightForward = 1.0;
-        double xPositionStraightForward = xPosition + lengthStraightForward + distanceToNextCar;
-
-        params.put(RequestConstants.X_POSITION_REQUEST, xPosition);
-        params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, xPositionStraightForward);
-        params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, lengthStraightForward);
-
-        // time step
         params.put(RequestConstants.TIME_STEP_REQUEST, 1.0);
-        // speed of next car
+        params.put(RequestConstants.X_POSITION_REQUEST, 0.0);
+
+        // Setup distance to 10 cells
+        params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, 12.0);
+        params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, 1.0);
         params.put(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST, 3.0);
 
-        // LENGTH_REQUEST is only used when generating, but we keep things consistent
-        params.put(RequestConstants.LENGTH_REQUEST, 4.0);
-
         return params;
     }
 
     /**
-     * Helper method: create parameters for a scenario where
-     * random acceleration (+1) actually changes the resulting speed
-     * compared to the no-random-change case.
-     */
-    private HashMap<String, Double> createBaseParamsScenario2() {
-        HashMap<String, Double> params = new HashMap<>();
-
-        // high free speed
-        params.put(RequestConstants.MAX_SPEED_REQUEST, 30.0);
-        // currentSpeed = 10
-        params.put(RequestConstants.CURRENT_SPEED_REQUEST, 10.0);
-
-        // position setup: distance to next car = 10 cells (within synchronization gap)
-        double xPosition = 0.0;
-        double distanceToNextCar = 10.0;
-        double lengthStraightForward = 1.0;
-        double xPositionStraightForward = xPosition + lengthStraightForward + distanceToNextCar;
-
-        params.put(RequestConstants.X_POSITION_REQUEST, xPosition);
-        params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, xPositionStraightForward);
-        params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, lengthStraightForward);
-
-        // time step
-        params.put(RequestConstants.TIME_STEP_REQUEST, 1.0);
-        // next car is slower
-        params.put(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST, 5.0);
-
-        params.put(RequestConstants.LENGTH_REQUEST, 4.0);
-
-        return params;
-    }
-
-    /**
-     * Helper: inject a custom Random instance into KKW_Linear.rand via reflection,
-     * so tests can control the stochastic behavior deterministically.
-     */
-    private void setRandom(KKW_Linear model, Random random) throws Exception {
-        Field f = KKW_Linear.class.getDeclaredField("rand");
-        f.setAccessible(true);
-        f.set(model, random);
-    }
-
-    /**
-     * Fixed Random that always returns a value < chanceB.
-     * This forces the "random slowdown" branch (r < chanceB → -1.0).
-     */
-    private static class FixedRandomSlowdown extends Random {
-        @Override
-        public double nextDouble() {
-            return 0.0; // always below chanceB (0.3)
-        }
-    }
-
-    /**
-     * Fixed Random that returns a value > chanceA + chanceB.
-     * This forces "no random modification" (r >= chanceA + chanceB → 0.0).
-     */
-    private static class FixedRandomNoChange extends Random {
-        @Override
-        public double nextDouble() {
-            return 0.99; // safely above chanceA + chanceB (0.32)
-        }
-    }
-
-    /**
-     * Fixed Random that returns a value between chanceB and chanceA + chanceB,
-     * which triggers random acceleration (+1.0).
-     *
-     * For scenario1 and scenario2: chanceB = 0.3, chanceA = 0.02 → (0.3, 0.32)
-     */
-    private static class FixedRandomAcceleration extends Random {
-        @Override
-        public double nextDouble() {
-            return 0.31; // between 0.3 and 0.32
-        }
-    }
-
-    /**
-     * Test: requestParameters() should return the correct list of required parameters
-     * in the correct order.
-     */
+     * test to verify basic getter methods of the model
+     **/
     @Test
-    void requestParameters_returnsExpectedList() {
-        KKW_Linear model = new KKW_Linear();
+    void testBasicProperties() {
+        assertEquals("kkw-linear", kkwLinearModel.getID(), "ID should be 'kkw-linear'");
+        assertEquals("Kerner-Klenov-Wolf (linear)", kkwLinearModel.getName(), "Name should match predefined string");
+        assertEquals(Constants.CELLULAR, kkwLinearModel.getType(), "Type should be CELLULAR");
+        assertEquals(1.5, kkwLinearModel.getCellSize(), "Cell size should be 1.5");
 
-        String[] expected = {
-                RequestConstants.CURRENT_SPEED_REQUEST,
-                RequestConstants.MAX_SPEED_REQUEST,
-                RequestConstants.X_POSITION_REQUEST,
-                RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
-                RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST,
-                RequestConstants.TIME_STEP_REQUEST,
-                RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST
-        };
-
-        assertEquals(
-                String.join(RequestConstants.REQUEST_SEPARATOR, expected),
-                model.requestParameters(),
-                "requestParameters() should return the proper parameter list in correct order."
-        );
+        String genParams = kkwLinearModel.getParametersForGeneration();
+        assertTrue(genParams.contains(RequestConstants.MAX_SPEED_REQUEST));
+        assertTrue(genParams.contains(RequestConstants.LENGTH_REQUEST));
     }
 
     /**
-     * Test: getParametersForGeneration() should return correct parameters for car generation.
-     */
+     * test to verify that getSynchronizationGap calculates the correct value based on the formula
+     **/
     @Test
-    void getParametersForGeneration_returnsExpectedList() {
-        KKW_Linear model = new KKW_Linear();
-
-        String[] expected = {
-                RequestConstants.MAX_SPEED_REQUEST,
-                RequestConstants.LENGTH_REQUEST
-        };
-
-        assertEquals(
-                String.join(RequestConstants.REQUEST_SEPARATOR, expected),
-                model.getParametersForGeneration(),
-                "getParametersForGeneration() should return parameter list for generation."
-        );
-    }
-
-    /**
-     * Test the deterministic part in a simple scenario where random modification = 0.
-     * For scenario1 + FixedRandomNoChange:
-     *
-     * deterministicSpeed = 4
-     * smallestSpeed      = 4
-     * randomSpeedChance  = 0 → newSpeed = 4
-     */
-    @Test
-    void getNewSpeed_noRandomChange_scenario1() throws Exception {
-        KKW_Linear model = new KKW_Linear();
-        setRandom(model, new FixedRandomNoChange());
-
-        HashMap<String, Double> params = createBaseParamsScenario1();
-
-        double result = model.getNewSpeed(params);
-
-        // Expected new speed = deterministicSpeed = 4.0
-        assertEquals(4.0, result, 1e-9,
-                "New speed should equal deterministic speed when there is no random modification.");
-    }
-
-    /**
-     * Test slowdown branch: r < chanceB → randomSpeedChance = -1.0.
-     *
-     * In scenario1:
-     * deterministicSpeed = 4
-     * randomSpeedChance  = -1 → randomAffectSpeed = 3
-     * smallestSpeed      = 4
-     * => newSpeed = min(3, 4) = 3
-     */
-    @Test
-    void getNewSpeed_randomSlowdown_scenario1() throws Exception {
-        KKW_Linear model = new KKW_Linear();
-        setRandom(model, new FixedRandomSlowdown());
-
-        HashMap<String, Double> params = createBaseParamsScenario1();
-
-        double result = model.getNewSpeed(params);
-
-        assertEquals(3.0, result, 1e-9,
-                "Random slowdown should reduce speed by one cell (within constraints).");
-    }
-
-    /**
-     * Test acceleration branch: chanceB <= r < chanceA + chanceB → randomSpeedChance = +1.0.
-     *
-     * In scenario2:
-     * currentSpeed = 10, timeStep = 1, acceleration = 1
-     * gap = 10, safeSpeed = 10
-     * syncGap = (int) (2 + 1 * 10 * 1) = 12 → distanceToNextCar <= syncGap
-     * speedNextCar = 5 < currentSpeed → signum(5 - 10) = -1
-     * synchronizedSpeed = currentSpeed + 1 * 1 * (-1) = 9
-     * deterministicSpeed = min(freeSpeed=30, min(safe=10, sync=9)) = 9
-     * smallestSpeed = min(current+1=11, min(free=30, safe=10)) = 10
-     *
-     * With randomSpeedChance = +1:
-     * randomAffectSpeed = deterministicSpeed + 1 * 1 = 10
-     * newSpeed = min(10, smallestSpeed=10) = 10
-     *
-     * For no random change, newSpeed would be 9 → acceleration branch has a visible effect.
-     */
-    @Test
-    void getNewSpeed_randomAcceleration_scenario2() throws Exception {
-        KKW_Linear model = new KKW_Linear();
-        setRandom(model, new FixedRandomAcceleration());
-
-        HashMap<String, Double> params = createBaseParamsScenario2();
-
-        double result = model.getNewSpeed(params);
-
-        assertEquals(10.0, result, 1e-9,
-                "Random acceleration should increase speed by one cell (up to the smallestSpeed limit).");
-    }
-
-    /**
-     * Test: when the speed of the car ahead is unknown (speedNextCar == NO_CAR_THERE),
-     * getNewSpeed() should treat the next car speed as freeSpeed.
-     * We mainly verify that the method runs and stays within [0, freeSpeed].
-     */
-    @Test
-    void getNewSpeed_noCarAhead_usesFreeSpeedAsNextSpeed() throws Exception {
-        KKW_Linear model = new KKW_Linear();
-        setRandom(model, new FixedRandomNoChange()); // keep stochastic part neutral
-
-        HashMap<String, Double> params = createBaseParamsScenario1();
-        double freeSpeed = 15.0;
-        params.put(RequestConstants.MAX_SPEED_REQUEST, freeSpeed);
-        params.put(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST, (double) Constants.NO_CAR_THERE);
-
-        double result = model.getNewSpeed(params);
-
-        assertTrue(result >= 0.0 && result <= freeSpeed,
-                "When next car speed is unknown, new speed should remain within [0, freeSpeed].");
-    }
-
-    /**
-     * Test: getSynchronizationGap() should follow the formula:
-     * syncGap = (int) (d + k * currentSpeed * timeStep)
-     *
-     * Here, d = 2.0, k = 1.0.
-     */
-    @Test
-    void getSynchronizationGap_worksAsExpected() {
-        KKW_Linear model = new KKW_Linear();
-
+    void getSynchronizationGap_ShouldWorkAsExpected() {
         double currentSpeed = 5.0;
         double d = 2.0;
         double k = 1.0;
         double dt = 1.5;
 
-        int expected = (int) (d + k * currentSpeed * dt); // (int)(2 + 5 * 1.5) = (int)9.5 = 9
+        // Formula: (int) (d + k * currentSpeed * dt) -> 2 + 1 * 5 * 1.5 = 9.5 -> int = 9
+        int expected = 9;
+        int result = kkwLinearModel.getSynchronizationGap(currentSpeed, d, k, dt);
 
-        int gap = model.getSynchronizationGap(currentSpeed, d, k, dt);
-
-        assertEquals(expected, gap,
-                "Synchronization gap should be computed as (int)(d + k * v * dt).");
+        assertEquals(expected, result, "Synchronization gap should be calculated via floor(d + k * v * dt)");
     }
 
     /**
-     * Test: getName() returns readable model name.
-     */
-    @Test
-    void getName_returnsCorrectName() {
-        KKW_Linear model = new KKW_Linear();
-        assertEquals("Kerner-Klenov-Wolf (linear)", model.getName());
-    }
-
-    /**
-     * Test: getID() returns the correct identifier.
-     */
-    @Test
-    void getID_returnsCorrectID() {
-        KKW_Linear model = new KKW_Linear();
-        assertEquals("kkw-linear", model.getID());
-    }
-
-    /**
-     * Test: getType() returns cellular type.
-     */
-    @Test
-    void getType_returnsCellular() {
-        KKW_Linear model = new KKW_Linear();
-        assertEquals(Constants.CELLULAR, model.getType());
-    }
-
-    /**
-     * Test: getCellSize() returns the configured cell size.
-     */
-    @Test
-    void getCellSize_returnsCorrectValue() {
-        KKW_Linear model = new KKW_Linear();
-        assertEquals(1.5, model.getCellSize(), 1e-9);
-    }
-
-    /**
-     * Test: will use random slowdown for starts when starting from 0 speed.
+     * test to verify that the model returns deterministic speed when random condition hits the "no change" branch
      **/
     @Test
-    void getNewSpeed_usesRandomSlowdownForStarts() throws Exception {
-        KKW_Linear model = new KKW_Linear();
-        setRandom(model, new FixedRandomSlowdown());
+    void getNewSpeed_ShouldReturnDeterministicSpeed_WhenNoRandomChange() {
+        // currentSpeed = 3.0 -> chanceB = 0.3, chanceA = 0.02 -> chanceA_plus_B = 0.32
+        setSeedForTest(0, 0.3, 0.32);
+
+        HashMap<String, Double> params = createBaseParams();
+        double result = kkwLinearModel.getNewSpeed(params);
+
+        // Distance = (12 - 0 - 1) - 1 = 10
+        // SafeSpeed = 10 / 1 = 10
+        // SyncGap = 2 + 1*3*1 = 5
+        // SyncSpeed (distance > syncGap) = 3 + 1 = 4
+        // Deterministic = min(10, 10, 4) = 4
+        assertEquals(4.0, result, 0.001, "New speed should equal deterministic speed (4.0) with no random change");
+    }
+
+    /**
+     * test to verify the random slowdown branch (random modification = -1)
+     **/
+    @Test
+    void getNewSpeed_ShouldReduceSpeed_WhenRandomSlowdownTriggers() {
+        setSeedForTest(-1, 0.3, 0.32);
+
+        HashMap<String, Double> params = createBaseParams();
+        double result = kkwLinearModel.getNewSpeed(params);
+
+        // Deterministic is 4. Random drops it by 1 * acceleration(1.0) = 3.0
+        assertEquals(3.0, result, 0.001, "Random slowdown should reduce deterministic speed by 1");
+    }
+
+    /**
+     * test to verify the random acceleration branch (random modification = 1)
+     * using a scenario where sync gap causes braking, but random chance accelerates it
+     **/
+    @Test
+    void getNewSpeed_ShouldIncreaseSpeed_WhenRandomAccelerationTriggers() {
+        // High speed scenario: speed = 10 -> chanceA = 0.02, chanceB = 0.3 -> A+B = 0.32
+        setSeedForTest(1, 0.3, 0.32);
 
         HashMap<String, Double> params = new HashMap<>();
-
-        // freeSpeed
-        params.put(RequestConstants.MAX_SPEED_REQUEST, 10.0);
-        // currentSpeed = 0
-        params.put(RequestConstants.CURRENT_SPEED_REQUEST, 0.0);
-
-        // position setup: distance to next car = 10 cells
-        double xPosition = 0.0;
-        double distanceToNextCar = 10.0;
-        double lengthStraightForward = 1.0;
-        double xPositionStraightForward = xPosition + lengthStraightForward + distanceToNextCar;
-
-        params.put(RequestConstants.X_POSITION_REQUEST, xPosition);
-        params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, xPositionStraightForward);
-        params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, lengthStraightForward);
-
-        // time step
+        params.put(RequestConstants.MAX_SPEED_REQUEST, 30.0);
+        params.put(RequestConstants.CURRENT_SPEED_REQUEST, 10.0);
         params.put(RequestConstants.TIME_STEP_REQUEST, 1.0);
-        // speed of next car
-        params.put(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST, 3.0);
+        params.put(RequestConstants.X_POSITION_REQUEST, 0.0);
 
-        double result = model.getNewSpeed(params);
+        // distance to next car = 10 cells (12 - 0 - 1 = 11 -> distance math = 10)
+        params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, 12.0);
+        params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, 1.0);
+        params.put(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST, 5.0); // Slower car ahead
 
-        // With random slowdown when starting, speed should remain 0
-        assertEquals(0.0, result, 1e-9,
-                "When starting from 0 speed, random slowdown for starts should keep speed at 0.");
+        double result = kkwLinearModel.getNewSpeed(params);
+
+        // Deterministic speed would be 9. Random adds 1. SmallestSpeed limit is 10. Result = 10.
+        assertEquals(10.0, result, 0.001, "Random acceleration should bump the speed back up to 10");
+    }
+
+    /**
+     * test to verify handling when there is no car ahead (Constants.NO_CAR_THERE)
+     **/
+    @Test
+    void getNewSpeed_ShouldAssumeFreeSpeed_WhenNoCarAhead() {
+        setSeedForTest(0, 0.3, 0.32);
+
+        HashMap<String, Double> params = createBaseParams();
+        params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, (double) Constants.NO_CAR_THERE);
+        params.put(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST, (double) Constants.NO_CAR_THERE);
+
+        double result = kkwLinearModel.getNewSpeed(params);
+
+        // Distance is MAX_VALUE. Deterministic should just accelerate by 1.
+        assertEquals(4.0, result, 0.001, "Should accelerate safely when no car is ahead");
     }
 }

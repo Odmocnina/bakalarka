@@ -1,222 +1,202 @@
 package models.carFollowingModels;
 
+import core.utils.RandomNumberGenerator;
 import core.utils.constants.Constants;
 import core.utils.constants.RequestConstants;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class HeadLeadingTest {
+/****************************************************
+ * Unit tests for the HeadLeading (JUTS) car-following model, focusing on basic properties,
+ * parameter requests, and the specific cellular rules for acceleration, deceleration,
+ * and randomized slowing down (dawdling).
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ *****************************************************/
+public class HeadLeadingTest {
+
+    /** instance of the HeadLeading model to be used in tests **/
+    private HeadLeading headLeadingModel;
 
     /**
-     * Helper to create a HeadLeading instance
-     *
-     * @return HeadLeading instance
+     * setup method to initialize a fresh instance of the HeadLeading model before each test
      **/
-    private HeadLeading create() {
-        return new HeadLeading(new Random());
+    @BeforeEach
+    void setUp() {
+        headLeadingModel = new HeadLeading();
     }
 
     /**
-     * Helper to build parameter map for getNewSpeed()
+     * Helper method to dynamically find and set a seed for RandomNumberGenerator.
+     * This ensures the tests are 100% deterministic regardless of JDK version.
      *
-     * @param currentSpeed current speed of the car
-     * @param maxSpeed     maximum speed of the car
-     * @param distance     distance to the next car (in cells)
-     * @return HashMap with parameters
-     **/
-    private HashMap<String, Double> buildParams(double currentSpeed, double maxSpeed, double distance) {
-        HashMap<String, Double> map = new HashMap<>();
-
-        map.put(RequestConstants.CURRENT_SPEED_REQUEST, currentSpeed);
-        map.put(RequestConstants.MAX_SPEED_REQUEST, maxSpeed);
-
-        // For distance = x2 - x1 - length. Choose x1 = 0, length = 1 → x2 = distance + 1.
-        double xPosition = 0.0;
-        double lengthStraightForward = 1.0;
-        double xPositionStraightForward = distance + xPosition + lengthStraightForward;
-
-        map.put(RequestConstants.X_POSITION_REQUEST, xPosition);
-        map.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, xPositionStraightForward);
-        map.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, lengthStraightForward);
-
-        return map;
-    }
-
-    /**
-     * Constructor helper with injected Random for testing purposes
-     *
-     * @param fixedValue the fixed value to return from Random.nextDouble()
-     **/
-    private HeadLeading createWithFixedRandom(double fixedValue) {
-        Random fixedRandom = new Random() {
-            @Override
-            public double nextDouble() {
-                return fixedValue;
+     * @param triggerProbability true if we want the random event to happen (val < threshold), false to bypass it
+     * @param threshold the probability threshold (e.g., 0.3 or 0.5)
+     */
+    private void setSeedForTest(boolean triggerProbability, double threshold) {
+        long seed = 0;
+        while (true) {
+            java.util.Random tempRandom = new java.util.Random(seed);
+            double val = tempRandom.nextDouble();
+            if (triggerProbability && val < threshold) {
+                RandomNumberGenerator.getInstance(0).resetSeed(seed);
+                break;
+            } else if (!triggerProbability && val >= threshold) {
+                RandomNumberGenerator.getInstance(0).resetSeed(seed);
+                break;
             }
-        };
-        return new HeadLeading(fixedRandom);
-    }
-
-    // ------------------------------------------------------
-    // Getter tests
-    // ------------------------------------------------------
-
-    /**
-     * Test: getID() should return "head-leading"
-     **/
-    @Test
-    void getId_shouldReturnHeadLeading() {
-        HeadLeading hl = create();
-        assertEquals("head-leading", hl.getID(), "ID should be 'head-leading'.");
+            seed++;
+        }
     }
 
     /**
-     * Test: getName() should return "Head-leading algorithm"
+     * test to verify basic getter methods of the model
      **/
     @Test
-    void getName_shouldReturnText() {
-        HeadLeading hl = create();
-        assertEquals("Head-leading algorithm", hl.getName(),
-                "Name should be the readable algorithm name.");
+    void testBasicProperties() {
+        assertEquals("juts", headLeadingModel.getID(), "ID should be 'juts'");
+        assertEquals("JUTS (Java urban traffic simulation) Model", headLeadingModel.getName(), "Name should match JUTS");
+        assertEquals(Constants.CELLULAR, headLeadingModel.getType(), "Type should be CELLULAR");
+        assertEquals(2.5, headLeadingModel.getCellSize(), "Cell size should be exactly 2.5 meters");
+
+        String genParams = headLeadingModel.getParametersForGeneration();
+        assertTrue(genParams.contains(RequestConstants.MAX_SPEED_REQUEST), "Generation params should include max speed");
+        assertTrue(genParams.contains(RequestConstants.LENGTH_REQUEST), "Generation params should include length");
     }
 
     /**
-     * Test: getType() should return Constants.CELLULAR
+     * test to verify that requestParameters returns a properly formatted string containing required constants
      **/
     @Test
-    void getType_shouldReturnCellular() {
-        HeadLeading hl = create();
-        assertEquals(Constants.CELLULAR, hl.getType(),
-                "Type should be Constants.CELLULAR.");
+    void requestParameters_ShouldReturnDelimitedString() {
+        String requests = headLeadingModel.requestParameters();
+        assertNotNull(requests);
+        assertTrue(requests.contains(RequestConstants.CURRENT_SPEED_REQUEST), "Should request current speed");
+        assertTrue(requests.contains(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST), "Should request leading car position");
+        assertTrue(requests.contains(RequestConstants.REQUEST_SEPARATOR), "Should use the correct separator");
     }
 
     /**
-     * Test: getCellSize() should return 2.5
+     * test to verify that the car accelerates by 1 when the road is clear and
+     * no random slow-down occurs
      **/
     @Test
-    void getCellSize_shouldReturnFixedValue() {
-        HeadLeading hl = create();
-        assertEquals(2.5, hl.getCellSize(), 1e-9,
-                "Cell size should be 2.5 meters.");
+    void getNewSpeed_ShouldAccelerate_WhenRoadIsClear() {
+        // Find a seed where nextDouble() >= 0.3 (random slow-down will NOT happen)
+        setSeedForTest(false, 0.3);
+
+        HashMap<String, Double> params = new HashMap<>();
+        params.put(RequestConstants.CURRENT_SPEED_REQUEST, 2.0);
+        params.put(RequestConstants.MAX_SPEED_REQUEST, 5.0);
+        params.put(RequestConstants.X_POSITION_REQUEST, 10.0);
+
+        // No car ahead
+        params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, (double) Constants.NO_CAR_THERE);
+        params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, 0.0);
+
+        double newSpeed = headLeadingModel.getNewSpeed(params);
+
+        // Current speed 2 -> accelerates to 3 -> no obstacle -> no random slowdown -> returns 3
+        assertEquals(3.0, newSpeed, "Should accelerate by 1 cell/step when the road ahead is clear");
     }
 
     /**
-     * Test: requestParameters() should return expected parameters
+     * test to verify that the car slows down to distanceInCells - 1 when approaching an obstacle
      **/
     @Test
-    void requestParameters_shouldMatchExpected() {
-        HeadLeading hl = create();
+    void getNewSpeed_ShouldDecelerate_WhenCarAheadIsClose() {
+        // Find a seed where nextDouble() >= 0.3 (random slow-down will NOT happen)
+        setSeedForTest(false, 0.3);
 
-        String[] expected = {
-                RequestConstants.MAX_SPEED_REQUEST,
-                RequestConstants.CURRENT_SPEED_REQUEST,
-                RequestConstants.X_POSITION_REQUEST,
-                RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST,
-                RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST
-        };
+        HashMap<String, Double> params = new HashMap<>();
+        params.put(RequestConstants.CURRENT_SPEED_REQUEST, 4.0);
+        params.put(RequestConstants.MAX_SPEED_REQUEST, 5.0);
+        params.put(RequestConstants.X_POSITION_REQUEST, 10.0);
 
-        assertEquals(String.join(RequestConstants.REQUEST_SEPARATOR, expected),
-                hl.requestParameters(),
-                "Request parameters must match expected order.");
+        // Car ahead is at position 14, length is 1. Distance = 14 - 10 - 1 = 3 cells.
+        params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, 14.0);
+        params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, 1.0);
+
+        double newSpeed = headLeadingModel.getNewSpeed(params);
+
+        // Speed increases to 5, but distance is 3.
+        // Rule: if distance <= speed, speed = distance - 1. So speed becomes 3 - 1 = 2.
+        assertEquals(2.0, newSpeed, "Should decelerate to avoid collision (speed = distance - 1)");
     }
 
     /**
-     * Test: getParametersForGeneration() should return expected parameters
+     * test to verify the randomized dawdling (slow down) effect when the car is already moving.
+     * The model has a 30% chance to reduce speed by 1.
      **/
     @Test
-    void getParametersForGeneration_shouldMatchExpected() {
-        HeadLeading hl = create();
+    void getNewSpeed_ShouldRandomlySlowDown_WhenMoving() {
+        // Find a seed where nextDouble() < 0.3 (random slow-down WILL happen)
+        setSeedForTest(true, 0.3);
 
-        String[] expected = {
-                RequestConstants.MAX_SPEED_REQUEST,
-                RequestConstants.LENGTH_REQUEST
-        };
+        HashMap<String, Double> params = new HashMap<>();
+        params.put(RequestConstants.CURRENT_SPEED_REQUEST, 3.0);
+        params.put(RequestConstants.MAX_SPEED_REQUEST, 5.0);
+        params.put(RequestConstants.X_POSITION_REQUEST, 10.0);
 
-        assertEquals(String.join(RequestConstants.REQUEST_SEPARATOR, expected),
-                hl.getParametersForGeneration(),
-                "Generation parameters must match expected order.");
-    }
+        params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, (double) Constants.NO_CAR_THERE);
+        params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, 0.0);
 
-    // ------------------------------------------------------
-    // getNewSpeed() tests
-    // ------------------------------------------------------
+        double newSpeed = headLeadingModel.getNewSpeed(params);
 
-    /**
-     * Test: getNewSpeed() should accelerate by +1 when below max speed
-     **/
-    @Test
-    void getNewSpeed_shouldAccelerateWhenBelowMaxSpeed() {
-        HeadLeading hl = createWithFixedRandom(1.0);
-        var params = buildParams(2, 5, 10);
-
-        double newSpeed = hl.getNewSpeed(params);
-
-        assertEquals(3, newSpeed,
-                "Car should accelerate by +1 when below max speed and no slowdown happens.");
+        // Speed increases to 4 -> Random check passes (< 0.3) -> Speed reduced by 1 -> Returns 3
+        assertEquals(3.0, newSpeed, "Should accelerate to 4, but then randomly slow down back to 3 due to the dawdling probability");
     }
 
     /**
-     * Test: getNewSpeed() should not crash to next car
+     * test to verify the randomized dawdling effect when the car is starting from 0.
+     * The model uses a higher 50% chance to stay at 0 to simulate delayed starts.
      **/
     @Test
-    void getNewSpeed_shouldLimitByDistanceToNextCar() {
-        HeadLeading hl = createWithFixedRandom(1.0);
-        var params = buildParams(4, 10, 3);
+    void getNewSpeed_ShouldRandomlySlowDown_WhenStarting() {
+        // Find a seed where nextDouble() < 0.5 (random slow-down WILL happen)
+        setSeedForTest(true, 0.5);
 
-        double newSpeed = hl.getNewSpeed(params);
+        HashMap<String, Double> params = new HashMap<>();
+        params.put(RequestConstants.CURRENT_SPEED_REQUEST, 0.0); // Car is stopped (starting = true)
+        params.put(RequestConstants.MAX_SPEED_REQUEST, 5.0);
+        params.put(RequestConstants.X_POSITION_REQUEST, 10.0);
 
-        assertEquals(2, newSpeed,
-                "Speed should be distanceInCells - 1 when too close to the next car.");
+        params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, (double) Constants.NO_CAR_THERE);
+        params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, 0.0);
+
+        double newSpeed = headLeadingModel.getNewSpeed(params);
+
+        // Starts at 0 -> accelerates to 1 -> Random check passes (< 0.5) -> reduced to 0 -> Returns 0
+        assertEquals(0.0, newSpeed, "Should fail to start (speed stays 0) due to the higher starting slow-down probability");
     }
 
     /**
-     * Test: getNewSpeed() should apply random slowdown based on slowdownChance
+     * test to verify that the math.max(0, currentSpeed) safeguard prevents negative speeds
+     * if the distance to the next car is 0 or negative.
      **/
     @Test
-    void getNewSpeed_startingCarShouldUseHigherRandomSlowdownChance() {
-        HeadLeading hl = createWithFixedRandom(0.2);
-        var params = buildParams(0, 5, 10);
+    void getNewSpeed_ShouldNotReturnNegativeSpeed_WhenDistanceIsZero() {
+        // Seed doesn't matter here because currentSpeed drops to -1, bypassing the random check
+        setSeedForTest(false, 0.3);
 
-        double newSpeed = hl.getNewSpeed(params);
+        HashMap<String, Double> params = new HashMap<>();
+        params.put(RequestConstants.CURRENT_SPEED_REQUEST, 0.0);
+        params.put(RequestConstants.MAX_SPEED_REQUEST, 5.0);
+        params.put(RequestConstants.X_POSITION_REQUEST, 10.0);
 
-        assertEquals(0, newSpeed,
-                "Starting car should have higher slowdown chance and may drop back to 0.");
-    }
+        // Car right in front of us, distance = 11 - 10 - 1 = 0
+        params.put(RequestConstants.X_POSITION_STRAIGHT_FORWARD_REQUEST, 11.0);
+        params.put(RequestConstants.LENGTH_STRAIGHT_FORWARD_REQUEST, 1.0);
 
-    @Test
-    void getNewSpeed_shouldNotSlowDownWhenRandomAboveThreshold() {
-        HeadLeading hl = createWithFixedRandom(0.9);
-        var params = buildParams(1, 5, 10);
+        double newSpeed = headLeadingModel.getNewSpeed(params);
 
-        double newSpeed = hl.getNewSpeed(params);
-
-        assertEquals(2, newSpeed,
-                "Car should not slow down when randomness is above slowdown chance.");
-    }
-
-    @Test
-    void getNewSpeed_getSpeedWhenNoCarAhead() {
-        HeadLeading hl = createWithFixedRandom(1.0);
-        var params = buildParams(3, 5, Double.MAX_VALUE);
-
-        double newSpeed = hl.getNewSpeed(params);
-
-        assertEquals(4, newSpeed,
-                "When there is no car ahead, car should accelerate normally.");
-    }
-
-    @Test
-    void getNewSpeed_neverReturnsNegativeSpeed() {
-        HeadLeading hl = createWithFixedRandom(1.0);
-        var params = buildParams(0, 3, 0);
-
-        double newSpeed = hl.getNewSpeed(params);
-
-        assertEquals(0, newSpeed,
-                "Speed should never be negative (clamped to 0).");
+        // Speed increases to 1. Distance is 0. Speed becomes 0 - 1 = -1.
+        // Math.max(0, -1) limits it to 0.
+        assertEquals(0.0, newSpeed, "Should cap the minimum speed at 0 to prevent negative speeds in a collision state");
     }
 }

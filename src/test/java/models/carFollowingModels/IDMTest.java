@@ -8,18 +8,24 @@ import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/***********************************************
+ * Unit tests for IDM car following model class
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ***********************************************/
 class IDMTest {
 
     /**
      * helper to create a fresh IDM instance for each test
-     */
+     **/
     private IDM createIDM() {
         return new IDM();
     }
 
     /**
      * helper to build parameter map for IDM.getNewSpeed
-     */
+     **/
     private HashMap<String, Double> buildParameters(
             double maxSpeed,
             double currentSpeed,
@@ -48,6 +54,9 @@ class IDMTest {
         return params;
     }
 
+    /**
+     * Test to verify that IDM.getID() returns the correct model ID string.
+     **/
     @Test
     void getId_shouldReturnIdm() {
         IDM idm = createIDM();
@@ -55,6 +64,9 @@ class IDMTest {
         assertEquals("idm", idm.getID(), "Model ID should be 'idm'.");
     }
 
+    /**
+     * Test to verify that IDM.getType() returns the correct model type constant.
+     **/
     @Test
     void getType_shouldReturnContinuousTypeConstant() {
         IDM idm = createIDM();
@@ -63,6 +75,9 @@ class IDMTest {
                 "Model type should match Constants.CONTINOUS.");
     }
 
+    /**
+     * Test to verify that IDM.getCellSize() returns the correct value for continuous models.
+     **/
     @Test
     void getCellSize_shouldReturnParameterUndefined() {
         IDM idm = createIDM();
@@ -71,6 +86,9 @@ class IDMTest {
                 "Cell size should be PARAMETER_UNDEFINED for continuous model.");
     }
 
+    /**
+     * Test to verify that IDM.getName() returns a human-readable name for the model.
+     **/
     @Test
     void getName_shouldReturnReadableName() {
         IDM idm = createIDM();
@@ -79,6 +97,9 @@ class IDMTest {
                 "Model name should be human readable IDM name.");
     }
 
+    /**
+     * Test to verify that IDM.requestParameters() returns the correct list of requested parameters in the correct order.
+     **/
     @Test
     void requestParameters_shouldReturnCorrectRequestString() {
         IDM idm = createIDM();
@@ -102,6 +123,10 @@ class IDMTest {
                 "Request parameters string should contain all required parameters in the correct order.");
     }
 
+    /**
+     * Test to verify that IDM.getParametersForGeneration() returns the correct list of parameters required for car
+     * generation in the correct order.
+     **/
     @Test
     void getParametersForGeneration_shouldReturnCorrectRequestString() {
         IDM idm = createIDM();
@@ -121,6 +146,10 @@ class IDMTest {
                 "Generation parameters string should contain all required parameters in the correct order.");
     }
 
+    /**
+     * Test to verify that IDM.getNewSpeed() returns a reasonable new speed when there is no car ahead and the current
+     * speed is below max speed
+     **/
     @Test
     void getNewSpeed_noCarAhead_shouldAccelerateTowardsMaxSpeed() {
         IDM idm = createIDM();
@@ -171,6 +200,10 @@ class IDMTest {
                 "New speed should follow IDM free-flow acceleration (interaction term is negligible for infinite distance).");
     }
 
+    /**
+     * Test to verify that IDM.getNewSpeed() returns a lower speed when there is a slower car ahead at close distance,
+     * indicating strong deceleration.
+     **/
     @Test
     void getNewSpeed_withSlowerCarAhead_shouldDecelerateStrongly() {
         IDM idm = createIDM();

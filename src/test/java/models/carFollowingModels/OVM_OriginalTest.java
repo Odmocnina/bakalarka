@@ -8,12 +8,18 @@ import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/***********************************************
+ * Unit tests for OVM_Original car following model class
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ***********************************************/
 class OVM_OriginalTest {
 
     /**
      * Helper subclass to expose the protected optimalVelocity method
      * for direct unit testing.
-     */
+     **/
     private static class TestOVM_Original extends OVM_Original {
         public double callOptimalVelocity(double distance, double maxSpeedRoad, double minGap) {
             return optimalVelocity(distance, maxSpeedRoad, minGap);
@@ -22,7 +28,7 @@ class OVM_OriginalTest {
 
     /**
      * Helper method to build a basic parameter set for getNewSpeed tests.
-     */
+     **/
     private HashMap<String, Double> createBaseParams() {
         HashMap<String, Double> params = new HashMap<>();
 
@@ -41,9 +47,9 @@ class OVM_OriginalTest {
     }
 
     /**
-     * Test: optimalVelocity should follow the implemented formula:
+     * optimalVelocity should follow the implemented formula:
      * tanh(distance - 2) - tanh(2), ignoring maxSpeedRoad and minGap.
-     */
+     **/
     @Test
     void optimalVelocity_usesTanhFormula() {
         TestOVM_Original model = new TestOVM_Original();
@@ -60,9 +66,9 @@ class OVM_OriginalTest {
     }
 
     /**
-     * Test: getNewSpeed in a normal situation when there is a car ahead.
+     * getNewSpeed in a normal situation when there is a car ahead.
      * We re-implement the same formula in the test to compute the expected value.
-     */
+     **/
     @Test
     void getNewSpeed_normalCase_withCarAhead() {
         OVM_Original model = new OVM_Original();
@@ -100,10 +106,9 @@ class OVM_OriginalTest {
     }
 
     /**
-     * Test: when there is no car ahead (xPositionStraightForward == NO_CAR_THERE),
-     * distance should be treated as Double.MAX_VALUE.
-     * We mainly verify branch coverage and that speed stays <= maxSpeed.
-     */
+     * when there is no car ahead (xPositionStraightForward == NO_CAR_THERE), distance should be treated as
+     * Double.MAX_VALUE. We mainly verify branch coverage and that speed stays <= maxSpeed.
+     **/
     @Test
     void getNewSpeed_noCarAhead_usesInfiniteDistance() {
         OVM_Original model = new OVM_Original();
@@ -126,9 +131,9 @@ class OVM_OriginalTest {
     }
 
     /**
-     * Test: collision prevention – when distance < newSpeed,
-     * speed should be set to distance - minGap before final min with maxSpeed.
-     */
+     * collision prevention – when distance < newSpeed, speed should be set to distance - minGap before final min with
+     * maxSpeed.
+     **/
     @Test
     void getNewSpeed_collisionPrevention_applies() {
         OVM_Original model = new OVM_Original();
@@ -174,9 +179,8 @@ class OVM_OriginalTest {
     }
 
     /**
-     * Test: requestParameters() must return the correct list of requested parameters
-     * in the correct order.
-     */
+     * requestParameters() must return the correct list of requested parameters in the correct order.
+     **/
     @Test
     void requestParameters_returnsExpectedList() {
         OVM_Original model = new OVM_Original();
@@ -199,8 +203,8 @@ class OVM_OriginalTest {
     }
 
     /**
-     * Test: getParametersForGeneration() must return the correct list.
-     */
+     * getParametersForGeneration() must return the correct list.
+     **/
     @Test
     void getParametersForGeneration_returnsExpectedList() {
         OVM_Original model = new OVM_Original();
@@ -219,8 +223,8 @@ class OVM_OriginalTest {
     }
 
     /**
-     * Test: getID() returns correct model ID.
-     */
+     * getID() returns correct model ID.
+     **/
     @Test
     void getID_returnsCorrectID() {
         OVM_Original model = new OVM_Original();
@@ -228,8 +232,8 @@ class OVM_OriginalTest {
     }
 
     /**
-     * Test: getType() returns continuous type.
-     */
+     * getType() returns continuous type.
+     **/
     @Test
     void getType_returnsContinuous() {
         OVM_Original model = new OVM_Original();
@@ -237,8 +241,8 @@ class OVM_OriginalTest {
     }
 
     /**
-     * Test: getName() returns a human-readable model name.
-     */
+     * getName() returns a human-readable model name.
+     **/
     @Test
     void getName_returnsCorrectName() {
         OVM_Original model = new OVM_Original();
@@ -246,8 +250,8 @@ class OVM_OriginalTest {
     }
 
     /**
-     * Test: getCellSize() returns PARAMETER_UNDEFINED for this continuous model.
-     */
+     * getCellSize() returns PARAMETER_UNDEFINED for this continuous model.
+     **/
     @Test
     void getCellSize_returnsUndefined() {
         OVM_Original model = new OVM_Original();

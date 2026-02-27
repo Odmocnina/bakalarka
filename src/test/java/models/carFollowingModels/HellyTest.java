@@ -8,6 +8,12 @@ import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/***************************************
+ * Unit tests for Helly car following model class
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ***************************************/
 class HellyTest {
 
     /**
@@ -32,8 +38,7 @@ class HellyTest {
     }
 
     /**
-     * Test: verifies that Helly computes new speed correctly
-     * with normal conditions (next car exists & speed exists).
+     *  verifies that Helly computes new speed correctly with normal conditions (next car exists & speed exists).
      */
     @Test
     void getNewSpeed_normalCase() {
@@ -65,8 +70,7 @@ class HellyTest {
     }
 
     /**
-     * Test: when there is no car ahead (NO_CAR_THERE),
-     * distance = Double.MAX_VALUE and speed difference = 0.
+     *  when there is no car ahead (NO_CAR_THERE), distance = Double.MAX_VALUE and speed difference = 0.
      */
     @Test
     void getNewSpeed_noCarAhead() {
@@ -89,8 +93,7 @@ class HellyTest {
     }
 
     /**
-     * Test: if the computed new speed would be negative,
-     * it must be clamped to 0.
+     *  if the computed new speed would be negative, it must be clamped to 0.
      */
     @Test
     void getNewSpeed_clampedToZero() {
@@ -111,7 +114,7 @@ class HellyTest {
     }
 
     /**
-     * Test: new speed must not exceed maxSpeed.
+     *  new speed must not exceed maxSpeed.
      */
     @Test
     void getNewSpeed_clampedToMaxSpeed() {
@@ -132,8 +135,7 @@ class HellyTest {
     }
 
     /**
-     * Test: verifies that requestParameters() returns exactly
-     * the expected list in correct order.
+     *  verifies that requestParameters() returns exactly the expected list in correct order.
      */
     @Test
     void requestParameters_returnsCorrectList() {
@@ -158,7 +160,7 @@ class HellyTest {
     }
 
     /**
-     * Test: verifies parameters for generation.
+     *  verifies parameters for generation.
      */
     @Test
     void getParametersForGeneration_returnsCorrectList() {
@@ -179,7 +181,7 @@ class HellyTest {
     }
 
     /**
-     * Test: getID() must be "helly".
+     * getID() must be "helly".
      */
     @Test
     void getID_returnsCorrectID() {
@@ -187,7 +189,7 @@ class HellyTest {
     }
 
     /**
-     * Test: getType() must return Constants.CONTINOUS.
+     *  getType() must return Constants.CONTINOUS.
      */
     @Test
     void getType_returnsCorrectType() {
@@ -195,7 +197,7 @@ class HellyTest {
     }
 
     /**
-     * Test: getName() returns readable model name.
+     * getName() returns readable model name.
      */
     @Test
     void getName_returnsCorrectName() {
@@ -203,7 +205,7 @@ class HellyTest {
     }
 
     /**
-     * Test: getCellSize() should return PARAMETER_UNDEFINED.
+     * getCellSize() should return PARAMETER_UNDEFINED.
      */
     @Test
     void getCellSize_returnsUndefined() {

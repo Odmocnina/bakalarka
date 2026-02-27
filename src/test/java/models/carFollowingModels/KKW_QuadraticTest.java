@@ -6,6 +6,14 @@ import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**********************************
+ * Unit tests for the KKW_Quadratic car-following model, focusing on verifying
+ * that the synchronization gap is calculated using the correct quadratic formula,
+ * and that basic properties like name and ID are correct.
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ **********************************/
 class KKW_QuadraticTest {
 
     /**
@@ -21,7 +29,7 @@ class KKW_QuadraticTest {
     }
 
     /**
-     * Test: getSynchronizationGap() must follow the quadratic formula:
+     *  getSynchronizationGap() must follow the quadratic formula:
      *
      * gap = (int)( d + v * dt + v + beta * v / (2 * acceleration) )
      *
@@ -51,7 +59,7 @@ class KKW_QuadraticTest {
     }
 
     /**
-     * Test: verify behavior with lower speeds.
+     * verify behavior with lower speeds.
      */
     @Test
     void synchronizationGap_smallSpeed() throws Exception {
@@ -76,7 +84,7 @@ class KKW_QuadraticTest {
     }
 
     /**
-     * Test: name must be correct.
+     * name must be correct.
      */
     @Test
     void getName_returnsQuadraticName() {
@@ -84,7 +92,7 @@ class KKW_QuadraticTest {
     }
 
     /**
-     * Test: ID must be correct.
+     * ID must be correct.
      */
     @Test
     void getID_returnsQuadraticID() {
@@ -92,7 +100,7 @@ class KKW_QuadraticTest {
     }
 
     /**
-     * Test: inheritance sanity check — ensure that quadratic model still behaves
+     *  inheritance sanity check — ensure that quadratic model still behaves
      * like linear model for parts not overridden.
      */
     @Test

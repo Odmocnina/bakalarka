@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Logger;
 public class MyLogger {
 
     /** Logger instance from log4j2 **/
-    private static final Logger logger = LogManager.getLogger(MyLogger.class);
+    private static Logger logger = LogManager.getLogger(MyLogger.class);
 
     /**
      * Logs a message at the specified level if logging is enabled in the application context.
