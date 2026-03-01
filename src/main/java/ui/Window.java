@@ -507,6 +507,33 @@ public class Window extends Application {
     }
 
     /**
+     * Helper method to create a button with a Label as an icon
+     *
+     * @param iconLabel   Label to be used as the graphic (e.g. text icon)
+     * @param tooltipText tooltip text for button
+     * @return Button with the label graphic
+     */
+    private Button createIconButton(Label iconLabel, String tooltipText) {
+        Button button = new Button();
+
+        // safe check for null label, if null log error and set text to "ERR" to indicate problem
+        if (iconLabel == null) {
+            MyLogger.log("Failed to create button, iconLabel is null", Constants.ERROR_FOR_LOGGING);
+            button.setText("ERR");
+            return button;
+        }
+
+        // set the label as the graphic of the button
+        button.setGraphic(iconLabel);
+
+        // set tooltip and focus traversable
+        button.setTooltip(new Tooltip(tooltipText));
+        button.setFocusTraversable(false);
+
+        return button;
+    }
+
+    /**
      * helper method to create toggle (on/off) button with icon
      *
      * @param resourcePath path to icon in resources (e.g. "/icons/ban.png")
@@ -686,7 +713,10 @@ public class Window extends Application {
         Button exportResultsToTxtBtn = createIconButton("/icons/export.png", "Export results to TXT");
         Button exportToCsvBtn = createIconButton("/icons/csvSeparator.png", "Export results to CSV");
         Button setOutputFileNameBtn = createIconButton("/icons/exportFileName.png", "Set output file name");
-        Button setCsvSeparatorBtn = createIconButton("/icons/csvSeparator.png", "Set CSV separator");
+        Label textIconForCsvSeparator = new Label(";");
+        textIconForCsvSeparator.setFont(Font.font("System", FontWeight.BOLD, 12));
+        textIconForCsvSeparator.setTextFill(Color.BLACK);
+        Button setCsvSeparatorBtn = createIconButton(textIconForCsvSeparator, "Set CSV separator");
         Button whatToExportBtn = createIconButton("/icons/whatToExport.png", "What to export");
         whatToExportBtn.setOnAction(e -> {
             ContextMenu contextMenu = new ContextMenu();
@@ -704,7 +734,7 @@ public class Window extends Application {
         ToggleButton toggleAllLoggingBtn = //createIconToggleButton("/icons/log.png", "Toggle all logging");
                 createBoundToggleButton("/icons/log.png", "Toggle all logging",
                         logSettingsProps[Constants.GENERAL_LOGGING_INDEX]);
-        Button whatToLogBtn = createIconButton("/icons/whatToExport.png", "What to log");
+        Button whatToLogBtn = createIconButton("/icons/whatToLog.png", "What to log");
         whatToLogBtn.setOnAction(e -> {
             ContextMenu contextMenu = new ContextMenu();
             makeToggleLoggingMenu(contextMenu.getItems());
@@ -921,8 +951,10 @@ public class Window extends Application {
         MenuItem setOutputFileNameItem = new MenuItem("Set output file name",
                 createMenuIcon("/icons/exportFileName.png"));
         MenuItem exportToCSVItem = new CheckMenuItem("Export to CSV");
-        MenuItem setCsvSeparator = new MenuItem("Set CSV separator",
-                createMenuIcon("/icons/csvSeparator.png"));
+        Label textIconForCsvSeparator = new Label(";");
+        textIconForCsvSeparator.setFont(Font.font("System", FontWeight.BOLD, 12));
+        textIconForCsvSeparator.setTextFill(Color.BLACK);
+        MenuItem setCsvSeparator = new MenuItem("Set CSV separator", textIconForCsvSeparator);
         Menu whatToExportSubMenu = new Menu("What to export",
                 createMenuIcon("/icons/whatToExport.png"));
 
