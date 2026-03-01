@@ -1140,6 +1140,7 @@ public class DialogMaker {
         // filter for csv files, so only csv files are shown
         fileChooser.getExtensionFilters().addAll(
             new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"),
+            new FileChooser.ExtensionFilter("Text files (*.txt)", "*.txt"),
             new FileChooser.ExtensionFilter("All files (*.*)", "*.*")
         );
 

@@ -211,9 +211,20 @@ public class Simulation {
      **/
     public void resetSimulationWithSameRoads() {
         this.stepCount = 0;
+        this.running = false;
         resetAllLightPlans(this.roads);
         clearAllRoads();
+        resetCarQueues();
         ResultsRecorder.getResultsRecorder().resetCarNumbers();
+    }
+
+    /**
+     * Sets the internal running state of the simulation.
+     *
+     * @param running true if simulation is running, false otherwise
+     **/
+    public void setRunning(boolean running) {
+        this.running = running;
     }
 
     /**
@@ -227,25 +238,12 @@ public class Simulation {
     }
 
     /**
-     * Clears all queues on all roads, used when resetting the simulation with the same roads to ensure all queues are cleared
+     * Resets all car queues on all roads, used when resetting the simulation with the same roads to ensure all queues are cleared
      * before running the simulation again.
      **/
-    private void clearAllQueues() {
-        for (Road road : roads) {
-            road.clearCarQueues();
-        }
-    }
-
     private void resetCarQueues() {
         for (Road road : roads) {
-            road.removeAllCars();
-            road.clearCarQueues();
-        }
-    }
-
-    private void remakeCarQueues() {
-        for (Road road : roads) {
-            road.setUpQueuesIfNeeded();
+            road.resetCarQueues();
         }
     }
 

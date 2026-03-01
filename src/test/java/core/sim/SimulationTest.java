@@ -337,30 +337,6 @@ public class SimulationTest {
     }
 
     /**
-     * test to verify the unused private methods (clearAllQueues, resetCarQueues, remakeCarQueues)
-     **/
-    @Test
-    void unusedPrivateMethods_ShouldBeInvokedSuccessfullyViaReflection() throws Exception {
-        // Act & Assert clearAllQueues
-        invokePrivateMethod("clearAllQueues");
-        verify(mockRoad1, times(1)).clearCarQueues();
-        verify(mockRoad2, times(1)).clearCarQueues();
-
-        // Act & Assert resetCarQueues
-        invokePrivateMethod("resetCarQueues");
-
-        verify(mockRoad1, times(1)).removeAllCars();
-        verify(mockRoad2, times(1)).removeAllCars();
-
-        verify(mockRoad1, times(2)).clearCarQueues();
-        verify(mockRoad2, times(2)).clearCarQueues();
-
-        invokePrivateMethod("remakeCarQueues");
-        verify(mockRoad1, times(1)).setUpQueuesIfNeeded();
-        verify(mockRoad2, times(1)).setUpQueuesIfNeeded();
-    }
-
-    /**
      * Helper to modify private fields via reflection
      */
     private void setPrivateField(Object object, String fieldName, Object value) {

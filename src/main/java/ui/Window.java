@@ -128,10 +128,21 @@ public class Window extends Application {
             Platform.runLater(() -> infoLabel.setText(infoString));
 
             if (roads == null || roads.length == 0) {
-                MyLogger.log("Error while getting roads to render", Constants.ERROR_FOR_LOGGING);
+                if (AppContext.RUN_DETAILS.mapLoaded) { // log error only if map was loaded, otherwise it is expected that there are no roads
+                    MyLogger.log("Error while getting roads to render", Constants.ERROR_FOR_LOGGING);
+                }
                 gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+                // hide scrollbars if there are no roads to render, otherwise they will be shown with 0 visible amount
+                // which looks weird
+                hScroll.setVisible(false);
+                vScroll.setVisible(false);
                 return;
             }
+
+            // show scrollbars, they will be properly set up in the drawing method based on content size
+            hScroll.setVisible(true);
+            vScroll.setVisible(true);
 
             final double GAP = 20.0;           // gap between roads when drawing
             Object content = roads[0].getContent();
@@ -512,7 +523,7 @@ public class Window extends Application {
      * @param iconLabel   Label to be used as the graphic (e.g. text icon)
      * @param tooltipText tooltip text for button
      * @return Button with the label graphic
-     */
+     **/
     private Button createIconButton(Label iconLabel, String tooltipText) {
         Button button = new Button();
 
@@ -950,7 +961,7 @@ public class Window extends Application {
                 createMenuIcon("/icons/export.png"));
         MenuItem setOutputFileNameItem = new MenuItem("Set output file name",
                 createMenuIcon("/icons/exportFileName.png"));
-        MenuItem exportToCSVItem = new CheckMenuItem("Export to CSV");
+        MenuItem exportToCSVItem = new CheckMenuItem("Export to CSV", createMenuIcon("/icons/csvSeparator.png"));
         Label textIconForCsvSeparator = new Label(";");
         textIconForCsvSeparator.setFont(Font.font("System", FontWeight.BOLD, 12));
         textIconForCsvSeparator.setTextFill(Color.BLACK);
@@ -1054,6 +1065,8 @@ public class Window extends Application {
      * @param paintAll runnable to repaint all roads after reset
      **/
     private void handleReset(Stage stage, Runnable paintAll) {
+        boolean wasRunning = engine != null && engine.getRunning();
+
         if (simulation.getStepCount() > 0) {
             boolean reset = DialogMaker.confirmDialog(stage, "Reset Simulation Confirmation",
                     "Changing road properties will reset the simulation state.");
@@ -1062,7 +1075,23 @@ public class Window extends Application {
                 return;
             }
         }
+
+        if (engine != null && engine.getRunning()) {
+            engine.stop();
+        }
+
         Actions.resetSimulationAction(simulation, paintAll);
+
+        if (wasRunning) {
+            engine.start();
+            simulation.setRunning(true);
+            setButtonImage("/icons/stop.png", toolbarStartStopBtn);
+            setButtonImage("/icons/stop.png", menuStartStopItem);
+        } else {
+            simulation.setRunning(false);
+            setButtonImage("/icons/run.png", toolbarStartStopBtn);
+            setButtonImage("/icons/run.png", menuStartStopItem);
+        }
     }
 
     private void handleOpenNewMap(Stage stage, Runnable paintAll) {

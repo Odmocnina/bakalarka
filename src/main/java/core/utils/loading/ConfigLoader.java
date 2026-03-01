@@ -69,33 +69,40 @@ public class ConfigLoader {
     public static Road[] loadRoads(String mapFileFromParameter) {
         try {
             String roadFile;
+            String source = "parameters";
             if (mapFileFromParameter == null) {
+                MyLogger.logLoadingOrSimulationStartEnd("No map file provided in input parameters, looking for road file in config file"
+                        , Constants.INFO_FOR_LOGGING);
                 DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
                 Document doc = dBuilder.parse(configFile);
 
                 Element roadElement = (Element) doc.getElementsByTagName(ConfigConstants.ROAD_FILE_TAG).item(0);
                 if (roadElement == null) {
-                    MyLogger.logLoadingOrSimulationStartEnd("Missing road file tag in config file, exiting", Constants.FATAL_FOR_LOGGING);
+                    MyLogger.logLoadingOrSimulationStartEnd(
+                            "Missing road file tag in parameters and config file, app will start without map " +
+                                    "(if gui is enabled) or exit (if gui is disabled)"
+                            , Constants.WARN_FOR_LOGGING);
                     return null;
                 }
 
                 roadFile = roadElement.getTextContent();
-
+                source = "config";
             } else {
                 roadFile = mapFileFromParameter;
             }
 
             if (roadFile == null || roadFile.isEmpty()) {
-                // to - do open without road file
-                MyLogger.logLoadingOrSimulationStartEnd("Road file path is empty, exiting", Constants.FATAL_FOR_LOGGING);
+                // to - do open without road file - DONE
+                MyLogger.logLoadingOrSimulationStartEnd("Road file path in " + source + " is empty, app will start " +
+                        "without map (if gui is enabled) or exit (if gui is disabled)", Constants.ERROR_FOR_LOGGING);
                 return null;
             }
 
             if (!new File(roadFile).exists()) {
-                // to - do open without road file
-                MyLogger.logLoadingOrSimulationStartEnd("Road file does not exist: " + roadFile + ", exiting"
-                        , Constants.FATAL_FOR_LOGGING);
+                // to - do open without road file - DONE
+                MyLogger.logLoadingOrSimulationStartEnd("Road file does not exist: " + roadFile + ", app will " +
+                        "start without map (if gui is enabled) or exit (if gui is disabled)", Constants.ERROR_FOR_LOGGING);
                 return null;
             }
 
@@ -536,7 +543,7 @@ public class ConfigLoader {
      * @param outputElements XML Element containing output settings
      * @return true if output writing is enabled and settings were loaded successfully, false if output writing is
      *          disabled or loading failed
-     */
+     **/
     private static boolean loadOutput(RunDetails detailsFromConfig, Element outputElements, String outputFileFromParameter) {
         if (outputElements == null) {
             MyLogger.logLoadingOrSimulationStartEnd("Missing output details in run details, defaulting to no output"
@@ -592,6 +599,20 @@ public class ConfigLoader {
         }
     }
 
+    /**
+     * Main method to load all configuration details from the configuration file and input parameters, including run
+     * details, car following model, lane changing model, and roads, also performs validation of loaded settings and
+     * consistency checks between them, stores loaded models in app context for later use
+     *
+     * @param configFilePath path to the configuration file, if null or empty, defaults to Constants.DEFAULT_CONFIG_FILE
+     * @param carFollowingModelFromInput car following model provided in input parameters, if null, will be loaded from config file
+     * @param laneChangingModelFromInput lane changing model provided in input parameters, if null, will be loaded from config file
+     * @param duration duration of the simulation provided in input parameters, if Constants.NO_DURATION_PROVIDED, will be loaded from config file
+     * @param outputFile output file name provided in input parameters, if null or empty, will be loaded from config file or defaulted to Constants.DEFAULT_OUTPUT_FILE
+     * @param logFromParameter logging setting provided in input parameters, if Constants.LOGGING_OFF_FROM_INPUT_PARAMETERS or Constants.LOGGING_ON_FROM_INPUT_PARAMETERS, will override logging settings in config file, otherwise logging settings will be loaded from config file
+     * @param mapFileFromInput map file path provided in input parameters, if null or empty, will be loaded from config file
+     * @return true if all configuration details were loaded successfully and are consistent, false if loading failed or there are consistency issues
+     **/
     public static boolean loadAllConfig(String configFilePath, ICarFollowingModel carFollowingModelFromInput,
                                         ILaneChangingModel laneChangingModelFromInput, int duration, String outputFile,
                                         int logFromParameter, String mapFileFromInput) {
@@ -671,13 +692,11 @@ public class ConfigLoader {
         boolean mapLoaded = false;
         Road[] roads = ConfigLoader.loadRoads(mapFileFromInput);
         if (roads == null) {
-            MyLogger.logLoadingOrSimulationStartEnd("Failed to load road configuration, exiting."
-                    , Constants.FATAL_FOR_LOGGING);
-          //  return false;
+            MyLogger.logLoadingOrSimulationStartEnd("Map file not provided or failed loading of it, app will" +
+                    " start without map (if gui is enabled) or exit (if gui is disabled)", Constants.WARN_FOR_LOGGING);
         } else {
-            for (int i = 0; i < roads.length; i++) {
-                MyLogger.logLoadingOrSimulationStartEnd("Loaded road(" + i + ")", Constants.INFO_FOR_LOGGING); //+ roads[i].toString(), Constants.INFO_FOR_LOGGING);
-            }
+            MyLogger.logLoadingOrSimulationStartEnd("Map loaded successfully, number of roads: " + roads.length,
+                    Constants.INFO_FOR_LOGGING);
             mapLoaded = true;
         }
 
@@ -709,18 +728,46 @@ public class ConfigLoader {
 
 
         if (mapLoaded) {
-            String mapFileName = ConfigLoader.getMapFileName();
-            runDetails.setNewMapFile(mapFileName);
+            if (isValidMapFile(mapFileFromInput)) {
+                runDetails.setNewMapFile(mapFileFromInput);
+            } else {
+                String mapFileName = ConfigLoader.getMapFileName();
+                runDetails.setNewMapFile(mapFileName);
+            }
         }
         AppContext.RUN_DETAILS = runDetails;
 
         if (mapLoaded) {
             ResultsRecorder.getResultsRecorder().initialize(roads, runDetails.outputDetails.outputFile);
+            AppContext.RUN_DETAILS.mapLoaded = true;
+        }
+
+        if (!mapLoaded && !runDetails.showGui) {
+            MyLogger.logLoadingOrSimulationStartEnd("No map loaded and GUI is disabled, simulation cannot run, exiting",
+                    Constants.FATAL_FOR_LOGGING);
+            return false;
         }
 
         // create simulation and store it in app context, simulation is the thing that updates all roads and cars
         AppContext.SIMULATION = new Simulation(roads);
         return true;
+    }
+
+    /**
+     * Helper method to check if the map file provided in input parameters is valid, meaning it is not null, not empty,
+     * and exists as a file, this is used to determine whether to use the map file from input parameters or from config
+     * file when setting the new map file in run details for the map editor to save to the correct file
+     *
+     * @param mapFromParameters the map file path provided in input parameters
+     * @return true if the map file from parameters is valid, false otherwise
+     **/
+    private static boolean isValidMapFile(String mapFromParameters) {
+        if (mapFromParameters == null || mapFromParameters.isEmpty()) {
+            return false;
+        }
+
+        return new File(mapFromParameters).exists();
+
     }
 
 }

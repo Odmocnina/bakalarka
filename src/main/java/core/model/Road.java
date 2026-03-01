@@ -492,6 +492,23 @@ public abstract class Road {
         }
     }
 
+    /**
+     * method to reset car queues, used when resetting the simulation
+     **/
+    public void resetCarQueues() {
+        for (int i = 0; i < carQueuesPerLane.length; i++) {
+            if (carQueuesPerLane[i] != null && this.generators[i].generatingToQueue()) {
+                carQueuesPerLane[i] = generators[i].generateCarsInToQueue();
+            }
+        }
+    }
+
+    /**
+     * abstract method to count the number of stopped cars in a lane, implemented in subclasses
+     *
+     * @param lane lane to count stopped cars in
+     * @return number of stopped cars in lane
+     **/
     protected abstract int countStoppedCarsInLane(int lane);
 
     /**
