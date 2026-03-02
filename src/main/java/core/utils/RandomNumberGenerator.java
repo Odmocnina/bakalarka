@@ -2,6 +2,14 @@ package core.utils;
 
 import java.util.Random;
 
+/************************************
+ * Class responsible for generating random numbers for the simulation, it uses a singleton pattern to ensure that the
+ * same random generator is used throughout the simulation, and it allows for setting a random seed for reproducibility
+ * of the simulation results.
+ *
+ * @author Michael Hladky
+ * @version 1.0
+ ************************************/
 public class RandomNumberGenerator {
 
     /** Random seed for the simulation, can be set for reproducibility **/

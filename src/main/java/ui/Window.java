@@ -759,7 +759,7 @@ public class Window extends Application {
         resetBtn.setOnAction(e -> handleReset(primaryStage, paintAll));
         exportResultsToTxtBtn.setOnAction(e -> this.handleExportResults(primaryStage, Constants.RESULTS_OUTPUT_TXT));
         exportToCsvBtn.setOnAction(e -> this.handleExportResults(primaryStage, Constants.RESULTS_OUTPUT_CSV));
-        nextStepBtn.setOnAction(e -> Actions.nextStepAction(simulation, paintAll));
+        nextStepBtn.setOnAction(e -> this.handleNextStep(primaryStage, paintAll));
         saveMapFileBtn.setOnAction(e -> Actions.saveMapAction(this.simulation));
         saveAsMapFileBtn.setOnAction(e -> Actions.saveMapAsAction(this.simulation, primaryStage));
         openMapFileBtn.setOnAction(e -> this.handleOpenNewMap(primaryStage, paintAll));
@@ -933,7 +933,7 @@ public class Window extends Application {
                 createMenuIcon("/icons/time.png"));
 
         menuStartStopItem.setOnAction(e -> handleStartStopAction(primaryStage));
-        nextStepItem.setOnAction(e -> Actions.nextStepAction(simulation, paintAll));
+        nextStepItem.setOnAction(e -> this.handleNextStep(primaryStage, paintAll));
         resetSimulationItem.setOnAction(e -> handleReset(primaryStage, paintAll));
         setTimeBetweenStepsItem.setOnAction(e -> Actions.setTimeBetweenStepsAction(primaryStage, engine));
 
@@ -1094,12 +1094,24 @@ public class Window extends Application {
         }
     }
 
+    /**
+     * helper method to handle opening a new map, used by both toolbar button and menu item to keep them in sync
+     *
+     * @param stage primary stage for file chooser
+     * @param paintAll runnable to repaint all roads after opening new map
+     **/
     private void handleOpenNewMap(Stage stage, Runnable paintAll) {
         hScroll.setValue(0);
         vScroll.setValue(0);
         Actions.openMapAction(stage, paintAll);
     }
 
+    /**
+     * helper method to handle exporting results, used by both toolbar buttons and menu items to keep them in sync
+     *
+     * @param stage primary stage for file choosers and dialogs
+     * @param fileType type of file to export (e.g. "TXT" or "CSV")
+     **/
     private void handleExportResults(Stage stage, String fileType) {
         // if simulation is running, don't export and give dialog where its said that cannot export while running
         if (engine.getRunning()) {
@@ -1114,5 +1126,22 @@ public class Window extends Application {
         } else if (fileType.equalsIgnoreCase(Constants.RESULTS_OUTPUT_TXT)) {
             Actions.exportResultsToTxtAction(this.simulation);
         }
+    }
+
+    /**
+     * helper method to handle advancing to next simulation step
+     *
+     * @param stage primary stage for dialogs
+     * @param paintAll runnable to repaint all roads after advancing step
+     **/
+    private void handleNextStep(Stage stage, Runnable paintAll) {
+        if (engine.getRunning()) {
+            DialogMaker.warningDialog(stage, "Cannot manually step while simulation is running. " +
+                    "Stop the simulation to manually step.");
+            MyLogger.log("Next step cancelled: Simulation is running.", Constants.INFO_FOR_LOGGING);
+            return;
+        }
+
+        Actions.nextStepAction(simulation, paintAll);
     }
 }

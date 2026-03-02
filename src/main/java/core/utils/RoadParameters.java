@@ -119,6 +119,16 @@ public class RoadParameters {
         return roads;
     }
 
+    /**
+     * method to set the generate length as one setting on all car generators of all roads, it iterates through the given
+     * array list of road parameters and for each non-null road parameter, it iterates through its car generators and sets
+     * the generate length as one setting to the given value, this is used in the gui when changing the car following
+     * model to a model that does not support generation of different lengths, so all generators need to be updated to
+     * generate length as one, used for models like rule-184 and nagel-schreckenberg
+     *
+     * @param roadsParameters array list of road parameters whose car generators should be updated with the given setting
+     * @param generateLengthAsOne new value for the generate length as one setting to be set on all car generators of all roads
+     **/
     public static void setGenerateLengthAsOneOnAllGenerators(ArrayList<RoadParameters> roadsParameters, boolean generateLengthAsOne) {
         for (RoadParameters rp : roadsParameters) {
             for (CarGenerator cg : rp.carGenerators) {
@@ -127,6 +137,15 @@ public class RoadParameters {
         }
     }
 
+    /**
+     * method to handle the setting of the generate length as one setting on all car generators of all roads, it checks
+     * the given id and if it is "nagel-schreckenberg" or "rule-184", it sets the generate length as one setting to true on
+     * all car generators of all roads, this is used in the gui when changing the car following model to a model that does
+     * not support generation of different lengths, so all generators need to be updated to generate length as one
+     *
+     * @param roadsParameters array list of road parameters whose car generators should be updated with the new setting if needed
+     * @param id id of the car following model that is being set, used to determine if the generate length as one setting should be updated on all car generators of all roads
+     **/
     public static void handleSettingOfLengthGeneration(ArrayList<RoadParameters> roadsParameters, String id) {
         if (id.equals("nagel-schreckenberg") || id.equals("rule-184")) {
             RoadParameters.setGenerateLengthAsOneOnAllGenerators(roadsParameters, true);

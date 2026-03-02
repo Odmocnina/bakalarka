@@ -10,6 +10,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Objects;
 
 /********************************************
  * Continuous road renderer implementation, used for drawing continuous roads
@@ -95,11 +96,7 @@ public class ContinuousRoadRenderer implements IRoadRenderer {
                 double carY = y + laneHpx * carUpLiftFactor;
                 double carH = laneHpx * carSmallingFactor;
 
-                if (car.color != null) {
-                    carColor = car.color;
-                } else {
-                    carColor = Color.RED;
-                }
+                carColor = Objects.requireNonNullElse(car.color, Color.RED);
 
                 if (AppContext.RUN_DETAILS.debug) {
                     gc.setFill(Color.PURPLE);
@@ -119,6 +116,6 @@ public class ContinuousRoadRenderer implements IRoadRenderer {
         }
 
         // turn off dashed line pattern, probably useless but whatever
-        gc.setLineDashes(null);
+        gc.setLineDashes((double[]) null);
     }
 }

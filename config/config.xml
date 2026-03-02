@@ -12,7 +12,7 @@
 
     <runDetails>
         <drawCells>false</drawCells>
-        <laneChange>true</laneChange>
+        <laneChange>false</laneChange>
         <timeStep>1</timeStep>
         <debug>false</debug>
         <preventCollision>false</preventCollision>

@@ -419,7 +419,8 @@ public class CarGenerator implements Cloneable {
         this.parameters.remove(key);
     }
 
-    /** getter for flow rate (lambda parameter)
+    /**
+     * getter for flow rate (lambda parameter)
      *
      * @return double flow rate (cars per second)
      **/
@@ -534,22 +535,6 @@ public class CarGenerator implements Cloneable {
      **/
     public double getLambdaPerSec() {
         return this.lambdaPerSec;
-    }
-
-    /**
-     * function to check if all parameters in generator settings are valid
-     *
-     * @return boolean whether all parameters are valid
-     **/
-    public boolean areAllParametersOk() {
-        for (String key : parameters.keySet()) {
-            Parameter p = parameters.get(key);
-            if (!p.checkIfValid()) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**

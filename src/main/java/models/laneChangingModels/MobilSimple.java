@@ -104,7 +104,8 @@ public class MobilSimple implements ILaneChangingModel {
     }
 
     /**
-     * decides whether to change lane or not based on the MOBIL model
+     * decides whether to change lane or not based on the MOBIL model, not really used because the lane change decision
+     * is made for each direction separately in continuous road, but implemented for completeness
      *
      * @param parameters the parameters needed to make a decision in hashmap form, where key is the parameter name and
      *                   value is the parameter value in double
@@ -112,19 +113,19 @@ public class MobilSimple implements ILaneChangingModel {
      **/
     @Override
     public Direction changeLaneIfDesired(HashMap<String, Double> parameters) {
-        double edgeValueForLaneChange = parameters.get(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST);
-        double politenessFactor = parameters.get(RequestConstants.POLITENESS_FACTOR_REQUEST);
-        double nowAcceleration = parameters.get(RequestConstants.NOW_ACCELERATION_REQUEST);
-        double nowAccelerationLeftBackward = parameters.get(RequestConstants.NOW_ACCELERATION_LEFT_BACKWARD_REQUEST);
-        double nowAccelerationRightBackward = parameters.get(RequestConstants.NOW_ACCELERATION_RIGHT_BACKWARD_REQUEST);
-        double nowAccelerationStraightBackward = parameters.get(RequestConstants.NOW_ACCELERATION_STRAIGHT_BACKWARD_REQUEST);
-        double theoreticalAcceleration = parameters.get(RequestConstants.THEORETICAL_ACCELERATION_REQUEST);
-        double theoreticalAccelerationLeftBackward = parameters.get(RequestConstants.THEORETICAL_ACCELERATION_LEFT_BACKWARD_REQUEST);
-        double theoreticalAccelerationRightBackward = parameters.get(RequestConstants.THEORETICAL_ACCELERATION_RIGHT_BACKWARD_REQUEST);
-        double theoreticalAccelerationStraightBackward = parameters.get(RequestConstants.THEORETICAL_ACCELERATION_STRAIGHT_BACKWARD_REQUEST);
+        // first we check if we can change to the left lane, if it is desired and safe
+        Direction leftDecision = changeLaneIfDesired(parameters, Direction.LEFT);
+        if (leftDecision == Direction.LEFT) {
+            return Direction.LEFT;
+        }
 
-        double accelerationGain = theoreticalAcceleration - nowAcceleration;
-        boolean changeToRight;
+        // try to change to the right lane, if it is desired and safe
+        Direction rightDecision = changeLaneIfDesired(parameters, Direction.RIGHT);
+        if (rightDecision == Direction.RIGHT) {
+            return Direction.RIGHT;
+        }
+
+        // if both lane changes are not desired or not safe, we stay in the current lane
         return Direction.STRAIGHT;
     }
 

@@ -53,11 +53,12 @@ public class Constants {
     public static final int FATAL_LOGGING_INDEX = 4;
     public static final int DEBUG_LOGGING_INDEX = 5;
 
-
+    // duration from input parameters constants
     public static final int NO_DURATION_PROVIDED = -1;
     public static final int INVALID_INPUT_PARAMETERS = -2;
     public static final int NO_RECORD_YET = -3;
 
+    // input parameters prefixes
     public static final String DURATION_PARAMETER_PREFIX = "--dur=";
     public static final String CONFIG_PATH_PARAMETER_PREFIX = "--cfg=";
     public static final String OUTPUT_FILE_PARAMETER_PREFIX = "--out=";

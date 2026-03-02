@@ -35,7 +35,7 @@ public class CellularRoad extends Road {
 
     /** value to mark car as cut, if car is cut and light is red then car is removed from the road, this is to prevent
      * cars that are cut and are almost from road, but then the red light comes, and they can't move and are still on the
-     * road, so the would be waiting in the middle of the road for the light to turn green, so remove cars that already
+     * road, so there would be waiting in the middle of the road for the light to turn green, so remove cars that already
      * passed the road but sill have butt in on the road, this is a bit of a hack, but it works */
     private final double CAR_IS_CUT = -2.0;
 

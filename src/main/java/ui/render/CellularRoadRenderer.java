@@ -76,12 +76,6 @@ public class CellularRoadRenderer implements IRoadRenderer {
 
                 gc.setFill(cell.isOccupied() ? carColor : Constants.ROAD_COLOR);
                 gc.fillRect(x, y, cellSize, cellSize);
-
-                /*if (AppContext.RUN_DETAILS.drawCells) {
-                    gc.setLineWidth(Constants.CELL_SEPARATOR_WIDTH);
-                    gc.setStroke(Constants.CELL_SEPARATOR_COLOR);
-                    gc.strokeRect(x, y, cellSize, cellSize);
-                }*/
             }
 
             // separating line between lanes
@@ -93,7 +87,7 @@ public class CellularRoadRenderer implements IRoadRenderer {
                 }
                 double sepY = y + cellSize;
                 gc.strokeLine(offsetX, sepY, offsetX + roadWidthPx, sepY);
-                gc.setLineDashes(null);
+                gc.setLineDashes((double[]) null);
             }
         }
     }

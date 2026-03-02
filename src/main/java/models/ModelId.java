@@ -4,7 +4,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /***************************************************
- * Annotation for car following model ID, used for identification when starting application, reflectively
+ * Annotation for car following model ID, used for identification of car following / lane changing models when starting
+ * application, reflectively
  *
  * @author Michael Hladky
  * @version 1.0

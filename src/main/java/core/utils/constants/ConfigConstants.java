@@ -7,8 +7,6 @@ package core.utils.constants;
  * @version 1.0
  ***************************/
 public class ConfigConstants {
-
-    public static final String CONFIG_REQUEST_SEPARATOR = "/";
     public static final String ROAD_FILE_TAG = "roadFile";
     public static final String MODELS_TAG = "models";
     public static final String CAR_FOLLOWING_MODEL_TAG = "carFollowingModel";
@@ -19,13 +17,6 @@ public class ConfigConstants {
     public static final String LANE_CHANGE_TAG = "laneChange";
     public static final String TIME_STEP_TAG = "timeStep";
     public static final String DEBUG_TAG = "debug";
-    public static final String LOGGING_TAG = "logging";
-    public static final String LOG_GENERAL_TAG = "log";
-    public static final String LOG_INFO_TAG = "info";
-    public static final String LOG_WARN_TAG = "warn";
-    public static final String LOG_DEBUG_TAG = "debug";
-    public static final String LOG_ERROR_TAG = "error";
-    public static final String LOG_FATAL_TAG = "fatal";
     public static final String OUTPUT_TAG = "output";
     public static final String WRITE_OUTPUT_TAG = "writeOutput";
     public static final String FILE_TAG = "file";
@@ -34,6 +25,17 @@ public class ConfigConstants {
     public static final String TIME_BETWEEN_STEPS_TAG = "timeBetweenSteps";
     public static final String PREVENT_COLLISION_TAG = "preventCollision";
     public static final String SEED_TAG = "seed";
+
+
+    // logging constants
+    public static final String LOGGING_TAG = "logging";
+    public static final String LOG_GENERAL_TAG = "log";
+    public static final String LOG_INFO_TAG = "info";
+    public static final String LOG_WARN_TAG = "warn";
+    public static final String LOG_DEBUG_TAG = "debug";
+    public static final String LOG_ERROR_TAG = "error";
+    public static final String LOG_FATAL_TAG = "fatal";
+
 
     // what to write tags
     public static final String WHAT_TO_WRITE_TAG = "whatToWrite";

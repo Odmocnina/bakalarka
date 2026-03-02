@@ -18,6 +18,14 @@ import java.util.List;
  ****************************/
 public class InputParametersHandeler {
 
+    /**
+     * Method to get specific parameter from input parameters, e.g. duration, config file path, output file path, etc.
+     *
+     * @param args input parameters from command line
+     * @param prefix prefix of parameter to look for, e.g. "--dur=", "--config=", "--output=", "--log=", "--cfm=",
+     *               "--lcm="
+     * @return value of parameter if found, null if not found
+     **/
     public static String getSpecificParameter(String[] args, String prefix) {
         for (String arg : args) {
             if (arg.startsWith(prefix)) {
@@ -28,6 +36,15 @@ public class InputParametersHandeler {
         return null;
     }
 
+    /**
+     * Method to get part of parameter value from input parameter, e.g. duration value from "--dur=60", config file path
+     * from "--config=path/to/config.xml", etc.
+     *
+     * @param arg input parameter from command line, e.g. "--dur=60", "--config=path/to/config.json", etc.
+     * @param prefix prefix of parameter to look for, e.g. "--dur=", "--config=", "--output=", "--log=", "--cfm=",
+     *               "--lcm="
+     * @return part of parameter value if arg starts with prefix, null otherwise
+     **/
     public static String getPartOfParameter(String arg, String prefix) {
         if (arg.startsWith(prefix)) {
             return arg.substring(prefix.length());
@@ -35,6 +52,12 @@ public class InputParametersHandeler {
         return null;
     }
 
+    /**
+     * Method to get duration value from input parameter, if provided, otherwise return constant indicating no duration provided
+     *
+     * @param duration duration value as string from input parameter, e.g. "60" from "--dur=60"
+     * @return duration value as int if valid, constant indicating no duration provided or invalid input parameters otherwise
+     **/
     public static int getDurationFromParameter(String duration) {
         if (duration == null) {
             MyLogger.logLoadingOrSimulationStartEnd("Duration not given, application will run in GUI mode.",
@@ -59,6 +82,13 @@ public class InputParametersHandeler {
         }
     }
 
+    /**
+     * Method to get config file path from input parameter, if provided, otherwise return default config file path
+     *
+     * @param configPath config file path from input parameter, e.g. "path/to/config.json" from
+     *                   "--config=path/to/config.xml"
+     * @return config file path from input parameter if valid, default config file path otherwise
+     **/
     public static String getConfigPathFromParameter(String configPath) {
         if (configPath == null || configPath.isEmpty()) {
             MyLogger.logLoadingOrSimulationStartEnd("No config file path provided in input parameters, using default config" +
@@ -69,6 +99,13 @@ public class InputParametersHandeler {
         return configPath;
     }
 
+    /**
+     * Method to get output file path from input parameter, if provided, otherwise return default output file path
+     *
+     * @param outputFilePath output file path from input parameter, e.g. "path/to/output.csv" from
+     *                       "--output=path/to/output.csv"
+     * @return output file path from input parameter if valid, default output file path otherwise
+     **/
     public static String getOutputFilePathFromParameter(String outputFilePath) {
         if (outputFilePath == null || outputFilePath.isEmpty()) {
             MyLogger.logLoadingOrSimulationStartEnd("No output file path provided in input parameters, using default output " +
@@ -79,6 +116,12 @@ public class InputParametersHandeler {
         return outputFilePath;
     }
 
+    /**
+     * Method to get logging settings from input parameter, if provided, otherwise return constant indicating no logging settings provided
+     *
+     * @param logging logging settings from input parameter, e.g. "true" from "--log=true"
+     * @return constant indicating logging on/off from input parameters if valid, constant indicating no logging settings provided or invalid input parameters otherwise
+     **/
     public static int getLoggingFromParameter(String logging) {
         if (logging == null || logging.isEmpty()) {
             MyLogger.logLoadingOrSimulationStartEnd("No logging settings provided in input parameters, using" +
@@ -103,6 +146,12 @@ public class InputParametersHandeler {
         }
     }
 
+    /**
+     * Method to get car following model from input parameter, if provided, otherwise return default car following model from config
+     *
+     * @param carFollowingModelId car following model id from input parameter, e.g. "idm" from "--cfm=idm"
+     * @return car following model instance if valid, null otherwise
+     **/
     public static ICarFollowingModel getCarFollowingModelFromParameter(String carFollowingModelId) {
         if (carFollowingModelId == null || carFollowingModelId.isEmpty()) {
             MyLogger.logLoadingOrSimulationStartEnd("Invalid car following model provided in input parameters: " +
@@ -119,6 +168,12 @@ public class InputParametersHandeler {
         return model;
     }
 
+    /**
+     * Method to get car following model instance by id, using reflection to find class with matching ModelId annotation value
+     *
+     * @param id car following model id, e.g. "idm"
+     * @return car following model instance if found, null otherwise
+     **/
     public static ICarFollowingModel getCarFollowingModelById(String id) {
         if (id == null || id.isEmpty()) {
             return null;
@@ -153,6 +208,12 @@ public class InputParametersHandeler {
         return null;
     }
 
+    /**
+     * Method to get lane changing model from input parameter, if provided, otherwise return default lane changing model from config
+     *
+     * @param laneChangingModelId lane changing model id from input parameter, e.g. "mobil" from "--lcm=mobil"
+     * @return lane changing model instance if valid, null otherwise
+     **/
     public static ILaneChangingModel getLaneChangingModelFromParameter(String laneChangingModelId) {
         if (laneChangingModelId == null || laneChangingModelId.isEmpty()) {
             MyLogger.logLoadingOrSimulationStartEnd("Invalid lane changing model provided in input parameters: " +
@@ -169,6 +230,12 @@ public class InputParametersHandeler {
         return model;
     }
 
+    /**
+     * Method to get lane changing model instance by id, using reflection to find class with matching ModelId annotation value
+     *
+     * @param id lane changing model id, e.g. "mobil"
+     * @return lane changing model instance if found, null otherwise
+     **/
     public static ILaneChangingModel getLaneChangingModelById(String id) {
         if (id == null || id.isEmpty()) {
             return null;
@@ -197,13 +264,18 @@ public class InputParametersHandeler {
             }
         } catch (Exception e) {
             MyLogger.logLoadingOrSimulationStartEnd("Error searching for model by ID: " + e.getMessage(), Constants.FATAL_FOR_LOGGING);
-            e.printStackTrace();
         }
 
         MyLogger.logLoadingOrSimulationStartEnd("Model with ID '" + targetId + "' not found.", Constants.WARN_FOR_LOGGING);
         return null;
     }
 
+    /**
+     * Method to get map file path from input parameter, if provided, otherwise return null to indicate that default map file from config should be used
+     *
+     * @param mapFile map file path from input parameter, e.g. "path/to/map.xml" from "--map=path/to/map.xml"
+     * @return map file path from input parameter if valid, null otherwise (indicating default map file from config should be used)
+     **/
     public static String handleMapFileParameter(String mapFile) {
         if (mapFile == null || mapFile.isEmpty()) {
             MyLogger.logLoadingOrSimulationStartEnd("No map file provided in input parameters, using default map file from config.", Constants.WARN_FOR_LOGGING);

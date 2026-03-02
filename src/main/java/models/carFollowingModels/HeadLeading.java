@@ -7,7 +7,6 @@ import models.ICarFollowingModel;
 import models.ModelId;
 
 import java.util.HashMap;
-import java.util.Random;
 
 /********************************************
  * Head-leading car following model implementation (cellular), annotated with @ModelId("head-leading") for
@@ -154,16 +153,6 @@ public class HeadLeading implements ICarFollowingModel {
     @Override
     public String getName() {
         return "JUTS (Java urban traffic simulation) Model";
-    }
-
-    /**
-     * Constructor with injected Random for testing purposes
-     *
-     * @param random Random instance to use
-     **/
-    HeadLeading(Random random) {
-        this.type = Constants.CELLULAR;
-      //  this.random = random;
     }
 }
 

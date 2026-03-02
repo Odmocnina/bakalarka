@@ -22,6 +22,9 @@ public class Main {
      *             file is used
      **/
     public static void main(String[] args) {
+
+        // get input parameters from command line arguments
+
         String durationArgument = InputParametersHandeler.getSpecificParameter(args, Constants.DURATION_PARAMETER_PREFIX);
         int duration = InputParametersHandeler.getDurationFromParameter(durationArgument);
         if (duration == Constants.INVALID_INPUT_PARAMETERS) {
@@ -74,6 +77,8 @@ public class Main {
             MyLogger.logLoadingOrSimulationStartEnd("No lane changing model provided in input parameters, using default " +
                     "model in config file.", Constants.INFO_FOR_LOGGING);
         }
+
+        // parameters are now loaded, start loading configuration file and start app
 
 
         // load run details from configuration file

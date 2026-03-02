@@ -790,37 +790,6 @@ public class DialogMaker {
                  MyLogger.log("Dialog cancelled.", Constants.INFO_FOR_LOGGING);
              }
          });
-
-         // show the dialog and wait for user response
-         /*dialog.showAndWait().ifPresent(response -> {
-             if (response == applyButtonType) {
-                 if (checkRoadInputs(lanesSpinner.getValue(), speedLimitField.getText(), lengthField.getText(), generators, lightPlan)) {
-                     AppContext.RUN_DETAILS.mapChanged = true;
-                     if (!changingAll) {
-                         MyLogger.log("Selected road properties updated via dialog.", Constants.INFO_FOR_LOGGING);
-                         changeRoadParameters(index, lanesSpinner.getValue(), Double.parseDouble(speedLimitField.getText()),
-                                 Double.parseDouble(lengthField.getText()), lightPlan, generators, roadParameters);
-                         return;
-                     }
-                     MyLogger.log("All road properties updated via dialog.", Constants.INFO_FOR_LOGGING);
-                     for (int i = 0; i < numberOfRoads; i++) {
-                         changeRoadParameters(i, lanesSpinner.getValue(), Double.parseDouble(speedLimitField.getText()),
-                                 Double.parseDouble(lengthField.getText()), lightPlan, generators, roadParameters);
-                     }
-
-                 } else {
-                     MyLogger.log("Invalid road inputs provided in dialog.", Constants.ERROR_FOR_LOGGING);
-                     warningDialog(stage, "Invalid road inputs provided. Please check number of lanes, max speed and length.");
-                 }
-             } else if (response == deleteButtonType) {
-                 if (!changingAll) {
-                     removeRoadFormMap(roadParameters, index, stage);
-                     AppContext.RUN_DETAILS.mapChanged = true;
-                 }
-             } else {
-                 MyLogger.log("Dialog cancelled.", Constants.INFO_FOR_LOGGING);
-             }
-         });*/
      }
 
     /**
