@@ -37,8 +37,8 @@ public class MobilSimpleTest {
     void testBasicProperties() {
         // Note: The original code returns "mobil" for getID(), even though class is MobilSimple.
         // We test what is actually in the code.
-        assertEquals("mobil", mobilSimpleModel.getID(), "ID should be 'mobil'");
-        assertEquals("MOBIL", mobilSimpleModel.getName(), "Name should be 'MOBIL'");
+        assertEquals("mobil-simple", mobilSimpleModel.getID(), "ID should be 'mobil-simple'");
+        assertEquals("MOBIL (simple version)", mobilSimpleModel.getName(), "Name should be 'MOBIL (simple version)'");
         assertEquals(Constants.CONTINUOUS, mobilSimpleModel.getType(), "Type should be CONTINUOUS");
 
         String genParams = mobilSimpleModel.getParametersForGeneration();
@@ -76,26 +76,34 @@ public class MobilSimpleTest {
     }
 
     /**
-     * test to verify that changeLaneIfDesired without direction parameter currently defaults to STRAIGHT
-     * (as explicitly coded in MobilSimple class)
+     * Test to verify that changeLaneIfDesired (without explicit direction)
+     * evaluates LEFT and RIGHT, and returns STRAIGHT if neither lane change is beneficial
      **/
     @Test
-    void changeLaneIfDesired_NoDirection_ShouldReturnStraight() {
+    void changeLaneIfDesired_NoDirection_ShouldEvaluateBothAndReturnStraight() {
         HashMap<String, Double> params = new HashMap<>();
-        // Filling dummy parameters to prevent exceptions
+
+        // basic parameters for both sides, set to values that would not trigger a lane change on their own
         params.put(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST, 0.2);
         params.put(RequestConstants.POLITENESS_FACTOR_REQUEST, 0.5);
         params.put(RequestConstants.NOW_ACCELERATION_REQUEST, 1.0);
-        params.put(RequestConstants.NOW_ACCELERATION_LEFT_BACKWARD_REQUEST, 1.0);
-        params.put(RequestConstants.NOW_ACCELERATION_RIGHT_BACKWARD_REQUEST, 1.0);
-        params.put(RequestConstants.NOW_ACCELERATION_STRAIGHT_BACKWARD_REQUEST, 1.0);
         params.put(RequestConstants.THEORETICAL_ACCELERATION_REQUEST, 1.0);
-        params.put(RequestConstants.THEORETICAL_ACCELERATION_LEFT_BACKWARD_REQUEST, 1.0);
-        params.put(RequestConstants.THEORETICAL_ACCELERATION_RIGHT_BACKWARD_REQUEST, 1.0);
-        params.put(RequestConstants.THEORETICAL_ACCELERATION_STRAIGHT_BACKWARD_REQUEST, 1.0);
 
+        // left lane parameters
+        params.put(RequestConstants.NOW_ACCELERATION_LEFT_BACKWARD_REQUEST, 1.0);
+        params.put(RequestConstants.THEORETICAL_ACCELERATION_LEFT_BACKWARD_REQUEST, 1.0);
+        params.put(RequestConstants.DECELERATION_COMFORT_LEFT_BACKWARD_REQUEST, 2.0);
+
+        // right lane parameters
+        params.put(RequestConstants.NOW_ACCELERATION_RIGHT_BACKWARD_REQUEST, 1.0);
+        params.put(RequestConstants.THEORETICAL_ACCELERATION_RIGHT_BACKWARD_REQUEST, 1.0);
+        params.put(RequestConstants.DECELERATION_COMFORT_RIGHT_BACKWARD_REQUEST, 2.0);
+
+        // because the gain for both sides is 0.0, and the politeness penalty is 0.5 * 0.0 + 0.2 = 0.2, neither lane
+        // change should be desired, so the method should return STRAIGHT
         Direction decision = mobilSimpleModel.changeLaneIfDesired(params);
-        assertEquals(Direction.STRAIGHT, decision, "Method should return STRAIGHT according to current implementation");
+
+        assertEquals(Direction.STRAIGHT, decision, "Method should evaluate left and right, and return STRAIGHT if neither is desired");
     }
 
     /**

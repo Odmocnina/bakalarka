@@ -7,6 +7,7 @@ import models.ICarFollowingModel;
 import models.ILaneChangingModel;
 import models.ModelId;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /*****************************
@@ -17,6 +18,120 @@ import java.util.List;
  * @version 1.0
  ****************************/
 public class InputParametersHandeler {
+
+    /**
+     * Method to handle help parameter, shows help message with usage instructions and available models, then exits
+     **/
+    public static void handleHelp() {
+        StringBuilder helpMessage = new StringBuilder("""
+                Usage: java -jar traffic-simulation.jar [options]
+                Options:
+                  --help                Show this help message and exit
+                  --dur=<seconds>       Set duration of simulation in seconds (steps in simulation), if not provided app will run in GUI mode until user closes it, if provided app will run without GUI for specified duration and then exit
+                  --config=<file>       Path to config file (XML)
+                  --output=<file>       Path to output file for simulation results (TXT or CSV)
+                  --log=<true/false>    Enable or disable logging (overrides config file settings)
+                  --cfm=<model_id>      Car following model to use (overrides config file settings), e.g. 'idm'
+                  --lcm=<model_id>      Lane changing model to use (overrides config file settings), e.g. 'mobil'
+                  --map=<file>          Path to map file (XML) to load, if not provided default map from config will be used, if also not provided in config app will start without map (when gui is enabled) or exit (when gui is disabled)
+                """);
+
+        String laneChangingModelsPackage = "models.laneChangingModels";
+        String carFollowingModelsPackage = "models.carFollowingModels";
+        ArrayList<ModelNameAndId> laneChangingModelsCellular = getAllModels(laneChangingModelsPackage, Constants.CELLULAR);
+        ArrayList<ModelNameAndId> carFollowingModelsCellular = getAllModels(carFollowingModelsPackage, Constants.CELLULAR);
+        ArrayList<ModelNameAndId> laneChangingModelsContinuous = getAllModels(laneChangingModelsPackage, Constants.CONTINUOUS);
+        ArrayList<ModelNameAndId> carFollowingModelsContinuous = getAllModels(carFollowingModelsPackage, Constants.CONTINUOUS);
+
+        helpMessage.append("""
+
+                Available models can be used in input parameters to specify which model to use instead of default one from config file, e.g. --cfm=idm to use Intelligent Driver Model (idm is its id) as forward model and --lcm for lane changing models. If these parameters arent specified stock form config will be used. Types of forward and lane change model MUST match. Below you can see now available models (name - id).\s
+                """);
+
+        helpMessage.append("\nAvailable cellular forward models:\n");
+        for (ModelNameAndId model : carFollowingModelsCellular) {
+            helpMessage.append("  ").append(model.name).append(" - ").append(model.id).append("\n");
+        }
+
+        helpMessage.append("\nAvailable continuous forward models:\n");
+        for (ModelNameAndId model : carFollowingModelsContinuous) {
+            helpMessage.append("  ").append(model.name).append(" - ").append(model.id).append("\n");
+        }
+
+        helpMessage.append("\nAvailable cellular lane changing models:\n");
+        for (ModelNameAndId model : laneChangingModelsCellular) {
+            helpMessage.append("  ").append(model.name).append(" - ").append(model.id).append("\n");
+        }
+
+        helpMessage.append("\nAvailable continuous lane changing models:\n");
+        for (ModelNameAndId model : laneChangingModelsContinuous) {
+            helpMessage.append("  ").append(model.name).append(" - ").append(model.id).append("\n");
+        }
+
+        System.out.println(helpMessage);
+    }
+
+    /**
+     * Method to get all available car following / lane changing models, e.g. for showing them in help message or for
+     * validating input parameters, etc. Gets them of one type (cellular/continuous) Uses reflexion.
+     *
+     * @param packageName package to search for models, e.g. "models.carFollowingModels" or "models.laneChangingModels"
+     * @param type type of models to search for, e.g. "cellular" or "continuous", this is determined by getType() method
+     * @return list of all available car following cellular model ids and names (values of ModelId annotation) in the
+     *          application
+     **/
+    public static ArrayList<ModelNameAndId> getAllModels(String packageName, String type) {
+        ArrayList<ModelNameAndId> modelIds = new ArrayList<>();
+
+        try {
+            // get all classes in the package, this method uses reflection to find all classes in the specified package
+            List<Class<?>> classes = ConfigLoader.getClasses(packageName);
+
+            for (Class<?> clazz : classes) {
+                // check if class implements ICarFollowingModel and has ModelId annotation, if yes, create instance of
+                // the model and check if its type is cellular (using getType() method from ICarFollowingModel interface)
+                if (ICarFollowingModel.class.isAssignableFrom(clazz) && clazz.isAnnotationPresent(ModelId.class)) {
+
+                    // create new instance of the model to call getType() method, this is needed because we need to
+                    // check if the model is cellular or not
+                    ICarFollowingModel model = (ICarFollowingModel) clazz.getDeclaredConstructor().newInstance();
+
+                    // if the model is cellular, get its id and name and add it to the list of model ids to return
+                    if (type.equals(model.getType())) {
+                        ModelNameAndId modelInfo = new ModelNameAndId();
+
+                        // get value of ModelId annotation for the model, this is the id that can be used in input
+                        // parameters to specify the model, e.g. "idm" for "Intelligent Driver Model"
+                        modelInfo.id = model.getID();
+                        modelInfo.name = model.getName();
+
+                        modelIds.add(modelInfo);
+                    }
+                } else if (ILaneChangingModel.class.isAssignableFrom(clazz) && clazz.isAnnotationPresent(ModelId.class)) {
+
+                    // create new instance of the model to call getType() method, this is needed because we need to
+                    // check if the model is cellular or not
+                    ILaneChangingModel model = (ILaneChangingModel) clazz.getDeclaredConstructor().newInstance();
+
+                    // if the model is cellular, get its id and name and add it to the list of model ids to return
+                    if (type.equals(model.getType())) {
+                        ModelNameAndId modelInfo = new ModelNameAndId();
+
+                        // get value of ModelId annotation for the model, this is the id that can be used in input
+                        // parameters to specify the model, e.g. "mobil" for "Minimizing Overall Braking Induced by Lane changes" model
+                        modelInfo.id = model.getID();
+                        modelInfo.name = model.getName();
+
+                        modelIds.add(modelInfo);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            MyLogger.logLoadingOrSimulationStartEnd("Error searching for cellular models: " + e.getMessage(), Constants.FATAL_FOR_LOGGING);
+        }
+
+        return modelIds;
+    }
 
     /**
      * Method to get specific parameter from input parameters, e.g. duration, config file path, output file path, etc.
@@ -283,6 +398,21 @@ public class InputParametersHandeler {
         }
         MyLogger.logLoadingOrSimulationStartEnd("Map file provided: " + mapFile, Constants.INFO_FOR_LOGGING);
         return mapFile;
+    }
+
+    /**************************************
+     * Helper class to store model name and id for showing available models in help message, etc.
+     *
+     * @author Michael Hladky
+     * @version 1.0
+     **************************************/
+    public static class ModelNameAndId {
+
+        /** Model name for showing in help message, e.g. "Intelligent Driver Model" for "idm" car following model **/
+        public String name;
+
+        /** Model id for showing in help message, e.g. "idm" for "Intelligent Driver Model" car following model **/
+        public String id;
     }
 
 

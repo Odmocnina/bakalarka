@@ -26,7 +26,7 @@ public class MobilSimple implements ILaneChangingModel {
      **/
     @Override
     public String getID() {
-        return "mobil";
+        return "mobil-simple";
     }
 
     /*
@@ -193,7 +193,7 @@ public class MobilSimple implements ILaneChangingModel {
      **/
     @Override
     public String getName() {
-        return "MOBIL";
+        return "MOBIL (simple version)";
     }
 
     /**

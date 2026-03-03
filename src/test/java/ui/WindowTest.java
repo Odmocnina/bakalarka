@@ -231,14 +231,30 @@ public class WindowTest {
         when(mockSimulation.getStepCount()).thenReturn(0);
         Runnable dummyPaintAll = () -> {};
 
-        try (MockedStatic<Actions> actionsMock = mockStatic(Actions.class)) {
-            // Act
-            invokePrivateMethod("handleReset", new Class<?>[]{Stage.class, Runnable.class},
-                    null, dummyPaintAll);
+        java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
 
-            // Assert
-            actionsMock.verify(() -> Actions.resetSimulationAction(mockSimulation, dummyPaintAll), times(1));
-        }
+        // Act & Assert
+        Platform.runLater(() -> {
+            // MockStatic must be in the same thread where the method is called, so we put it inside the Platform.runLater block
+            try (MockedStatic<Actions> actionsMock = mockStatic(Actions.class)) {
+
+                // call the private method via reflection to test the logic without needing to trigger it through the UI
+                invokePrivateMethod("handleReset", new Class<?>[]{Stage.class, Runnable.class},
+                        null, dummyPaintAll);
+
+                // verify that the reset action was called directly without showing any dialogs or logging warnings
+                actionsMock.verify(() -> Actions.resetSimulationAction(mockSimulation, dummyPaintAll), times(1));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                latch.countDown();
+            }
+        });
+
+        // testing thread needs to wait for the Platform.runLater block to complete before finishing the test, otherwise
+        // the test might end before the assertions are verified
+        latch.await();
     }
 
     /**

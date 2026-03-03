@@ -25,6 +25,12 @@ public class Main {
 
         // get input parameters from command line arguments
 
+        String help = InputParametersHandeler.getSpecificParameter(args, Constants.HELP_PARAMETER_PREFIX);
+        if (help != null) {
+            InputParametersHandeler.handleHelp();
+            return;
+        }
+
         String durationArgument = InputParametersHandeler.getSpecificParameter(args, Constants.DURATION_PARAMETER_PREFIX);
         int duration = InputParametersHandeler.getDurationFromParameter(durationArgument);
         if (duration == Constants.INVALID_INPUT_PARAMETERS) {

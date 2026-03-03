@@ -74,26 +74,32 @@ public class MobilTest {
     }
 
     /**
-     * test to verify that changeLaneIfDesired without direction parameter currently defaults to STRAIGHT
-     * (as implemented in the current code version)
+     * Test to verify that changeLaneIfDesired (without explicit direction)
+     * evaluates LEFT and RIGHT, and returns STRAIGHT if neither lane change is beneficial
      **/
     @Test
-    void changeLaneIfDesired_NoDirection_ShouldReturnStraight() {
-        // We supply dummy values to prevent NullPointerException from HashMap
+    void changeLaneIfDesired_NoDirection_ShouldEvaluateBothAndReturnStraight() {
         HashMap<String, Double> params = new HashMap<>();
+
+        // Set up parameters such that neither lane change is advantageous enough to overcome the threshold and politeness penalty
         params.put(RequestConstants.EDGE_VALUE_FOR_LANE_CHANGE_REQUEST, 0.2);
         params.put(RequestConstants.POLITENESS_FACTOR_REQUEST, 0.5);
         params.put(RequestConstants.NOW_ACCELERATION_REQUEST, 1.0);
-        params.put(RequestConstants.NOW_ACCELERATION_LEFT_BACKWARD_REQUEST, 1.0);
-        params.put(RequestConstants.NOW_ACCELERATION_RIGHT_BACKWARD_REQUEST, 1.0);
-        params.put(RequestConstants.NOW_ACCELERATION_STRAIGHT_BACKWARD_REQUEST, 1.0);
         params.put(RequestConstants.THEORETICAL_ACCELERATION_REQUEST, 1.0);
-        params.put(RequestConstants.THEORETICAL_ACCELERATION_LEFT_BACKWARD_REQUEST, 1.0);
-        params.put(RequestConstants.THEORETICAL_ACCELERATION_RIGHT_BACKWARD_REQUEST, 1.0);
+
+        params.put(RequestConstants.NOW_ACCELERATION_STRAIGHT_BACKWARD_REQUEST, 1.0);
         params.put(RequestConstants.THEORETICAL_ACCELERATION_STRAIGHT_BACKWARD_REQUEST, 1.0);
 
+        params.put(RequestConstants.NOW_ACCELERATION_LEFT_BACKWARD_REQUEST, 1.0);
+        params.put(RequestConstants.THEORETICAL_ACCELERATION_LEFT_BACKWARD_REQUEST, 1.0);
+        params.put(RequestConstants.DECELERATION_COMFORT_LEFT_BACKWARD_REQUEST, 2.0);
+
+        params.put(RequestConstants.NOW_ACCELERATION_RIGHT_BACKWARD_REQUEST, 1.0);
+        params.put(RequestConstants.THEORETICAL_ACCELERATION_RIGHT_BACKWARD_REQUEST, 1.0);
+        params.put(RequestConstants.DECELERATION_COMFORT_RIGHT_BACKWARD_REQUEST, 2.0); // Dříve chybělo!
+
         Direction decision = mobilModel.changeLaneIfDesired(params);
-        assertEquals(Direction.STRAIGHT, decision, "Current implementation should return STRAIGHT");
+        assertEquals(Direction.STRAIGHT, decision, "Method should evaluate left and right, and return STRAIGHT if neither is desired");
     }
 
     /**

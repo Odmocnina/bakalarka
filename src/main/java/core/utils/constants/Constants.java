@@ -66,6 +66,7 @@ public class Constants {
     public static final String LANE_CHANGING_MODEL_PARAMETER_PREFIX = "--lcm=";
     public static final String LOGGING_PARAMETER_PREFIX = "--log=";
     public static final String MAP_FILE_PARAMETER_PREFIX = "--map=";
+    public static final String HELP_PARAMETER_PREFIX = "--help";
 
     // state of logging in input parameters
     public static final int LOGGING_ON_FROM_INPUT_PARAMETERS = 1;
