@@ -19,7 +19,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -47,7 +50,7 @@ public class ConfigLoader {
      * @param filePath path to the configuration file
      * @return true if the file was set successfully, false otherwise
      **/
-    public static boolean giveConfigFile(String filePath) {
+    /*public static boolean giveConfigFile(String filePath) {
         try {
             configFile = new File(filePath);
         } catch (NullPointerException e) {
@@ -56,6 +59,59 @@ public class ConfigLoader {
             configFile = new File(Constants.DEFAULT_CONFIG_FILE);
             if (!configFile.exists()) {
                 MyLogger.logLoadingOrSimulationStartEnd("Default config file not found, exiting"
+                        , Constants.FATAL_FOR_LOGGING);
+                return false;
+            }
+        }
+
+        return true;
+    }*/
+
+    /**
+     * method to set the configuration file path.
+     * If a custom file is provided but missing, it fails.
+     * If the default file is missing, it attempts to extract it from the JAR.
+     *
+     * @param filePath path to the configuration file
+     * @return true if the file was set successfully, false otherwise
+     **/
+    public static boolean giveConfigFile(String filePath) {
+        // if no file path provided, use default config file
+        if (filePath == null) {
+            filePath = Constants.DEFAULT_CONFIG_FILE;
+        }
+
+        configFile = new File(filePath);
+
+        // if file does not exist, check if it's the default config file and try to extract it from the JAR
+        if (!configFile.exists()) {
+
+            // check if the missing file is the default config file, if so, try to extract it from the JAR, if not, fail
+            if (filePath.equals(Constants.DEFAULT_CONFIG_FILE)) {
+                MyLogger.logLoadingOrSimulationStartEnd("Default config file not found on disk, attempting to extract from JAR..."
+                        , Constants.INFO_FOR_LOGGING);
+
+                // try to extract the default config file from the JAR resources
+                try (InputStream in = ConfigLoader.class.getResourceAsStream("/" + Constants.DEFAULT_CONFIG_FILE)) {
+                    if (in == null) {
+                        MyLogger.logLoadingOrSimulationStartEnd("Default config file not found inside JAR either, exiting"
+                                , Constants.FATAL_FOR_LOGGING);
+                        return false;
+                    }
+
+                    Files.copy(in, configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    MyLogger.logLoadingOrSimulationStartEnd("Successfully extracted default config to: " + configFile.getAbsolutePath()
+                            , Constants.INFO_FOR_LOGGING);
+                    return true;
+
+                } catch (Exception e) {
+                    MyLogger.logLoadingOrSimulationStartEnd("Failed to extract default config: " + e.getMessage()
+                            , Constants.FATAL_FOR_LOGGING);
+                    return false;
+                }
+            } else {
+                // user provided a custom config file path, but it does not exist, fail
+                MyLogger.logLoadingOrSimulationStartEnd("Provided config file does not exist: " + filePath + ", exiting"
                         , Constants.FATAL_FOR_LOGGING);
                 return false;
             }
@@ -276,41 +332,13 @@ public class ConfigLoader {
 
     /**
      * function to get all classes in a package, used for reflection to find the model class with the matching id
-     * annotation
-     *
-     * @param packageName the name of the package to get classes from
-     * @return list of classes in the package
-     * @throws ClassNotFoundException if a class in the package cannot be found
-     * @throws IOException if there is an error reading from the package resources
-     */
-   /* public static List<Class<?>> getClasses(String packageName) throws ClassNotFoundException, IOException {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        assert classLoader != null;
-        String path = packageName.replace('.', '/');
-        Enumeration<URL> resources = classLoader.getResources(path);
-        List<File> dirs = new ArrayList<>();
-
-        while (resources.hasMoreElements()) {
-            URL resource = resources.nextElement();
-            dirs.add(new File(resource.getFile()));
-        }
-
-        ArrayList<Class<?>> classes = new ArrayList<>();
-        for (File directory : dirs) {
-            classes.addAll(findClasses(directory, packageName));
-        }
-        return classes;
-    }*/
-
-    /**
-     * function to get all classes in a package, used for reflection to find the model class with the matching id
      * annotation. Handles both standard file directories and JAR files.
      *
      * @param packageName the name of the package to get classes from
      * @return list of classes in the package
      * @throws ClassNotFoundException if a class in the package cannot be found
      * @throws IOException if there is an error reading from the package resources
-     */
+     **/
     public static List<Class<?>> getClasses(String packageName) throws ClassNotFoundException, IOException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         assert classLoader != null;
@@ -322,11 +350,9 @@ public class ConfigLoader {
         while (resources.hasMoreElements()) {
             URL resource = resources.nextElement();
 
-            // Kontrola, jestli čteme ze složky na disku (IDE) nebo z JAR archivu
-            if (resource.getProtocol().equals("file")) {
+            if (resource.getProtocol().equals("file")) {     // if reading from file directory (IDE)
                 classes.addAll(findClasses(new File(resource.getFile()), packageName));
-            } else if (resource.getProtocol().equals("jar")) {
-                // Čtení z JARu
+            } else if (resource.getProtocol().equals("jar")) { // if reading from JAR file (compiled from jar)
                 JarURLConnection connection = (JarURLConnection) resource.openConnection();
                 try (JarFile jarFile = connection.getJarFile()) {
                     Enumeration<JarEntry> entries = jarFile.entries();
@@ -334,7 +360,7 @@ public class ConfigLoader {
                         JarEntry entry = entries.nextElement();
                         String entryName = entry.getName();
 
-                        // Hledáme pouze .class soubory v našem konkrétním balíčku
+                        // look for class files in the specified package
                         if (entryName.startsWith(path) && entryName.endsWith(".class") && !entry.isDirectory()) {
                             String className = entryName.replace('/', '.').substring(0, entryName.length() - 6);
                             classes.add(Class.forName(className));
@@ -343,6 +369,7 @@ public class ConfigLoader {
                 }
             }
         }
+
         return classes;
     }
 
