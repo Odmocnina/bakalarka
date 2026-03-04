@@ -45,29 +45,6 @@ public class ConfigLoader {
     private static File configFile;
 
     /**
-     * method to set the configuration file path, if null or invalid, defaults to Constants.CONFIG_FILE
-     *
-     * @param filePath path to the configuration file
-     * @return true if the file was set successfully, false otherwise
-     **/
-    /*public static boolean giveConfigFile(String filePath) {
-        try {
-            configFile = new File(filePath);
-        } catch (NullPointerException e) {
-            MyLogger.logLoadingOrSimulationStartEnd("Config file not found, loading default config"
-                    , Constants.ERROR_FOR_LOGGING);
-            configFile = new File(Constants.DEFAULT_CONFIG_FILE);
-            if (!configFile.exists()) {
-                MyLogger.logLoadingOrSimulationStartEnd("Default config file not found, exiting"
-                        , Constants.FATAL_FOR_LOGGING);
-                return false;
-            }
-        }
-
-        return true;
-    }*/
-
-    /**
      * method to set the configuration file path.
      * If a custom file is provided but missing, it fails.
      * If the default file is missing, it attempts to extract it from the JAR.
