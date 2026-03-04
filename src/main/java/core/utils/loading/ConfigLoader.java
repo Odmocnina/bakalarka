@@ -99,6 +99,16 @@ public class ConfigLoader {
                         return false;
                     }
 
+                    // create the config directory if it does not exist, to ensure we can extract the default config file there
+                    File parentDir = configFile.getParentFile();
+                    if (parentDir != null && !parentDir.exists()) {
+                        if (!parentDir.mkdirs()) { //creates mkdir folder
+                            MyLogger.logLoadingOrSimulationStartEnd("Failed to create config directory for default config file, exiting"
+                                    , Constants.FATAL_FOR_LOGGING);
+                            return false;
+                        }
+                    }
+
                     Files.copy(in, configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     MyLogger.logLoadingOrSimulationStartEnd("Successfully extracted default config to: " + configFile.getAbsolutePath()
                             , Constants.INFO_FOR_LOGGING);
