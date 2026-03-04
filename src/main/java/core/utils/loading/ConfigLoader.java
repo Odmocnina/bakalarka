@@ -9,6 +9,9 @@ import core.utils.constants.Constants;
 import models.ICarFollowingModel;
 import models.ILaneChangingModel;
 import models.ModelId;
+import ui.render.CellularRoadRenderer;
+import ui.render.ContinuousRoadRenderer;
+import ui.render.IRoadRenderer;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -23,9 +26,9 @@ import java.util.Enumeration;
 import java.util.List;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import ui.render.CellularRoadRenderer;
-import ui.render.ContinuousRoadRenderer;
-import ui.render.IRoadRenderer;
+import java.net.JarURLConnection;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /***********************************
  * Class for loading configuration from XML file and road files
@@ -280,7 +283,7 @@ public class ConfigLoader {
      * @throws ClassNotFoundException if a class in the package cannot be found
      * @throws IOException if there is an error reading from the package resources
      */
-    public static List<Class<?>> getClasses(String packageName) throws ClassNotFoundException, IOException {
+   /* public static List<Class<?>> getClasses(String packageName) throws ClassNotFoundException, IOException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         assert classLoader != null;
         String path = packageName.replace('.', '/');
@@ -295,6 +298,50 @@ public class ConfigLoader {
         ArrayList<Class<?>> classes = new ArrayList<>();
         for (File directory : dirs) {
             classes.addAll(findClasses(directory, packageName));
+        }
+        return classes;
+    }*/
+
+    /**
+     * function to get all classes in a package, used for reflection to find the model class with the matching id
+     * annotation. Handles both standard file directories and JAR files.
+     *
+     * @param packageName the name of the package to get classes from
+     * @return list of classes in the package
+     * @throws ClassNotFoundException if a class in the package cannot be found
+     * @throws IOException if there is an error reading from the package resources
+     */
+    public static List<Class<?>> getClasses(String packageName) throws ClassNotFoundException, IOException {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        assert classLoader != null;
+        String path = packageName.replace('.', '/');
+        Enumeration<URL> resources = classLoader.getResources(path);
+
+        ArrayList<Class<?>> classes = new ArrayList<>();
+
+        while (resources.hasMoreElements()) {
+            URL resource = resources.nextElement();
+
+            // Kontrola, jestli čteme ze složky na disku (IDE) nebo z JAR archivu
+            if (resource.getProtocol().equals("file")) {
+                classes.addAll(findClasses(new File(resource.getFile()), packageName));
+            } else if (resource.getProtocol().equals("jar")) {
+                // Čtení z JARu
+                JarURLConnection connection = (JarURLConnection) resource.openConnection();
+                try (JarFile jarFile = connection.getJarFile()) {
+                    Enumeration<JarEntry> entries = jarFile.entries();
+                    while (entries.hasMoreElements()) {
+                        JarEntry entry = entries.nextElement();
+                        String entryName = entry.getName();
+
+                        // Hledáme pouze .class soubory v našem konkrétním balíčku
+                        if (entryName.startsWith(path) && entryName.endsWith(".class") && !entry.isDirectory()) {
+                            String className = entryName.replace('/', '.').substring(0, entryName.length() - 6);
+                            classes.add(Class.forName(className));
+                        }
+                    }
+                }
+            }
         }
         return classes;
     }
