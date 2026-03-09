@@ -14,6 +14,7 @@ import javafx.collections.ObservableList;
 import core.sim.Simulation;
 
 import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -63,6 +64,10 @@ public class Window extends Application {
 
     /** menu item for start/stop in menu **/
     private MenuItem menuStartStopItem;
+
+
+    /** boolean property for map loaded toggle button and menu item (if they are disabled when no map is loaded) **/
+    private BooleanProperty mapNotLoadedProp;
 
     /** boolean property for lane change ban toggle button and menu item, used for keeping toggle button and menu item
      * in sync **/
@@ -116,6 +121,8 @@ public class Window extends Application {
         // VBox to hold scrollbar and controls at the bottom
         VBox bottomLayout = new VBox(hScroll, infoLabel);
 
+        this.mapNotLoadedProp = new SimpleBooleanProperty(!AppContext.RUN_DETAILS.mapLoaded);
+
         // part that repaints all roads
         Runnable paintAll = () -> {
             GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -125,7 +132,10 @@ public class Window extends Application {
             String infoString = "Forward model used: " + AppContext.CAR_FOLLOWING_MODEL.getName() +
                     " | lane changing model used: " + AppContext.LANE_CHANGING_MODEL.getName() + " | time steps: " +
                     simulation.getStepCount() + " | Opened map file: " + AppContext.RUN_DETAILS.mapFile;
-            Platform.runLater(() -> infoLabel.setText(infoString));
+            Platform.runLater(() -> {
+                infoLabel.setText(infoString);
+                mapNotLoadedProp.set(!AppContext.RUN_DETAILS.mapLoaded);
+            });
 
             if (roads == null || roads.length == 0) {
                 if (AppContext.RUN_DETAILS.mapLoaded) { // log error only if map was loaded, otherwise it is expected that there are no roads
@@ -216,7 +226,9 @@ public class Window extends Application {
         canvasPane.setOnMouseClicked(event -> {
             // get roads
             Road[] roads = simulation.getRoads();
-            if (roads == null || roads.length == 0) return;
+            if (roads == null || roads.length == 0) {
+                return;
+            }
 
             // get y position with scroll offset
             double absoluteY = event.getY() + vScroll.getValue();
@@ -767,6 +779,18 @@ public class Window extends Application {
         setOutputFileNameBtn.setOnAction(e -> Actions.setOutputFileAction());
         setCsvSeparatorBtn.setOnAction(e -> Actions.setCsvSeparatorAction(primaryStage));
 
+        Object[] disabledButtons = {
+                editMapFileBtn,
+                saveMapFileBtn,
+                saveAsMapFileBtn,
+                toolbarStartStopBtn,
+                nextStepBtn,
+                resetBtn,
+                exportResultsToTxtBtn,
+                exportToCsvBtn};
+
+        this.bindDisabledButtons(disabledButtons);
+
         return new ToolBar(
                 newMapFileBtn,
                 editMapFileBtn,
@@ -887,6 +911,13 @@ public class Window extends Application {
         return menuBar;
     }
 
+    /**
+     * helper method to create map file menu with items for creating, opening, saving and modifying map files
+     *
+     * @param primaryStage primary stage for file choosers
+     * @param paintAll runnable to repaint all roads after actions that change the simulation
+     * @return Menu with items for creating, opening, saving and modifying map files
+     **/
     private Menu createMapFileMenu(Stage primaryStage, Runnable paintAll) {
         MenuItem itemNewFile = new MenuItem("New map file", createMenuIcon("/icons/newMapFile.png"));
         MenuItem itemEditFile = new MenuItem("Modify current map file", createMenuIcon("/icons/editMapFile.png"));
@@ -899,6 +930,9 @@ public class Window extends Application {
         itemOpenFile.setOnAction(e -> this.handleOpenNewMap(primaryStage, paintAll));
         itemSaveFile.setOnAction(e -> Actions.saveMapAction(this.simulation));
         itemSaveAsFile.setOnAction(e -> Actions.saveMapAsAction(this.simulation, primaryStage));
+
+        Object[] bindItems = {itemEditFile, itemSaveFile, itemSaveAsFile};
+        this.bindDisabledButtons(bindItems);
 
         Menu fileMenu = new Menu("Map file");
         fileMenu.getItems().addAll(
@@ -936,6 +970,9 @@ public class Window extends Application {
         nextStepItem.setOnAction(e -> this.handleNextStep(primaryStage, paintAll));
         resetSimulationItem.setOnAction(e -> handleReset(primaryStage, paintAll));
         setTimeBetweenStepsItem.setOnAction(e -> Actions.setTimeBetweenStepsAction(primaryStage, engine));
+
+        Object[] disabledItems = {menuStartStopItem, nextStepItem, resetSimulationItem};
+        this.bindDisabledButtons(disabledItems);
 
         simulationMenu.getItems().addAll(
                 menuStartStopItem,
@@ -975,6 +1012,9 @@ public class Window extends Application {
         setCsvSeparator.setOnAction(e -> Actions.setCsvSeparatorAction(primaryStage));
         exportResultsItem.setOnAction(e -> this.handleExportResults(primaryStage, Constants.RESULTS_OUTPUT_TXT));
         exportToCSVItem.setOnAction(e -> this.handleExportResults(primaryStage, Constants.RESULTS_OUTPUT_CSV));
+
+        Object[] disabledItems = {exportResultsItem, exportToCSVItem};
+        this.bindDisabledButtons(disabledItems);
 
         outputMenu.getItems().addAll(
                 exportResultsItem,
@@ -1091,6 +1131,27 @@ public class Window extends Application {
             simulation.setRunning(false);
             setButtonImage("/icons/run.png", toolbarStartStopBtn);
             setButtonImage("/icons/run.png", menuStartStopItem);
+        }
+    }
+
+    /**
+     * helper method to set buttons and menu items disabled or enabled by binding their disable property to a
+     * BooleanProperty, used to disable buttons when no map is loaded and enable them when a map is loaded
+     *
+     * @param items array of buttons and menu items to set disabled/enabled
+     **/
+    private void bindDisabledButtons(Object[] items) {
+        for (Object item : items) {
+            if (item instanceof Node) {
+                // for buttons and toggle buttons, which are Nodes
+                ((Node) item).disableProperty().bind(this.mapNotLoadedProp);
+            } else if (item instanceof MenuItem) {
+                ((MenuItem) item).disableProperty().bind(this.mapNotLoadedProp);
+            } else if (item != null) {
+                // log warning if we get an unsupported type, but only if item is not null (null can be used as a
+                // placeholder to skip certain parameters)
+                MyLogger.log("Unsupported type for setDisabled: " + item.getClass().getName(), Constants.WARN_FOR_LOGGING);
+            }
         }
     }
 

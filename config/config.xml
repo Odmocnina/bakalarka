@@ -17,7 +17,7 @@
         <debug>false</debug>
         <preventCollision>false</preventCollision>
         <timeBetweenSteps>100</timeBetweenSteps>
-        <seed>semenoNaKozy</seed>
+        <seed>linkin park</seed>
         <drawCells>true</drawCells>
         <logging>
             <log>true</log>
@@ -30,7 +30,7 @@
         <output>
             <writeOutput>true</writeOutput>
             <file>output/helly.txt</file>
-            <type>txt</type>
+            <type>csv</type>
             <csvSeparator>;</csvSeparator>
             <whatToWrite>
                 <simulationDetails>true</simulationDetails>
@@ -41,8 +41,8 @@
                 <laneChangesCount>true</laneChangesCount>
                 <averageLaneQueueLength>true</averageLaneQueueLength>
                 <detailedLaneQueueLength>true</detailedLaneQueueLength>
-                <detailedLightPlans>false</detailedLightPlans>
-                <exportDetailedToSeparateFiles>false</exportDetailedToSeparateFiles>
+                <detailedLightPlans>true</detailedLightPlans>
+                <exportDetailedToSeparateFiles>true</exportDetailedToSeparateFiles>
                 <collisionCount>true</collisionCount>
                 <roadDetails>true</roadDetails>
             </whatToWrite>

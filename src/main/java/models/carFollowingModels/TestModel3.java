@@ -7,8 +7,8 @@ import models.ModelId;
 
 import java.util.HashMap;
 
-@ModelId("test-model-2")
-public class TestModel2 implements ICarFollowingModel {
+@ModelId("test-model-3")
+public class TestModel3 implements ICarFollowingModel {
 
     /** type of the model **/
     private final String type;
@@ -16,7 +16,7 @@ public class TestModel2 implements ICarFollowingModel {
     /**
      * constructor for test model
      **/
-    public TestModel2() {
+    public TestModel3() {
         this.type = Constants.CONTINUOUS;
     }
 
@@ -27,7 +27,7 @@ public class TestModel2 implements ICarFollowingModel {
 
     @Override
     public String getID() {
-        return "test-model-2";
+        return "test-model-3";
     }
 
 

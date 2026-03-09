@@ -256,6 +256,7 @@ public class Actions {
         }
         MyLogger.log("Resetting simulation...", Constants.INFO_FOR_LOGGING);
         simulation.resetSimulationWithSameRoads();
+        RandomNumberGenerator.getInstance(0).resetSeed();
         paintAll.run();
     }
 }

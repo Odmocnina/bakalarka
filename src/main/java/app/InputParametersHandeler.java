@@ -24,7 +24,7 @@ public class InputParametersHandeler {
      **/
     public static void handleHelp() {
         StringBuilder helpMessage = new StringBuilder("""
-                Usage: java -jar traffic-simulation.jar [options]
+                Usage: java -jar trafficSim-1.0.0.jar [options]
                 Options:
                   --help                Show this help message and exit
                   --dur=<seconds>       Set duration of simulation in seconds (steps in simulation), if not provided app will run in GUI mode until user closes it, if provided app will run without GUI for specified duration and then exit
