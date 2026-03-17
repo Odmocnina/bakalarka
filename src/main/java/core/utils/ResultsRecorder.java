@@ -192,6 +192,7 @@ public class ResultsRecorder {
                 BufferedWriter bw = getBufferedWriter(fw);
                 bw.close();
                 fw.close();
+                decideToWriteDetailedExport();
             } catch (Exception e) {
                 MyLogger.log("Error writing results to file: " + e.getMessage(), Constants.ERROR_FOR_LOGGING);
             }
@@ -386,19 +387,11 @@ public class ResultsRecorder {
         if (outputDetails.writePart(ConfigConstants.AVERAGE_LANE_QUEUE_LENGTH_TAG)) {
             this.writeAverageLaneQueueLength(bw);
         }
-        if (outputDetails.writePart(ConfigConstants.DETAILED_LANE_QUEUE_LENGTH_TAG)) {
-            if (outputDetails.writePart(ConfigConstants.EXPORT_DETAILED_TO_SEPARATE_FILES_TAG)) {
-                this.processDetailedLaneQueueOutputSeparateFiles(outputDetails, AppContext.SIMULATION.getStepCount());
-            } else {
-                this.processDetailedLaneQueueOutput(outputDetails, AppContext.SIMULATION.getStepCount());
-            }
+        if (outputDetails.writePart(ConfigConstants.AVERAGE_LANE_QUEUE_LAST_RED_LENGTH_TAG)) {
+            this.writeAverageLaneQueueLengthOnLastRed(bw);
         }
-        if (outputDetails.writePart(ConfigConstants.DETAILED_LIGHT_PLANS_TAG)) {
-            if (outputDetails.writePart(ConfigConstants.EXPORT_DETAILED_TO_SEPARATE_FILES_TAG)) {
-                this.processLightPlanOfAllRoadsSeparateFiles(outputDetails, AppContext.SIMULATION.getStepCount());
-            } else {
-                this.processLightPlanOfAllRoads(outputDetails, AppContext.SIMULATION.getStepCount());
-            }
+        if (outputDetails.writePart(ConfigConstants.MAX_LANE_QUEUE_LENGTH_TAG)) {
+            this.writeMaxSizeOfLaneQueue(bw);
         }
         if (outputDetails.writePart(ConfigConstants.COLLISION_COUNT_TAG)) {
             this.writeCollisionsCount(bw);
@@ -446,6 +439,48 @@ public class ResultsRecorder {
     }
 
     /**
+     * writes the average lane queue length on the last red step results to the BufferedWriter, it iterates through the
+     * stoppedCarsOnRoadRecord array and writes the average lane queue length on the last red step for each road, as well
+     * as the overall average lane queue length on the last red step across all roads.
+     *
+     * @param bw The BufferedWriter to write to.
+     * @throws IOException If an I/O error occurs.
+     **/
+    private void writeAverageLaneQueueLengthOnLastRed(BufferedWriter bw) throws IOException {
+        bw.write("=== Average Last Red Step Queue Length ===\n");
+        double totalAverageLastRedStepQueueLength = 0.0;
+        int counter = 0;
+        for (int i = 0; i < stoppedCarsOnRoadRecord.length; i++) {
+            double averageLastRedStepQueueLength = getAverageLaneQueueLengthOnLastRed(i);
+            bw.write("Road " + i + ": Average Last Red Step Queue Length: " + averageLastRedStepQueueLength + "\n");
+            totalAverageLastRedStepQueueLength += averageLastRedStepQueueLength;
+            counter++;
+        }
+        bw.write("Overall Average Last Red Step Queue Length: " + (totalAverageLastRedStepQueueLength / (double) counter) + "\n\n");
+    }
+
+    /**
+     * writes the maximum lane queue length results to the BufferedWriter, it iterates through the stoppedCarsOnRoadRecord
+     * array and writes the maximum lane queue length for each road, as well as the overall average maximum lane queue
+     * length across all roads.
+     *
+     * @param bw The BufferedWriter to write to.
+     * @throws IOException If an I/O error occurs.
+     **/
+    private void writeMaxSizeOfLaneQueue(BufferedWriter bw) throws IOException {
+        bw.write("=== Max Queue Length ===\n");
+        int totalMaxQueueLength = 0;
+        int counter = 0;
+        for (int i = 0; i < stoppedCarsOnRoadRecord.length; i++) {
+            int maxQueueLength = getMaxSizeOfLaneQueue(i);
+            bw.write("Road " + i + ": Max Queue Length: " + maxQueueLength + "\n");
+            totalMaxQueueLength += maxQueueLength;
+            counter++;
+        }
+        bw.write("Overall Average Max Queue Length: " + (totalMaxQueueLength / (double) counter) + "\n\n");
+    }
+
+    /**
      * writes the recorded results in CSV format to the BufferedWriter. It checks the output details settings and writes
      * the corresponding sections to the BufferedWriter in CSV format.
      *
@@ -472,6 +507,12 @@ public class ResultsRecorder {
         }
         if (outputDetails.writePart(ConfigConstants.AVERAGE_LANE_QUEUE_LENGTH_TAG)) {
             header = header + "Average Lane Queue Length" + csvSeparator;
+        }
+        if (outputDetails.writePart(ConfigConstants.AVERAGE_LANE_QUEUE_LAST_RED_LENGTH_TAG)) {
+            header = header + "Average Last Red Step Queue Length" + csvSeparator;
+        }
+        if (outputDetails.writePart(ConfigConstants.MAX_LANE_QUEUE_LENGTH_TAG)) {
+            header = header + "Max Lane Queue Length" + csvSeparator;
         }
         if (outputDetails.writePart(ConfigConstants.COLLISION_COUNT_TAG)) {
             header = header + "Collisions Count" + csvSeparator;
@@ -504,6 +545,14 @@ public class ResultsRecorder {
                 double averageQueueLength = getAverageLaneQueueLength(i);
                 bw.write(averageQueueLength + csvSeparator);
             }
+            if (outputDetails.writePart(ConfigConstants.AVERAGE_LANE_QUEUE_LAST_RED_LENGTH_TAG)) {
+                double averageLastRedStepQueueLength = getAverageLaneQueueLengthOnLastRed(i);
+                bw.write(averageLastRedStepQueueLength + csvSeparator);
+            }
+            if (outputDetails.writePart(ConfigConstants.MAX_LANE_QUEUE_LENGTH_TAG)) {
+                int maxQueueLength = getMaxSizeOfLaneQueue(i);
+                bw.write(maxQueueLength + csvSeparator);
+            }
             if (outputDetails.writePart(ConfigConstants.COLLISION_COUNT_TAG)) {
                 bw.write(this.collisionsCount[i] + csvSeparator);
             }
@@ -517,6 +566,29 @@ public class ResultsRecorder {
     }
 
     /**
+     * decides whether to write detailed lane queue length and light plan outputs based on the output details settings, it
+     * checks if the detailed lane queue length and light plan outputs are enabled in the output details and calls the
+     * corresponding methods to process and write the outputs either to separate files or to the main output file.
+     **/
+    private void decideToWriteDetailedExport() {
+        OutputDetails outputDetails = AppContext.RUN_DETAILS.outputDetails;
+        if (outputDetails.writePart(ConfigConstants.DETAILED_LANE_QUEUE_LENGTH_TAG)) {
+            if (outputDetails.writePart(ConfigConstants.EXPORT_DETAILED_TO_SEPARATE_FILES_TAG)) {
+                this.processDetailedLaneQueueOutputSeparateFiles(outputDetails, AppContext.SIMULATION.getStepCount());
+            } else {
+                this.processDetailedLaneQueueOutput(outputDetails, AppContext.SIMULATION.getStepCount());
+            }
+        }
+        if (outputDetails.writePart(ConfigConstants.DETAILED_LIGHT_PLANS_TAG)) {
+            if (outputDetails.writePart(ConfigConstants.EXPORT_DETAILED_TO_SEPARATE_FILES_TAG)) {
+                this.processLightPlanOfAllRoadsSeparateFiles(outputDetails, AppContext.SIMULATION.getStepCount());
+            } else {
+                this.processLightPlanOfAllRoads(outputDetails, AppContext.SIMULATION.getStepCount());
+            }
+        }
+    }
+
+    /**
      * Retrieves the average lane queue length for a specific road.
      *
      * @param roadIndex The index of the road to retrieve the average lane queue length for.
@@ -525,6 +597,28 @@ public class ResultsRecorder {
     private double getAverageLaneQueueLength(int roadIndex) {
         StoppedCarsOnRoadRecord record = stoppedCarsOnRoadRecord[roadIndex];
         return record.getAverageStoppedCars();
+    }
+
+    /**
+     * Retrieves the average lane queue length on the last red step for a specific road.
+     *
+     * @param roadIndex The index of the road to retrieve the average lane queue length on the last red step for.
+     * @return The average lane queue length on the last red step for the specified road.
+     **/
+    private double getAverageLaneQueueLengthOnLastRed(int roadIndex) {
+        StoppedCarsOnRoadRecord record = stoppedCarsOnRoadRecord[roadIndex];
+        return record.getAverageOnLastRedStepInLightPlan();
+    }
+
+    /**
+     * Retrieves the maximum lane queue length for a specific road.
+     *
+     * @param roadIndex The index of the road to retrieve the maximum lane queue length for.
+     * @return The maximum lane queue length for the specified road.
+     **/
+    private int getMaxSizeOfLaneQueue(int roadIndex) {
+        StoppedCarsOnRoadRecord record = stoppedCarsOnRoadRecord[roadIndex];
+        return record.getMaxQueueSize();
     }
 
     /**
@@ -1029,6 +1123,75 @@ public class ResultsRecorder {
             }
 
             return totalEntries > 0 ? (double) totalCount / totalEntries : 0.0;
+        }
+
+        /**
+         * Retrieves the maximum queue size of stopped cars at red lights across all lanes and time steps. It iterates
+         * through the stoppedCarsPerStep list and checks each entry for whether it was on red light, keeping track of
+         * the maximum count of stopped cars found for entries where onRed is true.
+         *
+         * @return The maximum queue size of stopped cars at red lights across all lanes and time steps. If there are no
+         *         entries with onRed true, it returns 0.
+         **/
+        public int getMaxQueueSize() {
+            int maxQueueSize = 0;
+
+            for (LinkedList<NumberOfStandingCars> laneList : stoppedCarsPerStep) {
+                for (NumberOfStandingCars entry : laneList) {
+                    if (entry.onRed && entry.count > maxQueueSize) {
+                        maxQueueSize = entry.count;
+                    }
+                }
+            }
+
+            return maxQueueSize;
+        }
+
+        /**
+         * Retrieves the average peak queue size of stopped cars during red light phases on lane.
+         * It iterates through the stoppedCarsPerStep list, tracking the maximum count of stopped cars
+         * for each contiguous red phase, and calculates the average of these peaks.
+         *
+         * @return The average peak queue size at red lights. If there are no red phases, returns 0.0.
+         **/
+        public double getAverageOnLastRedStepInLightPlan() {
+            int totalPeakCarsOnRed = 0;
+            int redPhasesCount = 0;
+
+            for (LinkedList<NumberOfStandingCars> laneList : stoppedCarsPerStep) {
+                int currentRedPhasePeak = 0;
+                boolean currentlyInRedPhase = false;
+
+                for (NumberOfStandingCars current : laneList) {
+                    if (current.onRed) {
+                        if (!currentlyInRedPhase) {
+                            // new red phase started, reset the peak counter for this phase
+                            currentlyInRedPhase = true;
+                            currentRedPhasePeak = 0;
+                        }
+                        // look for biggest number of stopped cars during the red phase
+                        if (current.count > currentRedPhasePeak) {
+                            currentRedPhasePeak = current.count;
+                        }
+                    } else {
+                        if (currentlyInRedPhase) {
+                            // red phase ended, add the peak of this phase to the total and increment the count of red phases
+                            totalPeakCarsOnRed += currentRedPhasePeak;
+                            redPhasesCount++;
+                            currentlyInRedPhase = false;
+                        }
+                    }
+                }
+
+                // check if we ended while still in red phase (in case the simulation ended during a red phase)
+                if (currentlyInRedPhase) {
+                    totalPeakCarsOnRed += currentRedPhasePeak;
+                    redPhasesCount++;
+                }
+            }
+
+            // block of zero division
+            return redPhasesCount > 0 ? (double) totalPeakCarsOnRed / redPhasesCount : 0.0;
         }
     }
 

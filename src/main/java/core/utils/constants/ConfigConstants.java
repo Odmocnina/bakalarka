@@ -48,6 +48,8 @@ public class ConfigConstants {
     public static final String WHEN_WAS_ROAD_EMPTY_TAG = "whenWasRoadEmpty";
     public static final String LANE_CHANGES_COUNT_TAG = "laneChangesCount";
     public static final String AVERAGE_LANE_QUEUE_LENGTH_TAG = "averageLaneQueueLength";
+    public static final String AVERAGE_LANE_QUEUE_LAST_RED_LENGTH_TAG = "averageLaneQueueLastRedLength";
+    public static final String MAX_LANE_QUEUE_LENGTH_TAG = "maxLaneQueueLength";
     public static final String DETAILED_LANE_QUEUE_LENGTH_TAG = "detailedLaneQueueLength";
     public static final String DETAILED_LIGHT_PLANS_TAG = "detailedLightPlans";
     public static final String EXPORT_DETAILED_TO_SEPARATE_FILES_TAG = "exportDetailedToSeparateFiles";

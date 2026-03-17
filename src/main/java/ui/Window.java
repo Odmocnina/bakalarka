@@ -834,6 +834,10 @@ public class Window extends Application {
                 whatToExportPropsMap.getOrDefault(ConfigConstants.LANE_CHANGES_COUNT_TAG, new SimpleBooleanProperty(false)));
         CheckMenuItem laneQueueLengthItem = createBoundMenuItem("Average lane queue length", null,
                 whatToExportPropsMap.getOrDefault(ConfigConstants.AVERAGE_LANE_QUEUE_LENGTH_TAG, new SimpleBooleanProperty(false)));
+        CheckMenuItem laneQueueLengthLastRedItem = createBoundMenuItem("Lane queue length at last red light", null,
+                whatToExportPropsMap.getOrDefault(ConfigConstants.AVERAGE_LANE_QUEUE_LAST_RED_LENGTH_TAG, new SimpleBooleanProperty(false)));
+        CheckMenuItem laneQueueLengthMaxItem = createBoundMenuItem("Max lane queue length", null,
+                whatToExportPropsMap.getOrDefault(ConfigConstants.MAX_LANE_QUEUE_LENGTH_TAG, new SimpleBooleanProperty(false)));
         CheckMenuItem detailedLaneQueueLengthItem = createBoundMenuItem("Detailed lane queue length", null,
                 whatToExportPropsMap.getOrDefault(ConfigConstants.DETAILED_LANE_QUEUE_LENGTH_TAG, new SimpleBooleanProperty(false)));
         CheckMenuItem detailedLightPlanItem = createBoundMenuItem("Detailed light plan", null,
@@ -853,6 +857,8 @@ public class Window extends Application {
                 whenWasRoadEmptyItem,
                 laneChangeCount,
                 laneQueueLengthItem,
+                laneQueueLengthLastRedItem,
+                laneQueueLengthMaxItem,
                 detailedLaneQueueLengthItem,
                 detailedLightPlanItem,
                 detailedExportToSeparateFilesItem,

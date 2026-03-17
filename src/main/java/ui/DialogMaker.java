@@ -48,8 +48,13 @@ public class DialogMaker {
      **/
     protected static boolean editLightPlanDialog(Stage stage, LightPlan lightPlan, int lane) {
         Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Edit light plan on lane: " + lane);
-        dialog.setHeaderText("Edit the light plan on lane: " + lane);
+        if (lane > 0) {
+            dialog.setTitle("Edit light plan on lane: " + lane);
+            dialog.setHeaderText("Edit the light plan on lane: " + lane);
+        } else {
+            dialog.setTitle("Edit light plan on all lanes");
+            dialog.setHeaderText("Edit the light plan on all lanes");
+        }
         dialog.initOwner(stage);
 
         ButtonType applyButtonType = new ButtonType("Apply", ButtonBar.ButtonData.OK_DONE);
@@ -80,23 +85,35 @@ public class DialogMaker {
 
         dialog.getDialogPane().setContent(grid);
 
-        Optional<ButtonType> result = dialog.showAndWait();
+        final Button applyButton = (Button) dialog.getDialogPane().lookupButton(applyButtonType);
 
-        if (result.isPresent() && result.get() == applyButtonType) {
+        applyButton.addEventFilter(ActionEvent.ACTION, event -> {
+            // update the light plan with the new values from the dialog
             lightPlan.setCycleTime(cycleTimeSpinner.getValue());
             lightPlan.setTimeOfSwitch(switchTimeSpinner.getValue());
             lightPlan.setBeginsOnGreen(beginOnGreenBox.isSelected());
-            if (lightPlan.isLegitimate()) {
-                MyLogger.log("Light plan updated via dialog.", Constants.INFO_FOR_LOGGING);
-                return true; // Changes applied
-            } else {
+
+            // validate the light plan, if not valid show warning and do not close the dialog
+            if (!lightPlan.isLegitimate()) {
                 MyLogger.log("Light plan is not legitimate after dialog update.", Constants.ERROR_FOR_LOGGING);
-                warningDialog(stage, "The light plan is not legitimate! Make sure that the switch time is less than the cycle time.");
-                return false; // Invalid logic, treating as cancelled for safety, or you could keep loop
+                warningDialog(stage, "The light plan is not legitimate! If light plan begins on green then " +
+                        "switch time has to be less or equal to cycle time. If begins on red then switch time has to " +
+                        "be less than cycle time. Please fix the light plan parameters.");
+
+                // kill event, do not close dialog
+                event.consume();
+            } else {
+                MyLogger.log("Light plan updated via dialog.", Constants.INFO_FOR_LOGGING);
             }
+        });
+
+        Optional<ButtonType> result = dialog.showAndWait();
+
+        if (result.isPresent() && result.get() == applyButtonType) {
+            return true;
         } else {
             MyLogger.log("Light plan dialog cancelled.", Constants.INFO_FOR_LOGGING);
-            return false; // Cancelled
+            return false; // cancelled or closed without applying
         }
     }
 
@@ -123,8 +140,13 @@ public class DialogMaker {
      **/
     protected static void editGeneratorDialog(Stage stage, CarGenerator generator, int lane) {
         Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Edit car generator on lane: " + lane);
-        dialog.setHeaderText("Edit the car generator parameters ona lane: " + lane);
+        if (lane > 0) {
+            dialog.setTitle("Edit car generator on lane: " + lane);
+            dialog.setHeaderText("Edit the car generator parameters ona lane: " + lane);
+        } else {
+            dialog.setTitle("Edit car generator on all lanes");
+            dialog.setHeaderText("Edit the car generator parameters on all lanes");
+        }
         dialog.initOwner(stage);
 
         ButtonType applyButtonType = new ButtonType("Apply", ButtonBar.ButtonData.OK_DONE);

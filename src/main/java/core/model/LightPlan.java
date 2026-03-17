@@ -20,12 +20,18 @@ public class LightPlan {
     /** current state of the light, true if green **/
     private boolean isGreen;
 
+    /** whether the light is always green, used for roads without light **/
+    private boolean isAlwaysGreen;
+
     /** constructor for light plan **/
     public LightPlan(int cycleTime, int timeOfSwitch, boolean beginsOnGreen) {
         this.cycleTime = cycleTime;
         this.timeOfSwitch = timeOfSwitch;
         this.beginsOnGreen = beginsOnGreen;
         this.isGreen = beginsOnGreen;
+        if (this.cycleTime == this.timeOfSwitch && beginsOnGreen) {
+            this.isAlwaysGreen = true;
+        }
     }
 
     /**
@@ -34,6 +40,9 @@ public class LightPlan {
      * @param currentTime current time in the simulation
      */
     public void tryToSwitchLight(int currentTime) {
+        if (isAlwaysGreen) {
+            return;
+        }
         if (currentTime % timeOfSwitch == 0) {
             isGreen = !isGreen;
         } else if (currentTime % cycleTime == 0) {
@@ -47,6 +56,9 @@ public class LightPlan {
      * @return boolean whether the light plan is legitimate
      */
     public boolean isLegitimate() {
+        if (this.beginsOnGreen) {
+            return timeOfSwitch <= cycleTime;
+        }
         return timeOfSwitch < cycleTime;
     }
 
@@ -56,6 +68,9 @@ public class LightPlan {
      * @return boolean whether the light is green
      */
     public boolean isGreen() {
+        if (isAlwaysGreen) { // wierd hack but im don't want to ravel in this shit
+            return true;
+        }
         return isGreen;
     }
 

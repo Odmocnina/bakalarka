@@ -12,12 +12,11 @@
 
     <runDetails>
         <drawCells>false</drawCells>
-        <laneChange>false</laneChange>
+        <laneChange>true</laneChange>
         <timeStep>1</timeStep>
         <debug>false</debug>
         <preventCollision>false</preventCollision>
         <timeBetweenSteps>100</timeBetweenSteps>
-        <seed>linkin park</seed>
         <drawCells>true</drawCells>
         <logging>
             <log>true</log>
@@ -40,9 +39,11 @@
                 <whenWasRoadEmpty>true</whenWasRoadEmpty>
                 <laneChangesCount>true</laneChangesCount>
                 <averageLaneQueueLength>true</averageLaneQueueLength>
+                <averageLaneQueueLastRedLength>true</averageLaneQueueLastRedLength>
+                <maxLaneQueueLength>true</maxLaneQueueLength>
                 <detailedLaneQueueLength>true</detailedLaneQueueLength>
-                <detailedLightPlans>true</detailedLightPlans>
-                <exportDetailedToSeparateFiles>true</exportDetailedToSeparateFiles>
+                <detailedLightPlans>false</detailedLightPlans>
+                <exportDetailedToSeparateFiles>false</exportDetailedToSeparateFiles>
                 <collisionCount>true</collisionCount>
                 <roadDetails>true</roadDetails>
             </whatToWrite>

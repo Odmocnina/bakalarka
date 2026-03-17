@@ -517,8 +517,8 @@ public abstract class Road {
     protected void countStoppedCars() {
         for (int i = 0; i < numberOfLanes; i++) {
             int numberOfStandingCars = countStoppedCarsInLane(i);
-            boolean isGreen = this.lightPlansOnLanes[i].isGreen();
-            ResultsRecorder.getResultsRecorder().recordNumberOfStoppedCars(numberOfStandingCars, isGreen, this.id, i);
+            boolean isGreen = this.lightPlansOnLanes[i].isGreen();             // this was quite hidden
+            ResultsRecorder.getResultsRecorder().recordNumberOfStoppedCars(numberOfStandingCars, !isGreen, this.id, i);
         }
     }
 
