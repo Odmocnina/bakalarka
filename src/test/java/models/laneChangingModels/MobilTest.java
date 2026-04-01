@@ -119,6 +119,8 @@ public class MobilTest {
         params.put(RequestConstants.NOW_ACCELERATION_REQUEST, 1.0);
         params.put(RequestConstants.NOW_ACCELERATION_STRAIGHT_BACKWARD_REQUEST, 1.0);
         params.put(RequestConstants.THEORETICAL_ACCELERATION_STRAIGHT_BACKWARD_REQUEST, 1.0);
+        params.put(RequestConstants.NOW_ACCELERATION_LEFT_BACKWARD_REQUEST, 1.0);
+        params.put(RequestConstants.THEORETICAL_ACCELERATION_LEFT_BACKWARD_REQUEST, 1.0);
 
         Direction decision = mobilModel.changeLaneIfDesired(params, Direction.LEFT);
 

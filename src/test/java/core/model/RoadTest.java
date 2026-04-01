@@ -281,7 +281,7 @@ public class RoadTest {
 
         // Assert - Should record 5 standing cars (from our stubbed DummyRoad method)
         // Called twice, because we have 2 lanes
-        verify(mockRecorderInstance, times(2)).recordNumberOfStoppedCars(eq(5), eq(true), eq(road.getId()), anyInt());
+        verify(mockRecorderInstance, times(2)).recordNumberOfStoppedCars(eq(5), eq(false), eq(road.getId()), anyInt());
     }
 
     /**

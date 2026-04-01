@@ -12,12 +12,13 @@
 
     <runDetails>
         <drawCells>false</drawCells>
-        <laneChange>true</laneChange>
+        <laneChange>false</laneChange>
         <timeStep>1</timeStep>
         <debug>false</debug>
         <preventCollision>false</preventCollision>
         <timeBetweenSteps>100</timeBetweenSteps>
         <drawCells>true</drawCells>
+        <seed>92712587</seed>
         <logging>
             <log>true</log>
             <info>true</info>
@@ -28,20 +29,20 @@
         </logging>
         <output>
             <writeOutput>true</writeOutput>
-            <file>output/helly.txt</file>
-            <type>csv</type>
+            <file>output/output.txt</file>
+            <type>txt</type>
             <csvSeparator>;</csvSeparator>
             <whatToWrite>
                 <simulationDetails>true</simulationDetails>
-                <simulationTime>true</simulationTime>
-                <carsPassed>true</carsPassed>
-                <carsOnRoad>true</carsOnRoad>
+                <simulationTime>false</simulationTime>
+                <carsPassed>false</carsPassed>
+                <carsOnRoad>false</carsOnRoad>
                 <whenWasRoadEmpty>true</whenWasRoadEmpty>
                 <laneChangesCount>true</laneChangesCount>
                 <averageLaneQueueLength>true</averageLaneQueueLength>
                 <averageLaneQueueLastRedLength>true</averageLaneQueueLastRedLength>
                 <maxLaneQueueLength>true</maxLaneQueueLength>
-                <detailedLaneQueueLength>true</detailedLaneQueueLength>
+                <detailedLaneQueueLength>false</detailedLaneQueueLength>
                 <detailedLightPlans>false</detailedLightPlans>
                 <exportDetailedToSeparateFiles>false</exportDetailedToSeparateFiles>
                 <collisionCount>true</collisionCount>

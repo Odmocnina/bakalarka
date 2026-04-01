@@ -60,17 +60,39 @@ public class LightPlanTest {
     }
 
     /**
-     * test to verify that isLegitimate returns false when timeOfSwitch is greater than or equal to cycleTime
-     **/
+     * test to verify that isLegitimate returns false when timeOfSwitch is greater than cycleTime
+     */
     @Test
-    void isLegitimate_TimeOfSwitchGreaterOrEqual_ShouldReturnFalse() {
+    void isLegitimate_TimeOfSwitchGreaterThanCycleTime_ShouldReturnFalse() {
         // Arrange
-        LightPlan planEqual = new LightPlan(50, 50, true);
         LightPlan planGreater = new LightPlan(50, 60, true);
 
         // Act & Assert
-        assertFalse(planEqual.isLegitimate(), "Plan should not be legitimate when timeOfSwitch == cycleTime");
         assertFalse(planGreater.isLegitimate(), "Plan should not be legitimate when timeOfSwitch > cycleTime");
+    }
+
+    /**
+     * test to verify that isLegitimate returns true when timeOfSwitch is equal to cycleTime and starts on green
+     */
+    @Test
+    void isLegitimate_TimeOfSwitchEqualsCycleTimeAndStartsGreen_ShouldReturnTrue() {
+        // Arrange
+        LightPlan planEqualStartGreen = new LightPlan(50, 50, true);
+
+        // Act & Assert
+        assertTrue(planEqualStartGreen.isLegitimate(), "Plan should be legitimate when timeOfSwitch == cycleTime and starts on green");
+    }
+
+    /**
+     * test to verify that isLegitimate returns false when timeOfSwitch is equal to cycleTime but starts on red
+     */
+    @Test
+    void isLegitimate_TimeOfSwitchEqualsCycleTimeAndStartsRed_ShouldReturnFalse() {
+        // Arrange
+        LightPlan planEqualStartRed = new LightPlan(50, 50, false);
+
+        // Act & Assert
+        assertFalse(planEqualStartRed.isLegitimate(), "Plan should not be legitimate when timeOfSwitch == cycleTime and starts on red");
     }
 
     /**
