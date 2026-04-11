@@ -132,7 +132,7 @@ public class ModifyMapDialogMaker extends DialogMaker {
         grid.add(new Label("Length (m):"), 0, 0);
         grid.add(lengthField, 1, 0);
 
-        grid.add(new Label("Speed limit (km/h):"), 0, 1);
+        grid.add(new Label("Speed limit (m/s):"), 0, 1);
         grid.add(speedLimitField, 1, 1);
 
         grid.add(new Label("Number of lanes:"), 0, 2);

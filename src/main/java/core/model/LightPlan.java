@@ -40,13 +40,24 @@ public class LightPlan {
      * @param currentTime current time in the simulation
      */
     public void tryToSwitchLight(int currentTime) {
-        if (isAlwaysGreen) {
+        /*if (isAlwaysGreen) {
             return;
         }
         if (currentTime % timeOfSwitch == 0) {
             isGreen = !isGreen;
         } else if (currentTime % cycleTime == 0) {
             isGreen = beginsOnGreen;
+        }*/
+        if (isAlwaysGreen) {
+            return;
+        }
+
+        int timeInCycle = currentTime % cycleTime;
+
+        if (timeInCycle == 0) {
+            isGreen = beginsOnGreen;
+        } else if (timeInCycle == timeOfSwitch) {
+            isGreen = !beginsOnGreen;
         }
     }
 

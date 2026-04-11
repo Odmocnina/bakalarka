@@ -15,7 +15,7 @@
         <laneChange>false</laneChange>
         <timeStep>1</timeStep>
         <debug>false</debug>
-        <preventCollision>false</preventCollision>
+        <preventCollision>true</preventCollision>
         <timeBetweenSteps>100</timeBetweenSteps>
         <drawCells>true</drawCells>
         <seed>92712587</seed>
@@ -30,22 +30,22 @@
         <output>
             <writeOutput>true</writeOutput>
             <file>output/output.txt</file>
-            <type>txt</type>
+            <type>csv</type>
             <csvSeparator>;</csvSeparator>
             <whatToWrite>
-                <simulationDetails>true</simulationDetails>
+                <simulationDetails>false</simulationDetails>
                 <simulationTime>false</simulationTime>
-                <carsPassed>false</carsPassed>
-                <carsOnRoad>false</carsOnRoad>
-                <whenWasRoadEmpty>true</whenWasRoadEmpty>
+                <carsPassed>true</carsPassed>
+                <carsOnRoad>true</carsOnRoad>
+                <whenWasRoadEmpty>false</whenWasRoadEmpty>
                 <laneChangesCount>true</laneChangesCount>
                 <averageLaneQueueLength>true</averageLaneQueueLength>
                 <averageLaneQueueLastRedLength>true</averageLaneQueueLastRedLength>
                 <maxLaneQueueLength>true</maxLaneQueueLength>
-                <detailedLaneQueueLength>false</detailedLaneQueueLength>
+                <detailedLaneQueueLength>true</detailedLaneQueueLength>
                 <detailedLightPlans>false</detailedLightPlans>
                 <exportDetailedToSeparateFiles>false</exportDetailedToSeparateFiles>
-                <collisionCount>true</collisionCount>
+                <collisionCount>false</collisionCount>
                 <roadDetails>true</roadDetails>
             </whatToWrite>
         </output>

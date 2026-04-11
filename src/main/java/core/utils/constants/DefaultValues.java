@@ -22,10 +22,10 @@ public class DefaultValues {
     public static final double DEFAULT_DECELERATION_COMFORT_MIN = 2.0;
     public static final double DEFAULT_DESIRED_TIME_HEADWAY_MAX = 3.0;
     public static final double DEFAULT_DESIRED_TIME_HEADWAY_MIN = 1.0;
-    public static final double DEFAULT_SPEED_DIFFERENCE_SENSITIVITY_MAX = 0.5;
-    public static final double DEFAULT_SPEED_DIFFERENCE_SENSITIVITY_MIN = 0.5;
-    public static final double DEFAULT_DISTANCE_DIFFERENCE_SENSITIVITY_MAX = 2.2;
-    public static final double DEFAULT_DISTANCE_DIFFERENCE_SENSITIVITY_MIN = 1.5;
+    public static final double DEFAULT_SPEED_DIFFERENCE_SENSITIVITY_MAX = 1.0;
+    public static final double DEFAULT_SPEED_DIFFERENCE_SENSITIVITY_MIN = 0.0;
+    public static final double DEFAULT_DISTANCE_DIFFERENCE_SENSITIVITY_MAX = 1.0;
+    public static final double DEFAULT_DISTANCE_DIFFERENCE_SENSITIVITY_MIN = 0.0;
     public static final double DEFAULT_EDGE_VALUE_FOR_LANE_CHANGE_MAX = 0.3;
     public static final double DEFAULT_EDGE_VALUE_FOR_LANE_CHANGE_MIN = 0.1;
     public static final double POLITENESS_FACTOR_MIN = 0.0;

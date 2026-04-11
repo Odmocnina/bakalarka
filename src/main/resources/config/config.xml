@@ -17,7 +17,6 @@
         <debug>false</debug>
         <preventCollision>false</preventCollision>
         <timeBetweenSteps>100</timeBetweenSteps>
-        <seed>semenoNaKozy</seed>
         <drawCells>true</drawCells>
         <logging>
             <log>true</log>

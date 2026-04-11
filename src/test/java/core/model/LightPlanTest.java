@@ -99,17 +99,21 @@ public class LightPlanTest {
      * test to verify that tryToSwitchLight toggles the light when currentTime is a multiple of timeOfSwitch
      **/
     @Test
-    void tryToSwitchLight_MultipleOfTimeOfSwitch_ShouldToggleLight() {
-        // Arrange: starts on green (true)
+    void tryToSwitchLight_CycleLogic_ShouldSwitchAndResetCorrectly() {
+        // Arrange: starts on green (true), cycle = 100, switch at 20
         LightPlan plan = new LightPlan(100, 20, true);
 
-        // Act & Assert: step 20 (multiple of 20) -> should toggle to false
+        // Act & Assert: step 20 (reaches timeOfSwitch) -> should switch to false
         plan.tryToSwitchLight(20);
-        assertFalse(plan.isGreen(), "Light should toggle to red (false) at timeOfSwitch multiple");
+        assertFalse(plan.isGreen(), "Light should switch to red (false) at timeOfSwitch (20)");
 
-        // Act & Assert: step 40 (multiple of 20) -> should toggle back to true
+        // Act & Assert: step 40 (middle of the cycle) -> should STAY false
         plan.tryToSwitchLight(40);
-        assertTrue(plan.isGreen(), "Light should toggle to green (true) at next timeOfSwitch multiple");
+        assertFalse(plan.isGreen(), "Light should stay red (false) during the rest of the cycle");
+
+        // Act & Assert: step 100 (start of a new cycle) -> should reset back to true
+        plan.tryToSwitchLight(100);
+        assertTrue(plan.isGreen(), "Light should reset to green (true) at the start of a new cycle (100)");
     }
 
     /**
