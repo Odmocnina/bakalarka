@@ -444,9 +444,8 @@ public class ConfigLoader {
                         , Constants.INFO_FOR_LOGGING);
                 detailsFromConfig.timeStep = Double.parseDouble(timeStep.getTextContent());
             } else {
-                MyLogger.logLoadingOrSimulationStartEnd("Missing timeStep in run details, exiting"
-                        , Constants.FATAL_FOR_LOGGING);
-                return null;
+                MyLogger.logLoadingOrSimulationStartEnd("Missing time step in run details, defaulting to 1 second", Constants.WARN_FOR_LOGGING);
+                detailsFromConfig.timeStep = 1.0;
             }
 
             boolean hasOutput = loadOutput(detailsFromConfig, outputElements, outputFileFromParameter);
