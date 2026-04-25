@@ -50,7 +50,6 @@ class FVDMTest {
         double v = params.get(RequestConstants.CURRENT_SPEED_REQUEST);
         double vL = params.get(RequestConstants.CURRENT_SPEED_STRAIGHT_FORWARD_REQUEST);
 
-        // pokud je OVM_Different konkrétní třída, použij ji přímo:
         OVM_Different baseModel = new OVM_Different();
         FVDM fvdm = new FVDM();
 

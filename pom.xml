@@ -16,7 +16,6 @@
   </properties>
 
   <dependencies>
-    <!-- p��klad: Log4j 2 -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
@@ -28,7 +27,6 @@
       <version>2.24.1</version>
     </dependency>
 
-    <!-- Pokud JavaFX (voliteln�):-->
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
@@ -66,7 +64,6 @@
 
   <build>
     <plugins>
-      <!-- spouštění: mvn -q exec:java -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -76,7 +73,6 @@
         </configuration>
       </plugin>
 
-      <!-- vytvoření spustitelného JARu s Manifestem -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -90,7 +86,6 @@
         </configuration>
       </plugin>
 
-      <!-- JUnit 5 runner -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -100,7 +95,6 @@
         </configuration>
       </plugin>
 
-      <!-- fat-jar: mvn -q clean package -Pshade -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -123,7 +117,6 @@
     </plugins>
   </build>
 
-  <!-- profil pro fat-jar (aktivuj: -Pshade) -->
   <profiles>
     <profile>
       <id>shade</id>

@@ -40,7 +40,7 @@ public class Constants {
 
     public static final String RESULTS_OUTPUT_CSV = "csv";
     public static final String RESULTS_OUTPUT_TXT = "txt";
-    public static final String DEFAULT_OUTPUT_FILE = "output/output.txt";
+    public static final String DEFAULT_OUTPUT_FILE = "output.txt";
     public static final String DEFAULT_CSV_SEPARATOR = ";";
 
     public static final String newMapFileName = "newMap.xml";
