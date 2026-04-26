@@ -327,7 +327,7 @@ public class CarGenerator implements Cloneable {
     /**
      * function to generate multiple cars into a queue based on generator settings
      *
-     * @return @code{ Queue<CarParams>} queue of generated cars
+     * @return {@code Queue<CarParams>} queue of generated cars
      **/
     public Queue<CarParams> generateCarsInToQueue() {
         Queue<CarParams> queue = new java.util.LinkedList<>();
@@ -438,7 +438,7 @@ public class CarGenerator implements Cloneable {
 
     /** function to get all parameters in generator settings
      *
-     * @return @code{ HashMap<String, Parameter>} all parameters in generator settings
+     * @return {@code HashMap<String, Parameter>} all parameters in generator settings
      **/
     public HashMap<String, Parameter> getAllParameters() {
         return this.parameters;
@@ -599,7 +599,7 @@ public class CarGenerator implements Cloneable {
     /**
      * function to get all communication parameters (parameters used for communication with ui, user, map file...)
      *
-     * @return @code{ HashMap<String, Parameter>} all communication parameters
+     * @return {@code HashMap<String, Parameter>} all communication parameters
      **/
     public HashMap<String, Parameter> getAllComParameters() {
         return this.parametersForCommunication;
