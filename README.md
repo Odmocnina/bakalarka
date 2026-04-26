@@ -399,7 +399,8 @@ javac -cp <path_to_jar>/trafficSim-1.0.0.jar <path_to_model>/<ModelName>.java
 ```bash
 # For car-following models:
 mkdir models/carFollowingModels
-
+```
+```bash
 # For lane-changing models:
 mkdir models/laneChangingModels
 ```
