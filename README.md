@@ -167,7 +167,7 @@ After creation, the application asks whether to open the new map. Confirming loa
 - `flowRate` — corresponds to λ of the exponential distribution
 - Per-vehicle parameters: name, key (must be unique), min/max values
 
-  > ⚠️ **Warning:** The generator must include all parameters required by the active models, otherwise the map cannot be saved or edited.
+  > ⚠️ **Warning:** The generator must include all parameters required by the active models, otherwise the map cannot be saved or edited. Also when starting app generators must include all parameters required for vehicle generation by the active models, otherwise the app will not start.
 
 **Saving:**
 - **Save As** — save to a new file
@@ -375,10 +375,12 @@ public class Test implements ICarFollowingModel {
             + RequestConstants.FORWARD;
         double moveForward = parameters.get(forwardKey);
         if (moveForward == Constants.NO_CAR_THERE) return moveCurrent;
-        return moveCurrent - moveForward / 2;
+        return moveCurrent - moveForward / 2; 
     }
 }
 ```
+
+> ⚠️ **Warning:** When starting the application/creating a map, it is necessary that the map with which the application is to be launched/the map that is to be created must contain all the necessary parameters of models in all generators (for example, in the example above, the generators must have the parameter move). When using added models, either create new maps with the necessary parameters, or edit existing maps (when using the GUI application, it is necessary to first run the application with the model whose parameters the map has, edit it, and save the changes).
 
 #### Deploying a custom model
 
