@@ -23,8 +23,14 @@ public class Rickert implements ILaneChangingModel {
     /** chance to change lane if the model decides to change lane, used to add some randomness to the model **/
     private double chance = 0.9;
 
+    /** random number generator instance for adding randomness to the model, initialized in the constructor with the
+     *  seed set in the RandomNumberGenerator singleton **/
     private RandomNumberGenerator randomNumberGenerator;
 
+    /**
+     * default constructor, initializes the random number generator instance with the seed set in the
+     * RandomNumberGenerator singleton
+     **/
     public Rickert() {
         this.randomNumberGenerator = RandomNumberGenerator.getInstance(0); // the seed set here is not relevant,
         // as the seed should be already set in the RandomNumberGenerator singleton before creating the model

@@ -647,6 +647,8 @@ public class ResultsRecorder {
     /**
      * sets the output type for writing results, it updates the outputType variable with the given value (e.g., "txt" or
      * "csv").
+     *
+     * @param outputType The output type to set for writing results (e.g., "txt" or "csv").
      **/
     public void setOutputType(String outputType) {
         this.outputType = outputType;
@@ -690,6 +692,7 @@ public class ResultsRecorder {
      * current step count of the simulation.
      *
      * @param roadIndex The index of the road that was empty.
+     * @param stepCount The current step count of the simulation when the road was empty.
      **/
     public void recordRoadEmpty(int roadIndex, int stepCount) {
         if (whenWasRoadEmpty != null && roadIndex >= 0 && roadIndex < whenWasRoadEmpty.length) {

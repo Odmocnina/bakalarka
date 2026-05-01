@@ -113,6 +113,7 @@ public class RoadLoader {
      * method to load a single road from the specified file path
      *
      * @param roadElement XML Element containing road configuration
+     * @param index index of the road being loaded, used for logging and setting road ID
      * @return loaded Road object, or null if loading failed
      **/
     public static Road loadRoad(Element roadElement, int index) {
