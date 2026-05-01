@@ -23,7 +23,13 @@ public class LightPlan {
     /** whether the light is always green, used for roads without light **/
     private boolean isAlwaysGreen;
 
-    /** constructor for light plan **/
+    /**
+     * constructor for light plan
+     *
+     * @param cycleTime cycle time of the traffic light
+     * @param timeOfSwitch time of switch from green to red and vice versa
+     * @param beginsOnGreen whether the light begins on green or red
+     **/
     public LightPlan(int cycleTime, int timeOfSwitch, boolean beginsOnGreen) {
         this.cycleTime = cycleTime;
         this.timeOfSwitch = timeOfSwitch;

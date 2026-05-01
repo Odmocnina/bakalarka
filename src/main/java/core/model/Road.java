@@ -53,6 +53,7 @@ public abstract class Road {
      * @param numberOfLanes number of lanes on road
      * @param speedLimit speed limit on road
      * @param type type of road
+     * @param id id of road
      **/
     public Road(double length, int numberOfLanes, double speedLimit, String type, int id) {
         this.length = length;
@@ -380,6 +381,7 @@ public abstract class Road {
     /**
      * setter for road generator
      *
+     * @param lane lane to set generator on
      * @param generator car generator
      **/
     public void setRoadGenerator(int lane, CarGenerator generator) {

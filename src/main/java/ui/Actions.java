@@ -70,6 +70,7 @@ public class Actions {
      * method for toggling collision ban, which changes the configuration and then repaints the map to reflect the
      * change
      *
+     * @param simulation the simulation to be checked for roads before repainting the map
      * @param paintAll the function to repaint the map after toggling the collision ban
      **/
     public static void collisionBanAction(Simulation simulation, Runnable paintAll) {
@@ -84,6 +85,7 @@ public class Actions {
     /**
      * method for saving the current map file, which saves the map file and then logs the action
      *
+     * @param simulation the simulation to be checked for roads before saving the map file
      * @param primaryStage the primary stage of the application, used for showing file chooser and dialogs
      **/
     public static void saveMapAsAction(Simulation simulation, Stage primaryStage) {
@@ -97,6 +99,8 @@ public class Actions {
 
     /**
      * method for saving the current map file, which saves the map file and then logs the action
+     *
+     * @param simulation the simulation to be checked for roads before saving the map file
      **/
     public static void saveMapAction(Simulation simulation) {
         if (simulation.getRoads() == null || simulation.getRoads().length == 0) {
@@ -111,6 +115,7 @@ public class Actions {
      * method for toggling lane change ban, which changes the configuration and then repaints the map to reflect the
      * change
      *
+     * @param simulation the simulation to be checked for roads before repainting the map
      * @param paintAll the function to repaint the map after toggling the lane change ban
      **/
     public static void changeLaneChangingAction(Simulation simulation, Runnable paintAll) {
@@ -136,6 +141,7 @@ public class Actions {
     /**
      * method for editing the map file, which opens the edit map dialog and then repaints the map to reflect the change
      *
+     * @param simulation the simulation to be checked for roads before editing the map file
      * @param primaryStage the primary stage of the application, used for showing file chooser and dialogs
      * @param paintAll the function to repaint the map after editing the map file
      **/
@@ -151,6 +157,8 @@ public class Actions {
 
     /**
      * method for exporting the results to txt file, which writes the results to txt file and then logs the action
+     *
+     * @param simulation the simulation to be checked for roads before exporting the results
      **/
     public static void exportResultsToTxtAction(Simulation simulation) {
         if (simulation.getRoads() == null || simulation.getRoads().length == 0) {
@@ -164,6 +172,8 @@ public class Actions {
 
     /**
      * method for exporting the results to csv file, which writes the results to csv file and then logs the action
+     *
+     * @param simulation the simulation to be checked for roads before exporting the results
      **/
     public static void exportResultsToCsvAction(Simulation simulation) {
         if (simulation.getRoads() == null || simulation.getRoads().length == 0) {

@@ -241,6 +241,7 @@ public class CarGenerator implements Cloneable {
      * function to add parameter to real parameters used for generation
      *
      * @param key parameter key
+     * @param name parameter name for display parameters
      * @param minValue minimum value
      * @param maxValue maximum value
      **/
@@ -578,6 +579,7 @@ public class CarGenerator implements Cloneable {
      * file...)
      *
      * @param key parameter key
+     * @param name parameter name for display purposes
      * @param minValue minimum value
      * @param maxValue maximum value
      **/
@@ -643,12 +645,12 @@ public class CarGenerator implements Cloneable {
         return this.maxQueueSize;
     }
 
-    /*
+    /**
      * setter for length return as one, if true, the length parameter will return 1 for cellular models, this is used
      * for cellular models that have length always as 1 like nagel-schreckenberg, or rule 184
      *
      * @param lengthReturnAsOne boolean whether length parameter should return 1 for cellular models
-     */
+     **/
     public void setLengthReturnAsOne(boolean lengthReturnAsOne) {
         this.lengthReturnAsOne = lengthReturnAsOne;
     }

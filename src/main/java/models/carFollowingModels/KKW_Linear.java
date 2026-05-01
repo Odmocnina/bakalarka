@@ -51,6 +51,9 @@ public class KKW_Linear implements ICarFollowingModel {
     /** random slowdown when car is moving **/
     private double randomSlowdownChance = 0.3; // random slowdown chance when moving
 
+    /**
+     * constructor, initializes random number generator
+     **/
     public KKW_Linear() {
         this.randomNumberGenerator = RandomNumberGenerator.getInstance(0); // the seed set here is not relevant
     }

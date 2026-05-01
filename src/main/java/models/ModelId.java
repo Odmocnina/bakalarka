@@ -15,6 +15,8 @@ public @interface ModelId {
 
     /**
      * ID of the car following model, used for identification when starting application
+     *
+     * @return String of the ID of the car following model/lane changing model
      **/
     String value();
 }

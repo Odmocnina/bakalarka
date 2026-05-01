@@ -49,6 +49,8 @@ public class OVM_Original implements ICarFollowingModel {
      * function to calculate optimal velocity based on distance to the next car
      *
      * @param distance distance to the next car
+     * @param maxSpeedRoad maximum speed allowed on the road
+     * @param minGap minimum gap to the next car
      * @return optimal velocity as double
      **/
     protected double optimalVelocity(double distance, double maxSpeedRoad, double minGap) {

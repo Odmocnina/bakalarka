@@ -26,6 +26,7 @@ public class NewMapDialogMaker extends DialogMaker {
      * show dialog to create a new map
      *
      * @param primaryStage owner stage
+     * @param paintAll function to repaint the map after creating the new map and opening it
      **/
     public static void newMapDialog(Stage primaryStage, Runnable paintAll) {
         // Create main dialog window

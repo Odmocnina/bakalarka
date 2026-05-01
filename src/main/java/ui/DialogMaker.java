@@ -45,6 +45,8 @@ public class DialogMaker {
      *
      * @param stage owner stage
      * @param lightPlan light plan to edit
+     * @param lane lane number for dialog title and header, if 0 or less, it means editing all lanes
+     * @return true if light plan was edited and applied, false if cancelled
      **/
     protected static boolean editLightPlanDialog(Stage stage, LightPlan lightPlan, int lane) {
         Dialog<ButtonType> dialog = new Dialog<>();
@@ -137,6 +139,7 @@ public class DialogMaker {
      *
      * @param stage owner stage
      * @param generator car generator to edit
+     * @param lane lane number for dialog title and header, if 0 or less, it means editing all lanes
      **/
     protected static void editGeneratorDialog(Stage stage, CarGenerator generator, int lane) {
         Dialog<ButtonType> dialog = new Dialog<>();
@@ -943,6 +946,7 @@ public class DialogMaker {
      * @param maxSpeed max speed
      * @param length length of road
      * @param lightPlan light plan for the road
+     * @param generators car generators for the road
      * @param roadParameters list of road parameters
      **/
     protected static void addRoadParameters(int numberOfLanes, double maxSpeed, double length,
@@ -965,6 +969,7 @@ public class DialogMaker {
      * @param maxSpeed max speed
      * @param length length of road
      * @param lightPlan light plan for the road
+     * @param generators car generators for the road
      * @param roadParameters list of road parameters
      **/
     protected static void changeRoadParameters(int index, int numberOfLanes, double maxSpeed, double length,
@@ -985,6 +990,7 @@ public class DialogMaker {
      * @param numberOfLanes number of lanes
      * @param maxSpeed max speed
      * @param length length of road
+     * @param generator car generators for the road
      * @param lightPlan light plan for the road
      * @return true if inputs are valid, false otherwise
      **/
@@ -1198,6 +1204,14 @@ public class DialogMaker {
         dialog.showAndWait();
     }
 
+    /**
+     * create warning text about resetting simulation state if simulation is already started, to be shown in dialogs
+     * that change road properties, since changing road properties resets the simulation state, so it's important to
+     * warn the user about it if they have already started the simulation
+     *
+     * @param grid grid pane to add the warning label to
+     * @param line line number to add the warning label on
+     **/
     protected static void createWaringTextIfNeeded(GridPane grid, int line) {
         if (AppContext.SIMULATION.getStepCount() > 0) {
             String warningMessage = "Warning: Changing the road properties will reset the simulation state (cars, their" +
@@ -1210,6 +1224,14 @@ public class DialogMaker {
         }
     }
 
+    /**
+     * confirmation dialog with custom title and message, returns true if user confirms, false if user cancels
+     *
+     * @param stage owner stage for the dialog
+     * @param title title of the dialog
+     * @param message header text of the dialog
+     * @return true if user confirms, false if user cancels
+     **/
     public static boolean confirmDialog(Stage stage, String title, String message) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(title);
@@ -1221,6 +1243,17 @@ public class DialogMaker {
         return result.isPresent() && result.get() == ButtonType.OK;
     }
 
+    /**
+     * confirmation dialog for unsaved changes with option to save, discard or cancel, returns true if user wants to
+     * proceed with the action (either by saving or discarding changes), false if user cancels
+     *
+     * @param stage owner stage for the dialog
+     * @param title title of the dialog
+     * @param header header text of the dialog
+     * @param message content text of the dialog
+     * @param action action that user is being asked to confirm (used for logging)
+     * @return true if user wants to proceed with the action (either by saving or discarding changes), false if user cancels
+     **/
     protected static boolean askIfUserWantToSaveMap(Stage stage, String title, String header, String message,
                                                   String action) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);

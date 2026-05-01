@@ -28,6 +28,7 @@ public class ContinuosRoad extends Road {
      * @param length length of the road
      * @param numberOfLanes number of lanes on the road
      * @param speedLimit speed limit on the road
+     * @param id ID of the road, used for recording results
      **/
     public ContinuosRoad(double length, int numberOfLanes, double speedLimit, int id) {
         super(length, numberOfLanes, speedLimit, Constants.CONTINUOUS, id);

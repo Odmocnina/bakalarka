@@ -110,6 +110,7 @@ public class ConfigLoader {
     /**
      * method to load what file is road file and how many roads to load from the configuration file
      *
+     * @param mapFileFromParameter the road file path provided in input parameters, if null or empty, will be loaded from config file
      * @return array of loaded roads, or null if loading failed
      **/
     public static Road[] loadRoads(String mapFileFromParameter) {
@@ -390,6 +391,14 @@ public class ConfigLoader {
     /**
      * Method to load the run details from the configuration file
      *
+     * @param duration the duration of the simulation provided in input parameters, if Constants.NO_DURATION_PROVIDED,
+     *                 will be loaded from config file
+     * @param outputFileFromParameter the output file name provided in input parameters, if null or empty, will be
+     *                                loaded from config file or defaulted to Constants.DEFAULT_OUTPUT_FILE
+     * @param logParameter the logging setting provided in input parameters, if
+     *                     Constants.LOGGING_OFF_FROM_INPUT_PARAMETERS or Constants.LOGGING_ON_FROM_INPUT_PARAMETERS,
+     *                     will override logging settings in config file, otherwise logging settings will be loaded from
+     *                     config file
      * @return loaded RunDetails object, or null if loading failed
      **/
     public static RunDetails loadRunDetails(int duration, String outputFileFromParameter, int logParameter) {

@@ -12,7 +12,7 @@ import javafx.scene.canvas.GraphicsContext;
  ***********************************/
 public interface IRoadRenderer {
 
-    /*
+    /**
      * draws the road on the given graphics context, dependent on the implementation of the renderer
      *
      * @param gc the graphics context to draw on
@@ -20,7 +20,7 @@ public interface IRoadRenderer {
      * @param width the width of the drawing area
      * @param height the height of the drawing area
      * @param laneWidth the width of a single lane
-     */
+     **/
     void draw(GraphicsContext gc, Road road, double width, double height, double laneWidth);
 
 }

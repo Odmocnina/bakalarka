@@ -50,6 +50,7 @@ public class CellularRoad extends Road {
      * @param numberOfLanes number of lanes on the road
      * @param speedLimit speed limit on the road in m/s
      * @param cellSize size of each cell in meters
+     * @param id unique identifier for the road
      **/
     public CellularRoad(double length, int numberOfLanes, double speedLimit, double cellSize, int id) {
         super(length, numberOfLanes, speedLimit, Constants.CELLULAR, id);

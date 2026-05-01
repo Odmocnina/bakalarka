@@ -1,7 +1,7 @@
 package core.model;
 
 /********************************************
- * Enum representing possible orientations for a car on ONE lane (forward or backward) JSI GEJ MUHAHAHAHAHHAHAHA
+ * Enum representing possible orientations for a car on ONE lane (forward or backward) JSI VOJTA MUHAHAHAHAHHAHAHA
  *
  * @author Michael Hladky
  * @version 1.0

@@ -24,6 +24,7 @@ public class Parameter {
     /**
      * constructor for parameter
      *
+     * @param name name of parameter for ui
      * @param minValue minimum value of parameter
      * @param maxValue maximum value of parameter
      */
